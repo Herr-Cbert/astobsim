@@ -10,4 +10,4 @@ Das Projekt dient ausserdem als Uebungsprojekt fuer die Entwicklung mit Claude C
 
 ## Stand
 
-Phase 0 (Geruest). Tech-Stack noch nicht entschieden, siehe `docs/adr/` sobald vorhanden.
+Phase 1 (Anforderungen) abgeschlossen, Ergebnis in [docs/anforderungen.md](docs/anforderungen.md). Naechster Schritt: Phase 2 (Recherche). Tech-Stack noch nicht entschieden, siehe `docs/adr/` sobald vorhanden.
