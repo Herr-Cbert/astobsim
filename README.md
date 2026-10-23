@@ -10,4 +10,14 @@ Das Projekt dient ausserdem als Uebungsprojekt fuer die Entwicklung mit Claude C
 
 ## Stand
 
-Phase 2 (Recherche) abgeschlossen, Ergebnis in [docs/recherche/](docs/recherche/README.md) (Uebersicht mit Antworten auf die offenen Fragen und Entscheidungen vor Phase 3). Anforderungen in [docs/anforderungen.md](docs/anforderungen.md). Naechster Schritt: Phase 3 (Architektur). Tech-Stack noch nicht entschieden, siehe `docs/adr/` sobald vorhanden.
+Phase 3 (Architektur) abgeschlossen. Stack: TypeScript, Vite, Vitest, Vanilla DOM mit Canvas und WebGL2 ([ADR-0001](docs/adr/0001-stack.md)); Simulationsmodell ([ADR-0002](docs/adr/0002-simulationsmodell.md)); Datenformat ([ADR-0003](docs/adr/0003-datenformat.md)). Modulschnitt in [docs/architektur.md](docs/architektur.md), Begriffe in [GLOSSARY.md](GLOSSARY.md). Der Wegwerf-Prototyp zur Faltung liegt auf dem Branch `prototyp-faltung`. Anforderungen in [docs/anforderungen.md](docs/anforderungen.md), Recherche in [docs/recherche/](docs/recherche/README.md). Naechster Schritt: Phase 4 (Zerlegung in Issues).
+
+## Entwicklung
+
+```
+source ~/.nvm/nvm.sh   # Node 22
+npm install
+npm run dev            # Dev-Server
+npm test               # Vitest
+npm run build          # nach dist/
+```

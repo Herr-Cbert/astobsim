@@ -1,6 +1,6 @@
 # Anforderungen astobsim
 
-Ergebnis von Phase 1 (Interview am 2026-10-23). Dieses Dokument ist der einzige Input fuer Phase 2 (Recherche) und die Referenz fuer alle Issues. Am 2026-10-23 nach Phase 2 angepasst (A-F2, A-F4, A-P6, A-D9, A-X1, A-X9), Begruendung in `docs/recherche/README.md`. Jede Anforderung hat eine Kennung, eine Stufe und einen pruefbaren Satz.
+Ergebnis von Phase 1 (Interview am 2026-10-23). Dieses Dokument ist der einzige Input fuer Phase 2 (Recherche) und die Referenz fuer alle Issues. Am 2026-10-23 nach Phase 2 angepasst (A-F2, A-F4, A-P6, A-D9, A-X1, A-X9) und nach Phase 3 (A-X5), Begruendung in `docs/recherche/README.md`. Jede Anforderung hat eine Kennung, eine Stufe und einen pruefbaren Satz.
 
 Stufen: **Muss** (Version 1 ist ohne sie nicht fertig), **Kann** (nach Version 1, wird als Issue angelegt, nicht umgesetzt), **Nicht-Ziel** (bewusst ausgeschlossen).
 
@@ -92,7 +92,7 @@ Kennungen: A-Z Zweck, A-F Fernrohr und Geraete, A-B Bedingungen, A-P Physik und 
 | A-X2 | Muss | Jupiter wird mit den vier Galileischen Monden gezeigt, Saturn mit Titan und Rhea, jeweils in einer festen typischen Stellung. Jeder Mond hat in der Objektdatei Position relativ zum Planeten (Bogensekunden), Winkeldurchmesser und Magnitude. |
 | A-X3 | Muss | Verwendet werden nur echte Aufnahmen (Raumsonden, Mosaike) mit einer Lizenz, die Weitergabe und Bearbeitung erlaubt. Kein Bild kommt ohne geklaerte Lizenz ins Repo. |
 | A-X4 | Muss | Jedes Bild ist in einer Datendatei mit Quelle, Lizenz, Winkelgroesse und ggf. Bearbeitung nachgewiesen. |
-| A-X5 | Muss | Die Quellaufloesung darf bei 300 mm Oeffnung und 0,5 Bogensekunden Seeing nicht der begrenzende Faktor sein (Quellaufloesung mindestens doppelt so fein wie die beste simulierte Aufloesung). Wie der Mond dafuer gespeichert wird (Kacheln, Stufen, Regionen), entscheidet Phase 3. |
+| A-X5 | Muss | Die Quellaufloesung darf bei 300 mm Oeffnung und 0,5 Bogensekunden Seeing nicht der begrenzende Faktor sein (Quellaufloesung mindestens doppelt so fein wie die beste simulierte Aufloesung). Ausnahme Mond in Version 1: das NASA-SVS-Rendering hat 0,643 Bogensekunden je Pixel, der Mond ist damit ab etwa 200 mm bei sehr gutem Seeing quellbegrenzt; der Hilfetext nennt das (Entscheidung 2026-10-23, ADR-0002). Speicherung als Kachelpyramide (ADR-0003). |
 | A-X6 | Muss | Erstladen der Seite unter 5 MB. Bilder werden pro Objekt nachgeladen, pro Objekt unter 20 MB. |
 | A-X7 | Kann | Vollmond und weitere Mondphasen. |
 | A-X8 | Kann | Datum und Ephemeriden fuer Phase, Libration, Winkelgroesse, Ringneigung, Mondstellungen. |
