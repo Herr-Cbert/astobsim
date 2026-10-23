@@ -1,0 +1,20 @@
+# Claude Code, lokal
+CLAUDE.local.md
+.claude/settings.local.json
+
+# Abhaengigkeiten und Build (Stack noch offen)
+node_modules/
+dist/
+build/
+.venv/
+__pycache__/
+*.pyc
+
+# Rohbilder werden nicht versioniert, nur die aufbereiteten
+data/roh/
+
+# Editor, System
+.vscode/
+.idea/
+*.swp
+.DS_Store
