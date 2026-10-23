@@ -1,6 +1,6 @@
 # Anforderungen astobsim
 
-Ergebnis von Phase 1 (Interview am 2026-10-23). Dieses Dokument ist der einzige Input fuer Phase 2 (Recherche) und die Referenz fuer alle Issues. Jede Anforderung hat eine Kennung, eine Stufe und einen pruefbaren Satz.
+Ergebnis von Phase 1 (Interview am 2026-10-23). Dieses Dokument ist der einzige Input fuer Phase 2 (Recherche) und die Referenz fuer alle Issues. Am 2026-10-23 nach Phase 2 angepasst (A-F2, A-F4, A-P6, A-D9, A-X1, A-X9), Begruendung in `docs/recherche/README.md`. Jede Anforderung hat eine Kennung, eine Stufe und einen pruefbaren Satz.
 
 Stufen: **Muss** (Version 1 ist ohne sie nicht fertig), **Kann** (nach Version 1, wird als Issue angelegt, nicht umgesetzt), **Nicht-Ziel** (bewusst ausgeschlossen).
 
@@ -26,9 +26,9 @@ Kennungen: A-Z Zweck, A-F Fernrohr und Geraete, A-B Bedingungen, A-P Physik und 
 | Kennung | Stufe | Anforderung |
 |---|---|---|
 | A-F1 | Muss | Ein Geraet wird beschrieben durch Oeffnung (mm), Brennweite (mm), Obstruktion (Prozent des Oeffnungsdurchmessers) und Bauart (Refraktor, Newton, Schmidt-Cassegrain, Maksutov). Die Bauart setzt einen Vorschlagswert fuer die Obstruktion. |
-| A-F2 | Muss | Das Geraet kann aus einer Liste gewaehlt oder frei eingegeben werden. Die Liste enthaelt herstellerneutrale Klassen (z. B. "80 mm f/7 ED-Refraktor", "200 mm f/6 Newton", "8 Zoll Schmidt-Cassegrain"), etwa 15 bis 20 Fernrohre von 50 mm bis 300 mm. |
+| A-F2 | Muss | Das Geraet kann aus einer Liste gewaehlt oder frei eingegeben werden. Die Liste enthaelt herstellerneutrale Klassen (z. B. "80 mm f/7,5 ED-Refraktor", "200 mm f/6 Newton", "8 Zoll Schmidt-Cassegrain"), etwa 15 bis 20 Fernrohre von 50 mm bis 300 mm. |
 | A-F3 | Muss | Die Liste enthaelt den Eintrag "Blosses Auge": Oeffnung 6 mm, Vergroesserung fest 1, keine Okularwahl. |
-| A-F4 | Muss | Die Liste enthaelt drei Fernglaeser (8x42, 10x50, 15x70) mit fester Vergroesserung und typischem wahren Gesichtsfeld (6 bis 7 Grad), ohne Okularwahl. |
+| A-F4 | Muss | Die Liste enthaelt drei Fernglaeser (8x42, 10x50, 15x70) mit fester Vergroesserung und typischem wahren Gesichtsfeld (8x42 etwa 7,2 Grad, 10x50 etwa 6,5 Grad, 15x70 etwa 4,4 Grad), ohne Okularwahl. |
 | A-F5 | Muss | Die Geraeteliste liegt als eine von Hand erweiterbare Datendatei im Repo (Name, Typ, Bauart, Oeffnung, Brennweite, Obstruktion, bei Fernglaesern Vergroesserung und Gesichtsfeld). |
 | A-F6 | Muss | Das Okular wird durch Brennweite (mm) und scheinbares Gesichtsfeld (Grad) beschrieben, mit Presets (z. B. Ploessl 50 Grad, Weitwinkel 68 Grad, 82 Grad). Vergroesserung und wahres Gesichtsfeld werden daraus berechnet. |
 | A-F7 | Muss | Die Vergroesserung ist alternativ direkt editierbar; die Okularbrennweite wird dann angepasst. |
@@ -57,7 +57,7 @@ Kennungen: A-Z Zweck, A-F Fernrohr und Geraete, A-B Bedingungen, A-P Physik und 
 | A-P3 | Muss | Die Kontrastuebertragung beruecksichtigt die Obstruktion (Absenkung mittlerer Ortsfrequenzen). |
 | A-P4 | Muss | Die Bildhelligkeit skaliert mit der Austrittspupille relativ zur festen Augenpupille von 6 mm und mit der Extinktion aus Transparenz und Hoehe. Nach oben ist sie begrenzt; Blendung wird nicht simuliert. |
 | A-P5 | Muss | Der Nutzer sieht den typischen Anblick (Langzeitmittel), nicht den besten Moment. |
-| A-P6 | Muss | Punktquellen (Monde) werden ueber ein eigenes Modell dargestellt: Airy-Scheibchen plus Seeing-PSF, Helligkeit aus der Magnitude, bei grossen Oeffnungen als kleine Scheibchen mit ihrem Winkeldurchmesser. |
+| A-P6 | Muss | Punktquellen (Monde) werden ueber ein eigenes Modell dargestellt: Airy-Scheibchen plus Seeing-PSF, Helligkeit aus der Magnitude, bei grossen Oeffnungen als kleine Scheibchen mit ihrem Winkeldurchmesser. Da Blendung nicht simuliert wird (A-P9), gilt eine Blendungsregel: eine Punktquelle wird nicht gezeigt, wenn sie weniger als 10 Bogenminuten von einem Objekt entfernt steht, das mehr als 6 Magnituden heller ist (Jupitermonde mit blossem Auge). |
 | A-P7 | Muss | Die Physik ist als reine, einzeln testbare Funktionen implementiert (siehe A-Q1). |
 | A-P8 | Kann | Farbsaettigung nimmt bei dunklem Bild ab (Purkinje-Effekt). |
 | A-P9 | Nicht-Ziel | Alter des Beobachters, variable Augenpupille, Blendung, Dunkeladaption, beidaeugiges Sehen. |
@@ -74,7 +74,7 @@ Kennungen: A-Z Zweck, A-F Fernrohr und Geraete, A-B Bedingungen, A-P Physik und 
 | A-D6 | Muss | Jeder Parameter und jede Zahl der Anzeige hat einen kurzen Hilfetext (Tooltip oder Infosymbol). |
 | A-D7 | Muss | Das Ergebnis wird beim Aendern eines Parameters live neu berechnet, Zielwert unter 0,5 s bei typischer Bildgroesse. |
 | A-D8 | Muss | Alle Parameter stehen in der URL, so dass eine Konfiguration als Link weitergegeben werden kann. |
-| A-D9 | Muss | Startkonfiguration: 80 mm f/7 Refraktor, Okular 10 mm mit 50 Grad, Mond nach dem ersten Viertel, Seeing 2 Bogensekunden, Bortle 5, Transparenz klar, Hoehe 45 Grad. |
+| A-D9 | Muss | Startkonfiguration: 80 mm f/7,5 Refraktor (80/600), Okular 10 mm mit 50 Grad, Mond nach dem ersten Viertel, Seeing 2 Bogensekunden, Bortle 5, Transparenz klar, Hoehe 45 Grad. |
 | A-D10 | Muss | Oberflaeche auf Deutsch. Alle Texte liegen gesammelt in einer Datei, damit eine Uebersetzung spaeter moeglich ist. |
 | A-D11 | Muss | Orientierung: aufrecht, Norden oben, unabhaengig von der Bauart. |
 | A-D12 | Kann | Bildorientierung je Bauart (Newton umgekehrt, Refraktor mit Zenitspiegel seitenverkehrt). |
@@ -88,7 +88,7 @@ Kennungen: A-Z Zweck, A-F Fernrohr und Geraete, A-B Bedingungen, A-P Physik und 
 
 | Kennung | Stufe | Anforderung |
 |---|---|---|
-| A-X1 | Muss | Jedes Objekt hat feste, repraesentative Zustaende mit Winkelgroesse, die aus einer Liste gewaehlt werden: Mond kurz nach dem ersten Viertel; Mars 6, 14 und 25 Bogensekunden; Jupiter 35 und 47 Bogensekunden; Saturn 16 und 20 Bogensekunden mit mittlerer Ringoeffnung. |
+| A-X1 | Muss | Jedes Objekt hat feste, repraesentative Zustaende mit Winkelgroesse, die aus einer Liste gewaehlt werden: Mond kurz nach dem ersten Viertel; Mars 6, 14 und 25 Bogensekunden; Jupiter 35 und 47 Bogensekunden; Saturn 16 und 20 Bogensekunden mit Ringoeffnung 19 Grad. Mars 6 Bogensekunden wird als Vollscheibe gezeigt, obwohl Mars in dieser Groesse real gibbos ist (etwa 90 Prozent beleuchtet); der Hilfetext nennt das. |
 | A-X2 | Muss | Jupiter wird mit den vier Galileischen Monden gezeigt, Saturn mit Titan und Rhea, jeweils in einer festen typischen Stellung. Jeder Mond hat in der Objektdatei Position relativ zum Planeten (Bogensekunden), Winkeldurchmesser und Magnitude. |
 | A-X3 | Muss | Verwendet werden nur echte Aufnahmen (Raumsonden, Mosaike) mit einer Lizenz, die Weitergabe und Bearbeitung erlaubt. Kein Bild kommt ohne geklaerte Lizenz ins Repo. |
 | A-X4 | Muss | Jedes Bild ist in einer Datendatei mit Quelle, Lizenz, Winkelgroesse und ggf. Bearbeitung nachgewiesen. |
@@ -96,7 +96,7 @@ Kennungen: A-Z Zweck, A-F Fernrohr und Geraete, A-B Bedingungen, A-P Physik und 
 | A-X6 | Muss | Erstladen der Seite unter 5 MB. Bilder werden pro Objekt nachgeladen, pro Objekt unter 20 MB. |
 | A-X7 | Kann | Vollmond und weitere Mondphasen. |
 | A-X8 | Kann | Datum und Ephemeriden fuer Phase, Libration, Winkelgroesse, Ringneigung, Mondstellungen. |
-| A-X9 | Nicht-Ziel | Gerenderte Bilder (Kugel aus Karte oder Hoehenmodell), Hintergrundsterne, Marsmonde. |
+| A-X9 | Nicht-Ziel | Gerenderte Bilder (Kugel aus Karte oder Hoehenmodell), Hintergrundsterne, Marsmonde. Ausnahme Mond: das NASA-SVS-Rendering aus LRO-Daten (LOLA-Hoehenmodell und WAC-Mosaik) ist zugelassen, weil kein echtes Foto des ersten Viertels A-X5 erfuellt. |
 
 ## 7. Technik und Betrieb
 

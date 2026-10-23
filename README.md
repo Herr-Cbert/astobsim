@@ -10,4 +10,4 @@ Das Projekt dient ausserdem als Uebungsprojekt fuer die Entwicklung mit Claude C
 
 ## Stand
 
-Phase 1 (Anforderungen) abgeschlossen, Ergebnis in [docs/anforderungen.md](docs/anforderungen.md). Naechster Schritt: Phase 2 (Recherche). Tech-Stack noch nicht entschieden, siehe `docs/adr/` sobald vorhanden.
+Phase 2 (Recherche) abgeschlossen, Ergebnis in [docs/recherche/](docs/recherche/README.md) (Uebersicht mit Antworten auf die offenen Fragen und Entscheidungen vor Phase 3). Anforderungen in [docs/anforderungen.md](docs/anforderungen.md). Naechster Schritt: Phase 3 (Architektur). Tech-Stack noch nicht entschieden, siehe `docs/adr/` sobald vorhanden.
