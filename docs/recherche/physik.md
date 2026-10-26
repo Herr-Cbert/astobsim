@@ -49,6 +49,12 @@ Mit Obstruktion: geschlossene, abschnittsweise Formel bei O'Neill 1956 [5]; sie 
 
 Kontrollwert: $T(0{,}5) = 0{,}391$ (analytisch 0,3910, FFT 0,3910).
 
+**Rezept B, geschlossen (in astobsim umgesetzt, `src/physik/beugung.ts`):** Die Autokorrelation der Ringpupille ist die Ueberlappungsflaeche zweier um $d$ verschobener Ringe. Mit $R = 1$, $d = 2\nu$ und der Linsenflaeche $L(r_1, r_2, d)$ zweier Kreise [52] gilt
+
+$$T(\nu) = \frac{L(1,1,d) - 2\,L(1,\epsilon,d) + L(\epsilon,\epsilon,d)}{\pi\,(1-\epsilon^2)}, \qquad L(r_1,r_2,d) = r_1^2 \arccos\frac{a}{r_1} - a\sqrt{r_1^2-a^2} + r_2^2 \arccos\frac{b}{r_2} - b\sqrt{r_2^2-b^2}$$
+
+mit $a = (d^2 + r_1^2 - r_2^2)/2d$, $b = (d^2 + r_2^2 - r_1^2)/2d$; fuer $d \ge r_1 + r_2$ ist $L = 0$, fuer $d \le |r_1 - r_2|$ ist $L = \pi \min(r_1,r_2)^2$. Fuer $\epsilon = 0$ ergibt das genau die geschlossene Formel oben (0,39100 bei $\nu$ = 0,5); gegen die FFT-Tabelle stimmt es auf 0,003 (eigene Rechnung: $\epsilon$ = 0,33 bei $\nu$ = 0,35 liefert 0,393 gegen frei 0,564, Verhaeltnis 0,697). Das FFT-Rezept bleibt als Kontrolle.
+
 Ergebnis fuer verschiedene Obstruktionen (eigene Rechnung; die letzten beiden Spalten sind unobstruierte Oeffnungen mit Durchmesser $D(1-\epsilon)$, in Einheiten der Grenzfrequenz der vollen Oeffnung):
 
 | $\nu = f/f_c$ | frei | $\epsilon$ = 0,20 | 0,25 | 0,30 | 0,33 | 0,40 | frei, $0{,}67\,D$ | frei, $0{,}75\,D$ |
@@ -78,6 +84,8 @@ Spitzenintensitaet relativ zur freien Oeffnung gleichen Durchmessers: $(1-\epsil
 | Radius 1. Minimum in $\lambda/D$ | 1,220 | | 1,167 | 1,142 | 1,115 | 1,098 | 1,058 | 1,001 |
 
 Faustformel nach Sacek: verlorener Kernanteil $\approx 2\epsilon^2$ bis $\epsilon \approx 0{,}4$ [8]. S&T-Errata 2023 nennen fuer 33 % Obstruktion 65 % im Kern [12], passt.
+
+**Rechenweg in astobsim** (`energieImAiryKern`, eigene Rechnung): Amplitude der Ringoeffnung $A(v) = [2J_1(v)/v - \epsilon^2\,2J_1(\epsilon v)/(\epsilon v)]/(1-\epsilon^2)$ (Abschnitt 9, [1, 7]), erste Nullstelle $v_1$ per Bisektion in $(2{,}5;\ 3{,}9)$, dann Simpson-Integral $\int_0^{v_1} A(v)^2\, v\, dv$ mit 2000 Schritten, geteilt durch die Gesamtenergie $2/(1-\epsilon^2)$. Die Gesamtenergie folgt aus Parseval: sie ist proportional zur Pupillenflaeche $(1-\epsilon^2)$, die Spitze proportional $(1-\epsilon^2)^2$ [8], und fuer $\epsilon = 0$ ist $\int_0^\infty (2J_1(v)/v)^2\, v\, dv = 2$ [1, Kap. 8.5.2]. Ergebnis 0,8378 / 0,7638 / 0,6824 / 0,5843 fuer $\epsilon$ = 0 / 0,2 / 0,3 / 0,4, Nullstellen 1,2197 / 1,1665 / 1,1145 / 1,0577 $\lambda/D$, wie die Tabelle. $J_1$ nach Abramowitz-Stegun 9.4.4 und 9.4.6 [51], Fehler unter $1{,}3 \cdot 10^{-8}$.
 
 ### 1.5 Daumenregel "Obstruktion $\epsilon$ wirkt wie Oeffnung $D(1-\epsilon)$"
 
@@ -325,6 +333,9 @@ Alle mit $\lambda$ = 550 nm, 1 rad = 206 264,8''.
 | Flaechenhelligkeit Okular | AP 0,8 mm, p 6 mm | Faktor 0,01778, +4,375 mag |
 | $V_\mathrm{min}$, $V_\mathrm{max}$ 200 mm | $200/6$, $2 \cdot 200$ | 33x, 400x |
 | Quadratur 80 mm, 2'' | $\sqrt{1{,}459^2 + 2^2}$ | 2,476'' (echte Faltung 2,52'') |
+| Bessel $J_1$ | $J_1(1)$, $J_1(2)$, $J_1(5)$, $J_1(10)$ nach [51], Tabelle 9.1 | 0,4400506 / 0,5767248 / -0,3275791 / 0,0434727; erste Nullstelle 3,8317 |
+| Airy-Nullstelle $\epsilon$ = 0,33 | Tabelle 1.4 | 1,098 $\lambda/D$ (Intensitaet dort unter $10^{-4}$) |
+| MTF-Tabelle 1.3 | $\epsilon$ = 0,2 bei $\nu$ = 0,3; $\epsilon$ = 0,4 bei $\nu$ = 0,7 | 0,567; 0,224 (Toleranz 0,005) |
 
 ---
 
@@ -434,3 +445,5 @@ Beide Wege sind physikalisch gleichwertig (Langzeit-Kolmogorov); der Frequenzrau
 48. Galileische Monde als Scheibchen: Astronomy.com, "A brief history of Jupiter's Galilean moons, and how to observe them", https://www.astronomy.com/science/a-brief-history-of-jupiters-galilean-moons-and-how-to-observe-them/ ; ALPO Japan, Ganymed 1,8'', https://alpo-j.sakura.ne.jp/kk23/j231016r.htm
 49. Encircled-Energy-Formel fuer Ringoeffnung (Anhang): arXiv:1708.01257, https://arxiv.org/pdf/1708.01257
 50. Wikipedia "Fried parameter" (Einstieg, Bibliographie Fried 1966), https://en.wikipedia.org/wiki/Fried_parameter
+51. Abramowitz, M., Stegun, I. A. (Hrsg.): *Handbook of Mathematical Functions*, Dover 1972 (Nachdruck der NBS-Ausgabe 1964), Formeln 9.4.4 und 9.4.6 (Polynomnaeherungen fuer $J_1$, $|x| < 3$ bzw. $|x| \ge 3$, Fehler unter $1{,}3 \cdot 10^{-8}$), Tabelle 9.1 (Tafelwerte), https://personal.math.ubc.ca/~cbm/aands/page_370.htm
+52. Weisstein, E. W.: "Circle-Circle Intersection", MathWorld, https://mathworld.wolfram.com/Circle-CircleIntersection.html (Linsenflaeche zweier Kreise fuer die Pupillenautokorrelation, Abschnitt 1.3 Rezept B).
