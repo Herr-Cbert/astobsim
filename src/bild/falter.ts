@@ -1,6 +1,7 @@
 // Faltung des Arbeitsrasters mit dem Kern (Stufe 2, ADR-0002: direkte Faltung mit kleinem Kern,
 // Rand geklemmt). Falter ist die Naht fuer die zwei Adapter: FalterJs hier (Tests, Fallback),
-// WebGL2 spaeter (#9). Beide muessen bis auf eine 8-Bit-Stufe dasselbe Ergebnis liefern.
+// FalterWebgl2 in falter_webgl2.ts (Produktion, dort auch waehleFalter). Beide muessen bis auf eine
+// 8-Bit-Stufe dasselbe Ergebnis liefern (Gleichheitstest im Browser: npm run test:browser).
 
 import type { Kern } from "../naht/simulationsparameter";
 import { BildFehler, pruefePositivGanz } from "./fehler";

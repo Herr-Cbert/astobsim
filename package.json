@@ -9,7 +9,8 @@
     "build": "tsc --noEmit && vite build && node scripts/build-abschluss.mjs",
     "preview": "vite preview",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "test:browser": "vite build --config test/browser/vite.config.ts && node scripts/browser-test.mjs"
   },
   "devDependencies": {
     "typescript": "^7.0.2",
