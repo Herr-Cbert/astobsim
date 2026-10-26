@@ -17,6 +17,7 @@ Warum Kachelpyramide fuer den Mond: Das Mondbild muss bei 0,25"/px rund 7600 px 
 - Jeder Zustand verweist ueber `bild` auf einen Eintrag in `bilder.json`; jeder Bildeintrag hat Lizenz, Lizenz-URL, Namensnennung, Pixelmassstab in Bogensekunden je Pixel, Nordrichtung und Bearbeitung.
 - Kacheln und skalierte Planetenbilder werden ausschliesslich von Skripten unter `tools/` aus den Rohbildern in `data/roh/` (gitignored) erzeugt; das Skript schreibt den Bildnachweis mit. Kein Bild ohne Eintrag in `bilder.json` (A-X3).
 - Bildformat der Kacheln und Planetenbilder: WebP verlustbehaftet mit hoher Qualitaet; JPEG als Reserve, falls WebP in `tools/` Probleme macht. Entscheidung beim ersten Kachel-Issue, Groessenziel A-X6 bleibt massgeblich.
+- Nordrichtung (A-D11, Nachtrag 2026-10-26, Entscheidung Herbert zu Issue #12): `norden_oben` heisst bei Planeten Planetennorden oben (Rotationsachse senkrecht, wie in den Hubble-Pressebildern), beim Mond Himmelsnorden oben. Planetenbilder werden dafuer nicht gedreht; die Zustaende haben keinen Zeitpunkt, der Positionswinkel der Achse zum Aufnahmezeitpunkt steht dokumentierend in `positionswinkel_achse_grad`.
 - Das Mondbild aus NASA SVS hat 0,643"/px (Durchmesser rund 2760 px); die Pyramide hat damit vorerst drei bis vier Stufen. Ein feineres Rendering spaeter aendert nur die Anzahl der Stufen, nicht das Format.
 
 ## Verworfene Optionen

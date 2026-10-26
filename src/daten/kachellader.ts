@@ -67,7 +67,8 @@ export async function ladeRasterBrowser(pfad: string, nachweisId: string): Promi
 
 /** Lader fuer die Kachelpyramide eines Bildnachweises (nur im Browser). */
 export function kachelLaderBrowser(nachweis: Bildnachweis): KachelLader {
-  return (stufe, x, y) => ladeRasterBrowser(kachelPfad(nachweis, { stufe, x, y }), nachweis.id);
+  // async, damit auch ein Fehler in kachelPfad als abgelehntes Promise ankommt (Vertrag KachelLader).
+  return async (stufe, x, y) => ladeRasterBrowser(kachelPfad(nachweis, { stufe, x, y }), nachweis.id);
 }
 
 /** QuelleKacheln fuer einen Zustand im Browser: Geometrie skaliert auf winkelgroesseArcsec. */

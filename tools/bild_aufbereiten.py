@@ -13,6 +13,9 @@ schreibt ein quadratisches WebP nach daten/bilder/<datei>:
     - ausserhalb der Scheibe plus rand_px Rand schwarz,
     - nicht gedreht oder gespiegelt; die Orientierung belegt die
       Parameterdatei (Feld orientierung) und landet im Feld bearbeitung.
+Die Namensnennung ist die Credit-Zeile der Parameterdatei woertlich; bei
+CC-Lizenzen haengt das Skript "; bearbeitet: <aenderungsvermerk>" an
+(Pflichtfeld aenderungsvermerk, bilder.md Abschnitt 9, Schritt 8).
 Danach wird der Eintrag mit der id der Parameterdatei in daten/bilder.json
 ersetzt oder angehaengt; andere Eintraege bleiben erhalten.
 
@@ -92,6 +95,8 @@ def lade_parameter(pfad):
         raise SystemExit(f"{pfad}: leinwand_px {p['leinwand_px']} ist kleiner als die Scheibe plus Rand")
     if p["leinwand_px"] % 2:
         raise SystemExit(f"{pfad}: leinwand_px muss gerade sein (Scheibenmitte auf einer Pixelgrenze)")
+    if "CC" in p["lizenz"] and not p.get("aenderungsvermerk"):
+        raise SystemExit(f"{pfad}: CC-Lizenz verlangt aenderungsvermerk (bilder.md Abschnitt 9, Schritt 8)")
     if not p["datei"].endswith(".webp") or p["datei"].startswith("/") or ".." in p["datei"]:
         raise SystemExit(f"{pfad}: datei muss ein relativer Pfad unter daten/bilder/ auf .webp sein")
     return p
@@ -166,7 +171,11 @@ def miss_scheibe(rgb):
         zy, zx = int(round(cy)), int(round(cx))
         zeile = g[zy - 2:zy + 3].mean(axis=0)
         spalte = g[:, zx - 2:zx + 3].mean(axis=1)
-        (x0, x1), (y0, y1) = kanten(zeile, schwelle), kanten(spalte, schwelle)
+        kx, ky = kanten(zeile, schwelle), kanten(spalte, schwelle)
+        if kx is None or ky is None:
+            raise SystemExit(f"Keine Scheibenkante durch die Mitte {cx:.1f}/{cy:.1f} gefunden (Schwelle {schwelle:.1f}); "
+                             "Rohbild und roh_mitte_px pruefen")
+        (x0, x1), (y0, y1) = kx, ky
         cx, cy = (x0 + x1) / 2, (y0 + y1) / 2
     # Kreuzungen liegen zwischen Pixelzentren; der Durchmesser ist der Abstand der Kanten.
     return {"mitte": (cx, cy), "breite": x1 - x0, "hoehe": y1 - y0, "schwelle": schwelle}
@@ -268,7 +277,7 @@ def bildnachweis(p, farbraum, faktor, datei_bytes):
         "aufnahmedatum": p["aufnahmedatum"],
         "lizenz": p["lizenz"],
         "lizenz_url": p["lizenz_url"],
-        "namensnennung": p["namensnennung"],
+        "namensnennung": namensnennung(p),
         "pixel_breite": n,
         "pixel_hoehe": n,
         "original_pixel": p["original_pixel"],
@@ -284,6 +293,13 @@ def bildnachweis(p, farbraum, faktor, datei_bytes):
     eintrag["bearbeitung"] = bearbeitung
     eintrag["hinweise"] = hinweise
     return eintrag
+
+
+def namensnennung(p):
+    """Credit-Zeile woertlich, bei CC-Lizenzen gefolgt vom Aenderungsvermerk (bilder.md 9, Schritt 8)."""
+    if p.get("aenderungsvermerk"):
+        return f"{p['namensnennung']}; bearbeitet: {p['aenderungsvermerk']}"
+    return p["namensnennung"]
 
 
 def schreibe_bildnachweis(pfad, eintrag):

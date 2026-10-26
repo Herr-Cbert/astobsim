@@ -11,7 +11,9 @@ Prueft, ohne etwas zu schreiben (A-X3, A-X4, A-X6, ADR-0003):
       pixel_breite x pixel_hoehe, Dateigroesse gleich datei_bytes,
     - Kachelpyramide: jede Kachel jeder Stufe vorhanden, Masse wie erwartet
       (Randkacheln kleiner), Summe gleich kacheln.gesamt_bytes,
-    - jede Datei unter daten/bilder/ gehoert zu einem Eintrag,
+    - jede Datei unter daten/bilder/ gehoert zu einem Eintrag; Dateien und
+      Ordner, deren Name mit einem Punkt beginnt, werden uebergangen (wie
+      import.meta.glob im Nachbau),
     - je Objekt hoechstens 20 MB (20 000 000 Byte).
 Exit-Code 0, wenn alles stimmt, sonst 1 mit einer Zeile je Fehler.
 
@@ -118,8 +120,11 @@ def pruefe(bildnachweis, bilder):
         print(f"Objekt {objekt}: {summe} Byte ({summe / 1e6:.2f} MB)")
         if summe > GRENZE_BYTES_JE_OBJEKT:
             fehler.append(f"Objekt {objekt}: {summe} Byte, mehr als 20 MB (A-X6)")
-    for wurzel, _, namen in os.walk(bilder):
+    for wurzel, ordner, namen in os.walk(bilder):
+        ordner[:] = [o for o in ordner if not o.startswith(".")]
         for name in namen:
+            if name.startswith("."):
+                continue
             pfad = os.path.normpath(os.path.join(wurzel, name))
             if pfad not in erwartet:
                 fehler.append(f"{pfad}: kein Eintrag in {bildnachweis} (A-X3)")

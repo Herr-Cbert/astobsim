@@ -1,7 +1,7 @@
 // Einstieg des Moduls daten, beschraenkt auf das Interface aus docs/architektur.md Abschnitt 1:
 // ladeBildnachweise(), ladeObjekte(nachweise), objektzustand fuer die Naht und die Quellen aus der Kachelpyramide
-// (QuelleKacheln) und aus einem Einzelbild (QuelleEinzelbild, Planeten). Die
-// Geraeteliste (ladeGeraete) kommt mit #11. Interne Pruefhilfen importieren Tests aus pruefe.ts,
+// (QuelleKacheln) und aus einem Einzelbild (QuelleEinzelbild, Planeten), dazu die Geraeteliste
+// (geraete.ts). Interne Pruefhilfen importieren Tests aus pruefe.ts,
 // den Test-Adapter QuelleRaster aus testkacheln.ts.
 export {
   BILDER_DATEI,

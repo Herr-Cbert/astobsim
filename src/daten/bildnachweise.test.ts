@@ -141,6 +141,8 @@ describe("pruefeBildnachweise mit Einzelbildern", () => {
       expect(n.lizenz).toContain("Public Domain (NASA)");
       expect(n.lizenz).toContain("CC-BY-4.0 (ESA/Hubble)");
       expect(n.hinweise).toContain("6.3");
+      // CC BY: Credit-Zeile woertlich, dahinter der Aenderungsvermerk (bilder.md 9, Schritt 8).
+      expect(n.namensnennung).toMatch(/; bearbeitet: zugeschnitten, skaliert/);
     }
   });
 

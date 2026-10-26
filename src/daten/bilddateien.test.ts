@@ -2,7 +2,8 @@
 // tools/bildnachweis_pruefen.py fuer die CI ohne Python: jeder Nachweis hat seine Dateien mit den
 // eingetragenen Massen und Bytes, jede Datei gehoert zu einem Nachweis, je Objekt hoechstens 20 MB.
 // Die Dateien kommen ueber import.meta.glob mit ?inline als data:-URL (kein node:fs, ADR-0001),
-// die Masse aus dem WebP-Kopf (webpkopf.ts).
+// die Masse aus dem WebP-Kopf (webpkopf.ts). Der Glob uebergeht Dateien und Ordner mit Punkt am
+// Anfang; das Python-Skript tut dasselbe.
 
 import { describe, expect, it } from "vitest";
 import bilderJson from "../../daten/bilder.json";
