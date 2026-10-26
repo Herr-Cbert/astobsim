@@ -2,13 +2,16 @@
 // jede einzeln getestet gegen docs/recherche/physik.md Abschnitt 8 (A-Q1). Stufe 1:
 // Konfiguration zu Zwischengroessen (optik, atmosphaere, aufloesung, helligkeit,
 // arbeitsmassstab, kernbeschreibung) und begrenze. Stufe 2: baueKern mit den Testhelfern
-// kontrastUebertragung und kernFwhmArcsec (Issue #4). Stufe 3 (auswerten) kommt mit Issue #5.
+// kontrastUebertragung und kernFwhmArcsec (Issue #4). Stufe 3: auswerten mit Anzeigewerten,
+// Warnungen und Wiederverwendung des Kerns (Issue #5). ui und bild importieren nur von hier.
 
 export * from "../naht/konfiguration";
 export {
+  ANZEIGE_PX_STANDARD,
   ARCSEC_PRO_RAD,
   AUGE_AUFLOESUNG_ARCSEC,
   AUGE_GESICHTSFELD_GRAD,
+  AUSTRITTSPUPILLE_MIN_MM,
   BETA_MOFFAT,
   BORTLE_MAG_PRO_ARCSEC2,
   EXTINKTION_MAG_PRO_LUFTMASSE,
@@ -52,3 +55,4 @@ export { bortleMagProArcsec2, helligkeit } from "./helligkeit";
 export { arbeitsmassstab, kernSchluessel, kernbeschreibung } from "./arbeitsmassstab";
 export { GRENZEN, type Grenze, type Hinweis, begrenze } from "./begrenze";
 export { baueKern, kernFwhmArcsec, kontrastUebertragung } from "./kern";
+export { type Anzeigewerte, type Auswertoptionen, type Auswertung, type Warnung, auswerten } from "./auswerten";
