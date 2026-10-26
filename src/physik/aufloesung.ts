@@ -26,10 +26,10 @@ export interface Aufloesung {
 }
 
 /** Abschnitt 3.2 und 9: FWHM_Airy = 116,8''/D, FWHM_Auge = 60''/V, Gesamt = Quadratur, dominant = Maximum. */
-export function aufloesung(o: Optik, a: Atmosphaere): Aufloesung {
-  const beugungFwhmArcsec = airyFwhmArcsec(o.oeffnungMm);
-  const seeingFwhmArcsec = a.seeingFwhmArcsec;
-  const augeFwhmArcsec = AUGE_AUFLOESUNG_ARCSEC / o.vergroesserung;
+export function aufloesung(optik: Optik, atmosphaere: Atmosphaere): Aufloesung {
+  const beugungFwhmArcsec = airyFwhmArcsec(optik.oeffnungMm);
+  const seeingFwhmArcsec = atmosphaere.seeingFwhmArcsec;
+  const augeFwhmArcsec = AUGE_AUFLOESUNG_ARCSEC / optik.vergroesserung;
   const grenzen: [Aufloesungsgrenze, number][] = [
     ["beugung", beugungFwhmArcsec],
     ["seeing", seeingFwhmArcsec],
@@ -44,8 +44,8 @@ export function aufloesung(o: Optik, a: Atmosphaere): Aufloesung {
     }
   }
   return {
-    rayleighArcsec: rayleighArcsec(o.oeffnungMm),
-    dawesArcsec: dawesArcsec(o.oeffnungMm),
+    rayleighArcsec: rayleighArcsec(optik.oeffnungMm),
+    dawesArcsec: dawesArcsec(optik.oeffnungMm),
     beugungFwhmArcsec,
     seeingFwhmArcsec,
     augeFwhmArcsec,

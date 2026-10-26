@@ -1,27 +1,9 @@
 import { describe, expect, it } from "vitest";
 import { atmosphaere } from "./atmosphaere";
-import { begrenze } from "./begrenze";
+import { begrenze, GRENZEN } from "./begrenze";
 import type { Fernglas, Fernrohr, Konfiguration } from "./konfiguration";
 import { optik } from "./optik";
-
-const START: Konfiguration = {
-  geraet: {
-    art: "fernrohr",
-    oeffnungMm: 80,
-    brennweiteMm: 600,
-    obstruktion: 0,
-    bauart: "refraktor",
-    okular: { brennweiteMm: 10, scheinbaresGesichtsfeldGrad: 50 }
-  },
-  objekt: {
-    kennung: "mond-q1",
-    durchmesserArcsec: 1860,
-    magnitude: -10,
-    quelle: { breitePx: 7600, hoehePx: 7600, massstabArcsecProPx: 0.643, weissMagProArcsec2: 3.4 },
-    trabanten: []
-  },
-  bedingungen: { seeingFwhmArcsec: 2, bortle: 5, transparenz: "klar", hoeheGrad: 45 }
-};
+import { KONFIGURATION_A_D9 as START } from "./testdaten";
 
 function mitFernrohr(teil: Partial<Fernrohr>, okular: Partial<Fernrohr["okular"]> = {}): Konfiguration {
   const g = START.geraet as Fernrohr;
@@ -99,6 +81,11 @@ describe("begrenze (A-F8)", () => {
     expect(konfiguration.bedingungen).toEqual({ seeingFwhmArcsec: 0.5, bortle: 1, transparenz: "klar", hoeheGrad: 10 });
     expect(() => optik(konfiguration.geraet)).not.toThrow();
     expect(() => atmosphaere(konfiguration.bedingungen)).not.toThrow();
+  });
+
+  it("meldet -0 nicht als Schnitt und nennt jedes Feld unter seinem Pfad aus GRENZEN", () => {
+    expect(begrenze(mitFernrohr({ obstruktion: -0 })).hinweise).toEqual([]);
+    expect(begrenze(mitFernrohr({ obstruktion: 0.9 })).hinweise[0]?.feld).toBe(GRENZEN.obstruktion.feld);
   });
 
   it("veraendert die Eingabe nicht und meldet mehrere Schnitte in Feldreihenfolge", () => {

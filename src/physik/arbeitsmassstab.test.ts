@@ -1,33 +1,17 @@
 import { describe, expect, it } from "vitest";
-import type { Fenster } from "../naht/simulationsparameter";
 import { arbeitsmassstab, kernbeschreibung, kernSchluessel } from "./arbeitsmassstab";
 import { atmosphaere } from "./atmosphaere";
 import { aufloesung } from "./aufloesung";
 import { PhysikFehler } from "./fehler";
-import type { Bedingungen, Konfiguration, Objektzustand } from "./konfiguration";
+import type { Bedingungen } from "./konfiguration";
 import { optik } from "./optik";
-
-const MOND_QUELLE: Objektzustand["quelle"] = { breitePx: 7600, hoehePx: 7600, massstabArcsecProPx: 0.643, weissMagProArcsec2: 3.4 };
-const JUPITER_QUELLE: Objektzustand["quelle"] = { breitePx: 1000, hoehePx: 1000, massstabArcsecProPx: 0.047, weissMagProArcsec2: 5.5 };
-
-function fenster(breiteArcsec: number, px: number): Fenster {
-  return { breiteArcsec, mitteXArcsec: 0, mitteYArcsec: 0, px };
-}
+import { BEDINGUNGEN_A_D9 as KLAR_45, fenster, JUPITER_QUELLE, KONFIGURATION_A_D9, MOND_QUELLE, refraktorMitVergroesserung } from "./testdaten";
 
 function stufe1(oeffnungMm: number, vergroesserung: number, bedingungen: Bedingungen) {
-  const o = optik({
-    art: "fernrohr",
-    oeffnungMm,
-    brennweiteMm: 10 * oeffnungMm,
-    obstruktion: 0,
-    bauart: "refraktor",
-    okular: { brennweiteMm: (10 * oeffnungMm) / vergroesserung, scheinbaresGesichtsfeldGrad: 50 }
-  });
+  const o = optik(refraktorMitVergroesserung(oeffnungMm, vergroesserung));
   const a = atmosphaere(bedingungen);
   return { o, a, aufl: aufloesung(o, a) };
 }
-
-const KLAR_45: Bedingungen = { seeingFwhmArcsec: 2, bortle: 5, transparenz: "klar", hoeheGrad: 45 };
 
 describe("arbeitsmassstab (ADR-0002)", () => {
   it("Anzeige gewinnt: Mond 3000'' auf 1024 px ist 2,93''/px, groeber als FWHM/2,5 und Quelle", () => {
@@ -97,18 +81,7 @@ describe("kernbeschreibung und Schluessel", () => {
 
 describe("Startkonfiguration A-D9 durch Stufe 1", () => {
   it("80/600 mit 10 mm 50 Grad, Seeing 2'', Bortle 5, klar, 45 Grad: 60-fach, AP 1,33 mm, Anzeige bestimmt den Massstab", () => {
-    const k: Konfiguration = {
-      geraet: {
-        art: "fernrohr",
-        oeffnungMm: 80,
-        brennweiteMm: 600,
-        obstruktion: 0,
-        bauart: "refraktor",
-        okular: { brennweiteMm: 10, scheinbaresGesichtsfeldGrad: 50 }
-      },
-      objekt: { kennung: "mond-q1", durchmesserArcsec: 1860, magnitude: -10, quelle: MOND_QUELLE, trabanten: [] },
-      bedingungen: KLAR_45
-    };
+    const k = KONFIGURATION_A_D9;
     const o = optik(k.geraet);
     const a = atmosphaere(k.bedingungen);
     const aufl = aufloesung(o, a);

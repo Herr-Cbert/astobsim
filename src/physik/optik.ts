@@ -5,9 +5,7 @@
 import type { Gesichtsfeld } from "../naht/simulationsparameter";
 import { PhysikFehler, pruefeBereich } from "./fehler";
 import type { Geraet } from "./konfiguration";
-import { AUGE_GESICHTSFELD_GRAD, PUPILLE_MM, TRANSMISSION, VERGROESSERUNG_MAX_PRO_MM } from "./konstanten";
-
-const ARCSEC_PRO_GRAD = 3600;
+import { ARCSEC_PRO_GRAD, AUGE_GESICHTSFELD_GRAD, PUPILLE_MM, TRANSMISSION, VERGROESSERUNG_MAX_PRO_MM } from "./konstanten";
 
 /** Austrittspupille AP = D / V in mm (Abschnitt 4, [35]). */
 export function austrittspupilleMm(oeffnungMm: number, vergroesserung: number): number {
@@ -54,29 +52,27 @@ export function optik(geraet: Geraet): Optik {
   switch (geraet.art) {
     case "fernrohr": {
       const vergroesserung = geraet.brennweiteMm / geraet.okular.brennweiteMm;
-      const breiteArcsec = (geraet.okular.scheinbaresGesichtsfeldGrad / vergroesserung) * ARCSEC_PRO_GRAD;
-      return baue(geraet.oeffnungMm, vergroesserung, geraet.obstruktion, TRANSMISSION[geraet.bauart], {
-        form: "kreis",
-        breiteArcsec,
-        hoeheArcsec: breiteArcsec
+      const wahresGesichtsfeldGrad = geraet.okular.scheinbaresGesichtsfeldGrad / vergroesserung;
+      return baueOptik(geraet.oeffnungMm, vergroesserung, geraet.obstruktion, TRANSMISSION[geraet.bauart], kreis(wahresGesichtsfeldGrad));
+    }
+    case "fernglas":
+      return baueOptik(geraet.oeffnungMm, geraet.vergroesserung, 0, TRANSMISSION.fernglas, kreis(geraet.wahresGesichtsfeldGrad));
+    case "auge":
+      return baueOptik(PUPILLE_MM, 1, 0, TRANSMISSION.auge, {
+        form: "rechteck",
+        breiteArcsec: AUGE_GESICHTSFELD_GRAD * ARCSEC_PRO_GRAD,
+        hoeheArcsec: AUGE_GESICHTSFELD_GRAD * ARCSEC_PRO_GRAD
       });
-    }
-    case "fernglas": {
-      const breiteArcsec = geraet.wahresGesichtsfeldGrad * ARCSEC_PRO_GRAD;
-      return baue(geraet.oeffnungMm, geraet.vergroesserung, 0, TRANSMISSION.fernglas, {
-        form: "kreis",
-        breiteArcsec,
-        hoeheArcsec: breiteArcsec
-      });
-    }
-    case "auge": {
-      const breiteArcsec = AUGE_GESICHTSFELD_GRAD * ARCSEC_PRO_GRAD;
-      return baue(PUPILLE_MM, 1, 0, TRANSMISSION.auge, { form: "rechteck", breiteArcsec, hoeheArcsec: breiteArcsec });
-    }
   }
 }
 
-function baue(oeffnungMm: number, vergroesserung: number, obstruktion: number, transmission: number, gesichtsfeld: Gesichtsfeld): Optik {
+/** Kreisfoermiges wahres Gesichtsfeld aus dem Durchmesser in Grad. */
+function kreis(durchmesserGrad: number): Gesichtsfeld {
+  const breiteArcsec = durchmesserGrad * ARCSEC_PRO_GRAD;
+  return { form: "kreis", breiteArcsec, hoeheArcsec: breiteArcsec };
+}
+
+function baueOptik(oeffnungMm: number, vergroesserung: number, obstruktion: number, transmission: number, gesichtsfeld: Gesichtsfeld): Optik {
   pruefeBereich("oeffnungMm", oeffnungMm, Number.MIN_VALUE, Infinity);
   pruefeBereich("vergroesserung", vergroesserung, 1, Infinity);
   pruefeBereich("obstruktion", obstruktion, 0, 0.5);

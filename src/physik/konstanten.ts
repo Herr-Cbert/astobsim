@@ -10,6 +10,9 @@ export const WELLENLAENGE_M = 550e-9;
 /** Bogensekunden je Radiant, Abschnitt 8: 1 rad = 206 264,8''. */
 export const ARCSEC_PRO_RAD = 206264.8;
 
+/** Bogensekunden je Grad; Grad nur in Gesichtsfeld-Eingaben und -Anzeigen. */
+export const ARCSEC_PRO_GRAD = 3600;
+
 /** Feste Augenpupille p in mm (A-F3, Abschnitt 5.1). */
 export const PUPILLE_MM = 6;
 
@@ -59,8 +62,8 @@ export const TRANSMISSION: Readonly<Record<Bauart | "fernglas" | "auge", number>
   auge: 1.0
 };
 
-/** Himmelshelligkeit in mag je Quadratbogensekunde fuer Bortle 1 bis 9, Index 0 unbenutzt (Abschnitt 6.1, Spalte "Vorschlag astobsim"; 8 und 9 geschaetzt). */
-export const BORTLE_MAG_PRO_ARCSEC2: readonly number[] = [NaN, 21.9, 21.7, 21.4, 21.0, 20.0, 19.0, 18.3, 17.5, 17.0];
+/** Himmelshelligkeit in mag je Quadratbogensekunde fuer Bortle 1 bis 9, Index = Stufe - 1 (Abschnitt 6.1, Spalte "Vorschlag astobsim"; 8 und 9 geschaetzt). */
+export const BORTLE_MAG_PRO_ARCSEC2: readonly number[] = [21.9, 21.7, 21.4, 21.0, 20.0, 19.0, 18.3, 17.5, 17.0];
 
 /** Wortstufen des Seeings (A-B1). */
 export const SEEING_WORTSTUFEN = ["ausgezeichnet", "gut", "mittel", "schlecht"] as const;
@@ -85,8 +88,14 @@ export const SEEING_STUFEN: readonly {
 /** Rechteckiges Gesichtsfeld des blossen Auges in Grad, Breite und Hoehe (A-D1). */
 export const AUGE_GESICHTSFELD_GRAD = 5;
 
-/** Arbeitsmassstab: die Gesamt-FWHM ist nie kleiner als 2,5 Arbeitspixel (ADR-0002). */
+/**
+ * Arbeitsmassstab: nie feiner als Gesamt-FWHM / 2,5 (ADR-0002). Die Gesamt-FWHM ist damit
+ * hoechstens 2,5 Arbeitspixel breit; bei grober Anzeige auch weniger als ein Pixel.
+ */
 export const ARBEITSPIXEL_PRO_FWHM = 2.5;
+
+/** Kleinste Kantenlaenge eines Fensters in Anzeigepixeln (docs/entwuerfe/naht-variante-3.md 1.3, Fehlerfaelle). */
+export const FENSTER_MIN_PX = 16;
 
 /** Rundung der Naht-Schluessel und der Kernbeschreibung auf 4 signifikante Stellen (docs/architektur.md Abschnitt 3). */
 export const SIGNIFIKANTE_STELLEN = 4;

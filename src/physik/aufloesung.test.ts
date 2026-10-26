@@ -1,24 +1,12 @@
 import { describe, expect, it } from "vitest";
 import { atmosphaere } from "./atmosphaere";
 import { aufloesung } from "./aufloesung";
-import type { Bedingungen } from "./konfiguration";
 import { optik } from "./optik";
 import { quadratur } from "./profile";
+import { refraktorMitVergroesserung, zenit } from "./testdaten";
 
-// Refraktor mit Oeffnung D und Vergroesserung V (Brennweite 10 D, Okular passend).
 function refraktor(oeffnungMm: number, vergroesserung: number) {
-  return optik({
-    art: "fernrohr",
-    oeffnungMm,
-    brennweiteMm: 10 * oeffnungMm,
-    obstruktion: 0,
-    bauart: "refraktor",
-    okular: { brennweiteMm: (10 * oeffnungMm) / vergroesserung, scheinbaresGesichtsfeldGrad: 50 }
-  });
-}
-
-function zenit(seeingFwhmArcsec: number): Bedingungen {
-  return { seeingFwhmArcsec, bortle: 5, transparenz: "klar", hoeheGrad: 90 };
+  return optik(refraktorMitVergroesserung(oeffnungMm, vergroesserung));
 }
 
 // Testwerte aus docs/recherche/physik.md, Abschnitte 3.2, 8 und 9.

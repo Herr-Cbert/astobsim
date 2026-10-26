@@ -2,8 +2,8 @@ import { describe, expect, it } from "vitest";
 import type { Atmosphaere } from "./atmosphaere";
 import { PhysikFehler } from "./fehler";
 import { bortleMagProArcsec2, helligkeit } from "./helligkeit";
-import type { Objektzustand } from "./konfiguration";
 import type { Optik } from "./optik";
+import { MOND_Q1 as MOND } from "./testdaten";
 
 // Optik und Atmosphaere direkt als Skalare, damit jeder Faktor einzeln sichtbar wird.
 function optikMit(teil: Partial<Optik>): Optik {
@@ -18,13 +18,6 @@ function optikMit(teil: Partial<Optik>): Optik {
   };
 }
 const KLAR: Atmosphaere = { luftmasse: 1, seeingFwhmArcsec: 2, extinktionMag: 0, transmission: 1 };
-const MOND: Objektzustand = {
-  kennung: "mond-q1",
-  durchmesserArcsec: 1860,
-  magnitude: -10,
-  quelle: { breitePx: 7600, hoehePx: 7600, massstabArcsecProPx: 0.643, weissMagProArcsec2: 3.4 },
-  trabanten: []
-};
 
 // Testwerte aus docs/recherche/physik.md, Abschnitte 6.1, 6.2 und 8.
 describe("helligkeit: Objektfaktor", () => {

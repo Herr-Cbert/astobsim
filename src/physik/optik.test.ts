@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { PhysikFehler } from "./fehler";
 import { BAUARTEN, type Fernrohr } from "./konfiguration";
-import { TRANSMISSION } from "./konstanten";
+import { ARCSEC_PRO_GRAD, TRANSMISSION } from "./konstanten";
 import { austrittspupilleMm, flaechenhelligkeitsfaktor, optik, vergroesserungsgrenzen } from "./optik";
 
 // Testwerte aus docs/recherche/physik.md, Abschnitt 8.
@@ -46,7 +46,7 @@ describe("optik: Fernrohr", () => {
     expect(o.obstruktion).toBe(0);
     expect(o.transmission).toBe(0.9);
     expect(o.gesichtsfeld.form).toBe("kreis");
-    expect(o.gesichtsfeld.breiteArcsec).toBeCloseTo((50 / 56) * 3600, 6);
+    expect(o.gesichtsfeld.breiteArcsec).toBeCloseTo((50 / 56) * ARCSEC_PRO_GRAD, 6);
     expect(o.gesichtsfeld.hoeheArcsec).toBe(o.gesichtsfeld.breiteArcsec);
   });
   it.each(BAUARTEN)("Bauart %s hat ihre Transmission aus Abschnitt 5.2, Obstruktion bleibt getrennt", (bauart) => {
@@ -64,7 +64,7 @@ describe("optik: Fernglas", () => {
     expect(o.austrittspupilleMm).toBe(5);
     expect(o.obstruktion).toBe(0);
     expect(o.transmission).toBe(0.85);
-    expect(o.gesichtsfeld).toEqual({ form: "kreis", breiteArcsec: 6.5 * 3600, hoeheArcsec: 6.5 * 3600 });
+    expect(o.gesichtsfeld).toEqual({ form: "kreis", breiteArcsec: 6.5 * ARCSEC_PRO_GRAD, hoeheArcsec: 6.5 * ARCSEC_PRO_GRAD });
   });
 });
 
@@ -76,7 +76,7 @@ describe("optik: blosses Auge", () => {
     expect(o.austrittspupilleMm).toBe(6);
     expect(o.obstruktion).toBe(0);
     expect(o.transmission).toBe(1);
-    expect(o.gesichtsfeld).toEqual({ form: "rechteck", breiteArcsec: 5 * 3600, hoeheArcsec: 5 * 3600 });
+    expect(o.gesichtsfeld).toEqual({ form: "rechteck", breiteArcsec: 5 * ARCSEC_PRO_GRAD, hoeheArcsec: 5 * ARCSEC_PRO_GRAD });
   });
 });
 

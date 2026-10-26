@@ -47,5 +47,4 @@ export { airyProfil, gaussProfil, moffatProfil, quadratur } from "./profile";
 export { type Aufloesung, type Aufloesungsgrenze, aufloesung } from "./aufloesung";
 export { bortleMagProArcsec2, helligkeit } from "./helligkeit";
 export { arbeitsmassstab, kernSchluessel, kernbeschreibung } from "./arbeitsmassstab";
-export { rundeSignifikant, schluessel } from "./schluessel";
 export { GRENZEN, type Grenze, type Hinweis, begrenze } from "./begrenze";
