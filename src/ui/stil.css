@@ -1,0 +1,111 @@
+/* Grundlayout der Seite: dunkler Hintergrund (Beobachtung bei Nacht), Gesichtsfeld links,
+   Kennwerte rechts, auf schmalen Bildschirmen untereinander. */
+
+:root {
+  color-scheme: dark;
+  --hintergrund: #0b0d12;
+  --text: #d6d9e0;
+  --text-leise: #8a90a0;
+  --rand: #2a2f3a;
+  --fehler: #ff8a80;
+}
+
+body {
+  margin: 0;
+  background: var(--hintergrund);
+  color: var(--text);
+  font-family: system-ui, sans-serif;
+  line-height: 1.4;
+}
+
+#app {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 16px;
+}
+
+.kopf h1 {
+  margin: 0 0 4px;
+  font-size: 1.6rem;
+}
+
+.kopf p {
+  margin: 0 0 4px;
+}
+
+.untertitel,
+.konfiguration,
+.norden {
+  color: var(--text-leise);
+}
+
+.ansicht {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 24px;
+  align-items: flex-start;
+  margin-top: 16px;
+}
+
+.bild {
+  margin: 0;
+  flex: 1 1 320px;
+  max-width: 720px;
+}
+
+.norden {
+  text-align: center;
+  font-size: 0.85rem;
+  margin-bottom: 4px;
+}
+
+.gesichtsfeld {
+  display: block;
+  width: 100%;
+  aspect-ratio: 1;
+  background: #000;
+  outline: 1px solid var(--rand);
+  outline-offset: 0;
+}
+
+.gesichtsfeld[data-form="kreis"],
+.gesichtsfeld:not([data-form]) {
+  border-radius: 50%;
+}
+
+.info {
+  flex: 0 1 320px;
+}
+
+.info-liste {
+  display: grid;
+  grid-template-columns: auto auto;
+  gap: 6px 16px;
+  margin: 0;
+}
+
+.info-liste dt {
+  color: var(--text-leise);
+}
+
+.info-liste dd {
+  margin: 0;
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+
+.status {
+  margin-top: 16px;
+  color: var(--text-leise);
+}
+
+.status.fehler {
+  color: var(--fehler);
+}
+
+.status .details {
+  display: block;
+  font-family: ui-monospace, monospace;
+  font-size: 0.85rem;
+  overflow-wrap: anywhere;
+}
