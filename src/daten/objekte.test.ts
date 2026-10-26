@@ -44,6 +44,21 @@ describe("pruefeObjekte", () => {
     expect([f.datei, f.eintrag, f.feld]).toEqual(["objekte.json", "mond_ev", "magnitude"]);
   });
 
+  it("liest Mars mit drei Zustaenden und dem Hinweis fuer den Hilfetext bei 6 Bogensekunden", () => {
+    const mars = pruefeObjekte(objekteJson).find((o) => o.id === "mars");
+    expect(mars?.typ).toBe("planet");
+    expect(mars?.zustaende.map((z) => [z.id, z.winkelgroesseArcsec, z.weissMagProArcsec2])).toEqual([
+      ["mars_6", 6, 4.5],
+      ["mars_14", 14, 4.1],
+      ["mars_25", 25, 3.8]
+    ]);
+    expect(mars?.zustaende[0]?.hinweisHilfe).toContain("gibbos");
+    expect(mars?.zustaende[1]?.hinweisHilfe).toBeUndefined();
+    const roh = kopie();
+    ersterZustand(roh)["hinweis_hilfe"] = "";
+    expect(fehlerVon(() => pruefeObjekte(roh)).feld).toBe("hinweis_hilfe");
+  });
+
   it("prueft Zahlenbereiche", () => {
     const roh = kopie();
     ersterZustand(roh)["phase"] = 1.2;
@@ -123,6 +138,17 @@ describe("pruefeVerweise", () => {
     const andererZustand = nachweise.map((n) => ({ ...n, zustand: "mond_vollmond" }));
     const f = fehlerVon(() => pruefeVerweise(objekte, andererZustand));
     expect([f.datei, f.feld]).toEqual(["bilder.json", "zustand"]);
+  });
+
+  it("laesst mars_6 das Bild von mars_14 mitbenutzen; der Nachweis nennt mars_14", () => {
+    const mars = objekte.find((o) => o.id === "mars")!;
+    const bild = (id: string) => mars.zustaende.find((z) => z.id === id)!.bild;
+    expect(bild("mars_6")).toBe(bild("mars_14"));
+    expect(bild("mars_25")).not.toBe(bild("mars_14"));
+    expect(nachweise.find((n) => n.id === bild("mars_6"))!.zustand).toBe("mars_14");
+    // Ein geteiltes Bild darf aber nicht auf einen Zustand eines anderen Objekts zeigen.
+    const kaputt = nachweise.map((n) => (n.id === bild("mars_6") ? { ...n, zustand: "mond_ev" } : n));
+    expect(fehlerVon(() => pruefeVerweise(objekte, kaputt)).feld).toBe("zustand");
   });
 
   it("meldet einen Bildnachweis, den kein Zustand verwendet", () => {

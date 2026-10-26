@@ -2,7 +2,9 @@
 // Abschnitt 8): pruefeBildnachweise prueft die rohe Liste, ladeBildnachweise holt sie per fetch.
 // Kachelpyramiden (Mond) tragen das Unterobjekt kacheln; geprueft wird auch, dass die Stufen
 // zusammenpassen (halbierende Masse, verdoppelter Massstab, Kachelanzahl), weil QuelleKacheln
-// sich darauf verlaesst.
+// sich darauf verlaesst. Einzelbilder (Planeten, QuelleEinzelbild) haben kein kacheln, dafuer
+// datei_bytes, damit die Grenze von 20 MB je Objekt (A-X6) auch sie erfasst. Dass Masse und
+// Bytes zu den Dateien passen, prueft bilddateien.test.ts (und tools/bildnachweis_pruefen.py).
 
 import { DatenFehler } from "./fehler";
 import { alsListe, alsObjekt, ganzzahl, ladeJson, nurBekannteFelder, optional, text, wahrheitswert, zahl, type Ort } from "./pruefe";
@@ -34,6 +36,10 @@ export interface Kachelpyramide {
 export interface Bildnachweis {
   id: string;
   objekt: string;
+  /**
+   * Zustand, fuer den das Bild ausgewaehlt wurde. Weitere Zustaende desselben Objekts duerfen es
+   * ueber ihr Feld bild mitbenutzen (mars_6 nutzt das Bild von mars_14, pruefeVerweise).
+   */
   zustand: string;
   /** Pfad relativ zu daten/bilder/, bei Kachelpyramiden das Verzeichnis (endet auf /). */
   datei: string;
@@ -55,6 +61,8 @@ export interface Bildnachweis {
   nordenOben: boolean;
   bearbeitung: string;
   hinweise?: string;
+  /** Nur Einzelbilder: Groesse der Datei in Byte (A-X6); Kachelpyramiden nennen kacheln.gesamtBytes. */
+  dateiBytes?: number;
   kacheln?: Kachelpyramide;
 }
 
@@ -69,7 +77,8 @@ const FELDER_EINTRAG = [
   "id", "objekt", "zustand", "datei", "quelle_url", "quelle_datei", "mission", "instrument", "aufnahmedatum",
   "lizenz", "lizenz_url", "namensnennung", "pixel_breite", "pixel_hoehe", "original_pixel", "winkelgroesse_arcsec",
   "ringe_arcsec", "objekt_durchmesser_px", "bogensekunden_pro_pixel", "norden_oben", "sub_erde_breite_grad",
-  "sub_erde_laenge_grad", "phase", "kolongitude_grad", "positionswinkel_achse_grad", "bearbeitung", "hinweise", "kacheln"
+  "sub_erde_laenge_grad", "phase", "kolongitude_grad", "positionswinkel_achse_grad", "datei_bytes", "bearbeitung", "hinweise",
+  "kacheln"
 ] as const;
 const FELDER_KACHELN = ["kachel_px", "format", "qualitaet", "muster", "gesamt_bytes", "stufen"] as const;
 const FELDER_STUFE = ["stufe", "breite_px", "hoehe_px", "bogensekunden_pro_pixel", "kacheln_x", "kacheln_y"] as const;
@@ -87,17 +96,22 @@ export function pruefeBildnachweise(roh: unknown): Bildnachweis[] {
     nurBekannteFelder(obj, ort, FELDER_EINTRAG);
     return pruefeEintrag(obj, id, ort);
   });
-  // Nachgeladene Bilder je Objekt unter 20 MB (A-X6); bekannt ist die Groesse bei Kachelpyramiden.
+  // Nachgeladene Bilder je Objekt unter 20 MB (A-X6): Kachelpyramiden und Einzelbilder zusammen.
   const bytesJeObjekt = new Map<string, number>();
   for (const n of nachweise) {
-    if (n.kacheln === undefined) continue;
-    const summe = (bytesJeObjekt.get(n.objekt) ?? 0) + n.kacheln.gesamtBytes;
+    const summe = (bytesJeObjekt.get(n.objekt) ?? 0) + bildBytes(n);
     bytesJeObjekt.set(n.objekt, summe);
     if (summe > GRENZE_BYTES_JE_OBJEKT) {
-      throw new DatenFehler(BILDER_DATEI, n.id, "kacheln.gesamt_bytes", `Objekt ${n.objekt} hat ${summe} Byte, mehr als 20 MB (A-X6)`);
+      const feld = n.kacheln === undefined ? "datei_bytes" : "kacheln.gesamt_bytes";
+      throw new DatenFehler(BILDER_DATEI, n.id, feld, `Objekt ${n.objekt} hat ${summe} Byte, mehr als 20 MB (A-X6)`);
     }
   }
   return nachweise;
+}
+
+/** Bytes, die ein Nachweis im Repo belegt: alle Kacheln oder die eine Datei. */
+export function bildBytes(nachweis: Bildnachweis): number {
+  return nachweis.kacheln?.gesamtBytes ?? nachweis.dateiBytes ?? 0;
 }
 
 /** Laedt daten/bilder.json und prueft sie. */
@@ -166,9 +180,16 @@ function pruefeEintrag(obj: Record<string, unknown>, id: string, ort: Ort): Bild
     );
   }
   const kacheln = optional(obj, "kacheln", (o, f) => pruefeKacheln(alsObjekt(o[f], ort, f), nachweis, ort));
+  const dateiBytes = optional(obj, "datei_bytes", (o, f) => ganzzahl(o, f, ort, 1));
   if (kacheln !== undefined) {
     if (!nachweis.datei.endsWith("/")) throw new DatenFehler(ort.datei, id, "datei", "Verzeichnis mit / am Ende erwartet (Kachelpyramide)");
+    if (dateiBytes !== undefined) throw new DatenFehler(ort.datei, id, "datei_bytes", "nur bei Einzelbildern; Kachelpyramiden nennen kacheln.gesamt_bytes");
     nachweis.kacheln = kacheln;
+  } else {
+    // Einzelbild: eine Datei, deren Groesse fuer A-X6 bekannt sein muss.
+    if (nachweis.datei.endsWith("/")) throw new DatenFehler(ort.datei, id, "datei", "Datei erwartet, kein Verzeichnis (Einzelbild ohne kacheln)");
+    if (dateiBytes === undefined) throw new DatenFehler(ort.datei, id, "datei_bytes", "Pflicht bei Einzelbildern (A-X6)");
+    nachweis.dateiBytes = dateiBytes;
   }
   return nachweis;
 }

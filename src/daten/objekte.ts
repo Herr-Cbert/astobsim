@@ -18,7 +18,8 @@ export type Objekttyp = (typeof OBJEKTTYPEN)[number];
 const FELDER_OBJEKT = ["id", "name", "typ", "quelle_physik", "zustaende"] as const;
 const FELDER_ZUSTAND = [
   "id", "name", "winkelgroesse_arcsec", "polar_arcsec", "phase", "phasenwinkel_grad", "kolongitude_grad",
-  "ringneigung_grad", "ring_aussen_arcsec", "magnitude", "weiss_mag_arcsec2", "entfernung_au", "bild", "trabanten", "kommentar"
+  "ringneigung_grad", "ring_aussen_arcsec", "magnitude", "weiss_mag_arcsec2", "entfernung_au", "bild", "trabanten", "hinweis_hilfe",
+  "kommentar"
 ] as const;
 const FELDER_TRABANT = ["name", "dx_arcsec", "dy_arcsec", "durchmesser_arcsec", "magnitude"] as const;
 
@@ -45,6 +46,11 @@ export interface ZustandEintrag {
   ringneigungGrad?: number;
   ringAussenArcsec?: number;
   trabanten: Trabant[];
+  /**
+   * Satz fuer den Hilfetext zu diesem Zustand (z. B. Mars 6" gibbos, aber als Vollscheibe gezeigt,
+   * A-X1); ui zeigt ihn an. kommentar dagegen ist nur Dokumentation der Datei.
+   */
+  hinweisHilfe?: string;
   kommentar?: string;
 }
 
@@ -116,6 +122,8 @@ function pruefeZustand(wert: unknown, typ: Objekttyp, ortIndex: Ort): ZustandEin
   if (ringneigung !== undefined) zustand.ringneigungGrad = ringneigung;
   const ringAussen = optZahl("ring_aussen_arcsec", 0.1, 4000);
   if (ringAussen !== undefined) zustand.ringAussenArcsec = ringAussen;
+  const hinweisHilfe = optional(obj, "hinweis_hilfe", (o, f) => text(o, f, ort));
+  if (hinweisHilfe !== undefined) zustand.hinweisHilfe = hinweisHilfe;
   const kommentar = optional(obj, "kommentar", (o, f) => text(o, f, ort));
   if (kommentar !== undefined) zustand.kommentar = kommentar;
 
@@ -139,7 +147,9 @@ function pruefeZustand(wert: unknown, typ: Objekttyp, ortIndex: Ort): ZustandEin
 /**
  * Prueft den Verweis Zustand -> Bildnachweis: jedes bild zeigt auf einen vorhandenen Nachweis
  * desselben Objekts, und dessen zustand nennt einen Zustand dieses Objekts. Zwei Zustaende duerfen
- * sich ein Bild teilen (Jupiter 47" und 35", bilder.md Abschnitt 4). Ein Nachweis, den kein
+ * sich ein Bild teilen (Mars 14" und 6", Jupiter 47" und 35", bilder.md Abschnitte 3 und 4): der
+ * Nachweis nennt in zustand den Zustand, fuer den das Bild ausgewaehlt wurde (mars_14), der andere
+ * verweist nur ueber bild darauf; die Datei liegt einmal im Repo. Ein Nachweis, den kein
  * Zustand verwendet, ist ebenfalls ein Fehler (Bild im Repo, das niemand nutzt).
  */
 export function pruefeVerweise(objekte: readonly Objekt[], nachweise: readonly Bildnachweis[]): void {
