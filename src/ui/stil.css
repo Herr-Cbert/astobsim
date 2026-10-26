@@ -73,6 +73,12 @@ body {
   border-radius: 50%;
 }
 
+.nachweis {
+  margin-top: 8px;
+  font-size: 0.8rem;
+  color: var(--text-leise);
+}
+
 .info {
   flex: 0 1 320px;
 }

@@ -13,7 +13,7 @@ export interface Infozeile {
 
 const E = TEXTE.einheiten;
 
-/** Bogensekunden mit zwei Nachkommastellen, z. B. 1,73'' (als Zeichen ″). */
+/** Bogensekunden mit zwei Nachkommastellen, z. B. 1,73 mit dem Bogensekundenzeichen aus TEXTE.einheiten. */
 function bogensekunden(wert: number): string {
   return `${zahl(wert, 2)}${E.bogensekunde}`;
 }

@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { TEXTE } from "../texte";
 import { zahl } from "./format";
 
 describe("zahl", () => {
@@ -15,8 +16,8 @@ describe("zahl", () => {
     expect(zahl(-1.5, 1)).toBe("-1,5");
   });
 
-  it("zeigt nicht endliche Werte als Gedankenstrich", () => {
-    expect(zahl(NaN, 2)).toBe("–");
-    expect(zahl(Infinity, 0)).toBe("–");
+  it("zeigt nicht endliche Werte als Fehlwert aus texte.ts", () => {
+    expect(zahl(NaN, 2)).toBe(TEXTE.fehlwert);
+    expect(zahl(Infinity, 0)).toBe(TEXTE.fehlwert);
   });
 });

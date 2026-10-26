@@ -7,7 +7,7 @@
 import "./stil.css";
 import { ANZEIGEGRENZE_OHNE_WEBGL2_PX, FalterJs, rendere, type Zwischenspeicher } from "../bild";
 import { ladeBildnachweise, ladeGeraete, ladeObjekte, quelleKachelnBrowser } from "../daten";
-import { type Auswertung, auswerten, begrenze } from "../physik";
+import { type Auswertung, auswerten, begrenze, type Konfiguration } from "../physik";
 import { TEXTE } from "../texte";
 import { ausschnittsanfrage, waehleAnzeigePx } from "./fenster";
 import { infozeilen, zeigeInfozeilen } from "./infopanel";
@@ -18,6 +18,7 @@ import { zeichneAnblick } from "./zeichne";
 interface Seite {
   canvas: HTMLCanvasElement;
   info: HTMLElement;
+  nachweis: HTMLElement;
   status: HTMLElement;
 }
 
@@ -38,7 +39,8 @@ function baueSeite(wurzel: HTMLElement): Seite {
   canvas.setAttribute("role", "img");
   canvas.setAttribute("aria-label", TEXTE.gesichtsfeld);
   const bild = element("figure", "bild");
-  bild.append(element("div", "norden", TEXTE.nordenOben), canvas);
+  const nachweis = element("figcaption", "nachweis");
+  bild.append(element("div", "norden", TEXTE.nordenOben), canvas, nachweis);
 
   const info = element("aside", "info");
   info.setAttribute("aria-label", TEXTE.info.ueberschrift);
@@ -51,7 +53,7 @@ function baueSeite(wurzel: HTMLElement): Seite {
   status.setAttribute("aria-live", "polite");
 
   wurzel.replaceChildren(kopf, ansicht, status);
-  return { canvas, info, status };
+  return { canvas, info, nachweis, status };
 }
 
 function zeigeStatus(seite: Seite, text: string): void {
@@ -70,9 +72,24 @@ function zeigeFehler(seite: Seite, meldung: string, fehler: unknown): void {
   seite.status.replaceChildren(d.createTextNode(meldung + " "), details);
 }
 
-/** Wartet, bis der Browser den Statustext gezeichnet hat, bevor die Faltung den Hauptthread belegt. */
+/** Rueckfall fuer naechsterFrame in ms: im Hintergrund-Tab ruft der Browser requestAnimationFrame nicht auf. */
+const FRAME_RUECKFALL_MS = 100;
+
+/**
+ * Wartet, bis der Browser den Statustext gezeichnet hat, bevor die Faltung den Hauptthread belegt.
+ * Kommt kein Frame (Hintergrund-Tab), geht es nach FRAME_RUECKFALL_MS ueber setTimeout weiter.
+ */
 function naechsterFrame(): Promise<void> {
-  return new Promise((weiter) => requestAnimationFrame(() => setTimeout(weiter, 0)));
+  return new Promise((weiter) => {
+    let fertig = false;
+    const einmal = (): void => {
+      if (fertig) return;
+      fertig = true;
+      weiter();
+    };
+    requestAnimationFrame(() => setTimeout(einmal, 0));
+    setTimeout(einmal, FRAME_RUECKFALL_MS);
+  });
 }
 
 async function ladeStart(): Promise<Startkonfiguration> {
@@ -99,9 +116,12 @@ export async function starte(wurzel: HTMLElement): Promise<void> {
     return;
   }
 
+  seite.nachweis.textContent = TEXTE.bildnachweis(start.nachweis.namensnennung, start.nachweis.lizenz);
+
   let auswertung: Auswertung;
+  let konfiguration: Konfiguration;
   try {
-    const { konfiguration } = begrenze(start.konfiguration);
+    konfiguration = begrenze(start.konfiguration).konfiguration;
     const breiteCss = seite.canvas.getBoundingClientRect().width;
     const anzeigePx = waehleAnzeigePx(breiteCss, window.devicePixelRatio, ANZEIGEGRENZE_OHNE_WEBGL2_PX);
     auswertung = auswerten(konfiguration, { anzeigePx });
@@ -113,7 +133,7 @@ export async function starte(wurzel: HTMLElement): Promise<void> {
 
   const { parameter } = auswertung;
   zeigeStatus(seite, TEXTE.status.ladeKacheln);
-  const quelle = quelleKachelnBrowser(start.nachweis, start.konfiguration.objekt.durchmesserArcsec);
+  const quelle = quelleKachelnBrowser(start.nachweis, konfiguration.objekt.durchmesserArcsec);
   try {
     const anfrage = ausschnittsanfrage(parameter.quellbild);
     await quelle.lade(anfrage.mitte, anfrage.breiteArcsec, anfrage.massstabArcsecProPx);

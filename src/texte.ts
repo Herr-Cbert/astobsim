@@ -1,7 +1,7 @@
 // Alle Oberflaechentexte an einer Stelle (A-D10), damit eine Uebersetzung spaeter moeglich ist.
-// Umlaute und Sonderzeichen stehen als Unicode-Escape (ö = oe, ä = ae, ß = ss,
-// ° = Grad, ′ = Bogenminute, ″ = Bogensekunde, × = mal), damit der
-// Quelltext ASCII bleibt und die Oberflaeche trotzdem richtiges Deutsch zeigt.
+// Ausnahme von der ASCII-Regel (CLAUDE.md): Die Oberflaechentexte in dieser Datei stehen in
+// UTF-8 mit echten Umlauten und Sonderzeichen (Grad, Bogenminute, Bogensekunde, Malzeichen).
+// Bezeichner und Kommentare bleiben ASCII.
 
 export const TEXTE = {
   titel: "astobsim",
@@ -11,6 +11,10 @@ export const TEXTE = {
   startkonfiguration:
     "Refraktor 80/600, Okular 10 mm mit 50°, Mond kurz nach dem ersten Viertel, Seeing 2″, Bortle 5, klar, Höhe 45°",
   nordenOben: "Norden oben",
+  /** Namensnennung des Quellbilds unter dem Gesichtsfeld (aus bilder.json). */
+  bildnachweis: (namensnennung: string, lizenz: string): string => `Bild: ${namensnennung} Lizenz: ${lizenz}.`,
+  /** Platzhalter fuer einen nicht endlichen Zahlenwert. */
+  fehlwert: "–",
   gesichtsfeld: "Anblick im wahren Gesichtsfeld",
 
   status: {

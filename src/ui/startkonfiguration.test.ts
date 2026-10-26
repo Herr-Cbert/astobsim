@@ -10,6 +10,7 @@ import { pruefeBildnachweise, pruefeGeraete, pruefeObjekte } from "../daten";
 import { auswerten, begrenze } from "../physik";
 import { ausschnittsanfrage, type Ausschnittsanfrage } from "./fenster";
 import { infozeilen } from "./infopanel";
+import { TEXTE } from "../texte";
 import { startkonfiguration } from "./startkonfiguration";
 
 const nachweise = pruefeBildnachweise(bilderJson);
@@ -56,15 +57,17 @@ describe("Durchstich ohne Browser", () => {
 
   it("zeigt die Kennwerte A-D4 mit Beschriftung und Einheit", () => {
     const zeilen = infozeilen(auswertung.anzeige);
+    const { fach, grad, bogenminute, bogensekunde } = TEXTE.einheiten;
+    const sek = (muster: string): RegExp => new RegExp(`^${muster}${bogensekunde}$`);
     expect(zeilen.map((z) => z.wert)).toEqual([
-      "60×",
-      "0,83° (50′)",
+      `60${fach}`,
+      `0,83${grad} (50${bogenminute})`,
       "1,3 mm",
-      expect.stringMatching(/^1,7\d″$/),
-      expect.stringMatching(/^1,4\d″$/),
-      expect.stringMatching(/^2,\d\d″$/),
-      "1,00″",
-      "Seeing"
+      expect.stringMatching(sek("1,7\\d")),
+      expect.stringMatching(sek("1,4\\d")),
+      expect.stringMatching(sek("2,\\d\\d")),
+      `1,00${bogensekunde}`,
+      TEXTE.grenzen.seeing
     ]);
     expect(zeilen.every((z) => z.beschriftung.length > 0)).toBe(true);
   });
