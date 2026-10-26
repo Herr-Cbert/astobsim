@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { DatenFehler } from "./fehler";
-import { alsListe, alsObjekt, optional, text, wahl, zahl } from "./pruefe";
+import { alsListe, alsObjekt, ganzzahl, nurBekannteFelder, optional, text, wahl, wahrheitswert, zahl } from "./pruefe";
 
 const ort = { datei: "test.json", eintrag: "mond" };
 
@@ -41,5 +41,19 @@ describe("pruefe", () => {
     expect(() => zahl({ d: Number.NaN }, "d", ort)).toThrow(DatenFehler);
     expect(() => zahl({ d: 11 }, "d", ort, 0, 10)).toThrow(DatenFehler);
     expect(() => wahl({ art: "linie" }, "art", ort, ["flaeche"] as const)).toThrow(DatenFehler);
+  });
+
+  it("prueft ganze Zahlen und Wahrheitswerte", () => {
+    expect(ganzzahl({ n: 512 }, "n", ort, 1)).toBe(512);
+    expect(() => ganzzahl({ n: 1.5 }, "n", ort)).toThrow(DatenFehler);
+    expect(() => ganzzahl({ n: 0 }, "n", ort, 1)).toThrow(DatenFehler);
+    expect(wahrheitswert({ b: false }, "b", ort)).toBe(false);
+    expect(() => wahrheitswert({ b: "true" }, "b", ort)).toThrow(DatenFehler);
+    expect(fehlerVon(() => wahrheitswert({}, "b", ort)).feld).toBe("b");
+  });
+
+  it("meldet unbekannte Felder", () => {
+    expect(() => nurBekannteFelder({ name: "Mond" }, ort, ["name", "typ"])).not.toThrow();
+    expect(fehlerVon(() => nurBekannteFelder({ name: "Mond", nmae: "x" }, ort, ["name"])).feld).toBe("nmae");
   });
 });
