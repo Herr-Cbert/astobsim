@@ -70,7 +70,7 @@ export interface Helligkeit {                          // Stufe 3: Tonwert (bill
 export interface Gesichtsfeld { form: 'kreis' | 'rechteck'; breiteArcsec: number; hoeheArcsec: number; }
 export interface Simulationsparameter {
   quellbild: Quellbild; kern: Kern; helligkeit: Helligkeit;
-  gesichtsfeld: Gesichtsfeld;                          // Maske, zentriert auf Objektkoordinate 0/0
+  gesichtsfeld: Gesichtsfeld;                          // Maske, zentriert auf Objektkoordinate 0/0 [Nachtrag 2026-10-26: korrigiert auf Fenstermitte, Issue #6]
   fenster: Fenster;                                    // Stufe 4: Anzeige (Skalierung, Maske), immer billig
 }
 ```
@@ -132,7 +132,7 @@ export function kernFwhmArcsec(kern: Kern): number;
 
 Reihenfolge und Kosten von `auswerten`: `optik -> atmosphaere -> aufloesung -> fenster (Standard: ganzes Gesichtsfeld, anzeigePx 1024) -> arbeitsmassstab -> kernbeschreibung`; dann **nur wenn** `vorher?.kern.schluessel` nicht passt `baueKern`; dann `helligkeit`, `punktquellen`, Schluessel. Ohne Kernbau unter 0,1 ms. Der Kern aendert sich genau dann, wenn eine der fuenf Groessen der `Kernbeschreibung` sich (gerundet) aendert: D, Obstruktion, Seeing am Objekt (also Seeing oder Hoehe), Augen-FWHM (also V) oder Arbeitsmassstab (also Fenster oder Quelle). Bortle, Transparenz, Verschieben: kein Kernbau.
 
-Fehlerfaelle: `auswerten` und die Stufe-1-Funktionen werfen `PhysikFehler { feld: string; wert: number }` bei NaN, D <= 0, V < 1, Obstruktion ausserhalb 0..0,5, Hoehe ausserhalb 0..90, Fenster mit px < 16 oder breite <= 0. Das sind Programmierfehler; Nutzereingaben gehen vorher durch `begrenzeKonfiguration`, das nie wirft, sondern schneidet und Hinweise liefert. `baueKern` wirft, wenn das Raster den Kern nicht fassen kann (R < 2): passiert nicht, wenn der Massstab aus `arbeitsmassstab` kommt (Invariante: FWHM >= 2,5 Arbeitspixel).
+Fehlerfaelle: `auswerten` und die Stufe-1-Funktionen werfen `PhysikFehler { feld: string; wert: number }` bei NaN, D <= 0, V < 1, Obstruktion ausserhalb 0..0,5, Hoehe ausserhalb 0..90, Fenster mit px < 16 oder breite <= 0. Das sind Programmierfehler; Nutzereingaben gehen vorher durch `begrenzeKonfiguration`, das nie wirft, sondern schneidet und Hinweise liefert. `baueKern` wirft, wenn das Raster den Kern nicht fassen kann (R < 2): passiert nicht, wenn der Massstab aus `arbeitsmassstab` kommt (Invariante: FWHM >= 2,5 Arbeitspixel). [Nachtrag 2026-10-26: Die Invariante lautet umgekehrt FWHM hoechstens 2,5 Arbeitspixel (Arbeitsmassstab >= FWHM / 2,5, ADR-0002); baueKern traegt den Sub-Pixel-Fall, Issue #4.]
 
 ## 2. Beispiele
 
