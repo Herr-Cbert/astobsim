@@ -13,7 +13,7 @@ import { DatenFehler } from "./fehler";
 import type { Ort } from "./pruefe";
 import { alsListe, alsObjekt, ladeJson, optional, text, wahl, zahl } from "./pruefe";
 
-const DATEI = "geraete.json";
+export const GERAETE_DATEI = "geraete.json";
 const TYPEN = ["fernrohr", "fernglas", "auge"] as const;
 
 /**
@@ -65,18 +65,18 @@ export function mitOkular(geraet: Listengeraet, okular: Okular): Geraet {
 
 /** Laedt daten/geraete.json und prueft sie. */
 export async function ladeGeraete(): Promise<Geraeteeintrag[]> {
-  return pruefeGeraete(await ladeJson(DATEI));
+  return pruefeGeraete(await ladeJson(GERAETE_DATEI));
 }
 
 /** Prueft den rohen Inhalt von geraete.json und liefert die typisierten Eintraege. */
 export function pruefeGeraete(roh: unknown): Geraeteeintrag[] {
-  const liste = alsListe(roh, { datei: DATEI, eintrag: "-" }, "-");
+  const liste = alsListe(roh, { datei: GERAETE_DATEI, eintrag: "-" }, "-");
   const ids = new Set<string>();
   return liste.map((wert, index) => {
-    const obj = alsObjekt(wert, { datei: DATEI, eintrag: String(index) }, "-");
+    const obj = alsObjekt(wert, { datei: GERAETE_DATEI, eintrag: String(index) }, "-");
     const eintrag = pruefeEintrag(obj, index);
     if (ids.has(eintrag.id)) {
-      throw new DatenFehler(DATEI, eintrag.id, "id", "doppelt vergeben");
+      throw new DatenFehler(GERAETE_DATEI, eintrag.id, "id", "doppelt vergeben");
     }
     ids.add(eintrag.id);
     return eintrag;
@@ -84,9 +84,9 @@ export function pruefeGeraete(roh: unknown): Geraeteeintrag[] {
 }
 
 function pruefeEintrag(obj: Record<string, unknown>, index: number): Geraeteeintrag {
-  const id = text(obj, "id", { datei: DATEI, eintrag: String(index) });
-  const ort: Ort = { datei: DATEI, eintrag: id };
-  if (!/^[a-z0-9-]+$/.test(id)) throw new DatenFehler(DATEI, id, "id", "nur a-z, 0-9 und - erlaubt");
+  const id = text(obj, "id", { datei: GERAETE_DATEI, eintrag: String(index) });
+  const ort: Ort = { datei: GERAETE_DATEI, eintrag: id };
+  if (!/^[a-z0-9-]+$/.test(id)) throw new DatenFehler(GERAETE_DATEI, id, "id", "nur a-z, 0-9 und - erlaubt");
   const name = text(obj, "name", ort);
   const kommentar = optional(obj, "kommentar", (o, f) => text(o, f, ort));
   const typ = wahl(obj, "typ", ort, TYPEN);
