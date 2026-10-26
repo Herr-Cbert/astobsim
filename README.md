@@ -10,7 +10,7 @@ Das Projekt dient ausserdem als Uebungsprojekt fuer die Entwicklung mit Claude C
 
 ## Stand
 
-Phase 3 (Architektur) abgeschlossen. Stack: TypeScript, Vite, Vitest, Vanilla DOM mit Canvas und WebGL2 ([ADR-0001](docs/adr/0001-stack.md)); Simulationsmodell ([ADR-0002](docs/adr/0002-simulationsmodell.md)); Datenformat ([ADR-0003](docs/adr/0003-datenformat.md)). Modulschnitt in [docs/architektur.md](docs/architektur.md), Begriffe in [GLOSSARY.md](GLOSSARY.md). Der Wegwerf-Prototyp zur Faltung liegt auf dem Branch `prototyp-faltung`. Anforderungen in [docs/anforderungen.md](docs/anforderungen.md), Recherche in [docs/recherche/](docs/recherche/README.md). Naechster Schritt: Phase 4 (Zerlegung in Issues).
+Phase 4 (Zerlegung) abgeschlossen. Die Arbeitspakete fuer Version 1 liegen als Issues #1 bis #23 in drei Milestones (M1 "Mond im 80 mm Refraktor sichtbar", M2 "Alle Objekte und volle Bedienung", M3 "Version 1") auf GitHub, die Kann-Punkte als #24 bis #38 im Milestone "Nach Version 1". Reihenfolge, Abhaengigkeiten und Spielregeln in [docs/plan.md](docs/plan.md). Architektur: Stack ([ADR-0001](docs/adr/0001-stack.md)), Simulationsmodell ([ADR-0002](docs/adr/0002-simulationsmodell.md)), Datenformat ([ADR-0003](docs/adr/0003-datenformat.md)), Modulschnitt in [docs/architektur.md](docs/architektur.md), Begriffe in [GLOSSARY.md](GLOSSARY.md). Anforderungen in [docs/anforderungen.md](docs/anforderungen.md), Recherche in [docs/recherche/](docs/recherche/README.md). Der Wegwerf-Prototyp liegt auf dem Branch `prototyp-faltung`. Naechster Schritt: Phase 5 (Umsetzung), Stufe A sequentiell mit Issue #1.
 
 ## Entwicklung
 
