@@ -1,8 +1,8 @@
 // auswerten (Stufe 3): Konfiguration zu Simulationsparametern, Anzeigewerten und Warnungen in
 // einem Aufruf (docs/architektur.md Abschnitt 3, docs/entwuerfe/naht-variante-3.md Abschnitt 1.3,
 // A-D4, A-D5, A-D7). Reihenfolge: optik -> atmosphaere -> aufloesung -> fenster -> arbeitsmassstab
-// -> kernbeschreibung; dann nur bei geaendertem Kernschluessel baueKern; dann helligkeit,
-// Punktquellen, Schluessel. Formeln stehen in den Stufe-1-Funktionen, hier kommt keine neue hinzu.
+// -> Arbeitsraster -> kernbeschreibung; dann nur bei geaendertem Kernschluessel baueKern; dann
+// Quellbild mit Schluessel (Punktquellen ab #14), helligkeit, Anzeigewerte, Warnungen. Formeln stehen in den Stufe-1-Funktionen, hier kommt keine neue hinzu.
 //
 // Keine Memoisierung: Wiederverwendet wird nur der Kern aus vorher (architektur.md: ein vorher
 // statt Cache). Bortle, Transparenz und Verschieben bauen keinen Kern; Seeing, Hoehe, Oeffnung,
@@ -60,7 +60,9 @@ export interface Auswertung {
  * fenster: was angezeigt wird (Zoom A-D3, Verschieben A-D2); ohne Angabe das ganze wahre
  * Gesichtsfeld, Objekt zentriert, anzeigePx Pixel (Standard 1024). anzeigePx gilt nur fuer das
  * Standardfenster. vorher: die Parameter des letzten Aufrufs, deren Kern bei gleichem Schluessel
- * wiederverwendet wird.
+ * wiederverwendet wird. Dabei teilen sich alter und neuer Kern kern.daten: die Parameter nie per
+ * Transfer verschicken (postMessage mit Transferliste), sonst ist vorher.kern.daten danach
+ * detached und der naechste Reglerzug liefert einen leeren Kern. Ohne Transferliste wird kopiert.
  */
 export interface Auswertoptionen {
   fenster?: Fenster;
@@ -73,7 +75,7 @@ function standardfenster(o: Optik, px: number): Fenster {
   return { breiteArcsec: o.gesichtsfeld.breiteArcsec, mitteXArcsec: 0, mitteYArcsec: 0, px };
 }
 
-/** Programmierfehler im Fenster: Mitte nicht endlich, px keine ganze Zahl (px < 16 und Breite <= 0 prueft arbeitsmassstab). */
+/** Programmierfehler im Fenster: Mitte nicht endlich, px keine ganze Zahl (px < 16 und Breite <= 0 prueft arbeitsmassstab, zu schmale Breite arbeitsraster). */
 function pruefeFenster(f: Fenster): void {
   if (!Number.isFinite(f.mitteXArcsec)) throw new PhysikFehler("fenster.mitteXArcsec", f.mitteXArcsec, "ist nicht endlich");
   if (!Number.isFinite(f.mitteYArcsec)) throw new PhysikFehler("fenster.mitteYArcsec", f.mitteYArcsec, "ist nicht endlich");
@@ -83,11 +85,16 @@ function pruefeFenster(f: Fenster): void {
 /**
  * Arbeitsraster zum Fenster: rasterPx ganzzahlig, Massstab genau fenster.breite / rasterPx
  * (Invariante rasterPx * massstab = fenster.breiteArcsec). rasterPx wird abgerundet, damit der
- * Massstab nie feiner als der aus arbeitsmassstab() wird (ADR-0002 bleibt erfuellt); mindestens 1.
+ * Massstab nie feiner als der aus arbeitsmassstab() wird (ADR-0002 bleibt erfuellt). Ein Fenster
+ * schmaler als ein Arbeitspixel (Zoom unter 0,4 Gesamt-FWHM oder unter einem Quellpixel) ist ein
+ * Programmierfehler der ui: PhysikFehler.
  */
 function arbeitsraster(fenster: Fenster, massstabMin: number): { rasterPx: number; massstabArcsecProPx: number } {
   // 1e-9: ist der Fenstermassstab massgebend, ergibt breite / (breite / px) sonst 1023,999... statt 1024.
-  const rasterPx = Math.max(1, Math.floor(fenster.breiteArcsec / massstabMin + 1e-9));
+  const rasterPx = Math.floor(fenster.breiteArcsec / massstabMin + 1e-9);
+  if (rasterPx < 1) {
+    throw new PhysikFehler("fenster.breiteArcsec", fenster.breiteArcsec, `ist schmaler als ein Arbeitspixel (${massstabMin}'')`);
+  }
   return { rasterPx, massstabArcsecProPx: fenster.breiteArcsec / rasterPx };
 }
 
@@ -129,10 +136,11 @@ export function auswerten(k: Konfiguration, optionen: Auswertoptionen = {}): Aus
   const gebaut: Kern = vorherKern !== undefined && vorherKern.schluessel === kernSchluessel(beschreibung) ? vorherKern : baueKern(beschreibung);
   const kern = gebaut.massstabArcsecProPx === massstabArcsecProPx ? gebaut : { ...gebaut, massstabArcsecProPx };
 
-  // Die Mitte geht ungerundet in den Schluessel: Verschieben um weniger als die vierte Stelle
-  // ist bei feinem Massstab mehrere Arbeitspixel weit. Punktquellen kommen mit Issue #14.
+  // Massstab und Mitte gehen ungerundet in den Schluessel, damit gleicher Schluessel gleiches
+  // Ergebnis heisst: Verschieben um weniger als die vierte Stelle ist bei feinem Massstab mehrere
+  // Arbeitspixel weit, und bild fragt mit rasterPx * massstab an. Punktquellen kommen mit Issue #14.
   const quellbild: Quellbild = {
-    schluessel: schluessel("quellbild", k.objekt.kennung, massstabArcsecProPx, rasterPx, String(fenster.mitteXArcsec), String(fenster.mitteYArcsec)),
+    schluessel: schluessel("quellbild", k.objekt.kennung, String(massstabArcsecProPx), rasterPx, String(fenster.mitteXArcsec), String(fenster.mitteYArcsec)),
     objekt: k.objekt.kennung,
     massstabArcsecProPx,
     rasterPx,

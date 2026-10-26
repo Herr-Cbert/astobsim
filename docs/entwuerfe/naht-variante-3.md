@@ -130,6 +130,8 @@ export function kontrastUebertragung(kern: Kern, periodeArcsec: number): number;
 export function kernFwhmArcsec(kern: Kern): number;
 ```
 
+[Nachtrag 2026-10-26, Issue #5: `Anzeigewerte` fuehrt Pickering als Zahlen `pickeringVon` und `pickeringBis` statt als String, `seeingWortstufe` hat den Typ `Seeingwortstufe`; die Texte macht ui.]
+
 Reihenfolge und Kosten von `auswerten`: `optik -> atmosphaere -> aufloesung -> fenster (Standard: ganzes Gesichtsfeld, anzeigePx 1024) -> arbeitsmassstab -> kernbeschreibung`; dann **nur wenn** `vorher?.kern.schluessel` nicht passt `baueKern`; dann `helligkeit`, `punktquellen`, Schluessel. Ohne Kernbau unter 0,1 ms. Der Kern aendert sich genau dann, wenn eine der fuenf Groessen der `Kernbeschreibung` sich (gerundet) aendert: D, Obstruktion, Seeing am Objekt (also Seeing oder Hoehe), Augen-FWHM (also V) oder Arbeitsmassstab (also Fenster oder Quelle). Bortle, Transparenz, Verschieben: kein Kernbau.
 
 Fehlerfaelle: `auswerten` und die Stufe-1-Funktionen werfen `PhysikFehler { feld: string; wert: number }` bei NaN, D <= 0, V < 1, Obstruktion ausserhalb 0..0,5, Hoehe ausserhalb 0..90, Fenster mit px < 16 oder breite <= 0. Das sind Programmierfehler; Nutzereingaben gehen vorher durch `begrenzeKonfiguration`, das nie wirft, sondern schneidet und Hinweise liefert. `baueKern` wirft, wenn das Raster den Kern nicht fassen kann (R < 2): passiert nicht, wenn der Massstab aus `arbeitsmassstab` kommt (Invariante: FWHM >= 2,5 Arbeitspixel). [Nachtrag 2026-10-26: Die Invariante lautet umgekehrt FWHM hoechstens 2,5 Arbeitspixel (Arbeitsmassstab >= FWHM / 2,5, ADR-0002); baueKern traegt den Sub-Pixel-Fall, Issue #4.]

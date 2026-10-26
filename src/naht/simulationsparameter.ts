@@ -69,7 +69,15 @@ export interface Kern {
   beschreibung: Kernbeschreibung;
   groesse: number;
   radius: number;
+  /**
+   * Genauer Arbeitsmassstab, gleich Quellbild.massstabArcsecProPx. Die daten sind mit dem auf
+   * 4 Stellen gerundeten beschreibung.massstabArcsecProPx gerechnet, Abweichung hoechstens 5e-4.
+   */
   massstabArcsecProPx: number;
+  /**
+   * Bei Wiederverwendung ueber vorher teilen sich aufeinanderfolgende Kerne dieses Array: nie per
+   * Transfer (postMessage-Transferliste) verschicken, sonst ist es beim naechsten Aufruf detached.
+   */
   daten: Float32Array;
 }
 

@@ -147,6 +147,12 @@ describe("auswerten: Wiederverwendung des Kerns ueber vorher", () => {
     expect(zweite.parameter.kern).not.toBe(erste.parameter.kern);
     expect(zweite.parameter.kern).toEqual(erste.parameter.kern);
   });
+  it("Breite 3000'' und 3000,4'' geben verschiedene Quellbild-Schluessel (Massstab ungerundet)", () => {
+    const a = auswerten(KONFIGURATION_A_D9, { fenster: fenster(3000, 1024) });
+    const b = auswerten(KONFIGURATION_A_D9, { fenster: fenster(3000.4, 1024) });
+    expect(b.parameter.quellbild.rasterPx).toBe(a.parameter.quellbild.rasterPx);
+    expect(b.parameter.quellbild.schluessel).not.toBe(a.parameter.quellbild.schluessel);
+  });
   it("Verschieben um weniger als die vierte Stelle aendert den Quellbild-Schluessel trotzdem", () => {
     const f = { breiteArcsec: 66, mitteXArcsec: 1234.5, mitteYArcsec: 0, px: 768 };
     const a = auswerten(KONFIGURATION_A_D9, { fenster: f });
@@ -165,6 +171,7 @@ describe("auswerten: Fehlerfaelle sind Programmierfehler", () => {
       [KONFIGURATION_A_D9, { fenster: fenster(0, 1024) }, "fenster.breiteArcsec"],
       [KONFIGURATION_A_D9, { fenster: { ...fenster(3000, 1024), mitteXArcsec: NaN } }, "fenster.mitteXArcsec"],
       [KONFIGURATION_A_D9, { anzeigePx: 512.5 }, "fenster.px"],
+      [KONFIGURATION_A_D9, { fenster: fenster(1, 1024) }, "fenster.breiteArcsec"],
       [mitBedingungen({ bortle: 0 }), {}, "bortle"]
     ];
     for (const [k, optionen, feld] of faelle) {

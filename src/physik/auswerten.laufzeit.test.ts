@@ -5,8 +5,7 @@ import { KONFIGURATION_A_D9 } from "./testdaten";
 
 // Laufzeit von auswerten ohne Kernbau (Issue #5: unter 0,1 ms je Aufruf, A-D7). Eigene Datei,
 // damit kein Fehlerfall-Test mit ungueltigen Werten vorher die Objektformen in V8 verschlechtert.
-// Ausgabe mit npm test -- --silent=false sichtbar. Die harte Grenze im Test ist grosszuegiger
-// (0,5 ms), damit langsamere CI-Rechner nicht scheitern; die Zielzahl steht im Protokoll.
+// Ausgabe mit npm test -- --silent=false sichtbar. Harte Grenze 0,1 ms wie im Kriterium.
 
 describe("Laufzeit auswerten (Protokoll)", () => {
   it("Bortle-Reglerzug mit vorher: kein Kernbau, im Mittel unter 0,1 ms je Aufruf", () => {
@@ -27,6 +26,6 @@ describe("Laufzeit auswerten (Protokoll)", () => {
     console.log(`auswerten ohne Kernbau: ${(ms * 1000).toFixed(2)} us je Aufruf (Mittel ueber ${wiederholungen}, Ziel unter 100 us)`);
 
     expect(letzte.parameter.kern).toBe(erste.parameter.kern);
-    expect(ms).toBeLessThan(0.5);
+    expect(ms).toBeLessThan(0.1);
   });
 });
