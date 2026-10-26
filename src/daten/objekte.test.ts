@@ -88,6 +88,7 @@ describe("pruefeObjekte", () => {
           phase: 1,
           phasenwinkel_grad: 0.5,
           magnitude: -2.7,
+          weiss_mag_arcsec2: 5.3,
           entfernung_au: 4.195,
           bild: "jupiter_bild",
           trabanten: [{ name: "Io", dx_arcsec: -110, dy_arcsec: 2.9, durchmesser_arcsec: 1.2, magnitude: 5 }]

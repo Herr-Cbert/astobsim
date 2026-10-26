@@ -14,9 +14,10 @@
         "phasenwinkel_grad": 78.5,
         "kolongitude_grad": 11,
         "magnitude": -10.2,
+        "weiss_mag_arcsec2": 3.35,
         "entfernung_au": 0.00257,
         "bild": "mond_svs5587_6285",
-        "kommentar": "Winkelgroesse ist der Jahrbuch-Mittelwert (objekte.md 6.1). Das Quellbild zeigt 1774,4 Bogensekunden (bilder.json, winkelgroesse_arcsec); die Anwendung skaliert die Scheibe von objekt_durchmesser_px auf die Winkelgroesse des Zustands."
+        "kommentar": "Winkelgroesse ist der Jahrbuch-Mittelwert (objekte.md 6.1). Das Quellbild zeigt 1774,4 Bogensekunden (bilder.json, winkelgroesse_arcsec); die Anwendung skaliert die Scheibe von objekt_durchmesser_px auf die Winkelgroesse des Zustands. weiss_mag_arcsec2 ist die Vollmond-Flaechenhelligkeit (objekte.md 5.2), weil das Bild die Tagseite unveraendert in voller Helligkeit zeigt."
       }
     ]
   }
