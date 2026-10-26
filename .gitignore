@@ -10,8 +10,9 @@ build/
 __pycache__/
 *.pyc
 
-# Rohbilder werden nicht versioniert, nur die aufbereiteten
-data/roh/
+# Rohbilder werden nicht versioniert, nur die aufbereiteten; die LIESMICH zur Herkunft schon
+data/roh/*
+!data/roh/LIESMICH.md
 
 # Editor, System
 .vscode/

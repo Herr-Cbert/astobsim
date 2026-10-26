@@ -1,0 +1,23 @@
+[
+  {
+    "id": "mond",
+    "name": "Mond",
+    "typ": "mond",
+    "quelle_physik": "docs/recherche/objekte.md",
+    "zustaende": [
+      {
+        "id": "mond_ev",
+        "name": "Mond, 1 Tag nach erstem Viertel",
+        "winkelgroesse_arcsec": 1865,
+        "polar_arcsec": 1865,
+        "phase": 0.60,
+        "phasenwinkel_grad": 78.5,
+        "kolongitude_grad": 11,
+        "magnitude": -10.2,
+        "entfernung_au": 0.00257,
+        "bild": "mond_svs5587_6285",
+        "kommentar": "Winkelgroesse ist der Jahrbuch-Mittelwert (objekte.md 6.1). Das Quellbild zeigt 1774,4 Bogensekunden (bilder.json, winkelgroesse_arcsec); die Anwendung skaliert die Scheibe von objekt_durchmesser_px auf die Winkelgroesse des Zustands."
+      }
+    ]
+  }
+]
