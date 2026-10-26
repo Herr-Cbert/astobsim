@@ -6,6 +6,8 @@ Webanwendung, die zeigt, wie ein Himmelsobjekt (Mond, Jupiter, Saturn, ...) durc
 2. Bedingungen waehlen (Seeing, Himmelshelligkeit, Transparenz, Hoehe ueber Horizont).
 3. Ergebnis: hochaufgeloeste Bilder der Objekte, heruntergerechnet auf Aufloesung und Kontrast, die mit 1 und 2 erreichbar sind.
 
+Die Seite laeuft unter <https://herr-cbert.github.io/astobsim/> und zeigt den Stand von `main`.
+
 Das Projekt dient ausserdem als Uebungsprojekt fuer die Entwicklung mit Claude Code, von der Planung bis zur Fertigstellung. Der Ablauf steht in [docs/prozess.md](docs/prozess.md).
 
 ## Stand
@@ -19,5 +21,7 @@ source ~/.nvm/nvm.sh   # Node 22
 npm install
 npm run dev            # Dev-Server
 npm test               # Vitest
-npm run build          # nach dist/
+npm run build          # nach dist/, kopiert daten/ mit und prueft die Groesse des Erstladens
 ```
+
+GitHub Actions (`.github/workflows/`) fuehrt bei jedem Pull Request Tests und Build aus und veroeffentlicht jeden Push auf `main` auf GitHub Pages.
