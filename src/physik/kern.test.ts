@@ -6,8 +6,8 @@ import { aufloesung } from "./aufloesung";
 import { airyRadiusArcsec, lambdaDurchDArcsec, mtfPupille } from "./beugung";
 import { PhysikFehler } from "./fehler";
 import type { Bedingungen, Geraet, Objektzustand } from "./konfiguration";
-import { ARCSEC_PRO_GRAD, AUGE_GESICHTSFELD_GRAD } from "./konstanten";
-import { baueKern, KERN_GROESSE_MAX, kernFwhmArcsec, kontrastUebertragung } from "./kern";
+import { ARCSEC_PRO_GRAD, AUGE_GESICHTSFELD_GRAD, KERN_GROESSE_MAX } from "./konstanten";
+import { baueKern, kernFwhmArcsec, kontrastUebertragung } from "./kern";
 import { optik } from "./optik";
 import { quadratur } from "./profile";
 import { BEDINGUNGEN_A_D9, fenster, JUPITER_QUELLE, MOND_QUELLE, refraktorMitVergroesserung, zenit } from "./testdaten";
@@ -45,6 +45,11 @@ function summe(kern: Kern): number {
   return s;
 }
 
+/** Periode in Bogensekunden zur normierten Ortsfrequenz nu = f / f_c der 80-mm-Oeffnung (physik.md 1.3). */
+function periode80mm(nu: number): number {
+  return lambdaDurchDArcsec(80) / nu;
+}
+
 /** Invarianten aus docs/architektur.md Abschnitt 3 und der Naht-Dokumentation zu Kern. */
 function pruefeInvarianten(kern: Kern, b: Kernbeschreibung): void {
   expect(kern.groesse % 2).toBe(1);
@@ -63,13 +68,35 @@ function pruefeInvarianten(kern: Kern, b: Kernbeschreibung): void {
   expect(kern.schluessel).toBe(kernSchluessel(b));
 }
 
+/**
+ * Airy-Kern: Energie im Scheibchen zu Energie bis zum zweiten Minimum ist 0,838 / 0,910
+ * (physik.md 1.1; unabhaengig vom Abschneiden des Kerns), Kern-MTF trifft die Pupillen-MTF bei
+ * nu = 0,9 und verschwindet ab der Grenzfrequenz nu = 1.
+ */
+function pruefeAiryKern(kern: Kern, obstruktion: number): void {
+  if (obstruktion === 0) {
+    const e1 = energieInnerhalb(kern, airyRadiusArcsec(80));
+    const e2 = energieInnerhalb(kern, 2.233 * lambdaDurchDArcsec(80));
+    expect(Math.abs(e1 / e2 / (0.838 / 0.91) - 1)).toBeLessThan(0.01);
+    // Der auf 3 FWHM abgeschnittene und auf 1 normierte Kern zeigt im Scheibchen mehr als 0,838 (physik.md 1.1).
+    expect(e1).toBeGreaterThan(0.838);
+    expect(e1).toBeLessThan(0.9);
+  }
+  expect(Math.abs(kontrastUebertragung(kern, periode80mm(0.9)) - mtfPupille(0.9, obstruktion))).toBeLessThan(0.003);
+  expect(kontrastUebertragung(kern, periode80mm(1))).toBeLessThan(0.01);
+  expect(kontrastUebertragung(kern, periode80mm(1.2))).toBeLessThan(0.01);
+}
+
 /** 80 mm, 2'' Seeing, Augenanteil vernachlaessigbar wie in physik.md Tabelle 2.4; Massstab fein genug fuer die FWHM-Messung. */
 const PROTOTYP_80MM = beschreibung(80, 0, 2, 0.01, 0.25);
 /** Dasselbe mit dem Augenanteil des Prototyps (Vorgabe V = 100, also 0,6''). */
 const PROTOTYP_80MM_V100 = beschreibung(80, 0, 2, 0.6, 0.25);
-/** Nahezu reiner Airy-Kern: Seeing und Auge vernachlaessigbar. */
+/** Nahezu reiner Airy-Kern (Seeing und Auge vernachlaessigbar), 75 px: zweifach ueberabgetastet. */
 const AIRY_80MM = beschreibung(80, 0, 0.01, 0.01, 0.12);
 const AIRY_80MM_OBSTRUIERT = beschreibung(80, 0.33, 0.01, 0.01, 0.12);
+/** Derselbe Airy-Kern mit 41 px, also auf dem vierfach ueberabgetasteten Pfad (bis 42 px). */
+const AIRY_80MM_4X = beschreibung(80, 0, 0.01, 0.01, 0.22);
+const AIRY_80MM_OBSTRUIERT_4X = beschreibung(80, 0.33, 0.01, 0.01, 0.22);
 /** Sub-Pixel-Fall aus dem Hinweis zu #3: Mond 18000'' auf 256 px, 70''/px bei 3'' FWHM. */
 const SUB_PIXEL = beschreibung(300, 0, 3, 0.1, 70);
 /** Groesster erlaubter Kern: 81 px bei 80 mm und 2'' Seeing. */
@@ -115,8 +142,8 @@ describe("Invarianten des Kerns", () => {
       }
     }
   });
-  it("gelten fuer die Randfaelle Sub-Pixel, groesster Kern und Obstruktion", () => {
-    for (const b of [SUB_PIXEL, GROESSTER, AIRY_80MM_OBSTRUIERT, beschreibung(6, 0, 2, 60, 70)]) {
+  it("gelten fuer die Randfaelle Sub-Pixel, groesster Kern, Obstruktion und beide Ueberabtastungen", () => {
+    for (const b of [SUB_PIXEL, GROESSTER, AIRY_80MM_OBSTRUIERT, AIRY_80MM_4X, beschreibung(6, 0, 2, 60, 70)]) {
       pruefeInvarianten(baueKern(b), b);
     }
     expect(baueKern(GROESSTER).groesse).toBe(KERN_GROESSE_MAX);
@@ -125,7 +152,6 @@ describe("Invarianten des Kerns", () => {
 
 describe("Werte des Prototyps und der Recherche", () => {
   it("Kern-FWHM 2,52'' fuer 80 mm bei 2'' Seeing (Toleranz 1 Prozent)", () => {
-    expect(kernFwhmArcsec(baueKern(PROTOTYP_80MM))).toBeCloseTo(2.52, 1);
     expect(Math.abs(kernFwhmArcsec(baueKern(PROTOTYP_80MM)) / 2.52 - 1)).toBeLessThan(0.01);
     expect(Math.abs(kernFwhmArcsec(baueKern({ ...PROTOTYP_80MM, massstabArcsecProPx: 0.2 })) / 2.52 - 1)).toBeLessThan(0.01);
   });
@@ -139,35 +165,25 @@ describe("Werte des Prototyps und der Recherche", () => {
     expect(fwhm).toBeGreaterThan(2.52);
     expect(fwhm).toBeLessThan(2.52 * 1.06);
   });
-  it("Airy-Kern bei Obstruktion 0: Energie im Scheibchen zu Energie bis zum zweiten Minimum ist 0,838 / 0,910 (Toleranz 1 Prozent)", () => {
-    const kern = baueKern(AIRY_80MM);
-    const e1 = energieInnerhalb(kern, airyRadiusArcsec(80));
-    const e2 = energieInnerhalb(kern, 2.233 * lambdaDurchDArcsec(80));
-    expect(Math.abs(e1 / e2 / (0.838 / 0.91) - 1)).toBeLessThan(0.01);
-    // Der auf 3 FWHM abgeschnittene und auf 1 normierte Kern zeigt im Scheibchen mehr als 0,838 (physik.md 1.1).
-    expect(e1).toBeGreaterThan(0.838);
-    expect(e1).toBeLessThan(0.9);
+  it("Airy-Kern mit 75 px (zweifach ueberabgetastet): Energieverhaeltnis 0,838 / 0,910, MTF wie die Pupille", () => {
+    expect(baueKern(AIRY_80MM).groesse).toBe(75);
+    pruefeAiryKern(baueKern(AIRY_80MM), 0);
+    pruefeAiryKern(baueKern(AIRY_80MM_OBSTRUIERT), 0.33);
   });
-  it("MTF des Airy-Kerns trifft die Pupillen-MTF bei nu = 0,9 (Toleranz 0,003) und verschwindet ab nu = 1", () => {
-    for (const [b, obstruktion] of [
-      [AIRY_80MM, 0],
-      [AIRY_80MM_OBSTRUIERT, 0.33]
-    ] as const) {
-      const kern = baueKern(b);
-      const periode = (nu: number): number => lambdaDurchDArcsec(80) / nu;
-      expect(Math.abs(kontrastUebertragung(kern, periode(0.9)) - mtfPupille(0.9, obstruktion))).toBeLessThan(0.003);
-      expect(kontrastUebertragung(kern, periode(1))).toBeLessThan(0.01);
-      expect(kontrastUebertragung(kern, periode(1.2))).toBeLessThan(0.01);
-    }
+  it("Airy-Kern mit 41 px (vierfach ueberabgetastet): dieselben Werte", () => {
+    expect(baueKern(AIRY_80MM_4X).groesse).toBe(41);
+    pruefeAiryKern(baueKern(AIRY_80MM_4X), 0);
+    pruefeAiryKern(baueKern(AIRY_80MM_OBSTRUIERT_4X), 0.33);
   });
-  it("Obstruktion 0,33 senkt die MTF bei nu = 0,35 und hebt sie bei nu = 0,7 (physik.md 1.3)", () => {
+  it("Obstruktion 0,33 senkt die MTF bei nu = 0,35 wie die Pupillen-MTF (Toleranz 0,05) und hebt sie bei nu = 0,7 (physik.md 1.3)", () => {
     const frei = baueKern(AIRY_80MM);
     const obstruiert = baueKern(AIRY_80MM_OBSTRUIERT);
-    const periode = (nu: number): number => lambdaDurchDArcsec(80) / nu;
-    const verhaeltnis = kontrastUebertragung(obstruiert, periode(0.35)) / kontrastUebertragung(frei, periode(0.35));
-    expect(verhaeltnis).toBeGreaterThan(0.65);
-    expect(verhaeltnis).toBeLessThan(0.8);
-    expect(kontrastUebertragung(obstruiert, periode(0.7))).toBeGreaterThan(kontrastUebertragung(frei, periode(0.7)));
+    const verhaeltnis = kontrastUebertragung(obstruiert, periode80mm(0.35)) / kontrastUebertragung(frei, periode80mm(0.35));
+    const erwartet = mtfPupille(0.35, 0.33) / mtfPupille(0.35, 0);
+    expect(erwartet).toBeCloseTo(0.7, 1);
+    // Der auf 3 FWHM abgeschnittene Kern hebt die MTF bei niedrigen Frequenzen leicht an (physik.md 9), daher 0,05.
+    expect(Math.abs(verhaeltnis - erwartet)).toBeLessThan(0.05);
+    expect(kontrastUebertragung(obstruiert, periode80mm(0.7))).toBeGreaterThan(kontrastUebertragung(frei, periode80mm(0.7)));
   });
 });
 
@@ -189,13 +205,15 @@ describe("Testhelfer kontrastUebertragung und kernFwhmArcsec", () => {
     expect(kontrastUebertragung(kern, 2.52)).toBeGreaterThan(gauss * 0.7);
     expect(kontrastUebertragung(kern, 2.52)).toBeLessThan(gauss * 1.3);
   });
-  it("Sub-Pixel-Kern ist nahezu ein Delta: MTF ueber 0,999 bis zur Nyquist-Periode, FWHM etwa ein Arbeitspixel", () => {
+  it("Sub-Pixel-Kern ist nahezu ein Delta: MTF ueber 0,999 bis zur Nyquist-Periode, FWHM-Helfer liefert etwa die Rasteraufloesung", () => {
     const kern = baueKern(SUB_PIXEL);
     expect(kern.groesse).toBe(5);
     expect(kern.radius).toBe(2);
     expect(kern.daten[12]).toBeGreaterThan(0.999);
     expect(kontrastUebertragung(kern, 2 * 70)).toBeGreaterThan(0.999);
-    expect(kernFwhmArcsec(kern)).toBeCloseTo(70, 3);
+    // Die physikalische FWHM (3'') ist im Raster nicht messbar; der Helfer meldet etwa einen Arbeitspixel.
+    expect(kernFwhmArcsec(kern)).toBeGreaterThan(0.8 * 70);
+    expect(kernFwhmArcsec(kern)).toBeLessThan(1.2 * 70);
   });
   it("kontrastUebertragung wirft PhysikFehler bei Periode 0, negativ oder NaN", () => {
     const kern = baueKern(SUB_PIXEL);
@@ -241,15 +259,9 @@ describe("Fehlerfaelle", () => {
       expect(() => baueKern({ ...gut, ...aenderung })).toThrow(PhysikFehler);
     }
   });
-  it("wirft PhysikFehler, wenn der Massstab so fein ist, dass der Kern 81 px sprengen wuerde", () => {
+  it("wirft PhysikFehler mit Feld und Wert, wenn der Massstab so fein ist, dass der Kern 81 px sprengen wuerde", () => {
     expect(() => baueKern({ ...GROESSTER, massstabArcsecProPx: 0.18 })).toThrow(PhysikFehler);
-    try {
-      baueKern({ ...GROESSTER, massstabArcsecProPx: 0.1 });
-    } catch (fehler) {
-      expect(fehler).toBeInstanceOf(PhysikFehler);
-      expect((fehler as PhysikFehler).feld).toBe("kern.massstabArcsecProPx");
-      expect((fehler as PhysikFehler).wert).toBe(0.1);
-    }
+    expect(() => baueKern({ ...GROESSTER, massstabArcsecProPx: 0.1 })).toThrow(/kern\.massstabArcsecProPx = 0\.1 ist zu fein/);
   });
   it("wirft nicht im Sub-Pixel-Fall (Hinweis aus #3: FWHM unter einem Arbeitspixel ist gueltig)", () => {
     expect(() => baueKern(SUB_PIXEL)).not.toThrow();

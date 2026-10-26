@@ -87,6 +87,6 @@ Erster durchgehender Pfad (Milestone M1 in Phase 4): Mond im 80 mm Refraktor, fe
 
 ## 4. Offen fuer Phase 4
 
-- Grenze der Kerngroesse 81 px gegen sehr grosse Anzeigen (2048 px) bei blossem Auge: Arbeitsmassstab faengt das ab, Test noetig.
+- Grenze der Kerngroesse 81 px gegen sehr grosse Anzeigen (2048 px) bei blossem Auge: Arbeitsmassstab faengt das ab, Test noetig. **Erledigt (Issue #4):** der Kern aus dem Arbeitsmassstab ist hoechstens 17 px (blosses Auge, 5 Grad auf 2048 px: 25''/px, 17 px; selbst mit reinem Fenstermassstab 45 px), Test in `src/physik/kern.test.ts`; Details im Nachtrag zu ADR-0002.
 - Worker oder Hauptthread fuer bild: mit WebGL2 reicht der Hauptthread (Faltung in Millisekunden); der Worker ist nur fuer den JavaScript-Fallback interessant. Vorschlag: Version 1 ohne Worker, Naht bleibt klonbar.
 - Kalibrierkonstante fuer die Tabellen-Tests T1 bis T5 (Kontrastschwelle "erkennbar") wird in Phase 6 am Bild festgelegt, die Tests frieren sie danach ein.

@@ -20,3 +20,10 @@ export function pruefeBereich(feld: string, wert: number, min: number, max: numb
     throw new PhysikFehler(feld, wert, `liegt nicht in ${min} bis ${max}`);
   }
 }
+
+/** Wirft PhysikFehler, wenn wert nicht endlich oder nicht positiv ist. */
+export function pruefePositiv(feld: string, wert: number): void {
+  if (!Number.isFinite(wert) || wert <= 0) {
+    throw new PhysikFehler(feld, wert, "ist nicht endlich oder nicht positiv");
+  }
+}

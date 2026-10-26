@@ -18,7 +18,7 @@ $$I(\theta) = I_0 \left[\frac{2 J_1(v)}{v}\right]^2, \qquad v = \frac{\pi D \sin
 - Erstes Minimum bei $v = 3{,}8317$, also $\theta_1 = 1{,}2197\,\lambda/D$ (ueblich: $1{,}22\,\lambda/D$) [1].
 - Energieanteil innerhalb des ersten Minimums: 83,8 % [1, Kap. 8.5.2]; eigene Rechnung: 0,838. Weitere 7,2 % im ersten Ring, Rest aussen.
 - Halbwertsbreite (FWHM) des Airy-Kerns: $1{,}03\,\lambda/D$ (eigene Rechnung: 1,029; gleiche Zahl bei Sacek [8]). Fuer die Kombination mit dem Seeing (Abschnitt 2.5) ist die FWHM die passende Groesse, nicht der Radius des ersten Minimums.
-- Zweites Minimum bei $v = 7{,}0156$ (zweite Nullstelle von $J_1$ [51, Tabelle 9.5]), also $\theta_2 = 2{,}233\,\lambda/D$; mit Obstruktion ruecken die Minima nach innen (Tabelle 1.4). Eingeschlossene Energie innerhalb $v$ [1, Kap. 8.5.2]: $L(v) = 1 - J_0^2(v) - J_1^2(v)$, also 0,838 im Scheibchen, 0,910 innerhalb des zweiten Minimums, 0,938 innerhalb des dritten. Die Fluegel konvergieren langsam ($L \approx 1 - 2/(\pi v)$): ein auf $3{,}1\,\lambda/D$ (3 Airy-FWHM) abgeschnittener Kern enthaelt nur etwa 94 % der Energie (eigene Rechnung, Issue #4). Nach Normierung auf Summe 1 liest man aus einem solchen Kern deshalb etwa 0,89 statt 0,838 im Scheibchen ab; testbar bleibt das Verhaeltnis Scheibchen zu zweitem Minimum, $0{,}838 / 0{,}910 = 0{,}921$.
+- Zweites Minimum bei $v = 7{,}0156$, der zweiten Nullstelle von $J_1$ [51, Tabelle 9.5], also $\theta_2 = 2{,}233\,\lambda/D$ [1, Kap. 8.5.2]. Mit Obstruktion rueckt das erste Minimum nach innen (Tabelle 1.4, nach [7, 8]); fuer das zweite gilt laut Mahajan [7] dasselbe, hier nicht einzeln nachgerechnet. Eingeschlossene Energie innerhalb $v$ [1, Kap. 8.5.2]: $L(v) = 1 - J_0^2(v) - J_1^2(v)$, also 0,838 im Scheibchen, 0,910 innerhalb des zweiten Minimums, 0,938 innerhalb des dritten. Die Fluegel konvergieren langsam ($L \approx 1 - 2/(\pi v)$): ein auf $3{,}1\,\lambda/D$ (3 Airy-FWHM) abgeschnittener Kern enthaelt nur etwa 94 % der Energie (eigene Rechnung, Issue #4). Nach Normierung auf Summe 1 liest man aus einem solchen Kern deshalb etwa 0,89 statt 0,838 im Scheibchen ab; testbar bleibt das Verhaeltnis Scheibchen zu zweitem Minimum, $0{,}838 / 0{,}910 = 0{,}921$.
 
 In Bogensekunden bei 550 nm, $D$ in mm:
 
@@ -339,7 +339,8 @@ Alle mit $\lambda$ = 550 nm, 1 rad = 206 264,8''.
 | MTF-Tabelle 1.3 | $\epsilon$ = 0,2 bei $\nu$ = 0,3; $\epsilon$ = 0,4 bei $\nu$ = 0,7 | 0,567; 0,224 (Toleranz 0,005) |
 | Kern-FWHM 80 mm, 2'' (Issue #4) | `baueKern` ohne Augenanteil, Massstab 0,25''/px, FWHM aus dem radialen Profil | 2,52'' (Tabelle 2.4; Toleranz 1 %; bei 2,5 px je FWHM liest man wegen der Pixelintegration 2,65'') |
 | Airy-Kern aus `baueKern`, $\epsilon$ = 0 | Energie innerhalb 1,22 $\lambda/D$ geteilt durch Energie innerhalb 2,233 $\lambda/D$ | 0,838 / 0,910 = 0,921 (Toleranz 1 %) |
-| MTF des Airy-Kerns aus `baueKern` | `kontrastUebertragung` bei $\nu$ = 0,9 und $\nu \ge 1$, $\epsilon$ = 0 und 0,33 | 0,037 bzw. 0,042 (Toleranz 0,003); unter 0,01 ab $\nu$ = 1 |
+| MTF des Airy-Kerns aus `baueKern` | `kontrastUebertragung` bei $\nu$ = 0,9 und $\nu \ge 1$, $\epsilon$ = 0 und 0,33, Kern 75 px (zweifach) und 41 px (vierfach ueberabgetastet) | gleich `mtfPupille`(0,9; $\epsilon$), Toleranz 0,003; unter 0,01 ab $\nu$ = 1 |
+| Obstruktion im Airy-Kern | `kontrastUebertragung`($\epsilon$ = 0,33) / `kontrastUebertragung`($\epsilon$ = 0) bei $\nu$ = 0,35 | gleich `mtfPupille`(0,35; 0,33) / `mtfPupille`(0,35; 0) = 0,70, Toleranz 0,05 (abgeschnittene Fluegel heben niedrige Frequenzen an) |
 | Sub-Pixel-Kern | 3'' Gesamt-FWHM bei 70''/px | Groesse 5, Mitte > 0,999, Summe 1 |
 
 ---

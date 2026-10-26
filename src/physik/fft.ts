@@ -33,9 +33,9 @@ function pruefeZweierpotenz(n: number): void {
   }
 }
 
-/** Radix-2 in place mit vorbereiteten Drehfaktoren; re und im haben die Laenge w.n. */
-function fftMitFaktoren(re: Float64Array, im: Float64Array, w: Drehfaktoren, invers: boolean): void {
-  const n = w.n;
+/** Radix-2 in place mit vorbereiteten Drehfaktoren; re und im haben die Laenge faktoren.n. */
+function fftMitFaktoren(re: Float64Array, im: Float64Array, faktoren: Drehfaktoren, invers: boolean): void {
+  const n = faktoren.n;
   // Bit-Umkehr-Permutation
   for (let i = 1, j = 0; i < n; i++) {
     let bit = n >> 1;
@@ -57,8 +57,8 @@ function fftMitFaktoren(re: Float64Array, im: Float64Array, w: Drehfaktoren, inv
     const schritt = n / laenge;
     for (let start = 0; start < n; start += laenge) {
       for (let j = 0; j < halb; j++) {
-        const wr = w.cos[j * schritt]!;
-        const wi = vorzeichen * w.sin[j * schritt]!;
+        const wr = faktoren.cos[j * schritt]!;
+        const wi = vorzeichen * faktoren.sin[j * schritt]!;
         const a = start + j;
         const b = a + halb;
         const xr = re[b]! * wr - im[b]! * wi;
@@ -98,10 +98,10 @@ export function fft2d(re: Float64Array, im: Float64Array, n: number, invers = fa
   if (re.length !== n * n || im.length !== n * n) {
     throw new PhysikFehler("fft2d.length", re.length, `ist ungleich n*n = ${n * n}`);
   }
-  const w = drehfaktoren(n);
+  const faktoren = drehfaktoren(n);
   for (let y = 0; y < n; y++) {
     const o = y * n;
-    fftMitFaktoren(re.subarray(o, o + n), im.subarray(o, o + n), w, invers);
+    fftMitFaktoren(re.subarray(o, o + n), im.subarray(o, o + n), faktoren, invers);
   }
   const spalteRe = new Float64Array(n);
   const spalteIm = new Float64Array(n);
@@ -110,7 +110,7 @@ export function fft2d(re: Float64Array, im: Float64Array, n: number, invers = fa
       spalteRe[y] = re[y * n + x]!;
       spalteIm[y] = im[y * n + x]!;
     }
-    fftMitFaktoren(spalteRe, spalteIm, w, invers);
+    fftMitFaktoren(spalteRe, spalteIm, faktoren, invers);
     for (let y = 0; y < n; y++) {
       re[y * n + x] = spalteRe[y]!;
       im[y * n + x] = spalteIm[y]!;

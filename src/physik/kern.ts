@@ -1,53 +1,36 @@
 // Kernbau (Naht-Stufe 2): aus einer Kernbeschreibung entsteht deterministisch der diskrete Kern
-// der Gesamt-PSF im Arbeitsmassstab (ADR-0002, docs/architektur.md Abschnitt 3, Issue #4).
-// Gesamt-PSF = Airy(D, Obstruktion) gefaltet mit Moffat(Seeing-FWHM, beta 4,765) gefaltet mit
-// Gauss(Augen-FWHM); Formeln in docs/recherche/physik.md, Abschnitte 1.1, 2.2, 3.2 und 9.
+// der Gesamt-PSF im Arbeitsmassstab (ADR-0002 mit Nachtrag, docs/architektur.md Abschnitt 3,
+// Issue #4). Gesamt-PSF = Airy(D, Obstruktion) gefaltet mit Moffat(Seeing-FWHM, beta 4,765)
+// gefaltet mit Gauss(Augen-FWHM); Formeln in docs/recherche/physik.md, Abschnitte 1.1, 2.2, 3.2 und 9.
 //
 // Rechenweg wie im Prototyp (prototyp/faltung.html, Block logik, Branch prototyp-faltung):
 // jede Komponente auf einem feinen Raster (Arbeitspixel / Ueberabtastung) abtasten, auf Summe 1
 // normieren, per FFT multiplizieren, zuruecktransformieren und auf Arbeitspixel binnen.
 // Abweichungen vom Prototyp, jeweils am Ort begruendet: Drehfaktortabelle in der FFT,
 // punktsymmetrisches Binning, Ueberabtastung 2 statt 4 bei Kernen ueber 42 px, FFT-Groesse
-// mindestens 64 und hoechstens 256, PhysikFehler statt Abschneiden bei Kernen ueber 81 px.
+// mindestens 64 und hoechstens 256, PhysikFehler statt Klemmung bei Kernen ueber 81 px.
 //
 // Pur und deterministisch: gleiche Beschreibung, gleiche Daten; kein Cache, kein Zustand.
 
 import type { Kern, Kernbeschreibung } from "../naht/simulationsparameter";
 import { kernSchluessel } from "./arbeitsmassstab";
 import { airyFwhmArcsec } from "./beugung";
-import { PhysikFehler, pruefeBereich } from "./fehler";
+import { PhysikFehler, pruefeBereich, pruefePositiv } from "./fehler";
 import { fft2d } from "./fft";
+import { KERN_GROESSE_MAX, KERN_RADIUS_MIN, KERN_RADIUS_PRO_FWHM } from "./konstanten";
 import { airyProfil, gaussProfil, moffatProfil, quadratur } from "./profile";
 
-/** Kleinster Kernradius in Arbeitspixeln; bei Sub-Pixel-PSF wird der Kern nahezu ein Delta (Hinweis aus #3). */
-export const KERN_RADIUS_MIN = 2;
-
-/** Groesste Kerngroesse in Arbeitspixeln (docs/architektur.md Abschnitt 3: ungerade, 5 bis 81). */
-export const KERN_GROESSE_MAX = 81;
-
-/**
- * Kernradius in Gesamt-FWHM (physik.md Abschnitt 9: etwa 3 Gesamt-FWHM plus Airy-Ringe bis zum
- * zweiten Minimum). Die Ringe sind damit immer drin: 3 FWHM_gesamt >= 3 * 1,029 lambda/D = 3,09 lambda/D,
- * das zweite Airy-Minimum liegt bei 2,23 lambda/D (Abschnitt 1.1) und rueckt mit Obstruktion nach innen.
- */
-export const KERN_RADIUS_PRO_FWHM = 3;
+// Implementierungsparameter des Kernbaus, keine Modellkonstanten (die stehen in konstanten.ts).
 
 /** Ueberabtastung je Arbeitspixel beim Aufbau der Komponenten (ADR-0002: vierfach). */
-export const UEBERABTASTUNG = 4;
+const UEBERABTASTUNG = 4;
 
 /** FFT-Groesse je Achse: Zweierpotenz zwischen 64 und 256 (Issue #4). */
-export const FFT_MIN = 64;
-export const FFT_MAX = 256;
+const FFT_MIN = 64;
+const FFT_MAX = 256;
 
 /** Rand um den feinen Kern im FFT-Raster, damit die Fluegel nicht umlaufen (wie im Prototyp: Faktor 1,5). */
 const FFT_RANDFAKTOR = 1.5;
-
-/** Wirft PhysikFehler, wenn wert nicht endlich oder nicht positiv ist. */
-function pruefePositiv(feld: string, wert: number): void {
-  if (!Number.isFinite(wert) || wert <= 0) {
-    throw new PhysikFehler(feld, wert, "ist nicht endlich oder nicht positiv");
-  }
-}
 
 function pruefeBeschreibung(b: Kernbeschreibung): void {
   pruefePositiv("kern.oeffnungMm", b.oeffnungMm);
@@ -59,17 +42,18 @@ function pruefeBeschreibung(b: Kernbeschreibung): void {
 
 /** Kleinste Zweierpotenz >= x. */
 function zweierpotenzAb(x: number): number {
-  let p = 1;
-  while (p < x) p <<= 1;
-  return p;
+  let potenz = 1;
+  while (potenz < x) potenz <<= 1;
+  return potenz;
 }
 
 /**
- * Ueberabtastung und FFT-Groesse fuer eine Kerngroesse. Normalfall: vierfach, P = Zweierpotenz
- * >= 1,5 * 4 * groesse, mindestens 64. Ueber 42 px passt das nicht mehr in 256; dort wird
- * zweifach ueberabgetastet. Abweichung vom Prototyp (der liess P bis 1024 wachsen): haelt die
- * FFT bei hoechstens 256 Punkten und die Laufzeit des groessten Kerns unter 20 ms; bei solchen
- * Kernen ist die Gesamt-FWHM ueber 7 Arbeitspixel breit, zwei Feinpixel je Arbeitspixel reichen.
+ * Ueberabtastung und FFT-Groesse fuer eine Kerngroesse. Normalfall: vierfach, FFT-Groesse die
+ * Zweierpotenz >= 1,5 * 4 * groesse, mindestens 64. Ueber 42 px passt das nicht mehr in 256;
+ * dort wird zweifach ueberabgetastet. Abweichung vom Prototyp (der liess die FFT bis 1024
+ * wachsen): haelt die FFT bei hoechstens 256 Punkten und die Laufzeit des groessten Kerns unter
+ * 20 ms; bei solchen Kernen ist die Gesamt-FWHM ueber 7 Arbeitspixel breit, zwei Feinpixel je
+ * Arbeitspixel reichen.
  */
 function rasterwahl(groesse: number): { ueberabtastung: number; fftGroesse: number } {
   for (const ueberabtastung of [UEBERABTASTUNG, UEBERABTASTUNG / 2]) {
@@ -80,29 +64,29 @@ function rasterwahl(groesse: number): { ueberabtastung: number; fftGroesse: numb
 }
 
 /**
- * Tastet ein radiales Profil auf dem P x P FFT-Raster ab (Index 0 ist die Mitte, negative
- * Abstaende laufen von oben um), normiert auf Summe 1 und transformiert. Das Profil ist radial
+ * Tastet ein radiales Profil auf dem FFT-Raster ab (Index 0 ist die Mitte, negative Abstaende
+ * laufen von oben um), normiert auf Summe 1 und transformiert. Das Profil ist radial
  * symmetrisch, darum wird nur ein Quadrant gerechnet und gespiegelt.
  */
-function komponenteSpektrum(profil: (rArcsec: number) => number, p: number, feinArcsec: number): { re: Float64Array; im: Float64Array } {
-  const re = new Float64Array(p * p);
-  const im = new Float64Array(p * p);
-  const halb = p / 2;
+function komponenteSpektrum(profil: (rArcsec: number) => number, fftGroesse: number, feinArcsec: number): { re: Float64Array; im: Float64Array } {
+  const re = new Float64Array(fftGroesse * fftGroesse);
+  const im = new Float64Array(fftGroesse * fftGroesse);
+  const halb = fftGroesse / 2;
   for (let dy = 0; dy <= halb; dy++) {
-    const ySpiegel = (p - dy) % p;
+    const ySpiegel = (fftGroesse - dy) % fftGroesse;
     for (let dx = 0; dx <= halb; dx++) {
-      const xSpiegel = (p - dx) % p;
+      const xSpiegel = (fftGroesse - dx) % fftGroesse;
       const wert = profil(Math.hypot(dx, dy) * feinArcsec);
-      re[dy * p + dx] = wert;
-      re[dy * p + xSpiegel] = wert;
-      re[ySpiegel * p + dx] = wert;
-      re[ySpiegel * p + xSpiegel] = wert;
+      re[dy * fftGroesse + dx] = wert;
+      re[dy * fftGroesse + xSpiegel] = wert;
+      re[ySpiegel * fftGroesse + dx] = wert;
+      re[ySpiegel * fftGroesse + xSpiegel] = wert;
     }
   }
   let summe = 0;
   for (let i = 0; i < re.length; i++) summe += re[i]!;
   for (let i = 0; i < re.length; i++) re[i] = re[i]! / summe;
-  fft2d(re, im, p);
+  fft2d(re, im, fftGroesse);
   return { re, im };
 }
 
@@ -131,8 +115,8 @@ export function baueKern(beschreibung: Kernbeschreibung): Kern {
     );
   }
 
-  const { ueberabtastung: o, fftGroesse: p } = rasterwahl(groesse);
-  const feinArcsec = massstabArcsecProPx / o;
+  const { ueberabtastung, fftGroesse } = rasterwahl(groesse);
+  const feinArcsec = massstabArcsecProPx / ueberabtastung;
 
   // Komponenten im Frequenzraum multiplizieren (Faltung im Ortsraum), dann zuruecktransformieren.
   const profile: ((rArcsec: number) => number)[] = [
@@ -140,48 +124,48 @@ export function baueKern(beschreibung: Kernbeschreibung): Kern {
     (r) => moffatProfil(r, seeingFwhmArcsec),
     (r) => gaussProfil(r, augeFwhmArcsec)
   ];
-  const produktRe = new Float64Array(p * p).fill(1);
-  const produktIm = new Float64Array(p * p);
+  const produktRe = new Float64Array(fftGroesse * fftGroesse).fill(1);
+  const produktIm = new Float64Array(fftGroesse * fftGroesse);
   for (const profil of profile) {
-    const { re, im } = komponenteSpektrum(profil, p, feinArcsec);
-    for (let i = 0; i < p * p; i++) {
-      const a = produktRe[i]!;
-      const b = produktIm[i]!;
-      produktRe[i] = a * re[i]! - b * im[i]!;
-      produktIm[i] = a * im[i]! + b * re[i]!;
+    const { re, im } = komponenteSpektrum(profil, fftGroesse, feinArcsec);
+    for (let i = 0; i < produktRe.length; i++) {
+      const bisherRe = produktRe[i]!;
+      const bisherIm = produktIm[i]!;
+      produktRe[i] = bisherRe * re[i]! - bisherIm * im[i]!;
+      produktIm[i] = bisherRe * im[i]! + bisherIm * re[i]!;
     }
   }
-  fft2d(produktRe, produktIm, p, true);
+  fft2d(produktRe, produktIm, fftGroesse, true);
 
   // Binning auf Arbeitspixel. Ein Arbeitspixel k deckt im Feinraster das Intervall
-  // [k o - o/2, k o + o/2] ab; die Feinpixel an den beiden Raendern gehoeren je zur Haelfte dazu
-  // (Gewichte 1/2, 1, ..., 1, 1/2; Summe o). Abweichung vom Prototyp, der die Feinpixel
-  // k o - o/2 .. k o + o/2 - 1 voll zaehlt: das ist um ein halbes Feinpixel verschoben und
-  // bricht die Punktsymmetrie. Hier wird nur die erste Haelfte gerechnet und gespiegelt, damit
+  // [k u - u/2, k u + u/2] ab (u = Ueberabtastung); die Feinpixel an den beiden Raendern gehoeren
+  // je zur Haelfte dazu (Gewichte 1/2, 1, ..., 1, 1/2; Summe u). Abweichung vom Prototyp, der die
+  // Feinpixel k u - u/2 .. k u + u/2 - 1 voll zaehlt: das ist um ein halbes Feinpixel verschoben
+  // und bricht die Punktsymmetrie. Hier wird nur die erste Haelfte gerechnet und gespiegelt, damit
   // die Symmetrie exakt gilt. Winzige negative Werte aus der FFT-Rundung werden auf 0 gesetzt.
-  const halbO = o >> 1;
-  const gewicht = (j: number): number => (Math.abs(j) === halbO ? 0.5 : 1);
+  const halbeUeberabtastung = ueberabtastung >> 1;
+  const gewicht = (abstand: number): number => (Math.abs(abstand) === halbeUeberabtastung ? 0.5 : 1);
   const anzahl = groesse * groesse;
-  const daten = new Float32Array(anzahl);
-  const roh = new Float64Array(anzahl);
+  const gebinnt = new Float64Array(anzahl);
   let summe = 0;
   for (let i = 0; i <= (anzahl - 1) / 2; i++) {
     const ky = Math.floor(i / groesse) - radius;
     const kx = (i % groesse) - radius;
-    let s = 0;
-    for (let jy = -halbO; jy <= halbO; jy++) {
-      const fy = (((ky * o + jy) % p) + p) % p;
-      const wy = gewicht(jy);
-      for (let jx = -halbO; jx <= halbO; jx++) {
-        const fx = (((kx * o + jx) % p) + p) % p;
-        s += wy * gewicht(jx) * Math.max(0, produktRe[fy * p + fx]!);
+    let wert = 0;
+    for (let jy = -halbeUeberabtastung; jy <= halbeUeberabtastung; jy++) {
+      const fy = (((ky * ueberabtastung + jy) % fftGroesse) + fftGroesse) % fftGroesse;
+      const gewichtY = gewicht(jy);
+      for (let jx = -halbeUeberabtastung; jx <= halbeUeberabtastung; jx++) {
+        const fx = (((kx * ueberabtastung + jx) % fftGroesse) + fftGroesse) % fftGroesse;
+        wert += gewichtY * gewicht(jx) * Math.max(0, produktRe[fy * fftGroesse + fx]!);
       }
     }
-    roh[i] = s;
-    roh[anzahl - 1 - i] = s;
-    summe += i === anzahl - 1 - i ? s : 2 * s;
+    gebinnt[i] = wert;
+    gebinnt[anzahl - 1 - i] = wert;
+    summe += i === anzahl - 1 - i ? wert : 2 * wert;
   }
-  for (let i = 0; i < anzahl; i++) daten[i] = roh[i]! / summe;
+  const daten = new Float32Array(anzahl);
+  for (let i = 0; i < anzahl; i++) daten[i] = gebinnt[i]! / summe;
 
   return {
     schluessel: kernSchluessel(beschreibung),
@@ -227,15 +211,15 @@ export function kernFwhmArcsec(kern: Kern): number {
   const summen = new Map<number, { summe: number; anzahl: number }>();
   for (let y = 0; y < groesse; y++) {
     for (let x = 0; x < groesse; x++) {
-      const r2 = (x - radius) ** 2 + (y - radius) ** 2;
-      const eintrag = summen.get(r2) ?? { summe: 0, anzahl: 0 };
+      const abstandsquadrat = (x - radius) ** 2 + (y - radius) ** 2;
+      const eintrag = summen.get(abstandsquadrat) ?? { summe: 0, anzahl: 0 };
       eintrag.summe += daten[y * groesse + x]!;
       eintrag.anzahl += 1;
-      summen.set(r2, eintrag);
+      summen.set(abstandsquadrat, eintrag);
     }
   }
   const profil = [...summen.entries()]
-    .map(([r2, { summe, anzahl }]) => ({ r: Math.sqrt(r2), wert: summe / anzahl }))
+    .map(([abstandsquadrat, { summe, anzahl }]) => ({ r: Math.sqrt(abstandsquadrat), wert: summe / anzahl }))
     .sort((a, b) => a.r - b.r);
   const halb = profil[0]!.wert / 2;
   for (let i = 1; i < profil.length; i++) {
