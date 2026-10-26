@@ -5,7 +5,7 @@ import { atmosphaere } from "./atmosphaere";
 import { aufloesung } from "./aufloesung";
 import { airyRadiusArcsec, lambdaDurchDArcsec, mtfPupille } from "./beugung";
 import { PhysikFehler } from "./fehler";
-import type { Bedingungen, Geraet, Objektzustand } from "./konfiguration";
+import type { Bedingungen, Geraet, Objektzustand } from "../naht/konfiguration";
 import { ARCSEC_PRO_GRAD, AUGE_GESICHTSFELD_GRAD, KERN_GROESSE_MAX } from "./konstanten";
 import { baueKern, kernFwhmArcsec, kontrastUebertragung } from "./kern";
 import { optik } from "./optik";

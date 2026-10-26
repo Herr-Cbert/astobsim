@@ -7,14 +7,14 @@ Ergebnis von Phase 3 (2026-10-23). Begriffe nach `GLOSSARY.md`, Entscheidungen i
 | Modul | Ordner | Interface (Kurzform) | Versteckt | Adapter und Testzugang |
 |---|---|---|---|---|
 | physik | `src/physik/` | `auswerten(konfiguration, optionen) -> Auswertung`, `begrenze(konfiguration)`, dazu die Einzelformeln (Stufe 0) | Formelsammlung aus physik.md 9, Tabellen (Transmission, Extinktion, Bortle, Seeing-Stufen), Arbeitsmassstab, Kernaufbau (Bessel, Airy, Moffat, Gauss, kleine FFT), Blendungsregel | Keine Adapter, keine Abhaengigkeiten. Vitest ruft Einzelformeln (A-Q1) und `auswerten` direkt; Tabellen-Tests T1 bis T6 ueber `kontrastUebertragung(kern, periode)` |
-| naht | `src/naht/` | nur Typen: `Konfiguration`, `Fenster`, `Simulationsparameter`, `Auswertung` | nichts; die Datei ist der Vertrag | wird von physik geschrieben, von bild und ui gelesen; strukturiert klonbar |
+| naht | `src/naht/` | nur Typen: `Konfiguration` (mit `Geraet`, `Objektzustand`), `Fenster`, `Simulationsparameter`, `Auswertung`, `Raster`, `Quelle` | nichts; die Dateien sind der Vertrag | wird von physik geschrieben, von bild und ui gelesen; `Quelle` implementiert daten, ruft bild; strukturiert klonbar |
 | bild | `src/bild/` | `rendere(parameter, quelle) -> Anblick`; `Falter` mit `falte(raster, kern)` | Ausschnitt mitteln (Integralbild oder Kachelzugriff), Trabanten malen, Faltung, Tonwert, Maske, Skalierung auf Fenster; Wiederverwendung nach Stufenschluessel | Zwei Adapter fuer `Falter`: WebGL2 (Produktion) und JavaScript (Tests, Fallback). Tests mit synthetischen Rastern und Kernen (Delta, Kasten), ohne physik |
 | daten | `src/daten/` | `ladeGeraete()`, `ladeObjekte()`, `ladeBildnachweise()`, `Quelle.ausschnitt(mitte, breite, massstab)` | JSON-Validierung, Kachelpyramide, Stufenwahl, Nachladen, Cache | Adapter fuer Tests: Quelle aus synthetischem Bild im Speicher |
 | zustand | `src/zustand/` | `ausUrl(search) -> Konfiguration`, `inUrl(konfiguration) -> string`, `voreinstellung()` | Parameter-Namen in der URL, Defaults A-D9, Rueckwaertskompatibilitaet | reine Funktionen, Rundreise-Tests |
 | ui | `src/ui/` | `starte(wurzelElement)` | Formular, Regler, Gesichtsfeld-Canvas, Zoomansicht, Infopanel, Tooltips aus `src/texte.ts`, Worker-Anbindung | Browser-Test in Phase 6 von Hand; Logik bleibt in physik und zustand |
 | tools | `tools/` (Python) | Skripte: `bild_aufbereiten.py`, `mond_kacheln.py`, `bildnachweis_pruefen.py` | Zuschneiden, Nordrichtung, Skalieren, Kacheln, WebP | laufen offline; Ergebnis liegt unter `daten/` |
 
-Abhaengigkeitsrichtung: `ui -> zustand, physik, bild, daten`; `bild -> naht`; `physik -> naht`; `daten -> naht` (Typen fuer Objektzustand). `bild` importiert `physik` nicht; der Kern kommt als Daten ueber die Naht. Der Worker fuer `bild` ist ein Ausfuehrungsort, keine eigene Naht: dieselben Typen gehen per postMessage.
+Abhaengigkeitsrichtung: `ui -> zustand, physik, bild, daten`; `bild -> naht`; `physik -> naht`; `daten -> naht` (Typen fuer Geraet, Objektzustand, Raster und Quelle). `bild` importiert `physik` nicht; der Kern kommt als Daten ueber die Naht. Der Worker fuer `bild` ist ein Ausfuehrungsort, keine eigene Naht: dieselben Typen gehen per postMessage.
 
 ## 2. Design it twice: drei Entwuerfe fuer die Naht
 

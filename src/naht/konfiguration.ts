@@ -1,5 +1,6 @@
 // Konfiguration: alles, was der Nutzer einstellt (Geraet, Okular, Objektzustand, Bedingungen).
-// Nur Typen und Konstanten, strukturiert klonbar. Nach docs/entwuerfe/naht-variante-3.md
+// Nur Typen und Konstanten, strukturiert klonbar; Teil der Naht (docs/architektur.md Abschnitt 1),
+// damit daten und zustand sie ohne physik lesen. Nach docs/entwuerfe/naht-variante-3.md
 // Abschnitt 1.1 und docs/architektur.md Abschnitt 3; Begriffe nach GLOSSARY.md.
 //
 // Eine Konfiguration ist bereits begrenzt (A-F8); begrenze() in physik ist dafuer die einzige

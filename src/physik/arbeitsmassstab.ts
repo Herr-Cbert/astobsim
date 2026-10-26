@@ -6,7 +6,7 @@ import type { Fenster, Kernbeschreibung } from "../naht/simulationsparameter";
 import type { Atmosphaere } from "./atmosphaere";
 import type { Aufloesung } from "./aufloesung";
 import { pruefeBereich } from "./fehler";
-import type { Objektzustand } from "./konfiguration";
+import type { Objektzustand } from "../naht/konfiguration";
 import { ARBEITSPIXEL_PRO_FWHM, FENSTER_MIN_PX } from "./konstanten";
 import type { Optik } from "./optik";
 import { rundeSignifikant, schluessel } from "./schluessel";

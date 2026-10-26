@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { atmosphaere } from "./atmosphaere";
 import { begrenze, GRENZEN } from "./begrenze";
-import type { Fernglas, Fernrohr, Konfiguration } from "./konfiguration";
+import type { Fernglas, Fernrohr, Konfiguration } from "../naht/konfiguration";
 import { optik } from "./optik";
 import { KONFIGURATION_A_D9 as START } from "./testdaten";
 

@@ -1,19 +1,11 @@
-// Raster: Pixelbild in Fliesskommawerten fuer die Bildpipeline. Werte sind Helligkeiten relativ
-// zu Quellweiss, linear (docs/architektur.md Abschnitt 3); die Bit-Tiefe entsteht erst beim
-// Zeichnen auf den Canvas. Zeilenweise gespeichert: Zeile 0 ist Norden, Spalte 0 ist links
-// (+x rechts, +y Norden, A-D11). Bei drei Kanaelen liegen die Kanaele je Pixel hintereinander.
+// Raster: Pixelbild in Fliesskommawerten fuer die Bildpipeline. Der Typ gehoert zur Naht
+// (src/naht/raster.ts, dort Werte und Speicherordnung); hier die Funktionen dazu. Die Bit-Tiefe
+// entsteht erst beim Zeichnen auf den Canvas.
 
+import type { Kanaele, Raster } from "../naht/raster";
 import { BildFehler, pruefePositivGanz } from "./fehler";
 
-export type Kanaele = 1 | 3;
-
-export interface Raster {
-  breite: number;
-  hoehe: number;
-  kanaele: Kanaele;
-  /** breite * hoehe * kanaele Werte, zeilenweise, Kanaele je Pixel verschraenkt. */
-  daten: Float32Array;
-}
+export type { Kanaele, Raster };
 
 /** Neues Raster, mit fuellwert belegt (Standard 0, also Schwarz). */
 export function neuesRaster(breite: number, hoehe: number, kanaele: Kanaele = 1, fuellwert = 0): Raster {

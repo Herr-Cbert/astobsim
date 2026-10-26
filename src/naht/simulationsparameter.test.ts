@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import type { Konfiguration } from "../physik/konfiguration";
+import type { Konfiguration } from "./konfiguration";
 import type { Simulationsparameter } from "./simulationsparameter";
 
 // Die Naht muss strukturiert klonbar sein (postMessage an einen Worker, docs/architektur.md

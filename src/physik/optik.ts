@@ -4,7 +4,7 @@
 
 import type { Gesichtsfeld } from "../naht/simulationsparameter";
 import { PhysikFehler, pruefeBereich } from "./fehler";
-import type { Geraet } from "./konfiguration";
+import type { Geraet } from "../naht/konfiguration";
 import { ARCSEC_PRO_GRAD, AUGE_GESICHTSFELD_GRAD, PUPILLE_MM, TRANSMISSION, VERGROESSERUNG_MAX_PRO_MM } from "./konstanten";
 
 /** Austrittspupille AP = D / V in mm (Abschnitt 4, [35]). */
