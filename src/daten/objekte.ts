@@ -18,7 +18,7 @@ export type Objekttyp = (typeof OBJEKTTYPEN)[number];
 const FELDER_OBJEKT = ["id", "name", "typ", "quelle_physik", "zustaende"] as const;
 const FELDER_ZUSTAND = [
   "id", "name", "winkelgroesse_arcsec", "polar_arcsec", "phase", "phasenwinkel_grad", "kolongitude_grad",
-  "ringneigung_grad", "ring_aussen_arcsec", "magnitude", "entfernung_au", "bild", "trabanten", "kommentar"
+  "ringneigung_grad", "ring_aussen_arcsec", "magnitude", "weiss_mag_arcsec2", "entfernung_au", "bild", "trabanten", "kommentar"
 ] as const;
 const FELDER_TRABANT = ["name", "dx_arcsec", "dy_arcsec", "durchmesser_arcsec", "magnitude"] as const;
 
@@ -33,6 +33,11 @@ export interface ZustandEintrag {
   phase: number;
   phasenwinkelGrad: number;
   magnitude: number;
+  /**
+   * Flaechenhelligkeit in mag je Quadratbogensekunde, die Weiss (1,0) im Quellbild bedeutet
+   * (Objektzustand.quelle.weissMagProArcsec2); Werte aus docs/recherche/objekte.md 5.2.
+   */
+  weissMagProArcsec2: number;
   entfernungAu: number;
   /** id des Bildnachweises in bilder.json. */
   bild: string;
@@ -97,6 +102,7 @@ function pruefeZustand(wert: unknown, typ: Objekttyp, ortIndex: Ort): ZustandEin
     phase: zahl(obj, "phase", ort, 0, 1),
     phasenwinkelGrad: zahl(obj, "phasenwinkel_grad", ort, 0, 180),
     magnitude: zahl(obj, "magnitude", ort, -15, 10),
+    weissMagProArcsec2: zahl(obj, "weiss_mag_arcsec2", ort, -5, 25),
     entfernungAu: zahl(obj, "entfernung_au", ort, 0.0001, 100),
     bild: text(obj, "bild", ort),
     trabanten: []

@@ -309,6 +309,7 @@ Feste Mondstellungen: siehe Tabellen in 3.3 (Jupiter: Io -110/+2,9; Europa +175/
 Felder je Objekt: `id`, `name`, `typ` ("mond" | "planet"), `quelle_physik` (Verweis auf diese Datei), `zustaende[]`.
 Felder je Zustand: `id`, `name`, `winkelgroesse_arcsec` (aequatorial), `polar_arcsec`, `phase` (beleuchteter Anteil 0 bis 1), `phasenwinkel_grad`, `ringneigung_grad` (nur Saturn, sonst weglassen), `ring_aussen_arcsec` (nur Saturn), `magnitude`, `entfernung_au`, `bild` (Verweis auf Bildnachweis in der Bilddatendatei nach A-X4), `monde[]`.
 Felder je Mond: `name`, `dx_arcsec`, `dy_arcsec`, `durchmesser_arcsec`, `magnitude`.
+Nachtrag 2026-10-26 (Welle 2): Pflichtfeld `weiss_mag_arcsec2` je Zustand, die Flaechenhelligkeit in mag/"^2, die Weiss im Quellbild bedeutet (Werte aus 5.2: Mond 3,35 als Vollmond, weil die Tagseite im Bild volle Helligkeit hat; Mars 3,8 / 4,1 / 4,5; Jupiter 5,3 / 5,4; Saturn 6,6).
 Einheiten stehen im Feldnamen; Zahlen als Dezimalzahlen mit Punkt; keine berechenbaren Groessen doppelt speichern (Polar-Durchmesser wird trotzdem gespeichert, weil Bild und Modell ihn direkt brauchen).
 
 Beispiel Jupiter 47" mit vier Monden:
