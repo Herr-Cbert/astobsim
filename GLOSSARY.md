@@ -148,6 +148,9 @@ _Vermeiden_: Credit, Metadaten
 **Kachel**:
 Ein quadratischer Ausschnitt eines Quellbilds auf einer Stufe (am rechten und unteren Rand kleiner), damit grosse Quellbilder (Mond) teilweise und stufenweise geladen werden.
 
+**Einzelbild**:
+Ein Quellbild als eine Datei ohne Kacheln (Planeten); zwei Zustaende eines Objekts koennen sich ein Einzelbild teilen (Mars 14 und 6 Bogensekunden).
+
 **Stufe**:
 Eine Aufloesungsstufe einer Kachelpyramide; jede Stufe hat den halben Pixelmassstab der naechstfeineren.
 _Vermeiden_: Level, Zoomstufe

@@ -20,5 +20,53 @@
         "kommentar": "Winkelgroesse ist der Jahrbuch-Mittelwert (objekte.md 6.1). Das Quellbild zeigt 1774,4 Bogensekunden (bilder.json, winkelgroesse_arcsec); die Anwendung skaliert die Scheibe von objekt_durchmesser_px auf die Winkelgroesse des Zustands. weiss_mag_arcsec2 ist die Vollmond-Flaechenhelligkeit (objekte.md 5.2), weil das Bild die Tagseite unveraendert in voller Helligkeit zeigt."
       }
     ]
+  },
+  {
+    "id": "mars",
+    "name": "Mars",
+    "typ": "planet",
+    "quelle_physik": "docs/recherche/objekte.md",
+    "zustaende": [
+      {
+        "id": "mars_6",
+        "name": "Mars klein (6\")",
+        "winkelgroesse_arcsec": 6.0,
+        "polar_arcsec": 5.96,
+        "phase": 0.9,
+        "phasenwinkel_grad": 37,
+        "magnitude": 1.0,
+        "weiss_mag_arcsec2": 4.5,
+        "entfernung_au": 1.56,
+        "bild": "mars_hst_20160512",
+        "hinweis_hilfe": "Mars ist bei 6 Bogensekunden in Wirklichkeit nicht voll beleuchtet, sondern zu etwa 90 Prozent (gibbos, Phasenwinkel rund 37 Grad); astobsim zeigt ihn vereinfacht als volle Scheibe.",
+        "kommentar": "Werte aus objekte.md 6.1, Phasenwinkel aus 1.2 (36 bis 39 Grad). Kein eigenes Bild: nutzt das Bild von mars_14 (Hubble 2016, Vollscheibe, A-X1); phase und phasenwinkel_grad beschreiben den realen Zustand, nicht das Bild. weiss_mag_arcsec2 4,5 aus 5.2 (k = 0,9)."
+      },
+      {
+        "id": "mars_14",
+        "name": "Mars Aphel-Opposition (14\")",
+        "winkelgroesse_arcsec": 14.0,
+        "polar_arcsec": 13.9,
+        "phase": 1.0,
+        "phasenwinkel_grad": 0,
+        "magnitude": -1.4,
+        "weiss_mag_arcsec2": 4.1,
+        "entfernung_au": 0.669,
+        "bild": "mars_hst_20160512",
+        "kommentar": "Werte aus objekte.md 6.1, Phasenwinkel 0 wie in 5.1. Quellbild Hubble 12.05.2016 bei 17,51\" (bilder.json); die Anwendung skaliert die Scheibe auf 14\"."
+      },
+      {
+        "id": "mars_25",
+        "name": "Mars Perihel-Opposition (25\")",
+        "winkelgroesse_arcsec": 25.0,
+        "polar_arcsec": 24.9,
+        "phase": 1.0,
+        "phasenwinkel_grad": 0,
+        "magnitude": -3.0,
+        "weiss_mag_arcsec2": 3.8,
+        "entfernung_au": 0.375,
+        "bild": "mars_hst_20030826",
+        "kommentar": "Werte aus objekte.md 6.1, Phasenwinkel 0 wie in 5.1. Quellbild Hubble 26.08.2003 bei 25,12\" (bilder.json)."
+      }
+    ]
   }
 ]

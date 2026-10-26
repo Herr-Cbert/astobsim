@@ -1,8 +1,9 @@
-// Kachel-Lader fuer den Browser: fetch ueber BASE_URL + "daten/bilder/", Dekodierung mit
-// createImageBitmap, Pixel ueber einen (Offscreen-)Canvas, Umrechnung in ein Raster.
+// Bild-Lader fuer den Browser (Kacheln und Einzelbilder): fetch ueber BASE_URL + "daten/bilder/",
+// Dekodierung mit createImageBitmap, Pixel ueber einen (Offscreen-)Canvas, Umrechnung in ein Raster.
 //
-// Die Kacheln sind 8-Bit-WebP ohne Farbprofil, also sRGB-kodiert (das SVS-Rendering ist ein
-// Anzeigebild; tools/mond_kacheln.py aendert keine Farben). Die Naht verlangt lineare
+// Kacheln und Einzelbilder sind 8-Bit-WebP ohne Farbprofil, also sRGB-kodiert (das SVS-Rendering
+// ist ein Anzeigebild; tools/mond_kacheln.py aendert keine Farben, tools/bild_aufbereiten.py rechnet
+// eingebettete Profile wie Adobe RGB nach sRGB um). Die Naht verlangt lineare
 // Helligkeiten relativ zu Quellweiss (src/naht/raster.ts); deshalb wird mit der sRGB-Kennlinie
 // (IEC 61966-2-1) linearisiert, 255 = Quellweiss = 1,0. rgbaZuRaster ist rein und in Node getestet.
 
@@ -10,6 +11,7 @@ import type { Raster } from "../naht/raster";
 import type { Bildnachweis } from "./bildnachweise";
 import { DatenFehler } from "./fehler";
 import { kachelPfad, pyramidengeometrie, QuelleKacheln, type KachelLader } from "./kacheln";
+import { quelleEinzelbild, type QuelleEinzelbild } from "./quelle_einzelbild";
 
 /** sRGB-Kodewert 0..1 in lineare Helligkeit 0..1 (IEC 61966-2-1). */
 export function srgbZuLinear(wert: number): number {
@@ -36,39 +38,50 @@ export function rgbaZuRaster(rgba: Uint8ClampedArray | Uint8Array, breite: numbe
   return { breite, hoehe, kanaele: 3, daten };
 }
 
+/** Laedt daten/bilder/<pfad> (nur im Browser) und liefert es als lineares Raster mit drei Kanaelen. */
+export async function ladeRasterBrowser(pfad: string, nachweisId: string): Promise<Raster> {
+  const url = import.meta.env.BASE_URL + "daten/bilder/" + pfad;
+  let antwort: Response;
+  try {
+    antwort = await fetch(url);
+  } catch (e) {
+    throw new DatenFehler(pfad, nachweisId, "-", `nicht erreichbar (${String(e)})`);
+  }
+  if (!antwort.ok) throw new DatenFehler(pfad, nachweisId, "-", `HTTP ${antwort.status}`);
+  let bitmap: ImageBitmap;
+  try {
+    // Kein Farbmanagement und kein Vormultiplizieren: die Kodewerte sollen unveraendert ankommen.
+    bitmap = await createImageBitmap(await antwort.blob(), { colorSpaceConversion: "none", premultiplyAlpha: "none" });
+  } catch (e) {
+    throw new DatenFehler(pfad, nachweisId, "-", `nicht dekodierbar (${String(e)})`);
+  }
+  try {
+    const { width: breite, height: hoehe } = bitmap;
+    const kontext = zeichenflaeche(breite, hoehe);
+    kontext.drawImage(bitmap, 0, 0);
+    return rgbaZuRaster(kontext.getImageData(0, 0, breite, hoehe).data, breite, hoehe);
+  } finally {
+    bitmap.close();
+  }
+}
+
 /** Lader fuer die Kachelpyramide eines Bildnachweises (nur im Browser). */
 export function kachelLaderBrowser(nachweis: Bildnachweis): KachelLader {
-  return async (stufe, x, y) => {
-    const pfad = kachelPfad(nachweis, { stufe, x, y });
-    const url = import.meta.env.BASE_URL + "daten/bilder/" + pfad;
-    let antwort: Response;
-    try {
-      antwort = await fetch(url);
-    } catch (e) {
-      throw new DatenFehler(pfad, nachweis.id, "-", `nicht erreichbar (${String(e)})`);
-    }
-    if (!antwort.ok) throw new DatenFehler(pfad, nachweis.id, "-", `HTTP ${antwort.status}`);
-    let bitmap: ImageBitmap;
-    try {
-      // Kein Farbmanagement und kein Vormultiplizieren: die Kodewerte sollen unveraendert ankommen.
-      bitmap = await createImageBitmap(await antwort.blob(), { colorSpaceConversion: "none", premultiplyAlpha: "none" });
-    } catch (e) {
-      throw new DatenFehler(pfad, nachweis.id, "-", `nicht dekodierbar (${String(e)})`);
-    }
-    try {
-      const { width: breite, height: hoehe } = bitmap;
-      const kontext = zeichenflaeche(breite, hoehe);
-      kontext.drawImage(bitmap, 0, 0);
-      return rgbaZuRaster(kontext.getImageData(0, 0, breite, hoehe).data, breite, hoehe);
-    } finally {
-      bitmap.close();
-    }
-  };
+  return (stufe, x, y) => ladeRasterBrowser(kachelPfad(nachweis, { stufe, x, y }), nachweis.id);
 }
 
 /** QuelleKacheln fuer einen Zustand im Browser: Geometrie skaliert auf winkelgroesseArcsec. */
 export function quelleKachelnBrowser(nachweis: Bildnachweis, winkelgroesseArcsec: number): QuelleKacheln {
   return new QuelleKacheln(pyramidengeometrie(nachweis, winkelgroesseArcsec), kachelLaderBrowser(nachweis));
+}
+
+/**
+ * QuelleEinzelbild fuer einen Zustand im Browser: laedt das Bild einmal und linearisiert es;
+ * ausschnitt ist danach synchron. Zwei Zustaende mit demselben Bild (Mars 14" und 6") koennen das
+ * Raster teilen: new QuelleEinzelbild(quelle.raster, einzelbildMassstab(nachweis, winkel)).
+ */
+export async function quelleEinzelbildBrowser(nachweis: Bildnachweis, winkelgroesseArcsec: number): Promise<QuelleEinzelbild> {
+  return quelleEinzelbild(nachweis, winkelgroesseArcsec, await ladeRasterBrowser(nachweis.datei, nachweis.id));
 }
 
 /** 2D-Kontext zum Auslesen der Pixel: OffscreenCanvas (auch im Worker), sonst ein DOM-Canvas. */

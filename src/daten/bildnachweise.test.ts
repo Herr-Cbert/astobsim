@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import bilderJson from "../../daten/bilder.json";
-import { pruefeBildnachweise } from "./bildnachweise";
+import { bildBytes, pruefeBildnachweise } from "./bildnachweise";
 import { DatenFehler } from "./fehler";
 
 /** Tiefe Kopie der echten Datei als Vorlage fuer gezielt kaputte Varianten. */
@@ -118,5 +118,49 @@ describe("pruefeBildnachweise", () => {
     (roh2[0]!["kacheln"] as Record<string, unknown>)["gesamt_bytes"] = 12_000_000;
     roh2.push({ ...JSON.parse(JSON.stringify(roh2[0])), id: "mond_zweit" });
     expect(fehlerVon(roh2).eintrag).toBe("mond_zweit");
+  });
+});
+
+describe("pruefeBildnachweise mit Einzelbildern", () => {
+  /** Index des Einzelbilds Mars 2016 in der Kopie. */
+  const MARS_14 = (bilderJson as { id: string }[]).findIndex((e) => e.id === "mars_hst_20160512");
+
+  it("akzeptiert die Mars-Einzelbilder mit datei_bytes und ohne kacheln", () => {
+    const nachweise = pruefeBildnachweise(bilderJson);
+    const mars = nachweise.filter((n) => n.objekt === "mars");
+    expect(mars.map((n) => n.zustand).sort()).toEqual(["mars_14", "mars_25"]);
+    for (const n of mars) {
+      expect(n.kacheln).toBeUndefined();
+      expect(n.datei).toMatch(/^mars\/.+\.webp$/);
+      expect(n.dateiBytes).toBeGreaterThan(0);
+      expect(bildBytes(n)).toBe(n.dateiBytes);
+      // Planetenbilder 600 bis 1200 px Scheibe (bilder.md Abschnitt 9, Schritt 7).
+      expect(n.objektDurchmesserPx).toBeGreaterThanOrEqual(600);
+      expect(n.objektDurchmesserPx).toBeLessThanOrEqual(1200);
+      // Beide Lizenzangaben nach bilder.md 6.3.
+      expect(n.lizenz).toContain("Public Domain (NASA)");
+      expect(n.lizenz).toContain("CC-BY-4.0 (ESA/Hubble)");
+      expect(n.hinweise).toContain("6.3");
+    }
+  });
+
+  it("verlangt datei_bytes bei Einzelbildern und eine Datei statt eines Verzeichnisses", () => {
+    const roh = kopie();
+    delete roh[MARS_14]!["datei_bytes"];
+    expect([fehlerVon(roh).eintrag, fehlerVon(roh).feld]).toEqual(["mars_hst_20160512", "datei_bytes"]);
+    const roh2 = kopie();
+    roh2[MARS_14]!["datei"] = "mars/";
+    expect(fehlerVon(roh2).feld).toBe("datei");
+    // Kachelpyramiden nennen ihre Groesse in kacheln.gesamt_bytes, nicht in datei_bytes.
+    const roh3 = kopie();
+    roh3[0]!["datei_bytes"] = 1;
+    expect([fehlerVon(roh3).eintrag, fehlerVon(roh3).feld]).toEqual(["mond_svs5587_6285", "datei_bytes"]);
+  });
+
+  it("zaehlt Einzelbilder fuer die Grenze von 20 MB je Objekt mit (A-X6)", () => {
+    const roh = kopie();
+    roh[MARS_14]!["datei_bytes"] = 19_990_000;
+    const f = fehlerVon(roh);
+    expect([f.eintrag, f.feld]).toEqual(["mars_hst_20160512", "datei_bytes"]);
   });
 });
