@@ -44,9 +44,9 @@ const PLANETEN: Objekt[] = [
 
 const SYNTHETISCH: Kataloge = {
   geraete: ECHT.geraete,
-  objekte: [...objekteEcht, ...PLANETEN],
+  objekte: [...objekteEcht.filter((o) => o.id === "mond"), ...PLANETEN],
   nachweise: [
-    ...nachweiseEcht,
+    ...nachweiseEcht.filter((n) => n.objekt === "mond"),
     ...PLANETEN.flatMap((o) =>
       o.zustaende.map((z): Bildnachweis => ({ ...mondNachweis, id: z.bild, objekt: o.id, zustand: z.id, kacheln: undefined, pixelBreite: 1000, pixelHoehe: 800, objektDurchmesserPx: 500 }))
     )
