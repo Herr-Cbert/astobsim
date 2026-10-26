@@ -1,0 +1,26 @@
+# CI: Tests und Build bei jedem Pull Request und bei Push auf main (Issue #10).
+# Nur offizielle Actions von actions/ mit fester Major-Version, keine weiteren Abhaengigkeiten.
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  pruefen:
+    name: Test und Build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm test
+      # npm run build enthaelt scripts/build-abschluss.mjs: Groesse des Erstladens (A-X6), Kopie von daten/
+      - run: npm run build
