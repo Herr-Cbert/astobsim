@@ -26,7 +26,7 @@ Kennungen: A-Z Zweck, A-F Fernrohr und Geraete, A-B Bedingungen, A-P Physik und 
 | Kennung | Stufe | Anforderung |
 |---|---|---|
 | A-F1 | Muss | Ein Geraet wird beschrieben durch Oeffnung (mm), Brennweite (mm), Obstruktion (Prozent des Oeffnungsdurchmessers) und Bauart (Refraktor, Newton, Schmidt-Cassegrain, Maksutov). Die Bauart setzt einen Vorschlagswert fuer die Obstruktion. |
-| A-F2 | Muss | Das Geraet kann aus einer Liste gewaehlt oder frei eingegeben werden. Die Liste enthaelt herstellerneutrale Klassen (z. B. "80 mm f/7,5 ED-Refraktor", "200 mm f/6 Newton", "8 Zoll Schmidt-Cassegrain"), etwa 15 bis 20 Fernrohre von 50 mm bis 300 mm. |
+| A-F2 | Muss | Das Geraet kann aus einer Liste gewaehlt oder frei eingegeben werden. Die Liste enthaelt herstellerneutrale Klassen (z. B. "80 mm f/7,5 ED-Refraktor", "200 mm f/6 Newton", "8 Zoll Schmidt-Cassegrain"), die 22 Fernrohre der Kernliste aus `docs/recherche/geraete.md` (60 mm bis 300 mm). |
 | A-F3 | Muss | Die Liste enthaelt den Eintrag "Blosses Auge": Oeffnung 6 mm, Vergroesserung fest 1, keine Okularwahl. |
 | A-F4 | Muss | Die Liste enthaelt drei Fernglaeser (8x42, 10x50, 15x70) mit fester Vergroesserung und typischem wahren Gesichtsfeld (8x42 etwa 7,2 Grad, 10x50 etwa 6,5 Grad, 15x70 etwa 4,4 Grad), ohne Okularwahl. |
 | A-F5 | Muss | Die Geraeteliste liegt als eine von Hand erweiterbare Datendatei im Repo (Name, Typ, Bauart, Oeffnung, Brennweite, Obstruktion, bei Fernglaesern Vergroesserung und Gesichtsfeld). |
@@ -132,7 +132,7 @@ Kennungen: A-Z Zweck, A-F Fernrohr und Geraete, A-B Bedingungen, A-P Physik und 
 
 1. Gibt es fuer jeden Zustand aus A-X1 eine echte Aufnahme mit freier Lizenz und ausreichender Aufloesung (A-X5)? Sonst Liste der Zustaende anpassen.
 2. Typische Obstruktionswerte je Bauart fuer A-F1 (Newton, Schmidt-Cassegrain, Maksutov).
-3. Inhalt der Geraeteliste (A-F2): welche 15 bis 20 Klassen, mit welchen Werten.
+3. Inhalt der Geraeteliste (A-F2): welche Klassen, mit welchen Werten. Erledigt (Issue #11): die 22 Fernrohre der Kernliste in `docs/recherche/geraete.md`, A-F2 angepasst.
 4. Zuordnung Seeing in Bogensekunden zu Wortstufe und Pickering-Skala (A-B1).
 5. Skalierung des Seeings mit der Luftmasse und Extinktionskoeffizienten fuer die Transparenzstufen (A-B3, A-B4).
 6. Form der Seeing-PSF (Gauss, Moffat, Kolmogorov-Langzeit) und wie Beugung, Seeing und Auge zu einer Gesamt-PSF kombiniert werden (A-P2).

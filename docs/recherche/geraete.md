@@ -329,7 +329,7 @@ Abwaegung:
 
 ## Empfehlung fuer astobsim
 
-### Geraeteliste (Kernliste, 20 Fernrohre plus Auge und drei Fernglaeser)
+### Geraeteliste (Kernliste, 22 Fernrohre plus Auge und drei Fernglaeser)
 
 Herstellerneutral, Werte gerundet auf die ueblichen Klassenwerte. Obstruktion in Prozent des Durchmessers.
 
@@ -362,7 +362,7 @@ Herstellerneutral, Werte gerundet auf die ueblichen Klassenwerte. Obstruktion in
 | sc-235-2350 | 9,25 Zoll Schmidt-Cassegrain | fernrohr | schmidt-cassegrain | 235 | 2350 | 36 | | | [2] |
 | sc-280-2800 | 11 Zoll Schmidt-Cassegrain | fernrohr | schmidt-cassegrain | 280 | 2800 | 34 | | | [3] |
 
-Das sind 22 Fernrohre; um auf 20 zu kommen, sind "90 mm f/10 Achromat" (zwischen 80 und 102 mm) und "9,25 Zoll SC" (zwischen 8 und 11 Zoll) die ersten Streichkandidaten.
+Das sind 22 Fernrohre; um auf 20 zu kommen, sind "90 mm f/10 Achromat" (zwischen 80 und 102 mm) und "9,25 Zoll SC" (zwischen 8 und 11 Zoll) die ersten Streichkandidaten. Erledigt (Issue #11): Alle 22 bleiben, A-F2 ist angepasst.
 
 Moegliche Erweiterungen mit belegten Werten, falls die Liste laenger werden darf: 80 mm f/5 Kurzachromat 80/400 (0 %) [38]; 200 mm f/5 Newton 200/1000 (28 %) [21], [23]; 150 mm f/12 Maksutov 150/1800 (31 %) [12]; 180 mm f/15 Maksutov 180/2700 (23 %) [13]; 5 Zoll SC 127/1250 (Obstruktion nicht belegt, 37 % angenommen) [6].
 
