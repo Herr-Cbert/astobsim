@@ -38,6 +38,12 @@ export const MM_PRO_ZOLL = 25.4;
 /** Hoechste sinnvolle Vergroesserung: 2 D in mm, d. h. Austrittspupille 0,5 mm (Abschnitt 4). */
 export const VERGROESSERUNG_MAX_PRO_MM = 2;
 
+/** Kleinste sinnvolle Austrittspupille in mm, Warnschwelle in A-D5 (Abschnitt 4). */
+export const AUSTRITTSPUPILLE_MIN_MM = 0.5;
+
+/** Kantenlaenge des Standardfensters in Anzeigepixeln, wenn auswerten() kein anzeigePx bekommt (Issue #5). */
+export const ANZEIGE_PX_STANDARD = 1024;
+
 /** Extinktionskoeffizient k in mag je Luftmasse fuer die drei Transparenzstufen (Abschnitt 5.4). */
 export const EXTINKTION_MAG_PRO_LUFTMASSE: Readonly<Record<Transparenz, number>> = {
   klar: 0.2,
