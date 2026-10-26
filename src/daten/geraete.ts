@@ -27,17 +27,17 @@ export const OBSTRUKTION_VORSCHLAG_PROZENT = {
   maksutov: 31
 } as const satisfies Record<Bauart, number>;
 
-/** Verfeinerung fuer kleine schnelle Newtons: Oeffnung bis 150 mm und f/5 oder schneller. */
+/** Verfeinerung fuer kleine schnelle Newtons: Oeffnung bis 150 mm und Blendenzahl f/D bis 5. */
 export const OBSTRUKTION_VORSCHLAG_NEWTON_KLEIN = {
   prozent: 32,
   maxOeffnungMm: 150,
-  maxOeffnungsverhaeltnis: 5
+  maxBlendenzahl: 5
 } as const;
 
 /** Vorschlagswert der Obstruktion in Prozent fuer Bauart, Oeffnung und Brennweite in mm. */
 export function vorschlagObstruktionProzent(bauart: Bauart, oeffnungMm: number, brennweiteMm: number): number {
   const klein = OBSTRUKTION_VORSCHLAG_NEWTON_KLEIN;
-  if (bauart === "newton" && oeffnungMm <= klein.maxOeffnungMm && brennweiteMm / oeffnungMm <= klein.maxOeffnungsverhaeltnis) {
+  if (bauart === "newton" && oeffnungMm <= klein.maxOeffnungMm && brennweiteMm / oeffnungMm <= klein.maxBlendenzahl) {
     return klein.prozent;
   }
   return OBSTRUKTION_VORSCHLAG_PROZENT[bauart];

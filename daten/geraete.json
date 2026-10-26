@@ -205,7 +205,7 @@
   },
   {
     "id": "newton-250-1200",
-    "name": "250 mm f/4,7 Dobson",
+    "name": "250 mm f/4,8 Dobson",
     "typ": "fernrohr",
     "bauart": "newton",
     "oeffnung_mm": 250,
@@ -213,7 +213,7 @@
     "obstruktion_prozent": 25,
     "vergroesserung": null,
     "gesichtsfeld_grad": null,
-    "kommentar": "Beleg: Sky-Watcher Skyliner 250PX (Fangspiegel 58 bzw. 64 mm) [17], [18], GSO 10 Zoll f/5 [23]"
+    "kommentar": "Beleg: Sky-Watcher Skyliner 250PX (254/1200 f/4,7) (Fangspiegel 58 bzw. 64 mm) [17], [18], GSO 10 Zoll f/5 [23]"
   },
   {
     "id": "newton-300-1500",

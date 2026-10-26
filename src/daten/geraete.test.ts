@@ -7,11 +7,16 @@ import type { Geraeteeintrag } from "./geraete";
 import { OBSTRUKTION_VORSCHLAG_PROZENT, mitOkular, pruefeGeraete, vorschlagObstruktionProzent } from "./geraete";
 
 const roh: unknown = geraeteJson;
-const eintraege = pruefeGeraete(roh);
+let geprueft: Geraeteeintrag[] | undefined;
+/** Eintraege der echten Datei, erst beim ersten Zugriff geprueft, damit ein Fehler einem Test zugeordnet wird. */
+function eintraegeDerDatei(): Geraeteeintrag[] {
+  geprueft ??= pruefeGeraete(roh);
+  return geprueft;
+}
 const rohListe = geraeteJson as Record<string, unknown>[];
 
 function eintrag(id: string): Geraeteeintrag {
-  const e = eintraege.find((x) => x.id === id);
+  const e = eintraegeDerDatei().find((x) => x.id === id);
   if (e === undefined) throw new Error(`Eintrag ${id} fehlt`);
   return e;
 }
@@ -43,15 +48,19 @@ function fernrohrRoh(): Record<string, unknown> {
 }
 
 describe("geraete.json", () => {
+  it("besteht pruefeGeraete", () => {
+    expect(() => pruefeGeraete(roh)).not.toThrow();
+  });
+
   it("enthaelt die Kernliste: 22 Fernrohre, drei Fernglaeser, das Auge", () => {
-    const anzahl = (art: string) => eintraege.filter((e) => e.geraet.art === art).length;
+    const anzahl = (art: string) => eintraegeDerDatei().filter((e) => e.geraet.art === art).length;
     expect(anzahl("fernrohr")).toBe(22);
     expect(anzahl("fernglas")).toBe(3);
     expect(anzahl("auge")).toBe(1);
   });
 
   it("hat eindeutige ids im Format a-z0-9-", () => {
-    const ids = eintraege.map((e) => e.id);
+    const ids = eintraegeDerDatei().map((e) => e.id);
     expect(new Set(ids).size).toBe(ids.length);
     for (const id of ids) expect(id).toMatch(/^[a-z0-9-]+$/);
   });
@@ -77,7 +86,7 @@ describe("geraete.json", () => {
       expect(wert, wo).toBeGreaterThanOrEqual(g.min);
       expect(wert, wo).toBeLessThanOrEqual(g.max);
     };
-    for (const { id, geraet: g } of eintraege) {
+    for (const { id, geraet: g } of eintraegeDerDatei()) {
       if (g.art === "fernrohr") {
         imBereich(g.oeffnungMm, GRENZEN.oeffnungMm, id);
         imBereich(g.brennweiteMm, GRENZEN.brennweiteMm, id);
@@ -91,11 +100,12 @@ describe("geraete.json", () => {
   });
 
   it("weicht nur mit Kommentar zur Obstruktion vom Vorschlagswert der Bauart ab", () => {
-    for (const { id, kommentar, geraet: g } of eintraege) {
+    for (const { id, kommentar, geraet: g } of eintraegeDerDatei()) {
       if (g.art !== "fernrohr") continue;
       const prozent = Math.round(g.obstruktion * 100);
-      if (prozent !== vorschlagObstruktionProzent(g.bauart, g.oeffnungMm, g.brennweiteMm)) {
-        expect(kommentar ?? "", id).toContain("Obstruktion");
+      const vorschlag = vorschlagObstruktionProzent(g.bauart, g.oeffnungMm, g.brennweiteMm);
+      if (prozent !== vorschlag) {
+        expect(kommentar ?? "", id).toContain(`Obstruktion ${prozent} statt Vorschlag ${vorschlag}`);
       }
     }
   });
@@ -109,8 +119,8 @@ describe("geraete.json", () => {
   });
 
   it("enthaelt keine Herstellernamen im Anzeigenamen (A-F10)", () => {
-    const hersteller = /celestron|sky-?watcher|meade|bresser|omegon|tele ?vue|zeiss|nikon|baader|explore|gso|leica|vortex|olympus|skymax|evostar|skyliner|nexstar/i;
-    for (const e of eintraege) expect(e.name, e.id).not.toMatch(hersteller);
+    const hersteller = /celestron|sky[- ]?watcher|meade|bresser|omegon|tele ?vue|zeiss|nikon|baader|explore|gso|leica|vortex|olympus|orion|vixen|takahashi|ts-optics|skymax|evostar|skyliner|nexstar|startravel|astromaster|powerseeker|heritage/i;
+    for (const e of eintraegeDerDatei()) expect(e.name, e.id).not.toMatch(hersteller);
   });
 });
 
