@@ -20,6 +20,7 @@
     "bogensekunden_pro_pixel": 0.643,
     "norden_oben": true,
     "sub_erde_breite_grad": 5.36,
+    "sub_erde_laenge_grad": -0.44,
     "phase": 0.593,
     "kolongitude_grad": 11.2,
     "positionswinkel_achse_grad": 357.8,
@@ -57,6 +58,6 @@
         }
       ]
     },
-    "hinweise": "Rendering, zugelassen als Ausnahme A-X9 (ADR-0002). Winkelgroesse 1774,4\" ist die des Rendering-Zeitpunkts; der Zustand mond_ev zeigt 1865\". Nachtseite ist im Rendering schwach aufgehellt (etwa 5 Prozent der Tagseite), unveraendert uebernommen. Rohdatei moon.6285.tif: 10370890 Byte, SHA-256 d0d586f67118288e2e9552fb45a26f07d4fb45697ad05b0a7cfc02a5cb42f99d, abgerufen 2026-10-23. Die SVS-Seite hat keine einzelne Credit-Zeile; Namensnennung aus dem Abschnitt Credits."
+    "hinweise": "Rendering, zugelassen als Ausnahme A-X9 (ADR-0002). Winkelgroesse 1774,4\" ist die des Rendering-Zeitpunkts; der Zustand mond_ev zeigt 1865\". Scheibendurchmesser gemessen: Flaechendurchmesser aus dem Alphakanal 2753,8 px, Bounding-Box 2753x2757 px (Alpha >= 128); verwendet wird die SVS-Vorgabe 2758 px. Nachtseite ist im Rendering schwach aufgehellt (etwa 5 Prozent der Tagseite), unveraendert uebernommen. Rohdatei moon.6285.tif: 10370890 Byte, SHA-256 d0d586f67118288e2e9552fb45a26f07d4fb45697ad05b0a7cfc02a5cb42f99d, abgerufen 2026-10-23. Die SVS-Seite hat keine einzelne Credit-Zeile; Namensnennung aus dem Abschnitt Credits."
   }
 ]

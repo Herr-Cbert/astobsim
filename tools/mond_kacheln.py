@@ -15,7 +15,9 @@ daten/bilder.json geschrieben (bestehende andere Eintraege bleiben erhalten).
 Verwendung (aus dem Repo-Root, nur numpy und Pillow noetig):
     python3 tools/mond_kacheln.py                       # Standard-Rohbild
     python3 tools/mond_kacheln.py data/roh/svs5587_moon.6285.tif
-    python3 tools/mond_kacheln.py --qualitaet 95        # WebP-Qualitaet
+    python3 tools/mond_kacheln.py --qualitaet 95        # WebP-Qualitaet 0 bis 100
+    python3 tools/mond_kacheln.py --ziel daten/bilder/mond          # Zielordner der Kacheln
+    python3 tools/mond_kacheln.py --bildnachweis daten/bilder.json  # Datei fuer den Bildnachweis
     python3 tools/mond_kacheln.py --messen              # nur Qualitaet messen, nichts schreiben
 
 Das Skript ist idempotent: der Zielordner wird vorher geleert (nur Stufen-
@@ -101,6 +103,8 @@ ROH_ABRUF = "2026-10-23"
 
 def lade_rohbild(pfad):
     """Rohbild als uint8-Array HxWx4 (RGBA). Fehlt der Alphakanal, wird er voll gesetzt."""
+    if not os.path.isfile(pfad):
+        raise SystemExit(f"Rohbild nicht gefunden: {pfad} (Herkunft und Abruf: data/roh/LIESMICH.md)")
     Image.MAX_IMAGE_PIXELS = None
     with Image.open(pfad) as im:
         if im.size != (ROH_BREITE, ROH_HOEHE):
@@ -318,6 +322,7 @@ def bildnachweis(stufenliste, qualitaet, gesamt_bytes):
         "bogensekunden_pro_pixel": BOGENSEKUNDEN_PRO_PIXEL,
         "norden_oben": True,
         "sub_erde_breite_grad": SUB_ERDE_BREITE_GRAD,
+        "sub_erde_laenge_grad": SUB_ERDE_LAENGE_GRAD,
         "phase": PHASE,
         "kolongitude_grad": KOLONGITUDE_GRAD,
         "positionswinkel_achse_grad": POSITIONSWINKEL_ACHSE_GRAD,
@@ -339,7 +344,9 @@ def bildnachweis(stufenliste, qualitaet, gesamt_bytes):
         },
         "hinweise": (
             "Rendering, zugelassen als Ausnahme A-X9 (ADR-0002). Winkelgroesse 1774,4\" ist die des "
-            "Rendering-Zeitpunkts; der Zustand mond_ev zeigt 1865\". Nachtseite ist im Rendering "
+            "Rendering-Zeitpunkts; der Zustand mond_ev zeigt 1865\". Scheibendurchmesser gemessen: "
+            "Flaechendurchmesser aus dem Alphakanal 2753,8 px, Bounding-Box 2753x2757 px (Alpha >= 128); "
+            "verwendet wird die SVS-Vorgabe 2758 px. Nachtseite ist im Rendering "
             "schwach aufgehellt (etwa 5 Prozent der Tagseite), unveraendert uebernommen. "
             f"Rohdatei moon.{FRAME}.tif: {ROH_BYTES} Byte, SHA-256 {ROH_SHA256}, abgerufen {ROH_ABRUF}. "
             "Die SVS-Seite hat keine einzelne Credit-Zeile; Namensnennung aus dem Abschnitt Credits."
