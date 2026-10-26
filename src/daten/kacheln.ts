@@ -6,7 +6,14 @@
 // Dekodierung (kachellader.ts), in Tests ein synthetischer Lader (testkacheln.ts).
 //
 // Geometrie: die Bildmitte jeder Stufe ist die Objektmitte 0/0, Zeile 0 ist Norden (A-D11).
+// Bildmitte heisst Randkoordinate breitePx / 2, also die Grenze zwischen zwei Pixeln, nicht ein
+// Pixelzentrum. Beim Mond liegt die Scheibenmitte laut tools/mond_kacheln.py bei Pixelindex 1536
+// (Zentrum 1536,5); der Versatz von 0,5 px auf Stufe 0 (0,34'') ist vernachlaessigbar.
 // Alle Stufen decken dieselbe Flaeche am Himmel ab; Stufe n hat das 2^n-fache Pixelmass.
+//
+// Cache: LRU mit maxKacheln. Nie verdraengt werden die Kacheln laufender lade-Aufrufe, der
+// zuletzt abgeschlossenen Anfrage und der zuletzt gestarteten abgeschlossenen Anfrage. So gilt
+// "lade, dann ausschnitt" auch, wenn ein aelterer lade-Aufruf erst nach einem neueren fertig wird.
 
 import type { Objektpunkt, Quellausschnitt, Quelle } from "../naht/quelle";
 import type { Kanaele, Raster } from "../naht/raster";
@@ -56,6 +63,13 @@ export class QuelleKacheln implements Quelle {
   private readonly cache = new Map<string, Raster>();
   /** Laufende Ladevorgaenge, damit gleichzeitige lade-Aufrufe eine Kachel nur einmal holen. */
   private readonly laufend = new Map<string, Promise<Raster>>();
+  /** Kacheln je laufendem lade-Aufruf, nach fortlaufender Nummer des Aufrufs. */
+  private readonly anfragenLaufend = new Map<number, ReadonlySet<string>>();
+  private anfragenGestartet = 0;
+  /** Kacheln der zuletzt abgeschlossenen Anfrage. */
+  private letzteAbgeschlossen: ReadonlySet<string> = new Set();
+  /** Kacheln der zuletzt gestarteten unter den abgeschlossenen Anfragen, mit ihrer Nummer. */
+  private neuesteAbgeschlossen: { nummer: number; kacheln: ReadonlySet<string> } = { nummer: 0, kacheln: new Set() };
 
   constructor(
     readonly geometrie: Pyramidengeometrie,
@@ -115,11 +129,20 @@ export class QuelleKacheln implements Quelle {
    */
   async lade(mitte: Objektpunkt, breiteArcsec: number, massstabArcsecProPx: number): Promise<void> {
     const benoetigt = this.kachelnFuer(mitte, breiteArcsec, massstabArcsecProPx);
-    const ergebnisse = await Promise.allSettled(benoetigt.map((a) => this.ladeKachel(a)));
-    // Benoetigte Kacheln als zuletzt benutzt markieren, dann den Cache begrenzen, ohne sie zu verdraengen.
     const schluessel = new Set(benoetigt.map(kachelSchluessel));
+    const nummer = ++this.anfragenGestartet;
+    this.anfragenLaufend.set(nummer, schluessel);
+    let ergebnisse: PromiseSettledResult<Raster>[];
+    try {
+      ergebnisse = await Promise.allSettled(benoetigt.map((a) => this.ladeKachel(a)));
+    } finally {
+      this.anfragenLaufend.delete(nummer);
+    }
+    // Benoetigte Kacheln als zuletzt benutzt markieren, dann den Cache begrenzen.
     for (const s of schluessel) this.beruehre(s);
-    this.begrenzeCache(schluessel);
+    this.letzteAbgeschlossen = schluessel;
+    if (nummer > this.neuesteAbgeschlossen.nummer) this.neuesteAbgeschlossen = { nummer, kacheln: schluessel };
+    this.begrenzeCache();
     const fehler = ergebnisse.find((e): e is PromiseRejectedResult => e.status === "rejected");
     if (fehler !== undefined) throw fehler.reason;
   }
@@ -213,8 +236,10 @@ export class QuelleKacheln implements Quelle {
     this.cache.set(schluessel, kachel);
   }
 
-  /** Verdraengt die am laengsten unbenutzten Kacheln, nie die gerade benoetigten. */
-  private begrenzeCache(schutz: ReadonlySet<string>): void {
+  /** Verdraengt die am laengsten unbenutzten Kacheln, nie die geschuetzten (siehe Kopfkommentar). */
+  private begrenzeCache(): void {
+    const schutz = new Set([...this.letzteAbgeschlossen, ...this.neuesteAbgeschlossen.kacheln]);
+    for (const kacheln of this.anfragenLaufend.values()) for (const k of kacheln) schutz.add(k);
     for (const schluessel of this.cache.keys()) {
       if (this.cache.size <= this.maxKacheln) return;
       if (!schutz.has(schluessel)) this.cache.delete(schluessel);

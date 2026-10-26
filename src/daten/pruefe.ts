@@ -90,3 +90,10 @@ export function wahrheitswert(obj: Record<string, unknown>, feld: string, ort: O
   if (typeof wert !== "boolean") throw new DatenFehler(ort.datei, ort.eintrag, feld, "true oder false erwartet");
   return wert;
 }
+
+/** Wirft DatenFehler beim ersten Feld, das nicht in erlaubt steht (Tippfehler der Handpflege). */
+export function nurBekannteFelder(obj: Record<string, unknown>, ort: Ort, erlaubt: readonly string[]): void {
+  for (const feld of Object.keys(obj)) {
+    if (!erlaubt.includes(feld)) throw new DatenFehler(ort.datei, ort.eintrag, feld, "unbekanntes Feld (Tippfehler?)");
+  }
+}

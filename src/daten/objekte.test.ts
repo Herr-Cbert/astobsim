@@ -56,6 +56,15 @@ describe("pruefeObjekte", () => {
     expect(fehlerVon(() => pruefeObjekte(roh3)).feld).toBe("typ");
   });
 
+  it("meldet unbekannte Felder in Objekt, Zustand und Trabant", () => {
+    const roh = kopie();
+    roh[0]!["typp"] = "mond";
+    expect(fehlerVon(() => pruefeObjekte(roh)).feld).toBe("typp");
+    const roh2 = kopie();
+    ersterZustand(roh2)["helligkeit"] = 1;
+    expect([fehlerVon(() => pruefeObjekte(roh2)).eintrag, fehlerVon(() => pruefeObjekte(roh2)).feld]).toEqual(["mond_ev", "helligkeit"]);
+  });
+
   it("weist doppelte ids und das Feld monde zurueck", () => {
     const roh = kopie();
     (roh[0]!["zustaende"] as Roh[]).push(ersterZustand(roh));
@@ -91,6 +100,9 @@ describe("pruefeObjekte", () => {
     ((kaputt["zustaende"] as Roh[])[0]!["trabanten"] as Roh[])[0]!["durchmesser_arcsec"] = 0;
     const f = fehlerVon(() => pruefeObjekte([kaputt]));
     expect([f.eintrag, f.feld]).toEqual(["jupiter_47, trabanten[0]", "durchmesser_arcsec"]);
+    const tippfehler = JSON.parse(JSON.stringify(planet)) as Roh;
+    ((tippfehler["zustaende"] as Roh[])[0]!["trabanten"] as Roh[])[0]!["dx"] = 1;
+    expect(fehlerVon(() => pruefeObjekte([tippfehler])).feld).toBe("dx");
   });
 });
 

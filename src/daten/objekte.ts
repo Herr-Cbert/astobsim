@@ -6,21 +6,21 @@
 
 import { BILDER_DATEI, type Bildnachweis } from "./bildnachweise";
 import { DatenFehler } from "./fehler";
-import { alsListe, alsObjekt, ladeJson, optional, text, wahl, zahl, type Ort } from "./pruefe";
+import type { Trabant } from "../naht/konfiguration";
+import { alsListe, alsObjekt, ladeJson, nurBekannteFelder, optional, text, wahl, zahl, type Ort } from "./pruefe";
 
 export const OBJEKTE_DATEI = "objekte.json";
 
 export const OBJEKTTYPEN = ["mond", "planet"] as const;
 export type Objekttyp = (typeof OBJEKTTYPEN)[number];
 
-/** Trabant eines Planeten in Objektkoordinaten (+x rechts, +y Norden), Bogensekunden. */
-export interface TrabantEintrag {
-  name: string;
-  dxArcsec: number;
-  dyArcsec: number;
-  durchmesserArcsec: number;
-  magnitude: number;
-}
+/** Erlaubte Felder je Ebene; alles andere ist ein Tippfehler der Handpflege. */
+const FELDER_OBJEKT = ["id", "name", "typ", "quelle_physik", "zustaende"] as const;
+const FELDER_ZUSTAND = [
+  "id", "name", "winkelgroesse_arcsec", "polar_arcsec", "phase", "phasenwinkel_grad", "kolongitude_grad",
+  "ringneigung_grad", "ring_aussen_arcsec", "magnitude", "entfernung_au", "bild", "trabanten", "kommentar"
+] as const;
+const FELDER_TRABANT = ["name", "dx_arcsec", "dy_arcsec", "durchmesser_arcsec", "magnitude"] as const;
 
 /** Zustand eines Objekts, wie er in objekte.json steht. */
 export interface ZustandEintrag {
@@ -39,7 +39,7 @@ export interface ZustandEintrag {
   kolongitudeGrad?: number;
   ringneigungGrad?: number;
   ringAussenArcsec?: number;
-  trabanten: TrabantEintrag[];
+  trabanten: Trabant[];
   kommentar?: string;
 }
 
@@ -64,6 +64,7 @@ export function pruefeObjekte(roh: unknown): Objekt[] {
     const ort: Ort = { datei: OBJEKTE_DATEI, eintrag: id };
     if (objektIds.has(id)) throw new DatenFehler(OBJEKTE_DATEI, id, "id", "doppelt vergeben");
     objektIds.add(id);
+    nurBekannteFelder(obj, ort, FELDER_OBJEKT);
     const typ = wahl(obj, "typ", ort, OBJEKTTYPEN);
     const rohZustaende = alsListe(obj["zustaende"], ort, "zustaende");
     if (rohZustaende.length === 0) throw new DatenFehler(OBJEKTE_DATEI, id, "zustaende", "mindestens ein Zustand erwartet");
@@ -86,6 +87,7 @@ function pruefeZustand(wert: unknown, typ: Objekttyp, ortIndex: Ort): ZustandEin
   const id = text(obj, "id", ortIndex);
   const ort: Ort = { datei: OBJEKTE_DATEI, eintrag: id };
   if (obj["monde"] !== undefined) throw new DatenFehler(OBJEKTE_DATEI, id, "monde", 'heisst "trabanten" (GLOSSARY.md)');
+  nurBekannteFelder(obj, ort, FELDER_ZUSTAND);
   const optZahl = (feld: string, min: number, max: number) => optional(obj, feld, (o, f) => zahl(o, f, ort, min, max));
   const zustand: ZustandEintrag = {
     id,
@@ -116,6 +118,7 @@ function pruefeZustand(wert: unknown, typ: Objekttyp, ortIndex: Ort): ZustandEin
   zustand.trabanten = rohTrabanten.map((t, n) => {
     const ortT: Ort = { datei: OBJEKTE_DATEI, eintrag: `${id}, trabanten[${n}]` };
     const tObj = alsObjekt(t, ortT, "Trabant");
+    nurBekannteFelder(tObj, ortT, FELDER_TRABANT);
     return {
       name: text(tObj, "name", ortT),
       dxArcsec: zahl(tObj, "dx_arcsec", ortT, -7200, 7200),

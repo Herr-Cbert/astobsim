@@ -5,7 +5,7 @@
 // sich darauf verlaesst.
 
 import { DatenFehler } from "./fehler";
-import { alsListe, alsObjekt, ganzzahl, ladeJson, optional, text, wahrheitswert, zahl, type Ort } from "./pruefe";
+import { alsListe, alsObjekt, ganzzahl, ladeJson, nurBekannteFelder, optional, text, wahrheitswert, zahl, type Ort } from "./pruefe";
 
 export const BILDER_DATEI = "bilder.json";
 
@@ -61,18 +61,43 @@ export interface Bildnachweis {
 /** Erlaubte relative Abweichung zwischen gespeicherten und abgeleiteten Massstaeben. */
 const TOLERANZ_MASSSTAB = 0.01;
 
+/** Grenze fuer nachgeladene Bilder je Objekt (A-X6), 20 MB wie scripts/build-abschluss.mjs in Byte. */
+export const GRENZE_BYTES_JE_OBJEKT = 20_000_000;
+
+/** Erlaubte Felder je Ebene; alles andere ist ein Tippfehler der Handpflege. */
+const FELDER_EINTRAG = [
+  "id", "objekt", "zustand", "datei", "quelle_url", "quelle_datei", "mission", "instrument", "aufnahmedatum",
+  "lizenz", "lizenz_url", "namensnennung", "pixel_breite", "pixel_hoehe", "original_pixel", "winkelgroesse_arcsec",
+  "ringe_arcsec", "objekt_durchmesser_px", "bogensekunden_pro_pixel", "norden_oben", "sub_erde_breite_grad",
+  "sub_erde_laenge_grad", "phase", "kolongitude_grad", "positionswinkel_achse_grad", "bearbeitung", "hinweise", "kacheln"
+] as const;
+const FELDER_KACHELN = ["kachel_px", "format", "qualitaet", "muster", "gesamt_bytes", "stufen"] as const;
+const FELDER_STUFE = ["stufe", "breite_px", "hoehe_px", "bogensekunden_pro_pixel", "kacheln_x", "kacheln_y"] as const;
+
 /** Prueft die rohe Liste aus bilder.json; wirft DatenFehler mit Datei, Eintrag und Feld. */
 export function pruefeBildnachweise(roh: unknown): Bildnachweis[] {
   const liste = alsListe(roh, { datei: BILDER_DATEI, eintrag: "-" }, "Wurzel");
   const ids = new Set<string>();
-  return liste.map((wert, index) => {
+  const nachweise = liste.map((wert, index) => {
     const obj = alsObjekt(wert, { datei: BILDER_DATEI, eintrag: `Index ${index}` }, "Eintrag");
     const id = text(obj, "id", { datei: BILDER_DATEI, eintrag: `Index ${index}` });
     const ort: Ort = { datei: BILDER_DATEI, eintrag: id };
     if (ids.has(id)) throw new DatenFehler(BILDER_DATEI, id, "id", "doppelt vergeben");
     ids.add(id);
+    nurBekannteFelder(obj, ort, FELDER_EINTRAG);
     return pruefeEintrag(obj, id, ort);
   });
+  // Nachgeladene Bilder je Objekt unter 20 MB (A-X6); bekannt ist die Groesse bei Kachelpyramiden.
+  const bytesJeObjekt = new Map<string, number>();
+  for (const n of nachweise) {
+    if (n.kacheln === undefined) continue;
+    const summe = (bytesJeObjekt.get(n.objekt) ?? 0) + n.kacheln.gesamtBytes;
+    bytesJeObjekt.set(n.objekt, summe);
+    if (summe > GRENZE_BYTES_JE_OBJEKT) {
+      throw new DatenFehler(BILDER_DATEI, n.id, "kacheln.gesamt_bytes", `Objekt ${n.objekt} hat ${summe} Byte, mehr als 20 MB (A-X6)`);
+    }
+  }
+  return nachweise;
 }
 
 /** Laedt daten/bilder.json und prueft sie. */
@@ -103,6 +128,19 @@ function pruefeEintrag(obj: Record<string, unknown>, id: string, ort: Ort): Bild
     nordenOben: wahrheitswert(obj, "norden_oben", ort),
     bearbeitung: text(obj, "bearbeitung", ort)
   };
+  // Bild und Simulation setzen Norden oben voraus (A-D11); gedreht wird nur in tools/.
+  if (!nachweis.nordenOben) throw new DatenFehler(ort.datei, id, "norden_oben", "Bild muss Norden oben haben; in tools/ nach Norden drehen");
+  // Zusatzangaben zur Dokumentation: nur Typ und Bereich pruefen.
+  for (const [feld, min, max] of [
+    ["ringe_arcsec", 0.1, 4000],
+    ["sub_erde_breite_grad", -90, 90],
+    ["sub_erde_laenge_grad", -360, 360],
+    ["phase", 0, 1],
+    ["kolongitude_grad", -360, 360],
+    ["positionswinkel_achse_grad", -360, 360]
+  ] as const) {
+    optional(obj, feld, (o, f) => zahl(o, f, ort, min, max));
+  }
   const quelleDatei = optText("quelle_datei");
   if (quelleDatei !== undefined) nachweis.quelleDatei = quelleDatei;
   const hinweise = optText("hinweise");
@@ -138,6 +176,8 @@ function pruefeEintrag(obj: Record<string, unknown>, id: string, ort: Ort): Bild
 function pruefeKacheln(obj: Record<string, unknown>, nachweis: Bildnachweis, ort: Ort): Kachelpyramide {
   // Felder im Unterobjekt: der Eintrag nennt den Pfad dorthin, z. B. "mond_..., kacheln".
   const ortK: Ort = { datei: ort.datei, eintrag: `${ort.eintrag}, kacheln` };
+  nurBekannteFelder(obj, ortK, FELDER_KACHELN);
+  optional(obj, "qualitaet", (o, f) => ganzzahl(o, f, ortK, 0, 100));
   const kachelPx = ganzzahl(obj, "kachel_px", ortK, 16, 8192);
   const format = text(obj, "format", ortK);
   const muster = text(obj, "muster", ortK);
@@ -151,6 +191,7 @@ function pruefeKacheln(obj: Record<string, unknown>, nachweis: Bildnachweis, ort
   const stufen = rohStufen.map((roh, n): Kachelstufe => {
     const ortS: Ort = { datei: ort.datei, eintrag: `${ort.eintrag}, kacheln.stufen[${n}]` };
     const s = alsObjekt(roh, ortK, `stufen[${n}]`);
+    nurBekannteFelder(s, ortS, FELDER_STUFE);
     const stufe: Kachelstufe = {
       stufe: ganzzahl(s, "stufe", ortS, n, n),
       breitePx: ganzzahl(s, "breite_px", ortS, 1),
@@ -176,5 +217,11 @@ function pruefeKacheln(obj: Record<string, unknown>, nachweis: Bildnachweis, ort
     }
     return stufe;
   });
+  // tools/mond_kacheln.py halbiert ohne Rest; sonst decken die Stufen nicht genau dieselbe Flaeche ab
+  // und pyramidengeometrie (Massstab aus dem Breitenverhaeltnis) waere nicht exakt.
+  const teiler = 2 ** (stufen.length - 1);
+  for (const [feld, wert] of [["pixel_breite", nachweis.pixelBreite], ["pixel_hoehe", nachweis.pixelHoehe]] as const) {
+    if (wert % teiler !== 0) throw new DatenFehler(ort.datei, ort.eintrag, feld, `${wert} ist nicht durch ${teiler} teilbar (${stufen.length} Stufen)`);
+  }
   return { kachelPx, format, muster, gesamtBytes, stufen };
 }

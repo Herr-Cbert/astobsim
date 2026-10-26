@@ -4,7 +4,7 @@ import type { Raster } from "../naht/raster";
 import { pruefeBildnachweise } from "./bildnachweise";
 import { DatenFehler } from "./fehler";
 import { kachelPfad, pyramidengeometrie, QuelleKacheln } from "./kacheln";
-import { adresseText, pyramideAusRaster, quelleRaster } from "./testkacheln";
+import { adresseText, pyramideAusRaster, quelleRaster, schneideKachel } from "./testkacheln";
 
 const MITTE = { xArcsec: 0, yArcsec: 0 };
 
@@ -122,6 +122,37 @@ describe("QuelleKacheln Cache", () => {
     await quelle.lade(MITTE, 20, 1); // braucht 6 Kacheln, alle bleiben fuer diesen Ausschnitt
     expect(quelle.kachelnImCache).toBe(6);
     expect(quelle.ausschnitt(MITTE, 20, 1).raster.daten.every((w) => w > 0)).toBe(true);
+  });
+
+  it("verdraengt bei gleichzeitigen Aufrufen nicht die Kacheln einer neueren, schon fertigen Anfrage", async () => {
+    // Lader, der jede Kachel erst auf Freigabe liefert; maxKacheln 1.
+    const stufe0 = zaehlRaster();
+    const freigaben = new Map<string, () => void>();
+    const lader = (stufe: number, x: number, y: number) =>
+      new Promise<Raster>((erfuellt) => freigaben.set(`${stufe}/${x}_${y}`, () => erfuellt(schneideKachel(stufe0, 4, x, y))));
+    const quelle = new QuelleKacheln({ kachelPx: 4, kanaele: 1, stufen: [{ breitePx: 10, hoehePx: 6, massstabArcsecProPx: 1 }] }, lader, 1);
+    const nordwest = { xArcsec: -4.5, yArcsec: 2.5 }; // Kachel 0/0_0
+    const nordost = { xArcsec: 4.5, yArcsec: 2.5 }; // Kachel 0/2_0
+    const sued = { xArcsec: 4.5, yArcsec: -2.5 }; // Kachel 0/2_1
+    const istSchwarz = (mitte: typeof MITTE) => quelle.ausschnitt(mitte, 1, 1).raster.daten.every((w) => w === 0);
+
+    const a = quelle.lade(nordwest, 1, 1); // aeltere Anfrage
+    const b = quelle.lade(nordost, 1, 1); // neuere Anfrage
+    freigaben.get("0/2_0")!();
+    await b;
+    expect(istSchwarz(nordost)).toBe(false);
+    freigaben.get("0/0_0")!();
+    await a; // A wird spaeter fertig und darf B nicht verdraengen
+    expect(istSchwarz(nordost)).toBe(false);
+    expect(istSchwarz(nordwest)).toBe(false);
+    expect(quelle.kachelnImCache).toBe(2);
+
+    // Eine dritte, abgeschlossene Anfrage gibt die alten Kacheln frei.
+    const c = quelle.lade(sued, 1, 1);
+    freigaben.get("0/2_1")!();
+    await c;
+    expect(quelle.kachelnImCache).toBe(1);
+    expect(istSchwarz(sued)).toBe(false);
   });
 
   it("laedt nach einem Fehler die anderen Kacheln und versucht die fehlende erneut", async () => {

@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { DatenFehler } from "./fehler";
-import { alsListe, alsObjekt, ganzzahl, optional, text, wahl, wahrheitswert, zahl } from "./pruefe";
+import { alsListe, alsObjekt, ganzzahl, nurBekannteFelder, optional, text, wahl, wahrheitswert, zahl } from "./pruefe";
 
 const ort = { datei: "test.json", eintrag: "mond" };
 
@@ -50,5 +50,10 @@ describe("pruefe", () => {
     expect(wahrheitswert({ b: false }, "b", ort)).toBe(false);
     expect(() => wahrheitswert({ b: "true" }, "b", ort)).toThrow(DatenFehler);
     expect(fehlerVon(() => wahrheitswert({}, "b", ort)).feld).toBe("b");
+  });
+
+  it("meldet unbekannte Felder", () => {
+    expect(() => nurBekannteFelder({ name: "Mond" }, ort, ["name", "typ"])).not.toThrow();
+    expect(fehlerVon(() => nurBekannteFelder({ name: "Mond", nmae: "x" }, ort, ["name"])).feld).toBe("nmae");
   });
 });
