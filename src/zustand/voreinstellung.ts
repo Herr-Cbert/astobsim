@@ -3,12 +3,9 @@
 // Objektzustand kommen aus den Katalogen, damit die Werte nur in daten/ stehen. Fehlt der
 // Starteintrag, sind die Daten kaputt: DatenFehler, kein stiller Ersatz.
 
-import { DatenFehler, mitOkular, OBJEKTE_DATEI, objektzustand } from "../daten";
+import { DatenFehler, GERAETE_DATEI, mitOkular, OBJEKTE_DATEI, objektzustand } from "../daten";
 import type { Bedingungen, Konfiguration, Okular } from "../naht/konfiguration";
 import type { Kataloge } from "./kataloge";
-
-/** daten/geraete.ts exportiert seinen Dateinamen nicht; fuer die Fehlermeldung hier benannt. */
-const GERAETE_DATEI_NAME = "geraete.json";
 
 /** Startwerte nach A-D9; Geraet und Zustand als id in den Katalogen. */
 export const VOREINSTELLUNG = {
@@ -22,7 +19,7 @@ export const VOREINSTELLUNG = {
 export function voreinstellung(kataloge: Kataloge): Konfiguration {
   const eintrag = kataloge.geraete.find((e) => e.id === VOREINSTELLUNG.geraetId);
   if (eintrag === undefined) {
-    throw new DatenFehler(GERAETE_DATEI_NAME, VOREINSTELLUNG.geraetId, "id", "Startgeraet A-D9 fehlt");
+    throw new DatenFehler(GERAETE_DATEI, VOREINSTELLUNG.geraetId, "id", "Startgeraet A-D9 fehlt");
   }
   const objekt = objektzustand(kataloge.objekte, kataloge.nachweise, VOREINSTELLUNG.zustandId);
   if (objekt === undefined) {

@@ -4,7 +4,8 @@
 //
 // Zur Invariante "optik() ist die einzige Stelle, die ueber Geraet.art verzweigt": begrenze()
 // muss die Felder je Geraeteart kennen, um sie zu schneiden; es rechnet aber nichts aus der Art
-// ab und liefert wieder ein Geraet. Ausserhalb dieser beiden Funktionen kommt Geraet.art nicht vor.
+// ab und liefert wieder ein Geraet. Weitere Ausnahmen, die ebenfalls nichts aus der Art
+// berechnen: mitOkular() in daten und die URL-Serialisierung in zustand (docs/architektur.md).
 
 import type { Bedingungen, Geraet, Konfiguration } from "../naht/konfiguration";
 

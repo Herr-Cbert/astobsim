@@ -55,8 +55,13 @@ const SYNTHETISCH: Kataloge = {
 
 const START = voreinstellung(ECHT);
 
+/** Nur die Konfiguration aus ausUrl. */
+function aus(search: string, kataloge: Kataloge = ECHT): Konfiguration {
+  return ausUrl(search, kataloge).konfiguration;
+}
+
 function rundreise(k: Konfiguration, kataloge: Kataloge = ECHT): Konfiguration {
-  return ausUrl(inUrl(k, kataloge), kataloge);
+  return aus(inUrl(k, kataloge), kataloge);
 }
 
 function mitGeraet(geraet: Konfiguration["geraet"]): Konfiguration {
@@ -106,6 +111,12 @@ describe("inUrl", () => {
     // Ein Wert anders: freies Geraet.
     expect(parameter(mitGeraet({ ...g, obstruktion: 0.3 }))["a"]).toBe("fernrohr");
   });
+
+  it("schreibt eine nicht begrenzte Konfiguration begrenzt, Rundreise gleich begrenze(k)", () => {
+    const k: Konfiguration = { ...START, geraet: { ...FREIES_FERNROHR, oeffnungMm: 500, obstruktion: 0.7 }, bedingungen: { ...START.bedingungen, hoeheGrad: 0, bortle: 7.4 } };
+    expect(parameter(k)).toMatchObject({ d: "300", o: "0.5", h: "10", b: "7" });
+    expect(rundreise(k)).toEqual(begrenze(k).konfiguration);
+  });
 });
 
 describe("ausUrl(inUrl(k)) ist k", () => {
@@ -131,11 +142,11 @@ describe("ausUrl(inUrl(k)) ist k", () => {
     const ids = SYNTHETISCH.objekte.flatMap((o) => o.zustaende.map((z) => z.id));
     expect(ids).toEqual(["mond_ev", "mars_6", "mars_14", "mars_25", "jup_35", "jup_47", "sat_16", "sat_20"]);
     for (const id of ids) {
-      const k = ausUrl(`?z=${id}`, SYNTHETISCH);
+      const k = aus(`?z=${id}`, SYNTHETISCH);
       expect(k.objekt.kennung).toBe(id);
       expect(rundreise(k, SYNTHETISCH)).toEqual(k);
     }
-    expect(ausUrl("?z=jup_47", SYNTHETISCH).objekt.trabanten).toHaveLength(2);
+    expect(aus("?z=jup_47", SYNTHETISCH).objekt.trabanten).toHaveLength(2);
   });
 
   it("fuer Randwerte A-F8, A-B1, A-B2, A-B4 und alle Transparenzen", () => {
@@ -164,58 +175,78 @@ describe("ausUrl(inUrl(k)) ist k", () => {
 });
 
 describe("ausUrl: Begrenzung und Rueckfall", () => {
+  it("meldet je Schnitt einen Hinweis von begrenze, beim Rueckfall keinen", () => {
+    // d gilt nur fuer ein freies Geraet und wird hier nicht gelesen.
+    expect(ausUrl("?d=1000", ECHT).hinweise).toEqual([]);
+    const { hinweise } = ausUrl("?a=fernrohr&d=1000&s=0.1", ECHT);
+    expect(hinweise).toEqual([
+      { feld: "geraet.oeffnungMm", eingabe: 1000, wert: 300 },
+      { feld: "bedingungen.seeingFwhmArcsec", eingabe: 0.1, wert: 0.5 }
+    ]);
+    expect(ausUrl("?z=pluto&s=abc", ECHT).hinweise).toEqual([]);
+  });
+
+  it("reicht Unendlich (1e400) an begrenze weiter", () => {
+    const { konfiguration, hinweise } = ausUrl("?a=fernrohr&d=1e400&h=-1e400", ECHT);
+    expect((konfiguration.geraet as Fernrohr).oeffnungMm).toBe(300);
+    expect(konfiguration.bedingungen.hoeheGrad).toBe(10);
+    expect(hinweise).toEqual([
+      { feld: "geraet.oeffnungMm", eingabe: Infinity, wert: 300 },
+      { feld: "bedingungen.hoeheGrad", eingabe: -Infinity, wert: 10 }
+    ]);
+  });
   it("schneidet Werte ausserhalb A-F8 ueber begrenze", () => {
-    const k = ausUrl("?a=fernrohr&ba=newton&d=1000&f=50&o=50&ok=1&sg=120&s=9&b=12&h=-5", ECHT);
+    const k = aus("?a=fernrohr&ba=newton&d=1000&f=50&o=50&ok=1&sg=120&s=9&b=12&h=-5", ECHT);
     expect(k.geraet).toEqual({ art: "fernrohr", bauart: "newton", oeffnungMm: 300, brennweiteMm: 200, obstruktion: 0.5, okular: { brennweiteMm: 2, scheinbaresGesichtsfeldGrad: 100 } });
     expect(k.bedingungen).toEqual({ seeingFwhmArcsec: 5, bortle: 9, transparenz: "klar", hoeheGrad: 10 });
     expect(rundreise(k)).toEqual(k);
   });
 
   it("rundet die Bortle-Stufe", () => {
-    expect(ausUrl("?b=3.6", ECHT).bedingungen.bortle).toBe(4);
+    expect(aus("?b=3.6", ECHT).bedingungen.bortle).toBe(4);
   });
 
   it("liefert die Voreinstellung fuer eine leere oder unsinnige URL", () => {
     for (const search of ["", "?", "?v=1", "?x=1&y", "?v=99", "?%%%"]) {
-      expect(ausUrl(search, ECHT), search).toEqual(START);
+      expect(aus(search, ECHT), search).toEqual(START);
     }
   });
 
   it("faellt fuer unlesbare Parameter einzeln zurueck", () => {
-    const k = ausUrl("?g=refraktor-80-600-ed&ok=abc&sg=68&z=pluto&s=NaN&b=&t=neblig&h=Infinity", ECHT);
+    const k = aus("?g=refraktor-80-600-ed&ok=abc&sg=68&z=pluto&s=NaN&b=&t=neblig&h=", ECHT);
     expect(k.geraet).toEqual({ ...(START.geraet as Fernrohr), okular: { brennweiteMm: 10, scheinbaresGesichtsfeldGrad: 68 } });
     expect(k.objekt).toEqual(START.objekt);
     expect(k.bedingungen).toEqual(START.bedingungen);
   });
 
   it("nimmt bei unbekannter Geraete-id das Startgeraet, behaelt aber das Okular", () => {
-    const k = ausUrl("?g=gibt-es-nicht&ok=25", ECHT);
+    const k = aus("?g=gibt-es-nicht&ok=25", ECHT);
     expect(k.geraet).toEqual({ ...(START.geraet as Fernrohr), okular: { brennweiteMm: 25, scheinbaresGesichtsfeldGrad: 50 } });
   });
 
   it("ignoriert das Okular bei Fernglas und Auge", () => {
-    expect(ausUrl("?g=fernglas-10x50&ok=4&sg=82", ECHT).geraet).toEqual({ art: "fernglas", oeffnungMm: 50, vergroesserung: 10, wahresGesichtsfeldGrad: 6.5 });
-    expect(ausUrl("?g=auge&ok=4", ECHT).geraet).toEqual({ art: "auge" });
+    expect(aus("?g=fernglas-10x50&ok=4&sg=82", ECHT).geraet).toEqual({ art: "fernglas", oeffnungMm: 50, vergroesserung: 10, wahresGesichtsfeldGrad: 6.5 });
+    expect(aus("?g=auge&ok=4", ECHT).geraet).toEqual({ art: "auge" });
   });
 
   it("ergaenzt ein unvollstaendiges freies Fernrohr aus Startgeraet und Obstruktionsvorschlag", () => {
-    expect(ausUrl("?a=fernrohr&ba=schmidt-cassegrain&d=200", ECHT).geraet).toEqual({
+    expect(aus("?a=fernrohr&ba=schmidt-cassegrain&d=200", ECHT).geraet).toEqual({
       art: "fernrohr", bauart: "schmidt-cassegrain", oeffnungMm: 200, brennweiteMm: 600, obstruktion: 0.34, okular: { brennweiteMm: 10, scheinbaresGesichtsfeldGrad: 50 }
     });
-    expect((ausUrl("?a=fernrohr&ba=kaputt&o=x", ECHT).geraet as Fernrohr)).toMatchObject({ bauart: "refraktor", oeffnungMm: 80, obstruktion: 0 });
+    expect((aus("?a=fernrohr&ba=kaputt&o=x", ECHT).geraet as Fernrohr)).toMatchObject({ bauart: "refraktor", oeffnungMm: 80, obstruktion: 0 });
   });
 
   it("ergaenzt ein unvollstaendiges freies Fernglas aus dem ersten Fernglas der Liste", () => {
-    expect(ausUrl("?a=fernglas&vg=20", ECHT).geraet).toEqual({ art: "fernglas", oeffnungMm: 42, vergroesserung: 20, wahresGesichtsfeldGrad: 7.2 });
+    expect(aus("?a=fernglas&vg=20", ECHT).geraet).toEqual({ art: "fernglas", oeffnungMm: 42, vergroesserung: 20, wahresGesichtsfeldGrad: 7.2 });
     const ohneGlaeser: Kataloge = { ...ECHT, geraete: ECHT.geraete.filter((e) => e.geraet.art !== "fernglas") };
-    expect(ausUrl("?a=fernglas&vg=20", ohneGlaeser).geraet).toEqual(START.geraet);
+    expect(aus("?a=fernglas&vg=20", ohneGlaeser).geraet).toEqual(START.geraet);
   });
 
   it("bevorzugt eine bekannte Listen-id vor freien Zahlen", () => {
-    expect(ausUrl("?g=auge&a=fernrohr&d=200", ECHT).geraet).toEqual({ art: "auge" });
+    expect(aus("?g=auge&a=fernrohr&d=200", ECHT).geraet).toEqual({ art: "auge" });
   });
 
   it("liest den Suchteil auch ohne fuehrendes Fragezeichen", () => {
-    expect(ausUrl(inUrl(START, ECHT).slice(1), ECHT)).toEqual(START);
+    expect(aus(inUrl(START, ECHT).slice(1), ECHT)).toEqual(START);
   });
 });

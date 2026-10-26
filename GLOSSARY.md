@@ -10,6 +10,12 @@ Simulation des visuellen Anblicks von Himmelsobjekten am Okular eines Geraets un
 Das optische System vor dem Auge: Fernrohr, Fernglas oder blosses Auge. Beschrieben durch Oeffnung, Brennweite, Obstruktion und Bauart.
 _Vermeiden_: Teleskop, Instrument, Optik
 
+**Listengeraet**:
+Ein Geraet aus der Geraeteliste (`daten/geraete.json`), in der URL als id; ein Fernrohr der Liste traegt noch kein Okular.
+
+**Freies Geraet**:
+Ein Geraet, dessen Werte der Nutzer selbst eingibt und das mit keinem Listengeraet uebereinstimmt; in der URL als Zahlen.
+
 **Fernrohr**:
 Ein Geraet mit wechselbarem Okular. Bauarten: Refraktor, Newton, Schmidt-Cassegrain, Maksutov.
 _Vermeiden_: Teleskop
@@ -99,6 +105,13 @@ Die relative Weglaenge des Lichts durch die Atmosphaere, 1 im Zenit. Abgeleitet 
 **Konfiguration**:
 Alles, was der Nutzer einstellt: Geraet, Okular, Objekt mit Zustand und Bedingungen. Eine Konfiguration ist vollstaendig in der URL abbildbar.
 _Vermeiden_: Einstellungen, Setup, Szenario
+
+**Voreinstellung**:
+Die Startkonfiguration nach A-D9 und der Rueckfallwert fuer jeden fehlenden oder unlesbaren URL-Parameter.
+_Vermeiden_: Default, Preset
+
+**Kataloge**:
+Die geladenen Listen aus daten (Geraete, Objekte, Bildnachweise), aus denen zustand eine Konfiguration aus der URL wiederherstellt.
 
 **Aufloesungsgrenze**:
 Eine der drei Grenzen des Modells: Beugung (Oeffnung und Obstruktion), Seeing (Langzeit-PSF) und Auge (eine Bogenminute geteilt durch die Vergroesserung). Die groesste ist die dominante Grenze.

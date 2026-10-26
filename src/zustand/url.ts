@@ -14,7 +14,7 @@
 import { type Listengeraet, mitOkular, objektzustand, vorschlagObstruktionProzent } from "../daten";
 import { BAUARTEN, TRANSPARENZEN } from "../naht/konfiguration";
 import type { Bauart, Fernglas, Fernrohr, Geraet, Konfiguration, Okular } from "../naht/konfiguration";
-import { begrenze } from "../physik";
+import { begrenze, type Hinweis } from "../physik";
 import type { Kataloge } from "./kataloge";
 import { VOREINSTELLUNG, voreinstellung } from "./voreinstellung";
 
@@ -45,9 +45,11 @@ const P = PARAMETER;
 
 /**
  * Suchteil der URL zur Konfiguration, mit fuehrendem "?" (fertig fuer history.replaceState).
- * Die Konfiguration gilt als begrenzt (A-F8); inUrl schneidet nichts.
+ * Geschrieben wird begrenze(konfiguration), damit ausUrl(inUrl(k)) auch fuer eine nicht
+ * begrenzte Konfiguration gleich begrenze(k) ist.
  */
-export function inUrl(konfiguration: Konfiguration, kataloge: Kataloge): string {
+export function inUrl(eingabe: Konfiguration, kataloge: Kataloge): string {
+  const konfiguration = begrenze(eingabe).konfiguration;
   const q = new URLSearchParams();
   q.set(P.version, String(URL_VERSION));
   schreibeGeraet(q, konfiguration.geraet, kataloge);
@@ -63,10 +65,11 @@ export function inUrl(konfiguration: Konfiguration, kataloge: Kataloge): string 
 /**
  * Konfiguration aus dem Suchteil der URL (mit oder ohne "?"). Fehlende oder unlesbare Parameter
  * fallen einzeln auf die Voreinstellung zurueck, ebenso eine unbekannte Geraete- oder
- * Zustands-id; Werte ausserhalb A-F8 kommen ueber begrenze() geschnitten zurueck.
- * Wirft nur, wenn die Kataloge selbst die Voreinstellung nicht enthalten (DatenFehler).
+ * Zustands-id; Werte ausserhalb A-F8 kommen ueber begrenze() geschnitten zurueck, mit je einem
+ * Hinweis pro Schnitt (die UI zeigt sie an). Ein Rueckfall auf die Voreinstellung erzeugt keinen
+ * Hinweis. Wirft nur, wenn die Kataloge selbst die Voreinstellung nicht enthalten (DatenFehler).
  */
-export function ausUrl(search: string, kataloge: Kataloge): Konfiguration {
+export function ausUrl(search: string, kataloge: Kataloge): { konfiguration: Konfiguration; hinweise: Hinweis[] } {
   const q = new URLSearchParams(search);
   const start = voreinstellung(kataloge);
   const zahl = (name: string): number | undefined => leseZahl(q.get(name));
@@ -84,7 +87,7 @@ export function ausUrl(search: string, kataloge: Kataloge): Konfiguration {
       hoeheGrad: zahl(P.hoehe) ?? s.hoeheGrad
     }
   };
-  return begrenze(roh).konfiguration;
+  return begrenze(roh);
 }
 
 // ---------------------------------------------------------------------------------------------
@@ -201,11 +204,14 @@ function leseFernglas(q: URLSearchParams, start: Geraet, kataloge: Kataloge): Ge
 // ---------------------------------------------------------------------------------------------
 // Werte lesen
 
-/** Endliche Zahl oder undefined (fehlt, leer, unlesbar, NaN, Unendlich). */
+/**
+ * Zahl oder undefined (fehlt, leer, unlesbar). Plus und minus Unendlich (z. B. 1e400) gehen
+ * weiter an begrenze(), das sie auf die Grenze schneidet und meldet; nur NaN wird verworfen.
+ */
 function leseZahl(text: string | null): number | undefined {
   if (text === null || text.trim() === "") return undefined;
   const wert = Number(text);
-  return Number.isFinite(wert) ? wert : undefined;
+  return Number.isNaN(wert) ? undefined : wert;
 }
 
 /** Ein Wert aus einer festen Auswahl oder undefined. */
