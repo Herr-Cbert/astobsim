@@ -74,9 +74,11 @@ export function tonwert(raster: Raster, helligkeit: Helligkeit): Raster {
 }
 
 /**
- * Maske des wahren Gesichtsfelds (A-D1): Kreis oder Rechteck, zentriert auf Objektkoordinate 0/0
- * (Naht), Masse in Bogensekunden. Ausserhalb wird Schwarz, entschieden am Pixelmittelpunkt.
- * Das Raster deckt fenster ab; Pixel (i, j) hat die Mitte bei fenster.mitte + ((i + 0,5) - px/2, px/2 - (j + 0,5)) * massstab.
+ * Maske des wahren Gesichtsfelds (A-D1): Kreis oder Rechteck, zentriert auf die Fenstermitte
+ * (Entscheidung Herbert 2026-10-26: die Feldblende des Okulars bleibt in der Mitte, beim
+ * Verschieben nach A-D2 wandert das Objekt), Masse in Bogensekunden. Ausserhalb wird Schwarz,
+ * entschieden am Pixelmittelpunkt. Pixel (i, j) hat relativ zur Fenstermitte die Mitte bei
+ * ((i + 0,5) - px/2, px/2 - (j + 0,5)) * massstab.
  */
 export function maskiere(raster: Raster, gesichtsfeld: Gesichtsfeld, fenster: Fenster): Raster {
   const { breite, hoehe, kanaele } = raster;
@@ -86,9 +88,9 @@ export function maskiere(raster: Raster, gesichtsfeld: Gesichtsfeld, fenster: Fe
   const halbeHoehe = gesichtsfeld.hoeheArcsec / 2;
   const kreis = gesichtsfeld.form === "kreis";
   for (let j = 0; j < hoehe; j++) {
-    const y = fenster.mitteYArcsec + (hoehe / 2 - (j + 0.5)) * massstab;
+    const y = (hoehe / 2 - (j + 0.5)) * massstab;
     for (let i = 0; i < breite; i++) {
-      const x = fenster.mitteXArcsec + (i + 0.5 - breite / 2) * massstab;
+      const x = (i + 0.5 - breite / 2) * massstab;
       const innen = kreis
         ? (x * x) / (halbeBreite * halbeBreite) + (y * y) / (halbeHoehe * halbeHoehe) <= 1
         : Math.abs(x) <= halbeBreite && Math.abs(y) <= halbeHoehe;

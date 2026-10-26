@@ -101,8 +101,9 @@ export interface Helligkeit {
 }
 
 /**
- * Maske des wahren Gesichtsfelds, zentriert auf Objektkoordinate 0/0, Masse in Bogensekunden.
- * Kreis bei Fernrohr und Fernglas, Rechteck beim blossen Auge (A-D1).
+ * Maske des wahren Gesichtsfelds, zentriert auf die Fenstermitte (Fenster.mitte), Masse in
+ * Bogensekunden. Die Feldblende des Okulars bleibt in der Mitte, beim Verschieben (A-D2) wandert
+ * das Objekt. Kreis bei Fernrohr und Fernglas, Rechteck beim blossen Auge (A-D1).
  */
 export interface Gesichtsfeld {
   form: "kreis" | "rechteck";

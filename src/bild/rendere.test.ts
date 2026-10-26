@@ -83,16 +83,20 @@ describe("rendere", () => {
     expect(r.daten[pixelIndex(r, 15, 12)]).toBe(0); // y = -4,5
   });
 
-  it("Maske bleibt bei verschobenem Fenster auf Objektkoordinate 0/0 zentriert (Naht)", () => {
+  it("Maske bleibt bei verschobenem Fenster in der Fenstermitte, das Objekt wandert (A-D2)", () => {
+    // 16''-Fenster um 8'' nach rechts verschoben, Kreis 16'': ganzer Kreis sichtbar, Ecken schwarz.
     const p = parameter({
-      quellbild: { schluessel: "q|4|0", objekt: "test", massstabArcsecProPx: 1, rasterPx: N, mitteXArcsec: 4, mitteYArcsec: 0, punktquellen: [] },
-      fenster: { breiteArcsec: N, mitteXArcsec: 4, mitteYArcsec: 0, px: N },
-      gesichtsfeld: { form: "kreis", breiteArcsec: 4, hoeheArcsec: 4 }
+      quellbild: { schluessel: "q|8|0", objekt: "test", massstabArcsecProPx: 1, rasterPx: N, mitteXArcsec: 8, mitteYArcsec: 0, punktquellen: [] },
+      fenster: { breiteArcsec: N, mitteXArcsec: 8, mitteYArcsec: 0, px: N },
+      gesichtsfeld: { form: "kreis", breiteArcsec: N, hoeheArcsec: N }
     });
     const r = rendere(p, quelle(), falter).raster;
-    // Objektkoordinate 0/0 liegt bei Spalte 4 (x = 4,5 - 8 + 4 = 0,5).
-    expect(r.daten[pixelIndex(r, 4, 8)]).toBe(1);
-    expect(r.daten[pixelIndex(r, 8, 8)]).toBe(0);
+    expect(r.daten[pixelIndex(r, 0, 0)]).toBe(0); // Ecke ausserhalb des Kreises
+    expect(r.daten[pixelIndex(r, 0, 8)]).toBe(1); // linker Rand in der Mitte: im Kreis, Objekt
+    expect(r.daten[pixelIndex(r, 15, 8)]).toBe(0); // rechter Rand: im Kreis, aber jenseits der Quelle (x = 15,5): Schwarz
+    // Der helle Punkt bei x = +5,5 landet um 8 Spalten nach links verschoben: Spalte 13 - 8 = 5, Zeile 2.
+    expect(r.daten[pixelIndex(r, 5, 2)]).toBe(5);
+    expect(r.daten[pixelIndex(r, 13, 2)]).toBe(0);
   });
 
   it("Kastenkern 3x3 verschmiert den hellen Punkt auf 3x3 Pixel", () => {

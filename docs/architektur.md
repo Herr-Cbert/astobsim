@@ -72,7 +72,7 @@ export interface Auswertung { parameter: Simulationsparameter; anzeige: Anzeigew
 // kernFwhmArcsec sind ebenfalls exportiert; siehe Variante 3, Abschnitt 1.3.
 ```
 
-Vertrag fuer bild: Anblick = tonwert(falte(male(mittele(quelle, quellbild)), kern), helligkeit), maskiert mit `gesichtsfeld`, gezeichnet in `fenster`. Gleicher Schluessel einer Stufe heisst gleiches Ergebnis; bild darf Zwischenergebnisse behalten. Koordinaten: Objektmitte 0/0, +x rechts, +y Norden (A-D11), Bogensekunden. Helligkeiten relativ zu Quellweiss (1,0 = Flaechenhelligkeit, die Weiss im Quellbild bedeutet), linear.
+Vertrag fuer bild: Anblick = tonwert(falte(male(mittele(quelle, quellbild)), kern), helligkeit), maskiert mit `gesichtsfeld` (zentriert auf die Fenstermitte: die Feldblende bleibt in der Mitte, beim Verschieben nach A-D2 wandert das Objekt; Entscheidung 2026-10-26, Issue #6), gezeichnet in `fenster`. Gleicher Schluessel einer Stufe heisst gleiches Ergebnis; bild darf Zwischenergebnisse behalten. Koordinaten: Objektmitte 0/0, +x rechts, +y Norden (A-D11), Bogensekunden. Helligkeiten relativ zu Quellweiss (1,0 = Flaechenhelligkeit, die Weiss im Quellbild bedeutet), linear.
 
 Invarianten, die Tests absichern: Kern Summe 1 (Toleranz 1e-6), ungerade Groesse 5 bis 81, Symmetrie; `rasterPx * massstab = fenster.breiteArcsec`; Arbeitsmassstab >= Gesamt-FWHM / 2,5; Schluessel gleich genau dann, wenn gerundete Felder gleich; `begrenze` wirft nie, `auswerten` wirft `PhysikFehler` nur bei Programmierfehlern (NaN, unbegrenzte Eingaben).
 
