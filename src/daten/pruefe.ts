@@ -76,3 +76,17 @@ export function wahl<T extends string>(obj: Record<string, unknown>, feld: strin
 export function optional<T>(obj: Record<string, unknown>, feld: string, pruefer: (obj: Record<string, unknown>, feld: string) => T): T | undefined {
   return obj[feld] === undefined || obj[feld] === null ? undefined : pruefer(obj, feld);
 }
+
+/** Pflichtfeld als ganze Zahl in [min, max] (Pixelmasse, Anzahlen). */
+export function ganzzahl(obj: Record<string, unknown>, feld: string, ort: Ort, min = -Infinity, max = Infinity): number {
+  const wert = zahl(obj, feld, ort, min, max);
+  if (!Number.isInteger(wert)) throw new DatenFehler(ort.datei, ort.eintrag, feld, `ganze Zahl erwartet, nicht ${wert}`);
+  return wert;
+}
+
+/** Pflichtfeld als Wahrheitswert (true oder false). */
+export function wahrheitswert(obj: Record<string, unknown>, feld: string, ort: Ort): boolean {
+  const wert = obj[feld];
+  if (typeof wert !== "boolean") throw new DatenFehler(ort.datei, ort.eintrag, feld, "true oder false erwartet");
+  return wert;
+}
