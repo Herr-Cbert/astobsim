@@ -5,7 +5,7 @@
 import type { Helligkeit } from "../naht/simulationsparameter";
 import { type Atmosphaere, extinktionFaktor } from "./atmosphaere";
 import { PhysikFehler } from "./fehler";
-import type { Objektzustand } from "./konfiguration";
+import type { Objektzustand } from "../naht/konfiguration";
 import { BORTLE_MAG_PRO_ARCSEC2 } from "./konstanten";
 import { flaechenhelligkeitsfaktor, type Optik } from "./optik";
 import { schluessel } from "./schluessel";

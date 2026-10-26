@@ -3,7 +3,7 @@ import { arbeitsmassstab, kernbeschreibung, kernSchluessel } from "./arbeitsmass
 import { atmosphaere } from "./atmosphaere";
 import { aufloesung } from "./aufloesung";
 import { PhysikFehler } from "./fehler";
-import type { Bedingungen } from "./konfiguration";
+import type { Bedingungen } from "../naht/konfiguration";
 import { optik } from "./optik";
 import { BEDINGUNGEN_A_D9 as KLAR_45, fenster, JUPITER_QUELLE, KONFIGURATION_A_D9, MOND_QUELLE, refraktorMitVergroesserung } from "./testdaten";
 

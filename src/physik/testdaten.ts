@@ -2,7 +2,7 @@
 // Kein Teil des Moduls (nicht in index.ts exportiert), nur von *.test.ts importiert.
 
 import type { Fenster } from "../naht/simulationsparameter";
-import type { Bedingungen, Fernrohr, Konfiguration, Objektzustand } from "./konfiguration";
+import type { Bedingungen, Fernrohr, Konfiguration, Objektzustand } from "../naht/konfiguration";
 
 /** Mondquelle nach ADR-0002: NASA SVS, 7600 px, 0,643''/px, Weiss entspricht etwa Vollmond 3,4 mag/arcsec2. */
 export const MOND_QUELLE: Objektzustand["quelle"] = { breitePx: 7600, hoehePx: 7600, massstabArcsecProPx: 0.643, weissMagProArcsec2: 3.4 };

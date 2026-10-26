@@ -4,7 +4,7 @@
 // arbeitsmassstab, kernbeschreibung) und begrenze. Stufe 2: baueKern mit den Testhelfern
 // kontrastUebertragung und kernFwhmArcsec (Issue #4). Stufe 3 (auswerten) kommt mit Issue #5.
 
-export * from "./konfiguration";
+export * from "../naht/konfiguration";
 export {
   ARCSEC_PRO_RAD,
   AUGE_AUFLOESUNG_ARCSEC,

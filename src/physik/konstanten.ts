@@ -2,7 +2,7 @@
 // (Konstanten) und die dort genannten Abschnitte. 138,4 und 116,8 stehen nirgends als Zahl;
 // sie folgen in beugung.ts aus Wellenlaenge und Faktor.
 
-import type { Bauart, Transparenz } from "./konfiguration";
+import type { Bauart, Transparenz } from "../naht/konfiguration";
 
 /** Wellenlaenge des Modells in Metern (gruen, Maximum der Augenempfindlichkeit), Abschnitt 9. */
 export const WELLENLAENGE_M = 550e-9;

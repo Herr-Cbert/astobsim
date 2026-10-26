@@ -6,7 +6,7 @@
 // muss die Felder je Geraeteart kennen, um sie zu schneiden; es rechnet aber nichts aus der Art
 // ab und liefert wieder ein Geraet. Ausserhalb dieser beiden Funktionen kommt Geraet.art nicht vor.
 
-import type { Bedingungen, Geraet, Konfiguration } from "./konfiguration";
+import type { Bedingungen, Geraet, Konfiguration } from "../naht/konfiguration";
 
 /** Ein Schnitt: welches Feld (Pfad in der Konfiguration), was eingegeben war, was daraus wurde. */
 export interface Hinweis {

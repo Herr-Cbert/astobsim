@@ -110,8 +110,23 @@ _Vermeiden_: Unschaerfe, Blur, Kernel (der Kern ist die diskrete Form der Gesamt
 **Kern**:
 Die Gesamt-PSF als diskrete Matrix im Arbeitsmassstab.
 
+**Falter**:
+Der Baustein der Bildpipeline, der ein Raster mit dem Kern faltet; zwei Adapter (WebGL2 in Produktion, JavaScript fuer Tests und als Rueckfall), die dasselbe Ergebnis liefern.
+_Vermeiden_: Convolver, Filter
+
 **Arbeitsmassstab**:
 Der Pixelmassstab in Bogensekunden je Pixel, in dem gefaltet wird: nie feiner als das Quellbild, nie feiner als noetig fuer die Gesamt-PSF, nie feiner als die Anzeige.
+
+**Fenster**:
+Der Himmelsausschnitt, der gezeichnet wird: Mitte in Objektkoordinaten, Breite in Bogensekunden und Breite in Anzeigepixeln. Ohne Angabe das ganze wahre Gesichtsfeld mit dem Objekt in der Mitte (Standardfenster); Verschieben und Zoom sind nur ein anderes Fenster.
+_Vermeiden_: Viewport, Ansicht (die Zoomansicht ist ein eigener Begriff)
+
+**Arbeitsraster**:
+Das Pixelraster, auf dem gefaltet wird: das Fenster im Arbeitsmassstab.
+
+**Warnung**:
+Ein Hinweis an den Nutzer, dass eine Einstellung physikalisch ungeeignet ist (Austrittspupille ueber 6 mm oder unter 0,5 mm, Vergroesserung ueber dem Doppelten der Oeffnung in mm, A-D5). Eine Warnung verhindert keine Simulation.
+_Vermeiden_: Fehler (Fehler sind Programmierfehler oder kaputte Daten)
 
 **Anblick**:
 Das Ergebnisbild: das Objekt im wahren Gesichtsfeld, gefaltet mit der Gesamt-PSF, in Helligkeit und Kontrast angepasst. Zeigt den typischen Langzeit-Anblick, nicht den besten Moment.
@@ -131,7 +146,7 @@ Der Datensatz zu jedem Quellbild: Quelle, Mission, Lizenz, Namensnennung, Pixelm
 _Vermeiden_: Credit, Metadaten
 
 **Kachel**:
-Ein quadratischer Ausschnitt eines Quellbilds auf einer Stufe, damit grosse Quellbilder (Mond) teilweise und stufenweise geladen werden.
+Ein quadratischer Ausschnitt eines Quellbilds auf einer Stufe (am rechten und unteren Rand kleiner), damit grosse Quellbilder (Mond) teilweise und stufenweise geladen werden.
 
 **Stufe**:
 Eine Aufloesungsstufe einer Kachelpyramide; jede Stufe hat den halben Pixelmassstab der naechstfeineren.
@@ -139,6 +154,9 @@ _Vermeiden_: Level, Zoomstufe
 
 **Geraeteliste**:
 Die von Hand erweiterbare Datendatei mit den vordefinierten Geraeten.
+
+**Geraeteeintrag**:
+Eine Zeile der Geraeteliste: id, Name, Kommentar und das Geraet ohne Okular; erst mit dem gewaehlten Okular wird daraus das Geraet der Konfiguration.
 
 **Testfall**:
 Einer der sechs Beobachtungs-Testfaelle T1 bis T6 aus den Anforderungen, mit dem der Anblick gegen Beobachtungserfahrung geprueft wird.

@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { PhysikFehler } from "./fehler";
-import { BAUARTEN, type Fernrohr } from "./konfiguration";
+import { BAUARTEN, type Fernrohr } from "../naht/konfiguration";
 import { ARCSEC_PRO_GRAD, TRANSMISSION } from "./konstanten";
 import { austrittspupilleMm, flaechenhelligkeitsfaktor, optik, vergroesserungsgrenzen } from "./optik";
 

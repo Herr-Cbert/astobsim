@@ -3,7 +3,7 @@
 // Abschnitte 2.1, 2.5, 5.3, 5.4 und 9. Hoehe in Grad, Winkel in Bogensekunden bei 550 nm.
 
 import { pruefeBereich } from "./fehler";
-import type { Bedingungen, Transparenz } from "./konfiguration";
+import type { Bedingungen, Transparenz } from "../naht/konfiguration";
 import {
   ARCSEC_PRO_RAD,
   EXTINKTION_MAG_PRO_LUFTMASSE,
