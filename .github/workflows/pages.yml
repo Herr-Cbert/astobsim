@@ -15,7 +15,7 @@ concurrency:
 
 jobs:
   bauen:
-    name: Build
+    name: Bauen
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -34,7 +34,7 @@ jobs:
           path: dist
 
   veroeffentlichen:
-    name: Deploy
+    name: Veroeffentlichen
     needs: bauen
     runs-on: ubuntu-latest
     permissions:

@@ -15,7 +15,8 @@ Simulation des Anblicks von Himmelsobjekten durch ein Fernrohr unter gegebenen B
 
 - TypeScript, Vite, Vitest. Kein UI-Framework: Vanilla DOM, Canvas, WebGL2 fuer die Faltung.
 - Node 22 ueber nvm (`source ~/.nvm/nvm.sh`, in neuen Shells automatisch).
-- `npm install` einmalig, `npm run dev` startet den Dev-Server, `npm test` fuehrt Vitest einmal aus, `npm run build` baut nach `dist/`, `npm run preview` zeigt den Build.
+- `npm install` einmalig, `npm run dev` startet den Dev-Server, `npm test` fuehrt Vitest einmal aus, `npm run build` baut nach `dist/`, kopiert `daten/` nach `dist/daten/` und bricht ab, wenn das Erstladen (alles in `dist/` ohne `daten/`) 5 MB uebersteigt (A-X6), `npm run preview` zeigt den Build unter `http://localhost:4173/astobsim/` (Dev-Server unter `/`).
+- Daten zur Laufzeit immer ueber `import.meta.env.BASE_URL + "daten/..."` laden, nie ueber einen festen Pfad `/astobsim/`.
 - Vor jedem Commit: `npm test` und `npm run build` muessen durchlaufen.
 
 ## Ordner
@@ -28,6 +29,8 @@ Simulation des Anblicks von Himmelsobjekten durch ein Fernrohr unter gegebenen B
 - `daten/`: `geraete.json`, `objekte.json`, `bilder.json` und die aufbereiteten Bilder (ADR-0003).
 - `data/roh/`: Rohbilder, gitignored, mit `LIESMICH.md` zur Herkunft.
 - `tools/`: Python-Skripte (numpy, Pillow) zur Bildaufbereitung. Nur sie erzeugen Bilder unter `daten/` und schreiben den Bildnachweis.
+- `scripts/`: Node-Skripte ohne Pakete fuer den Build, derzeit `build-abschluss.mjs` (Groessenpruefung A-X6, Kopie `daten/` nach `dist/daten/`).
+- `.github/workflows/`: `ci.yml` (Tests und Build bei Pull Request und Push auf `main`), `pages.yml` (Deploy nach GitHub Pages bei Push auf `main`).
 - `prototyp/`: nur auf dem Branch `prototyp-faltung`, nicht auf `main`.
 
 ## Nicht tun
