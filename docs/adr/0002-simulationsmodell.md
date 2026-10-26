@@ -33,3 +33,10 @@ Moffat statt Gauss fuer das Seeing, weil die Kolmogorov-Langzeit-PSF Fluegel hat
 - Die Physik ist eine Sammlung reiner Funktionen mit einer Naht zur Bildpipeline; Schnitt und Datentyp stehen in `docs/architektur.md`.
 - Die Quelle des Mondbilds (NASA SVS, 0,643"/px) liegt ueber der A-X5-Messlatte von 0,25"/px. Ab etwa 200 mm Oeffnung bei sehr gutem Seeing ist der Mond quellbegrenzt. Entscheidung (Herbert, 2026-10-23): fuer Version 1 akzeptiert, der Hilfetext zum Mond nennt die Grenze. Eigenes Rendering aus LROC-WAC und LOLA wird als Kann-Punkt in Phase 4 angelegt.
 - Browser ohne WebGL2: Anzeige auf 1024 px begrenzen und JavaScript-Faltung nutzen.
+
+## Nachtrag 2026-10-26 (Kernbau, Issue #4)
+
+- **Kerngroesse** 5 bis 81 Arbeitspixel, Radius 3 Gesamt-FWHM (Quadratur), mindestens 2. Die Airy-Ringe bis zum zweiten Minimum (2,23 lambda/D) liegen darin, nicht additiv: 3 FWHM_gesamt ist mindestens 3,09 lambda/D. Mit dem Arbeitsmassstab (FWHM hoechstens 2,5 px) ist der Kern hoechstens 17 px; bei einer FWHM unter einem Pixel wird er ein Delta mit 5 px. Ist der Massstab so fein, dass der Kern ueber 81 px braeuchte, wirft `baueKern` `PhysikFehler` statt wie der Prototyp auf 40 px Radius zu klemmen.
+- **Ueberabtastung** vierfach bis 42 px Kerngroesse, darueber zweifach, damit die FFT bei hoechstens 256 Punkten bleibt und der groesste Kern unter 20 ms baut (gemessen 12 ms gegen etwa 50 ms mit 512 Punkten). Bei solchen Kernen ist die FWHM ueber 7 px breit, zwei Feinpixel je Arbeitspixel reichen.
+- **Folge des Radius** fuer beugungsbegrenzte Faelle: der Kern enthaelt etwa 94 % der Airy-Energie (Fluegel fallen wie 1/r), die Kern-MTF liegt bei nu = 0,1 um 7 % ueber der Pupillen-MTF, bei nu >= 0,9 stimmt sie. Der Prototyp hatte denselben Schnitt; Pruefung am Bild in Phase 6.
+- **Test der Airy-Energie**: 0,838 im Scheibchen ist auf dem abgeschnittenen, normierten Kern nicht absolut pruefbar (physik.md 1.1). Getestet werden das Verhaeltnis Scheibchen zu zweitem Minimum (0,838 / 0,910) und die Kern-MTF gegen `mtfPupille`; der Absolutwert bleibt in `energieImAiryKern`.

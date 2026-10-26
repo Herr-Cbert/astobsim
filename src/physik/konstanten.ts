@@ -94,6 +94,18 @@ export const AUGE_GESICHTSFELD_GRAD = 5;
  */
 export const ARBEITSPIXEL_PRO_FWHM = 2.5;
 
+/**
+ * Kernradius in Gesamt-FWHM (Abschnitt 9: etwa 3 Gesamt-FWHM). Die Airy-Ringe bis zum zweiten
+ * Minimum (2,23 lambda/D, Abschnitt 1.1) liegen darin, nicht additiv: 3 FWHM_gesamt >= 3,09 lambda/D.
+ */
+export const KERN_RADIUS_PRO_FWHM = 3;
+
+/** Kleinster Kernradius in Arbeitspixeln; bei Sub-Pixel-PSF wird der Kern nahezu ein Delta (ADR-0002, Nachtrag). */
+export const KERN_RADIUS_MIN = 2;
+
+/** Groesste Kerngroesse in Arbeitspixeln (docs/architektur.md Abschnitt 3: ungerade, 5 bis 81). */
+export const KERN_GROESSE_MAX = 81;
+
 /** Kleinste Kantenlaenge eines Fensters in Anzeigepixeln (docs/entwuerfe/naht-variante-3.md 1.3, Fehlerfaelle). */
 export const FENSTER_MIN_PX = 16;
 

@@ -1,8 +1,8 @@
 // Einstieg des Moduls physik (docs/architektur.md Abschnitt 3). Stufe 0: Einzelformeln,
 // jede einzeln getestet gegen docs/recherche/physik.md Abschnitt 8 (A-Q1). Stufe 1:
 // Konfiguration zu Zwischengroessen (optik, atmosphaere, aufloesung, helligkeit,
-// arbeitsmassstab, kernbeschreibung) und begrenze. Die Stufen 2 und 3 (baueKern, auswerten)
-// kommen mit den Issues #4 und #5 dazu.
+// arbeitsmassstab, kernbeschreibung) und begrenze. Stufe 2: baueKern mit den Testhelfern
+// kontrastUebertragung und kernFwhmArcsec (Issue #4). Stufe 3 (auswerten) kommt mit Issue #5.
 
 export * from "./konfiguration";
 export {
@@ -12,6 +12,9 @@ export {
   BETA_MOFFAT,
   BORTLE_MAG_PRO_ARCSEC2,
   EXTINKTION_MAG_PRO_LUFTMASSE,
+  KERN_GROESSE_MAX,
+  KERN_RADIUS_MIN,
+  KERN_RADIUS_PRO_FWHM,
   PUPILLE_MM,
   SEEING_STUFEN,
   SEEING_WORTSTUFEN,
@@ -48,3 +51,4 @@ export { type Aufloesung, type Aufloesungsgrenze, aufloesung } from "./aufloesun
 export { bortleMagProArcsec2, helligkeit } from "./helligkeit";
 export { arbeitsmassstab, kernSchluessel, kernbeschreibung } from "./arbeitsmassstab";
 export { GRENZEN, type Grenze, type Hinweis, begrenze } from "./begrenze";
+export { baueKern, kernFwhmArcsec, kontrastUebertragung } from "./kern";
