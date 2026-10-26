@@ -7,3 +7,4 @@ export { DatenFehler } from "./fehler";
 export { kachelLaderBrowser, quelleKachelnBrowser } from "./kachellader";
 export { pyramidengeometrie, QuelleKacheln, type Kacheladresse, type KachelLader, type Pyramidengeometrie } from "./kacheln";
 export { ladeObjekte, OBJEKTE_DATEI, pruefeObjekte, pruefeVerweise, type Objekt, type ZustandEintrag } from "./objekte";
+export * from "./geraete";
