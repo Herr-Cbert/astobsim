@@ -1,0 +1,63 @@
+[
+  {
+    "id": "mond_svs5587_6285",
+    "objekt": "mond",
+    "zustand": "mond_ev",
+    "datei": "mond/",
+    "quelle_url": "https://svs.gsfc.nasa.gov/5587",
+    "quelle_datei": "frames/5760x3240_16x9_30p/plain/moon.6285.tif",
+    "mission": "LRO / NASA SVS",
+    "instrument": "Rendering aus LOLA-Hoehenmodell und LROC-WAC-Farbmosaik, Ephemeride JPL DE421",
+    "aufnahmedatum": "2026-09-19T20:00:00Z",
+    "lizenz": "Public Domain (NASA)",
+    "lizenz_url": "https://svs.gsfc.nasa.gov/help/",
+    "namensnennung": "NASA Scientific Visualization Studio. Visualizer: Ernie Wright (USRA). Planetary scientist: Noah Petro (NASA/GSFC). Producer: James Tralie (eMITS).",
+    "pixel_breite": 3072,
+    "pixel_hoehe": 3072,
+    "original_pixel": "5760x3240",
+    "winkelgroesse_arcsec": 1774.4,
+    "objekt_durchmesser_px": 2758,
+    "bogensekunden_pro_pixel": 0.643,
+    "norden_oben": true,
+    "sub_erde_breite_grad": 5.36,
+    "sub_erde_laenge_grad": -0.44,
+    "phase": 0.593,
+    "kolongitude_grad": 11.2,
+    "positionswinkel_achse_grad": 357.8,
+    "bearbeitung": "Quadratischer Ausschnitt 3072 px um die Scheibenmitte (Pixel 2877/1622 des Rohbilds), Alphakanal auf Schwarz gelegt, ausserhalb der Scheibe plus 4 px Rand auf Schwarz gesetzt, nicht gedreht oder gespiegelt (Himmelsnorden oben laut SVS, Positionswinkel der Achse 357.8 Grad), keine Farb- oder Kontrastaenderung, in Kacheln von 512 px mit 3 Stufen zerlegt (WebP, Qualitaet 95). Stufe n hat das 2^n-fache Pixelmass von Stufe 0.",
+    "kacheln": {
+      "kachel_px": 512,
+      "format": "webp",
+      "qualitaet": 95,
+      "muster": "{stufe}/{x}_{y}.webp",
+      "gesamt_bytes": 1764664,
+      "stufen": [
+        {
+          "stufe": 0,
+          "breite_px": 3072,
+          "hoehe_px": 3072,
+          "bogensekunden_pro_pixel": 0.643,
+          "kacheln_x": 6,
+          "kacheln_y": 6
+        },
+        {
+          "stufe": 1,
+          "breite_px": 1536,
+          "hoehe_px": 1536,
+          "bogensekunden_pro_pixel": 1.286,
+          "kacheln_x": 3,
+          "kacheln_y": 3
+        },
+        {
+          "stufe": 2,
+          "breite_px": 768,
+          "hoehe_px": 768,
+          "bogensekunden_pro_pixel": 2.572,
+          "kacheln_x": 2,
+          "kacheln_y": 2
+        }
+      ]
+    },
+    "hinweise": "Rendering, zugelassen als Ausnahme A-X9 (ADR-0002). Winkelgroesse 1774,4\" ist die des Rendering-Zeitpunkts; der Zustand mond_ev zeigt 1865\". Scheibendurchmesser gemessen: Flaechendurchmesser aus dem Alphakanal 2753,8 px, Bounding-Box 2753x2757 px (Alpha >= 128); verwendet wird die SVS-Vorgabe 2758 px. Nachtseite ist im Rendering schwach aufgehellt (etwa 5 Prozent der Tagseite), unveraendert uebernommen. Rohdatei moon.6285.tif: 10370890 Byte, SHA-256 d0d586f67118288e2e9552fb45a26f07d4fb45697ad05b0a7cfc02a5cb42f99d, abgerufen 2026-10-23. Die SVS-Seite hat keine einzelne Credit-Zeile; Namensnennung aus dem Abschnitt Credits."
+  }
+]

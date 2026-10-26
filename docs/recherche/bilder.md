@@ -214,6 +214,7 @@ Eine JSON-Datei `daten/bilder.json` (Name in Phase 3 festlegen) mit einer Liste 
 
 | Feld | Typ | Bedeutung |
 |---|---|---|
+| `id` | string | Schluessel des Eintrags, Ziel des Verweises `bild` aus `objekte.json`, z. B. `mond_svs5587_6285` |
 | `objekt` | string | `mond`, `mars`, `jupiter`, `saturn` |
 | `zustand` | string | Schluessel aus A-X1, z. B. `mars_25`, `saturn_20_mittel`, `mond_erstes_viertel` |
 | `datei` | string | Pfad im Repo relativ zur Bilddatenwurzel; bei Kacheln das Verzeichnis |
@@ -233,6 +234,9 @@ Eine JSON-Datei `daten/bilder.json` (Name in Phase 3 festlegen) mit einer Liste 
 | `bearbeitung` | string | Freitext: Zuschnitt, Drehung, Skalierung, Hintergrund geschwaerzt, Farbkorrektur, Monde retuschiert |
 | `original_pixel` | string | Masse der Quelldatei, z. B. `3050x3050` |
 | `hinweise` | string | optional, z. B. offene Lizenzfragen, Satellit im Bild |
+| `kacheln` | object | nur bei Kachelpyramiden: `kachel_px`, `format`, `qualitaet`, `muster` (z. B. `{stufe}/{x}_{y}.webp`, relativ zu `datei`), `gesamt_bytes`, `stufen[]` mit je `stufe`, `breite_px`, `hoehe_px`, `bogensekunden_pro_pixel`, `kacheln_x`, `kacheln_y`; Stufe n hat das 2^n-fache Pixelmass von Stufe 0, Randkacheln duerfen kleiner als `kachel_px` sein |
+
+Konvention: `winkelgroesse_arcsec` im Bildnachweis ist die Groesse zum Aufnahme- oder Rendering-Zeitpunkt; die Anzeigegroesse steht im Objektzustand (`objekte.json`, `winkelgroesse_arcsec`), und die Anwendung skaliert die Scheibe von `objekt_durchmesser_px` auf die Winkelgroesse des Zustands.
 
 Beispiel:
 
