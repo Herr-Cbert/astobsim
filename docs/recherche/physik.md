@@ -49,6 +49,12 @@ Mit Obstruktion: geschlossene, abschnittsweise Formel bei O'Neill 1956 [5]; sie 
 
 Kontrollwert: $T(0{,}5) = 0{,}391$ (analytisch 0,3910, FFT 0,3910).
 
+**Rezept B, geschlossen (in astobsim umgesetzt, `src/physik/beugung.ts`):** Die Autokorrelation der Ringpupille ist die Ueberlappungsflaeche zweier um $d$ verschobener Ringe. Mit $R = 1$, $d = 2\nu$ und der Linsenflaeche $L(r_1, r_2, d)$ zweier Kreise [52] gilt
+
+$$T(\nu) = \frac{L(1,1,d) - 2\,L(1,\epsilon,d) + L(\epsilon,\epsilon,d)}{\pi\,(1-\epsilon^2)}, \qquad L(r_1,r_2,d) = r_1^2 \arccos\frac{a}{r_1} - a\sqrt{r_1^2-a^2} + r_2^2 \arccos\frac{b}{r_2} - b\sqrt{r_2^2-b^2}$$
+
+mit $a = (d^2 + r_1^2 - r_2^2)/2d$, $b = (d^2 + r_2^2 - r_1^2)/2d$; fuer $d \ge r_1 + r_2$ ist $L = 0$, fuer $d \le |r_1 - r_2|$ ist $L = \pi \min(r_1,r_2)^2$. Fuer $\epsilon = 0$ ergibt das genau die geschlossene Formel oben (0,39100 bei $\nu$ = 0,5); gegen die FFT-Tabelle stimmt es auf 0,003 (eigene Rechnung: $\epsilon$ = 0,33 bei $\nu$ = 0,35 liefert 0,393 gegen frei 0,564, Verhaeltnis 0,697). Das FFT-Rezept bleibt als Kontrolle.
+
 Ergebnis fuer verschiedene Obstruktionen (eigene Rechnung; die letzten beiden Spalten sind unobstruierte Oeffnungen mit Durchmesser $D(1-\epsilon)$, in Einheiten der Grenzfrequenz der vollen Oeffnung):
 
 | $\nu = f/f_c$ | frei | $\epsilon$ = 0,20 | 0,25 | 0,30 | 0,33 | 0,40 | frei, $0{,}67\,D$ | frei, $0{,}75\,D$ |
@@ -78,6 +84,8 @@ Spitzenintensitaet relativ zur freien Oeffnung gleichen Durchmessers: $(1-\epsil
 | Radius 1. Minimum in $\lambda/D$ | 1,220 | | 1,167 | 1,142 | 1,115 | 1,098 | 1,058 | 1,001 |
 
 Faustformel nach Sacek: verlorener Kernanteil $\approx 2\epsilon^2$ bis $\epsilon \approx 0{,}4$ [8]. S&T-Errata 2023 nennen fuer 33 % Obstruktion 65 % im Kern [12], passt.
+
+**Rechenweg in astobsim** (`energieImAiryKern`, eigene Rechnung): Amplitude der Ringoeffnung $A(v) = [2J_1(v)/v - \epsilon^2\,2J_1(\epsilon v)/(\epsilon v)]/(1-\epsilon^2)$ (Abschnitt 9, [1, 7]), erste Nullstelle $v_1$ per Bisektion in $(2{,}5;\ 3{,}9)$, dann Simpson-Integral $\int_0^{v_1} A(v)^2\, v\, dv$ mit 2000 Schritten, geteilt durch die Gesamtenergie $2/(1-\epsilon^2)$. Die Gesamtenergie folgt aus Parseval: sie ist proportional zur Pupillenflaeche $(1-\epsilon^2)$, die Spitze proportional $(1-\epsilon^2)^2$ [8], und fuer $\epsilon = 0$ ist $\int_0^\infty (2J_1(v)/v)^2\, v\, dv = 2$ [1, Kap. 8.5.2]. Ergebnis 0,8378 / 0,7638 / 0,6824 / 0,5843 fuer $\epsilon$ = 0 / 0,2 / 0,3 / 0,4, Nullstellen 1,2197 / 1,1665 / 1,1145 / 1,0577 $\lambda/D$, wie die Tabelle. $J_1$ nach Abramowitz-Stegun 9.4.4 und 9.4.6 [51], Fehler unter $1{,}3 \cdot 10^{-8}$.
 
 ### 1.5 Daumenregel "Obstruktion $\epsilon$ wirkt wie Oeffnung $D(1-\epsilon)$"
 
@@ -318,13 +326,16 @@ Alle mit $\lambda$ = 550 nm, 1 rad = 206 264,8''.
 | FWHM bei $r_0$ = 10 cm | $0{,}98 \cdot 550\cdot10^{-9} / 0{,}10 \cdot 206\,265$ | 1,112'' |
 | $r_0$ fuer 2'' Seeing | $0{,}98 \lambda / (2/206\,265)$ | 5,56 cm |
 | Seeing-Faktor 30 Grad Hoehe | $1{,}9943^{0{,}6}$ | 1,513 |
-| Extinktion $k$ = 0,25, 30 Grad | $0{,}25 \cdot 1{,}9943$ | 0,499 mag, Faktor 0,632 |
+| Extinktion $k$ = 0,25, 30 Grad | $0{,}25 \cdot 1{,}9943$ | 0,499 mag, Faktor 0,632; mit den Stufen klar / leicht diesig / diesig (0,20 / 0,30 / 0,45): 0,3989 / 0,5983 / 0,8974 mag |
 | MTF frei bei $\nu$ = 0,5 | $\frac{2}{\pi}[\arccos 0{,}5 - 0{,}5\sqrt{0{,}75}]$ | 0,3910 |
 | MTF $\epsilon$ = 0,33 bei $\nu$ = 0,35 | numerisch | 0,70 $\times$ MTF frei (0,41 gegen 0,565), Toleranz 2 % |
 | Energie im Airy-Kern | $\epsilon$ = 0 / 0,2 / 0,3 / 0,4 | 0,838 / 0,764 / 0,682 / 0,584 |
 | Flaechenhelligkeit Okular | AP 0,8 mm, p 6 mm | Faktor 0,01778, +4,375 mag |
 | $V_\mathrm{min}$, $V_\mathrm{max}$ 200 mm | $200/6$, $2 \cdot 200$ | 33x, 400x |
 | Quadratur 80 mm, 2'' | $\sqrt{1{,}459^2 + 2^2}$ | 2,476'' (echte Faltung 2,52'') |
+| Bessel $J_1$ | $J_1(1)$, $J_1(2)$, $J_1(5)$, $J_1(10)$ nach [51], Tabelle 9.1 | 0,4400506 / 0,5767248 / -0,3275791 / 0,0434727; erste Nullstelle 3,8317 |
+| Airy-Nullstelle $\epsilon$ = 0,33 | Tabelle 1.4 | 1,098 $\lambda/D$ (Intensitaet dort unter $10^{-4}$) |
+| MTF-Tabelle 1.3 | $\epsilon$ = 0,2 bei $\nu$ = 0,3; $\epsilon$ = 0,4 bei $\nu$ = 0,7 | 0,567; 0,224 (Toleranz 0,005) |
 
 ---
 
@@ -349,7 +360,7 @@ Alle mit $\lambda$ = 550 nm, 1 rad = 206 264,8''.
 - Dominante Grenze: Maximum der drei.
 
 **Bild (A-P2, A-P3, A-P5):** Objektbild $O(\theta)$ in ''/Pixel; Ergebnis $I = O \otimes \mathrm{PSF}$, wahlweise
-- Frequenzraum: $T(f) = T_\mathrm{Pupille}(f; D, \epsilon) \cdot \exp[-3{,}44 (\lambda f / r_0)^{5/3}] \cdot \exp[-(\pi f \sigma_e)^2 \cdot 2]$ mit $\sigma_e = \mathrm{FWHM}_\mathrm{Auge}/2{,}355$ (in rad), $T_\mathrm{Pupille}$ einmal pro ($D$, $\epsilon$) numerisch aus der Pupillenautokorrelation; oder
+- Frequenzraum: $T(f) = T_\mathrm{Pupille}(f; D, \epsilon) \cdot \exp[-3{,}44 (\lambda f / r_0)^{5/3}] \cdot \exp[-(\pi f \sigma_e)^2 \cdot 2]$ mit $\sigma_e = \mathrm{FWHM}_\mathrm{Auge}/2{,}355$ (in rad), $T_\mathrm{Pupille}$ geschlossen aus der Pupillenautokorrelation (Abschnitt 1.3, Rezept B); oder
 - Ortsraum: Kern = Airy$(D,\epsilon)$ $\otimes$ Moffat($\mathrm{FWHM}_s$, 4,765) $\otimes$ Gauss($\mathrm{FWHM}_\mathrm{Auge}$), Kernradius etwa $3\,\mathrm{FWHM}_\mathrm{gesamt}$ plus Airy-Ringe bis zum 2. Minimum.
 Beide Wege sind physikalisch gleichwertig (Langzeit-Kolmogorov); der Frequenzraum braucht keine Moffat-Naeherung, der Ortsraum ist einfacher zu testen. Die Obstruktion steckt vollstaendig in $T_\mathrm{Pupille}$ bzw. im Airy-Kern der Annulus-Formel $[(2J_1(v)/v - \epsilon^2\,2J_1(\epsilon v)/(\epsilon v))/(1-\epsilon^2)]^2$ [1, 7].
 
@@ -373,7 +384,7 @@ Beide Wege sind physikalisch gleichwertig (Langzeit-Kolmogorov); der Frequenzrau
 6. **Bortle 8 und 9 in mag/arcsec$^2$:** Dark Skies Awareness gibt fuer 8 nur "< 18" und fuer 9 nichts; 17,5 und 17,0 sind Schaetzungen aus Crumeys Wiener Werten (15 bis 19,25).
 7. **Augenaufloesung bei niedrigem Kontrast:** 2 bis 3' stuetzt sich auf klinische Buchstabentests (2,5 logMAR-Zeilen zwischen 90 % und 8 % Kontrast [33]) und die Form der CSF; eine Zahl speziell fuer Planetendetail (Sidgwick o. ae.) habe ich nicht belegt.
 8. **Transmissionswerte je Bauart:** Groessenordnung aus Spiegel- und Flaechenverlusten, keine Messreihe. Fuer das Bild ist der Unterschied 0,80 gegen 0,90 kaum sichtbar.
-9. **O'Neill 1956:** Bibliographie (JOSA 46, 285) aus einer Uebersichtsarbeit, die Formel selbst habe ich nicht eingesehen; fuer astobsim durch die numerische Autokorrelation ersetzt.
+9. **O'Neill 1956:** Bibliographie (JOSA 46, 285) aus einer Uebersichtsarbeit, die Formel selbst habe ich nicht eingesehen; fuer astobsim durch die Pupillenautokorrelation als Linsenflaechen-Formel ersetzt (Abschnitt 1.3, Rezept B).
 10. **Moffat 1969:** Bibcode 1969A&A.....3..455M aus Erinnerung, nicht abgerufen.
 11. **Rayleigh 1879:** Phil. Mag. (5) 8, 261 wird meist zitiert; Sparrow 1916 zitiert "(5) 9, 266, 1880" [4]. Die Arbeit erschien in mehreren Teilen in Band 8 und 9.
 12. **Kurzzeit-Heuristik fuer A-B6:** quadratisches Abziehen der Bildbewegung ist plausibel, aber nicht aus Fried abgeleitet; vor Umsetzung mit Fried 1966 Kurzzeit-OTF vergleichen.
@@ -434,3 +445,5 @@ Beide Wege sind physikalisch gleichwertig (Langzeit-Kolmogorov); der Frequenzrau
 48. Galileische Monde als Scheibchen: Astronomy.com, "A brief history of Jupiter's Galilean moons, and how to observe them", https://www.astronomy.com/science/a-brief-history-of-jupiters-galilean-moons-and-how-to-observe-them/ ; ALPO Japan, Ganymed 1,8'', https://alpo-j.sakura.ne.jp/kk23/j231016r.htm
 49. Encircled-Energy-Formel fuer Ringoeffnung (Anhang): arXiv:1708.01257, https://arxiv.org/pdf/1708.01257
 50. Wikipedia "Fried parameter" (Einstieg, Bibliographie Fried 1966), https://en.wikipedia.org/wiki/Fried_parameter
+51. Abramowitz, M., Stegun, I. A. (Hrsg.): *Handbook of Mathematical Functions*, Dover 1972 (Nachdruck der NBS-Ausgabe 1964), Formeln 9.4.4 und 9.4.6 (Polynomnaeherungen fuer $J_1$, $|x| < 3$ bzw. $|x| \ge 3$, Fehler unter $1{,}3 \cdot 10^{-8}$), Tabelle 9.1 (Tafelwerte), https://personal.math.ubc.ca/~cbm/aands/page_370.htm
+52. Weisstein, E. W.: "Circle-Circle Intersection", MathWorld, https://mathworld.wolfram.com/Circle-CircleIntersection.html (Linsenflaeche zweier Kreise fuer die Pupillenautokorrelation, Abschnitt 1.3 Rezept B).
