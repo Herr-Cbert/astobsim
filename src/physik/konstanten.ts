@@ -2,7 +2,7 @@
 // (Konstanten) und die dort genannten Abschnitte. 138,4 und 116,8 stehen nirgends als Zahl;
 // sie folgen in beugung.ts aus Wellenlaenge und Faktor.
 
-import type { Transparenz } from "./konfiguration";
+import type { Bauart, Transparenz } from "./konfiguration";
 
 /** Wellenlaenge des Modells in Metern (gruen, Maximum der Augenempfindlichkeit), Abschnitt 9. */
 export const WELLENLAENGE_M = 550e-9;
@@ -44,3 +44,49 @@ export const EXTINKTION_MAG_PRO_LUFTMASSE: Readonly<Record<Transparenz, number>>
 
 /** Koeffizienten der Luftmassenformel von Kasten und Young 1989 (Abschnitt 5.3, [39]). */
 export const KASTEN_YOUNG = { a: 0.50572, b: 6.07995, c: -1.6364 } as const;
+
+/**
+ * Transmission tau der Geraetearten einschliesslich Okular und Zenitspiegel (Abschnitt 5.2,
+ * Groessenordnung nach [32, 38]). Ohne Abschattung: der Faktor (1 - eps^2) steht genau einmal
+ * in helligkeit() (Abschnitt 9).
+ */
+export const TRANSMISSION: Readonly<Record<Bauart | "fernglas" | "auge", number>> = {
+  refraktor: 0.9,
+  newton: 0.8,
+  "schmidt-cassegrain": 0.8,
+  maksutov: 0.8,
+  fernglas: 0.85,
+  auge: 1.0
+};
+
+/** Himmelshelligkeit in mag je Quadratbogensekunde fuer Bortle 1 bis 9, Index 0 unbenutzt (Abschnitt 6.1, Spalte "Vorschlag astobsim"; 8 und 9 geschaetzt). */
+export const BORTLE_MAG_PRO_ARCSEC2: readonly number[] = [NaN, 21.9, 21.7, 21.4, 21.0, 20.0, 19.0, 18.3, 17.5, 17.0];
+
+/** Wortstufen des Seeings (A-B1). */
+export const SEEING_WORTSTUFEN = ["ausgezeichnet", "gut", "mittel", "schlecht"] as const;
+export type Seeingwortstufe = (typeof SEEING_WORTSTUFEN)[number];
+
+/**
+ * Zuordnung Seeing-FWHM im Zenit zu Wortstufe und Pickering-Stufen (Abschnitt 2.5, Tabelle
+ * "Vorschlag fuer A-B1"): eine Zeile gilt bis zu ihrer Obergrenze (ausschliesslich).
+ */
+export const SEEING_STUFEN: readonly {
+  bisArcsec: number;
+  wortstufe: Seeingwortstufe;
+  pickeringVon: number;
+  pickeringBis: number;
+}[] = [
+  { bisArcsec: 1, wortstufe: "ausgezeichnet", pickeringVon: 8, pickeringBis: 10 },
+  { bisArcsec: 2, wortstufe: "gut", pickeringVon: 6, pickeringBis: 7 },
+  { bisArcsec: 3, wortstufe: "mittel", pickeringVon: 4, pickeringBis: 5 },
+  { bisArcsec: Infinity, wortstufe: "schlecht", pickeringVon: 1, pickeringBis: 3 }
+];
+
+/** Rechteckiges Gesichtsfeld des blossen Auges in Grad, Breite und Hoehe (A-D1). */
+export const AUGE_GESICHTSFELD_GRAD = 5;
+
+/** Arbeitsmassstab: die Gesamt-FWHM ist nie kleiner als 2,5 Arbeitspixel (ADR-0002). */
+export const ARBEITSPIXEL_PRO_FWHM = 2.5;
+
+/** Rundung der Naht-Schluessel und der Kernbeschreibung auf 4 signifikante Stellen (docs/architektur.md Abschnitt 3). */
+export const SIGNIFIKANTE_STELLEN = 4;
