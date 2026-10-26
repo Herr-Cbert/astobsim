@@ -1,6 +1,4 @@
-import { TEXTE } from "./texte";
+import { starte } from "./ui/starte";
 
 const app = document.getElementById("app");
-if (app) {
-  app.innerHTML = `<h1>${TEXTE.titel}</h1><p>${TEXTE.untertitel}</p><p>${TEXTE.geruest}</p>`;
-}
+if (app) void starte(app);
