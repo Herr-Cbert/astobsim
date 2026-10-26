@@ -25,6 +25,14 @@ export interface Quellausschnitt {
 }
 
 /**
+ * Linke obere Ecke eines Rasters in Objektkoordinaten aus seiner Mitte, seinen Pixelmassen und
+ * seinem Massstab: linker Rand der Spalte 0 und noerdlicher Rand der Zeile 0.
+ */
+export function eckeLinksOben(mitte: Objektpunkt, breitePx: number, hoehePx: number, massstabArcsecProPx: number): Objektpunkt {
+  return { xArcsec: mitte.xArcsec - (breitePx * massstabArcsecProPx) / 2, yArcsec: mitte.yArcsec + (hoehePx * massstabArcsecProPx) / 2 };
+}
+
+/**
  * Vertrag zwischen bild und daten:
  * - bild fragt den Bereich an, den das Arbeitsraster braucht: Mitte in Objektkoordinaten,
  *   Breite des quadratischen Bereichs in Bogensekunden und den Arbeitsmassstab.
@@ -57,27 +65,16 @@ export class QuelleAusRaster implements Quelle {
     if (!(massstabArcsecProPx > 0)) throw new BildFehler(`Quellmassstab muss positiv sein, nicht ${massstabArcsecProPx}`);
   }
 
-  /** Linker Rand des Rasters in Objektkoordinaten. */
-  get linksXArcsec(): number {
-    return this.mitte.xArcsec - (this.raster.breite * this.massstabArcsecProPx) / 2;
-  }
-
-  /** Noerdlicher Rand des Rasters in Objektkoordinaten. */
-  get obenYArcsec(): number {
-    return this.mitte.yArcsec + (this.raster.hoehe * this.massstabArcsecProPx) / 2;
-  }
-
   ausschnitt(mitte: Objektpunkt, breiteArcsec: number, _massstabArcsecProPx: number): Quellausschnitt {
     this.aufrufe++;
     const ms = this.massstabArcsecProPx;
     const { breite, hoehe, kanaele, daten } = this.raster;
-    const links = this.linksXArcsec;
-    const oben = this.obenYArcsec;
+    const { xArcsec: links, yArcsec: oben } = eckeLinksOben(this.mitte, breite, hoehe, ms);
     // Angefragter Bereich in Quellpixeln, mit einem Pixel Rand, auf das Raster begrenzt.
-    const x0 = begrenze(Math.floor((mitte.xArcsec - breiteArcsec / 2 - links) / ms) - 1, 0, breite);
-    const x1 = begrenze(Math.ceil((mitte.xArcsec + breiteArcsec / 2 - links) / ms) + 1, 0, breite);
-    const y0 = begrenze(Math.floor((oben - (mitte.yArcsec + breiteArcsec / 2)) / ms) - 1, 0, hoehe);
-    const y1 = begrenze(Math.ceil((oben - (mitte.yArcsec - breiteArcsec / 2)) / ms) + 1, 0, hoehe);
+    const x0 = klemme(Math.floor((mitte.xArcsec - breiteArcsec / 2 - links) / ms) - 1, 0, breite);
+    const x1 = klemme(Math.ceil((mitte.xArcsec + breiteArcsec / 2 - links) / ms) + 1, 0, breite);
+    const y0 = klemme(Math.floor((oben - (mitte.yArcsec + breiteArcsec / 2)) / ms) - 1, 0, hoehe);
+    const y1 = klemme(Math.ceil((oben - (mitte.yArcsec - breiteArcsec / 2)) / ms) + 1, 0, hoehe);
     if (x1 <= x0 || y1 <= y0) {
       // Bereich liegt ganz ausserhalb des Bilds: ein schwarzes Pixel genuegt.
       return { raster: neuesRaster(1, 1, kanaele), massstabArcsecProPx: ms, linksXArcsec: links, obenYArcsec: oben };
@@ -92,6 +89,7 @@ export class QuelleAusRaster implements Quelle {
   }
 }
 
-function begrenze(wert: number, min: number, max: number): number {
+/** Klemmt wert auf [min, max]; nicht begrenze, das ist der Nahtbegriff aus physik. */
+function klemme(wert: number, min: number, max: number): number {
   return Math.min(max, Math.max(min, wert));
 }

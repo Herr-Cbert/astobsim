@@ -4,7 +4,7 @@ import { FalterJs, type Falter } from "./falter";
 import { BildFehler } from "./fehler";
 import { QuelleAusRaster } from "./quelle";
 import { neuesRaster, pixelIndex, summe, type Raster } from "./raster";
-import { neuerZwischenspeicher, rendere } from "./rendere";
+import { rendere, type Zwischenspeicher } from "./rendere";
 import { deltaKern, kastenKern } from "./testkerne";
 
 const N = 16;
@@ -124,7 +124,7 @@ describe("rendere", () => {
   it("Wiederverwendung nach Stufenschluessel: Quelle und Falter werden nur bei neuem Schluessel gerufen", () => {
     const q = quelle();
     const f = new FalterZaehlend();
-    const zwischen = neuerZwischenspeicher();
+    const zwischen: Zwischenspeicher = {};
     const p = parameter();
     rendere(p, q, f, zwischen);
     expect([q.aufrufe, f.aufrufe]).toEqual([1, 1]);

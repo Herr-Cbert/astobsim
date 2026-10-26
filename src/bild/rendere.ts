@@ -5,7 +5,7 @@
 
 import type { Fenster, Gesichtsfeld, Helligkeit, Quellbild, Simulationsparameter } from "../naht/simulationsparameter";
 import type { Falter } from "./falter";
-import { BildFehler } from "./fehler";
+import { BildFehler, pruefePositivGanz } from "./fehler";
 import { mittele, skaliere } from "./mittele";
 import type { Quelle } from "./quelle";
 import { pruefeRaster, type Raster } from "./raster";
@@ -22,14 +22,10 @@ export interface Anblick {
   raster: Raster;
 }
 
-/** Behaelt je Stufe das letzte Ergebnis mit seinem Schluessel. Einer je Anzeige, vom Aufrufer gehalten. */
+/** Behaelt je Stufe das letzte Ergebnis mit seinem Schluessel. Einer je Anzeige, vom Aufrufer als {} angelegt. */
 export interface Zwischenspeicher {
   stufe1?: { schluessel: string; raster: Raster };
   stufe2?: { schluessel: string; raster: Raster };
-}
-
-export function neuerZwischenspeicher(): Zwischenspeicher {
-  return {};
 }
 
 /** Relative Toleranz fuer Gleichheit von Massstaeben und Breiten, die physik gerundet liefert. */
@@ -42,7 +38,7 @@ function ungefaehrGleich(a: number, b: number): boolean {
 /** Wirft BildFehler bei Parametern, die den Invarianten der Naht widersprechen. */
 export function pruefeParameter(p: Simulationsparameter): void {
   const { quellbild, kern, helligkeit, fenster } = p;
-  if (!Number.isInteger(fenster.px) || fenster.px <= 0) throw new BildFehler(`fenster.px muss eine positive ganze Zahl sein, nicht ${fenster.px}`);
+  pruefePositivGanz("fenster.px", fenster.px);
   if (!(fenster.breiteArcsec > 0)) throw new BildFehler(`fenster.breiteArcsec muss positiv sein, nicht ${fenster.breiteArcsec}`);
   if (!ungefaehrGleich(quellbild.rasterPx * quellbild.massstabArcsecProPx, fenster.breiteArcsec)) {
     throw new BildFehler(`rasterPx * massstab (${quellbild.rasterPx * quellbild.massstabArcsecProPx}) muss fenster.breiteArcsec (${fenster.breiteArcsec}) sein`);

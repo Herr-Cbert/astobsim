@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import type { Quellbild } from "../naht/simulationsparameter";
-import { mittele, mittleFlaechig, skaliere } from "./mittele";
+import { mittele, mitteleFlaechig, skaliere } from "./mittele";
 import { QuelleAusRaster } from "./quelle";
 import { neuesRaster, pixelIndex, summe, type Raster } from "./raster";
 
@@ -15,21 +15,21 @@ function zaehlRaster(breite: number, hoehe: number): Raster {
   return raster;
 }
 
-describe("mittleFlaechig", () => {
+describe("mitteleFlaechig", () => {
   it("mittelt 4x4 mit Schritt 2 auf 2x2 Bloecke", () => {
-    const ergebnis = mittleFlaechig(zaehlRaster(4, 4), 2, 2, 0, 2, 0, 2);
+    const ergebnis = mitteleFlaechig(zaehlRaster(4, 4), 2, 2, 0, 2, 0, 2);
     expect(Array.from(ergebnis.daten)).toEqual([5.5, 7.5, 25.5, 27.5]);
   });
 
   it("mittelt mit halben Pixeln und Versatz", () => {
-    const ergebnis = mittleFlaechig(zaehlRaster(4, 1), 2, 1, 0.5, 1.5, 0, 1);
+    const ergebnis = mitteleFlaechig(zaehlRaster(4, 1), 2, 1, 0.5, 1.5, 0, 1);
     // Ziel 0 deckt [0,5, 2): 0,5 * 0 + 1 * 1 = 1 / 1,5; Ziel 1 deckt [2, 3,5): 2 + 0,5 * 3 = 3,5 / 1,5.
     expect(ergebnis.daten[0]).toBeCloseTo(1 / 1.5, 6);
     expect(ergebnis.daten[1]).toBeCloseTo(3.5 / 1.5, 6);
   });
 
   it("ausserhalb der Quelle ist Schwarz", () => {
-    const ergebnis = mittleFlaechig(neuesRaster(2, 2, 1, 1), 4, 4, -1, 1, -1, 1);
+    const ergebnis = mitteleFlaechig(neuesRaster(2, 2, 1, 1), 4, 4, -1, 1, -1, 1);
     expect(summe(ergebnis)).toBe(4);
     expect(ergebnis.daten[pixelIndex(ergebnis, 0, 0)]).toBe(0);
     expect(ergebnis.daten[pixelIndex(ergebnis, 1, 1)]).toBe(1);
@@ -40,7 +40,7 @@ describe("mittleFlaechig", () => {
   it("behandelt drei Kanaele getrennt", () => {
     const raster = neuesRaster(2, 1, 3);
     raster.daten.set([1, 2, 3, 3, 4, 5]);
-    const ergebnis = mittleFlaechig(raster, 1, 1, 0, 2, 0, 1);
+    const ergebnis = mitteleFlaechig(raster, 1, 1, 0, 2, 0, 1);
     expect(Array.from(ergebnis.daten)).toEqual([2, 3, 4]);
   });
 });
@@ -62,6 +62,14 @@ describe("mittele (Stufe 1) und Koordinaten", () => {
     const grob = mittele(quelle.ausschnitt({ xArcsec: 0, yArcsec: 0 }, 4, 2), quellbild({ massstabArcsecProPx: 2, rasterPx: 2 }));
     expect(grob.daten[pixelIndex(grob, 1, 0)]).toBeCloseTo(0.25, 6);
     expect(summe(grob)).toBeCloseTo(0.25, 6);
+  });
+
+  it("Quelle mit Mitte abseits 0/0: Objektkoordinaten folgen der Quellmitte", () => {
+    // Raster 4x4, Mitte bei (10, -10): Pixel (0, 0) deckt x in [8, 9), y in (-9, -8] ab.
+    const quelle = new QuelleAusRaster(zaehlRaster(4, 4), 1, { xArcsec: 10, yArcsec: -10 });
+    const q = quellbild({ rasterPx: 2, mitteXArcsec: 9, mitteYArcsec: -9 });
+    const ergebnis = mittele(quelle.ausschnitt({ xArcsec: 9, yArcsec: -9 }, 2, 1), q);
+    expect(Array.from(ergebnis.daten)).toEqual([0, 1, 10, 11]);
   });
 
   it("verschobene Mitte: Arbeitsraster mit Mitte (+1, +1) zeigt den Nordost-Quadranten der Quelle", () => {

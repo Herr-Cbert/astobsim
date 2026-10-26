@@ -1,7 +1,7 @@
-// Einstieg des Moduls bild (docs/architektur.md Abschnitt 1).
+// Einstieg des Moduls bild, beschraenkt auf das Interface aus docs/architektur.md Abschnitt 1.
+// Interne Schritte (mittele, skaliere, tonwert, maskiere) importieren Tests aus ihren Dateien.
 export { BildFehler } from "./fehler";
-export { FalterJs, pruefeKern, type Falter } from "./falter";
-export { mittele, mittleFlaechig, skaliere } from "./mittele";
+export { FalterJs, type Falter } from "./falter";
 export { QuelleAusRaster, type Objektpunkt, type Quellausschnitt, type Quelle } from "./quelle";
-export { neuesRaster, pixelIndex, pruefeRaster, summe, type Kanaele, type Raster } from "./raster";
-export { malePunktquellen, maskiere, neuerZwischenspeicher, pruefeParameter, rendere, tonwert, type Anblick, type Zwischenspeicher } from "./rendere";
+export { neuesRaster, type Kanaele, type Raster } from "./raster";
+export { rendere, type Anblick, type Zwischenspeicher } from "./rendere";

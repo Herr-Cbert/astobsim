@@ -73,11 +73,17 @@ describe("FalterJs", () => {
     expect(summe(norden)).toBe(1);
   });
 
-  it("Kastenkern erhaelt die Summe eines Rasters bis auf den Rand nicht, aber den Mittelwert eines konstanten", () => {
-    const raster = zufallsRaster(16, 16);
+  it("Kastenkern 5x5 verteilt ein helles Pixel in der Mitte gleichmaessig auf 5x5 Pixel, Summe bleibt 1", () => {
+    const raster = neuesRaster(9, 9);
+    raster.daten[pixelIndex(raster, 4, 4)] = 1;
     const ergebnis = falter.falte(raster, kastenKern(5));
-    const mittel = summe(raster) / raster.daten.length;
-    expect(summe(ergebnis) / ergebnis.daten.length).toBeCloseTo(mittel, 1);
+    for (let y = 0; y < 9; y++) {
+      for (let x = 0; x < 9; x++) {
+        const innen = Math.abs(x - 4) <= 2 && Math.abs(y - 4) <= 2;
+        expect(ergebnis.daten[pixelIndex(ergebnis, x, y)]).toBeCloseTo(innen ? 1 / 25 : 0, 6);
+      }
+    }
+    expect(summe(ergebnis)).toBeCloseTo(1, 5);
   });
 
   it("wirft BildFehler bei geradem Kern oder falscher Datenlaenge", () => {
@@ -90,13 +96,10 @@ describe("FalterJs", () => {
   it("Laufzeit 1024 px mit Kern 25 px (Ziel unter 0,6 s, ADR-0002; nur protokolliert)", () => {
     const raster = zufallsRaster(1024, 1024);
     const kern = kastenKern(25);
-    const zeiten: number[] = [];
-    for (let i = 0; i < 2; i++) {
-      const start = performance.now();
-      falter.falte(raster, kern);
-      zeiten.push(performance.now() - start);
-    }
-    console.log(`FalterJs 1024x1024 mit Kern 25x25: ${zeiten.map((t) => (t / 1000).toFixed(3)).join(" s, ")} s`);
-    expect(zeiten.length).toBe(2);
+    const start = performance.now();
+    const ergebnis = falter.falte(raster, kern);
+    const sekunden = (performance.now() - start) / 1000;
+    console.log(`FalterJs 1024x1024 mit Kern 25x25: ${sekunden.toFixed(3)} s`);
+    expect(ergebnis.daten.length).toBe(1024 * 1024);
   });
 });

@@ -3,8 +3,8 @@
 // (Arbeitsraster auf das Fenster bringen). Reine Funktionen, kein DOM.
 
 import type { Quellbild } from "../naht/simulationsparameter";
-import { BildFehler } from "./fehler";
-import type { Quellausschnitt } from "./quelle";
+import { BildFehler, pruefePositivGanz } from "./fehler";
+import { eckeLinksOben, type Quellausschnitt } from "./quelle";
 import { neuesRaster, pruefeRaster, type Raster } from "./raster";
 
 /**
@@ -45,7 +45,7 @@ function ueberdeckung(zielAnzahl: number, anfang: number, schritt: number, quell
  * Quellpixeln [spalteAnfang + i * spalteSchritt, +spalteSchritt) x [zeileAnfang + j * zeileSchritt,
  * +zeileSchritt) ab. Separabel in zwei Durchgaengen, Aufwand linear in Quell- plus Zielgroesse.
  */
-export function mittleFlaechig(
+export function mitteleFlaechig(
   quelle: Raster,
   breiteNeu: number,
   hoeheNeu: number,
@@ -54,7 +54,7 @@ export function mittleFlaechig(
   zeileAnfang: number,
   zeileSchritt: number
 ): Raster {
-  pruefeRaster(quelle, "Quelle fuer mittleFlaechig");
+  pruefeRaster(quelle, "Quelle fuer mitteleFlaechig");
   const k = quelle.kanaele;
   const spalten = ueberdeckung(breiteNeu, spalteAnfang, spalteSchritt, quelle.breite);
   const zeilen = ueberdeckung(hoeheNeu, zeileAnfang, zeileSchritt, quelle.hoehe);
@@ -107,13 +107,12 @@ export function mittele(ausschnitt: Quellausschnitt, quellbild: Quellbild): Rast
   const ms = ausschnitt.massstabArcsecProPx;
   const n = quellbild.rasterPx;
   if (!(m > 0) || !(ms > 0)) throw new BildFehler(`Massstaebe muessen positiv sein: Arbeit ${m}, Quelle ${ms}`);
-  if (!Number.isInteger(n) || n <= 0) throw new BildFehler(`rasterPx muss eine positive ganze Zahl sein, nicht ${n}`);
-  const linksArbeit = quellbild.mitteXArcsec - (n * m) / 2;
-  const obenArbeit = quellbild.mitteYArcsec + (n * m) / 2;
+  pruefePositivGanz("rasterPx", n);
+  const { xArcsec: linksArbeit, yArcsec: obenArbeit } = eckeLinksOben({ xArcsec: quellbild.mitteXArcsec, yArcsec: quellbild.mitteYArcsec }, n, n, m);
   // Zielpixel (i, j) in Quellpixelkoordinaten: Spalten wachsen nach rechts (+x), Zeilen nach Sueden (-y).
   const spalteAnfang = (linksArbeit - ausschnitt.linksXArcsec) / ms;
   const zeileAnfang = (ausschnitt.obenYArcsec - obenArbeit) / ms;
-  return mittleFlaechig(ausschnitt.raster, n, n, spalteAnfang, m / ms, zeileAnfang, m / ms);
+  return mitteleFlaechig(ausschnitt.raster, n, n, spalteAnfang, m / ms, zeileAnfang, m / ms);
 }
 
 /**
@@ -123,10 +122,10 @@ export function mittele(ausschnitt: Quellausschnitt, quellbild: Quellbild): Rast
  */
 export function skaliere(raster: Raster, px: number): Raster {
   pruefeRaster(raster, "Raster fuer skaliere");
-  if (!Number.isInteger(px) || px <= 0) throw new BildFehler(`Fensterbreite muss eine positive ganze Zahl sein, nicht ${px}`);
+  pruefePositivGanz("Fensterbreite px", px);
   if (raster.breite === px && raster.hoehe === px) return raster;
   if (px < raster.breite || px < raster.hoehe) {
-    return mittleFlaechig(raster, px, px, 0, raster.breite / px, 0, raster.hoehe / px);
+    return mitteleFlaechig(raster, px, px, 0, raster.breite / px, 0, raster.hoehe / px);
   }
   const k = raster.kanaele;
   const ziel = neuesRaster(px, px, k);

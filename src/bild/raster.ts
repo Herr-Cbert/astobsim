@@ -3,7 +3,7 @@
 // Zeichnen auf den Canvas. Zeilenweise gespeichert: Zeile 0 ist Norden, Spalte 0 ist links
 // (+x rechts, +y Norden, A-D11). Bei drei Kanaelen liegen die Kanaele je Pixel hintereinander.
 
-import { BildFehler } from "./fehler";
+import { BildFehler, pruefePositivGanz } from "./fehler";
 
 export type Kanaele = 1 | 3;
 
@@ -17,9 +17,8 @@ export interface Raster {
 
 /** Neues Raster, mit fuellwert belegt (Standard 0, also Schwarz). */
 export function neuesRaster(breite: number, hoehe: number, kanaele: Kanaele = 1, fuellwert = 0): Raster {
-  if (!Number.isInteger(breite) || !Number.isInteger(hoehe) || breite <= 0 || hoehe <= 0) {
-    throw new BildFehler(`Rastermasse muessen positive ganze Zahlen sein, nicht ${breite} x ${hoehe}`);
-  }
+  pruefePositivGanz("Rasterbreite", breite);
+  pruefePositivGanz("Rasterhoehe", hoehe);
   const daten = new Float32Array(breite * hoehe * kanaele);
   if (fuellwert !== 0) daten.fill(fuellwert);
   return { breite, hoehe, kanaele, daten };
@@ -28,9 +27,8 @@ export function neuesRaster(breite: number, hoehe: number, kanaele: Kanaele = 1,
 /** Wirft BildFehler, wenn Masse, Kanaele und Datenlaenge nicht zusammenpassen. */
 export function pruefeRaster(raster: Raster, name = "Raster"): void {
   const { breite, hoehe, kanaele, daten } = raster;
-  if (!Number.isInteger(breite) || !Number.isInteger(hoehe) || breite <= 0 || hoehe <= 0) {
-    throw new BildFehler(`${name}: Masse muessen positive ganze Zahlen sein, nicht ${breite} x ${hoehe}`);
-  }
+  pruefePositivGanz(`${name}: Breite`, breite);
+  pruefePositivGanz(`${name}: Hoehe`, hoehe);
   if (kanaele !== 1 && kanaele !== 3) {
     throw new BildFehler(`${name}: 1 oder 3 Kanaele erwartet, nicht ${String(kanaele)}`);
   }
