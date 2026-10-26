@@ -19,3 +19,6 @@ data/roh/*
 .idea/
 *.swp
 .DS_Store
+
+# Bau der Browsertests (npm run test:browser)
+test/browser/dist/
