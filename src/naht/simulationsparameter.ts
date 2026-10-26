@@ -60,7 +60,7 @@ export interface Punktquelle {
 /**
  * Stufe 2: die Gesamt-PSF als diskrete Matrix im Arbeitsmassstab, Eingabe der Faltung.
  * daten hat groesse * groesse Werte, zeilenweise, Summe 1 (Toleranz 1e-6), punktsymmetrisch,
- * keine negativen Werte. groesse = 2 * radius + 1, ungerade, 5 bis 81.
+ * keine negativen Werte. groesse und radius in Arbeitspixeln, groesse = 2 * radius + 1, ungerade, 5 bis 81.
  * massstabArcsecProPx ist gleich Quellbild.massstabArcsecProPx.
  */
 export interface Kern {
