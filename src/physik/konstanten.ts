@@ -1,6 +1,6 @@
 // Konstanten des Modells, jede genau einmal. Quelle: docs/recherche/physik.md, Abschnitt 9
-// (Konstanten) und die dort genannten Abschnitte. Ohne diese Datei stuenden 138,4 und 116,8
-// als nackte Zahlen im Code; sie folgen hier aus Wellenlaenge und Faktor.
+// (Konstanten) und die dort genannten Abschnitte. 138,4 und 116,8 stehen nirgends als Zahl;
+// sie folgen in beugung.ts aus Wellenlaenge und Faktor.
 
 import type { Transparenz } from "./konfiguration";
 
@@ -44,8 +44,3 @@ export const EXTINKTION_MAG_PRO_LUFTMASSE: Readonly<Record<Transparenz, number>>
 
 /** Koeffizienten der Luftmassenformel von Kasten und Young 1989 (Abschnitt 5.3, [39]). */
 export const KASTEN_YOUNG = { a: 0.50572, b: 6.07995, c: -1.6364 } as const;
-
-/** lambda/D in Bogensekunden fuer eine Oeffnung D in mm; Grundmass aller Beugungsgroessen. */
-export function lambdaDurchDArcsec(oeffnungMm: number): number {
-  return (WELLENLAENGE_M / (oeffnungMm * 1e-3)) * ARCSEC_PRO_RAD;
-}

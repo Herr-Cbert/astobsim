@@ -5,11 +5,17 @@
 import { besselJ1 } from "./bessel";
 import {
   AIRY_FWHM_FAKTOR,
+  ARCSEC_PRO_RAD,
   DAWES_ARCSEC_ZOLL,
   MM_PRO_ZOLL,
   RAYLEIGH_FAKTOR,
-  lambdaDurchDArcsec
+  WELLENLAENGE_M
 } from "./konstanten";
+
+/** lambda/D in Bogensekunden fuer eine Oeffnung D in mm, Grundmass aller Beugungsgroessen (Abschnitt 1.1). */
+export function lambdaDurchDArcsec(oeffnungMm: number): number {
+  return (WELLENLAENGE_M / (oeffnungMm * 1e-3)) * ARCSEC_PRO_RAD;
+}
 
 /** Rayleigh-Grenze 1,22 lambda/D = 138,4''/D (Abschnitt 1.2, [2]). */
 export function rayleighArcsec(oeffnungMm: number): number {
@@ -28,7 +34,7 @@ export function airyFwhmArcsec(oeffnungMm: number): number {
 
 /** Radius des ersten Airy-Minimums 1,22 lambda/D, gleich der Rayleigh-Grenze (Abschnitt 1.1, [1]). */
 export function airyRadiusArcsec(oeffnungMm: number): number {
-  return RAYLEIGH_FAKTOR * lambdaDurchDArcsec(oeffnungMm);
+  return rayleighArcsec(oeffnungMm);
 }
 
 /**

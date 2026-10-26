@@ -326,7 +326,7 @@ Alle mit $\lambda$ = 550 nm, 1 rad = 206 264,8''.
 | FWHM bei $r_0$ = 10 cm | $0{,}98 \cdot 550\cdot10^{-9} / 0{,}10 \cdot 206\,265$ | 1,112'' |
 | $r_0$ fuer 2'' Seeing | $0{,}98 \lambda / (2/206\,265)$ | 5,56 cm |
 | Seeing-Faktor 30 Grad Hoehe | $1{,}9943^{0{,}6}$ | 1,513 |
-| Extinktion $k$ = 0,25, 30 Grad | $0{,}25 \cdot 1{,}9943$ | 0,499 mag, Faktor 0,632 |
+| Extinktion $k$ = 0,25, 30 Grad | $0{,}25 \cdot 1{,}9943$ | 0,499 mag, Faktor 0,632; mit den Stufen klar / leicht diesig / diesig (0,20 / 0,30 / 0,45): 0,3989 / 0,5983 / 0,8974 mag |
 | MTF frei bei $\nu$ = 0,5 | $\frac{2}{\pi}[\arccos 0{,}5 - 0{,}5\sqrt{0{,}75}]$ | 0,3910 |
 | MTF $\epsilon$ = 0,33 bei $\nu$ = 0,35 | numerisch | 0,70 $\times$ MTF frei (0,41 gegen 0,565), Toleranz 2 % |
 | Energie im Airy-Kern | $\epsilon$ = 0 / 0,2 / 0,3 / 0,4 | 0,838 / 0,764 / 0,682 / 0,584 |
@@ -360,7 +360,7 @@ Alle mit $\lambda$ = 550 nm, 1 rad = 206 264,8''.
 - Dominante Grenze: Maximum der drei.
 
 **Bild (A-P2, A-P3, A-P5):** Objektbild $O(\theta)$ in ''/Pixel; Ergebnis $I = O \otimes \mathrm{PSF}$, wahlweise
-- Frequenzraum: $T(f) = T_\mathrm{Pupille}(f; D, \epsilon) \cdot \exp[-3{,}44 (\lambda f / r_0)^{5/3}] \cdot \exp[-(\pi f \sigma_e)^2 \cdot 2]$ mit $\sigma_e = \mathrm{FWHM}_\mathrm{Auge}/2{,}355$ (in rad), $T_\mathrm{Pupille}$ einmal pro ($D$, $\epsilon$) numerisch aus der Pupillenautokorrelation; oder
+- Frequenzraum: $T(f) = T_\mathrm{Pupille}(f; D, \epsilon) \cdot \exp[-3{,}44 (\lambda f / r_0)^{5/3}] \cdot \exp[-(\pi f \sigma_e)^2 \cdot 2]$ mit $\sigma_e = \mathrm{FWHM}_\mathrm{Auge}/2{,}355$ (in rad), $T_\mathrm{Pupille}$ geschlossen aus der Pupillenautokorrelation (Abschnitt 1.3, Rezept B); oder
 - Ortsraum: Kern = Airy$(D,\epsilon)$ $\otimes$ Moffat($\mathrm{FWHM}_s$, 4,765) $\otimes$ Gauss($\mathrm{FWHM}_\mathrm{Auge}$), Kernradius etwa $3\,\mathrm{FWHM}_\mathrm{gesamt}$ plus Airy-Ringe bis zum 2. Minimum.
 Beide Wege sind physikalisch gleichwertig (Langzeit-Kolmogorov); der Frequenzraum braucht keine Moffat-Naeherung, der Ortsraum ist einfacher zu testen. Die Obstruktion steckt vollstaendig in $T_\mathrm{Pupille}$ bzw. im Airy-Kern der Annulus-Formel $[(2J_1(v)/v - \epsilon^2\,2J_1(\epsilon v)/(\epsilon v))/(1-\epsilon^2)]^2$ [1, 7].
 
@@ -384,7 +384,7 @@ Beide Wege sind physikalisch gleichwertig (Langzeit-Kolmogorov); der Frequenzrau
 6. **Bortle 8 und 9 in mag/arcsec$^2$:** Dark Skies Awareness gibt fuer 8 nur "< 18" und fuer 9 nichts; 17,5 und 17,0 sind Schaetzungen aus Crumeys Wiener Werten (15 bis 19,25).
 7. **Augenaufloesung bei niedrigem Kontrast:** 2 bis 3' stuetzt sich auf klinische Buchstabentests (2,5 logMAR-Zeilen zwischen 90 % und 8 % Kontrast [33]) und die Form der CSF; eine Zahl speziell fuer Planetendetail (Sidgwick o. ae.) habe ich nicht belegt.
 8. **Transmissionswerte je Bauart:** Groessenordnung aus Spiegel- und Flaechenverlusten, keine Messreihe. Fuer das Bild ist der Unterschied 0,80 gegen 0,90 kaum sichtbar.
-9. **O'Neill 1956:** Bibliographie (JOSA 46, 285) aus einer Uebersichtsarbeit, die Formel selbst habe ich nicht eingesehen; fuer astobsim durch die numerische Autokorrelation ersetzt.
+9. **O'Neill 1956:** Bibliographie (JOSA 46, 285) aus einer Uebersichtsarbeit, die Formel selbst habe ich nicht eingesehen; fuer astobsim durch die Pupillenautokorrelation als Linsenflaechen-Formel ersetzt (Abschnitt 1.3, Rezept B).
 10. **Moffat 1969:** Bibcode 1969A&A.....3..455M aus Erinnerung, nicht abgerufen.
 11. **Rayleigh 1879:** Phil. Mag. (5) 8, 261 wird meist zitiert; Sparrow 1916 zitiert "(5) 9, 266, 1880" [4]. Die Arbeit erschien in mehreren Teilen in Band 8 und 9.
 12. **Kurzzeit-Heuristik fuer A-B6:** quadratisches Abziehen der Bildbewegung ist plausibel, aber nicht aus Fried abgeleitet; vor Umsetzung mit Fried 1966 Kurzzeit-OTF vergleichen.

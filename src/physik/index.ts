@@ -3,7 +3,14 @@
 // (optik, atmosphaere, aufloesung, baueKern, auswerten) kommen mit den Issues #3 bis #5 dazu.
 
 export * from "./konfiguration";
-export * from "./konstanten";
+export {
+  ARCSEC_PRO_RAD,
+  AUGE_AUFLOESUNG_ARCSEC,
+  BETA_MOFFAT,
+  EXTINKTION_MAG_PRO_LUFTMASSE,
+  PUPILLE_MM,
+  WELLENLAENGE_M
+} from "./konstanten";
 export { besselJ1 } from "./bessel";
 export {
   airyAmplitude,
@@ -11,6 +18,7 @@ export {
   airyRadiusArcsec,
   dawesArcsec,
   energieImAiryKern,
+  lambdaDurchDArcsec,
   mtfPupille,
   rayleighArcsec
 } from "./beugung";

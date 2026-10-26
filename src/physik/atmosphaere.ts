@@ -16,8 +16,8 @@ export function luftmasse(hoeheGrad: number): number {
 }
 
 /** Seeing-FWHM am Objekt: FWHM_Zenit mal X^0,6 (Abschnitt 2.1, [16, 22]). */
-export function seeingAmObjektArcsec(fwhmZenitArcsec: number, luftmasse: number): number {
-  return fwhmZenitArcsec * Math.pow(luftmasse, 0.6);
+export function seeingAmObjektArcsec(fwhmZenitArcsec: number, luftmasseX: number): number {
+  return fwhmZenitArcsec * Math.pow(luftmasseX, 0.6);
 }
 
 /** Fried-Parameter r0 in cm aus der Seeing-FWHM: r0 = 0,98 lambda / FWHM, FWHM in rad (Abschnitt 2.1, [16] Gl. 5). */
@@ -26,11 +26,11 @@ export function friedParameterCm(fwhmArcsec: number): number {
 }
 
 /** Extinktion in mag: k(Transparenz) mal Luftmasse, k = 0,20 / 0,30 / 0,45 (Abschnitt 5.4, [42]). */
-export function extinktionMag(transparenz: Transparenz, luftmasse: number): number {
-  return EXTINKTION_MAG_PRO_LUFTMASSE[transparenz] * luftmasse;
+export function extinktionMag(transparenz: Transparenz, luftmasseX: number): number {
+  return EXTINKTION_MAG_PRO_LUFTMASSE[transparenz] * luftmasseX;
 }
 
 /** Transmissionsfaktor der Atmosphaere aus der Extinktion: 10^(-0,4 mag) (Abschnitt 5.4). */
-export function extinktionFaktor(extinktionMag: number): number {
-  return Math.pow(10, -0.4 * extinktionMag);
+export function extinktionFaktor(mag: number): number {
+  return Math.pow(10, -0.4 * mag);
 }

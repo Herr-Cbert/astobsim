@@ -1,8 +1,20 @@
 import { describe, expect, it } from "vitest";
-import { airyFwhmArcsec, airyRadiusArcsec, dawesArcsec, energieImAiryKern, mtfPupille, rayleighArcsec } from "./beugung";
+import {
+  airyAmplitude,
+  airyFwhmArcsec,
+  airyRadiusArcsec,
+  dawesArcsec,
+  energieImAiryKern,
+  lambdaDurchDArcsec,
+  mtfPupille,
+  rayleighArcsec
+} from "./beugung";
 
 // Testwerte aus docs/recherche/physik.md, Abschnitt 8; MTF-Tabelle in Abschnitt 1.3, Energie in 1.4.
 describe("Beugungsgrenzen", () => {
+  it("lambda/D fuer 200 mm ist 0,567 Bogensekunden", () => {
+    expect(lambdaDurchDArcsec(200)).toBeCloseTo(0.567, 3);
+  });
   it("Rayleigh fuer 100 mm bei 550 nm ist 1,384 Bogensekunden", () => {
     expect(rayleighArcsec(100)).toBeCloseTo(1.384, 3);
   });
@@ -38,6 +50,15 @@ describe("MTF der Pupille", () => {
   });
   it("Obstruktion liegt bei nu 0,7 ueber der freien Oeffnung", () => {
     expect(mtfPupille(0.7, 0.33)).toBeGreaterThan(mtfPupille(0.7, 0));
+  });
+});
+
+describe("Airy-Amplitude der Ringoeffnung", () => {
+  it("ist 1 bei v 0 und hat die Nullstelle bei 3,8317 ohne Obstruktion, bei 3,449 mit 0,33", () => {
+    expect(airyAmplitude(0, 0)).toBe(1);
+    expect(airyAmplitude(0, 0.33)).toBe(1);
+    expect(Math.abs(airyAmplitude(3.8317, 0))).toBeLessThan(1e-5);
+    expect(Math.abs(airyAmplitude(1.098 * Math.PI, 0.33))).toBeLessThan(1e-3);
   });
 });
 

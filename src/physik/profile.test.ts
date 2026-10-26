@@ -1,6 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { airyFwhmArcsec, airyRadiusArcsec } from "./beugung";
-import { lambdaDurchDArcsec } from "./konstanten";
+import { airyFwhmArcsec, airyRadiusArcsec, lambdaDurchDArcsec } from "./beugung";
 import { airyProfil, gaussProfil, moffatProfil, quadratur } from "./profile";
 
 // Testwerte aus docs/recherche/physik.md, Abschnitt 8 (Quadratur) sowie 1.1 und 1.4 (Airy-Nullstellen).
