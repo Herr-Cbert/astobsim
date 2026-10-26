@@ -132,7 +132,7 @@ Kennungen: A-Z Zweck, A-F Fernrohr und Geraete, A-B Bedingungen, A-P Physik und 
 
 1. Gibt es fuer jeden Zustand aus A-X1 eine echte Aufnahme mit freier Lizenz und ausreichender Aufloesung (A-X5)? Sonst Liste der Zustaende anpassen.
 2. Typische Obstruktionswerte je Bauart fuer A-F1 (Newton, Schmidt-Cassegrain, Maksutov).
-3. Inhalt der Geraeteliste (A-F2): welche 15 bis 20 Klassen, mit welchen Werten.
+3. Inhalt der Geraeteliste (A-F2): welche Klassen, mit welchen Werten. Erledigt (Issue #11): die 22 Fernrohre der Kernliste in `docs/recherche/geraete.md`, A-F2 angepasst.
 4. Zuordnung Seeing in Bogensekunden zu Wortstufe und Pickering-Skala (A-B1).
 5. Skalierung des Seeings mit der Luftmasse und Extinktionskoeffizienten fuer die Transparenzstufen (A-B3, A-B4).
 6. Form der Seeing-PSF (Gauss, Moffat, Kolmogorov-Langzeit) und wie Beugung, Seeing und Auge zu einer Gesamt-PSF kombiniert werden (A-P2).
