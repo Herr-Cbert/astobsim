@@ -20,13 +20,26 @@ export class KontextVerloren extends Error {
   }
 }
 
+/**
+ * Das Raster passt nicht in eine Textur (MAX_TEXTURE_SIZE). Betrifft nur diesen Auftrag: der
+ * Aufrufer rechnet ihn mit FalterJs, ohne WebGL2 abzuschalten.
+ */
+export class ZuGrossFuerTextur extends Error {
+  constructor(breite: number, hoehe: number, grenze: number) {
+    super(`WebGL2: Textur ${breite} x ${hoehe} ueber der Grenze ${grenze} px`);
+    this.name = "ZuGrossFuerTextur";
+  }
+}
+
 /** Zeichenflaeche fuer den Kontext: im Fenster ein Canvas-Element, im Worker ein OffscreenCanvas. */
 export type Zeichenflaeche = HTMLCanvasElement | OffscreenCanvas;
 
 /**
  * Bis zu dieser Kerngroesse rechnet der ausgerollte Shader (Kern als Uniform, 157 vec4 bei 25 px,
  * unter dem WebGL2-Minimum von 224). Groessere Kerne (die Naht erlaubt bis 81 px, aus dem
- * Arbeitsmassstab entstehen hoechstens 17 px) laufen ueber den Schleifen-Shader.
+ * Arbeitsmassstab entstehen hoechstens 17 px, ADR-0002) laufen ueber den Schleifen-Shader. Der ist
+ * deutlich langsamer: 1024 px, Kern 27, drei Kanaele etwa 540 ms in SwiftShader und etwa 17 ms auf
+ * der GPU (RTX 4090).
  */
 const GROESSTER_AUSGEROLLTER_KERN = 25;
 
@@ -201,9 +214,16 @@ export class FalterWebgl2 implements Falter {
     return ergebnis;
   }
 
-  /** Gibt Texturen, Programme und Framebuffer frei. Der Falter ist danach nicht mehr nutzbar. */
+  /**
+   * Gibt Texturen, Programme, Framebuffer und den Kontext selbst frei (WEBGL_lose_context), damit
+   * der Browser nicht an die Grenze offener Kontexte stoesst. Der Falter ist danach nicht mehr nutzbar.
+   */
   freigeben(): void {
     const gl = this.gl;
+    if (gl.isContextLost()) {
+      this.verlorenFlag = true;
+      return;
+    }
     for (const p of this.programme.values()) gl.deleteProgram(p.programm);
     this.programme.clear();
     gl.deleteTexture(this.texBild);
@@ -212,6 +232,7 @@ export class FalterWebgl2 implements Falter {
     gl.deleteFramebuffer(this.ziel);
     gl.deleteVertexArray(this.vao);
     this.verlorenFlag = true;
+    gl.getExtension("WEBGL_lose_context")?.loseContext();
   }
 
   /** Gepolsterte Eingabe, vier Floats je Texel; Ausgabe ein Texel je vier Floats einer Zeile. */
@@ -284,7 +305,7 @@ export class FalterWebgl2 implements Falter {
 
   private pruefeGroesse(breite: number, hoehe: number): void {
     if (breite > this.maxTextur || hoehe > this.maxTextur) {
-      throw new Error(`WebGL2: Textur ${breite} x ${hoehe} ueber der Grenze ${this.maxTextur} px`);
+      throw new ZuGrossFuerTextur(breite, hoehe, this.maxTextur);
     }
   }
 
@@ -324,13 +345,19 @@ export class FalterWebgl2 implements Falter {
     if (vorhanden) return vorhanden;
     const gl = this.gl;
     const vs = uebersetze(gl, gl.VERTEX_SHADER, VERTEX_SHADER);
-    const fs = uebersetze(gl, gl.FRAGMENT_SHADER, quelltext());
-    const programm = pruefeObjekt(gl.createProgram());
-    gl.attachShader(programm, vs);
-    gl.attachShader(programm, fs);
-    gl.linkProgram(programm);
-    gl.deleteShader(vs);
-    gl.deleteShader(fs);
+    let fs: WebGLShader | null = null;
+    let programm: WebGLProgram;
+    try {
+      fs = uebersetze(gl, gl.FRAGMENT_SHADER, quelltext());
+      programm = pruefeObjekt(gl.createProgram());
+      gl.attachShader(programm, vs);
+      gl.attachShader(programm, fs);
+      gl.linkProgram(programm);
+    } finally {
+      // Auch wenn der Fragment-Shader scheitert: kein verwaister Vertex-Shader.
+      gl.deleteShader(vs);
+      if (fs) gl.deleteShader(fs);
+    }
     if (!gl.getProgramParameter(programm, gl.LINK_STATUS)) {
       if (this.verloren) throw new KontextVerloren();
       const log = gl.getProgramInfoLog(programm);
@@ -364,7 +391,6 @@ export class FalterWebgl2 implements Falter {
     this.zielHoehe = hoehe;
   }
 }
-
 
 function neueZeichenflaeche(): Zeichenflaeche | null {
   if (typeof document !== "undefined") return document.createElement("canvas");
@@ -459,6 +485,8 @@ class GewaehlterFalter implements Falterwahl {
       } catch (fehler) {
         // Fehler in Raster oder Kern gelten fuer beide Adapter: weiterwerfen, nicht wechseln.
         if (fehler instanceof BildFehler) throw fehler;
+        // Zu grosses Raster: nur diesen Auftrag mit JavaScript rechnen, WebGL2 bleibt gewaehlt.
+        if (fehler instanceof ZuGrossFuerTextur) return this.js.falte(raster, kern);
         this.wechsle(fehler instanceof KontextVerloren ? "kontextverlust" : "webgl2-fehler", fehler);
       }
     }

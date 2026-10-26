@@ -4,14 +4,11 @@ export { BildFehler } from "./fehler";
 export { FalterJs, type Falter } from "./falter";
 export {
   ANZEIGEGRENZE_OHNE_WEBGL2_PX,
-  FalterWebgl2,
-  KontextVerloren,
   waehleFalter,
   type FalterArt,
   type FalterGrund,
   type FalterWahlOptionen,
-  type Falterwahl,
-  type Zeichenflaeche
+  type Falterwahl
 } from "./falter_webgl2";
 export { QuelleAusRaster, type Objektpunkt, type Quellausschnitt, type Quelle } from "./quelle";
 export { neuesRaster, type Kanaele, type Raster } from "./raster";

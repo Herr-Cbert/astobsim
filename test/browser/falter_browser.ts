@@ -147,7 +147,12 @@ function lauf(): void {
     ["Delta Norden, 5x5", zufallsRaster(5, 5, 1), verschobenerDeltaKern(0, -1)],
     ["Delta schraeg, 31x17, 3 Kanaele", zufallsRaster(31, 17, 3), verschobenerDeltaKern(2, 1, 7)],
     ["Gauss 25 groesser als Raster, 11x7", zufallsRaster(11, 7, 1), gaussKern(25, 4)],
-    ["Gauss 81, 200x150, 3 Kanaele", zufallsRaster(200, 150, 3), gaussKern(81, 12)]
+    ["Gauss 81, 200x150, 3 Kanaele", zufallsRaster(200, 150, 3), gaussKern(81, 12)],
+    // Schleifen-Shader (Kern ueber 25 px): Richtung in x und y (Spiegelung), R32F- und RGB32F-Pfad.
+    ["Schleife: Delta (3, -5) Kern 27, 33x21, 1 Kanal", zufallsRaster(33, 21, 1), verschobenerDeltaKern(3, -5, 27)],
+    ["Schleife: Delta (3, -5) Kern 27, 33x21, 3 Kanaele", zufallsRaster(33, 21, 3), verschobenerDeltaKern(3, -5, 27)],
+    // Dasselbe im ausgerollten Shader zum Vergleich.
+    ["Ausgerollt: Delta (3, -5) Kern 25, 33x21, 3 Kanaele", zufallsRaster(33, 21, 3), verschobenerDeltaKern(3, -5, 25)]
   ];
   for (const [name, raster, kern] of faelle) ergebnis.vergleiche.push(vergleiche(name, gl.falte(raster, kern), js.falte(raster, kern)));
 
@@ -168,6 +173,8 @@ function lauf(): void {
   ergebnis.zeitenWebgl2.push(miss("1024 px, Kern 25, 3 Kanaele", messGl, bild3, gauss25, 5));
   ergebnis.zeitenWebgl2.push(miss("1024 px, Kern 17, 1 Kanal", messGl, bild1, gauss17, 5));
   ergebnis.zeitenWebgl2.push(miss("1024 px, Kern 17, 3 Kanaele", messGl, bild3, gauss17, 5));
+  ergebnis.zeitenWebgl2.push(miss("1024 px, Kern 21, 3 Kanaele", messGl, bild3, gaussKern(21, 3), 3));
+  ergebnis.zeitenWebgl2.push(miss("1024 px, Kern 27, 3 Kanaele (Schleifen-Shader)", messGl, bild3, gaussKern(27, 4), 2));
   messGl.freigeben();
   ergebnis.zeitenJs.push(miss("1024 px, Kern 25, 1 Kanal", js, bild1, gauss25, 1));
   ergebnis.zeitenJs.push(miss("1024 px, Kern 25, 3 Kanaele", js, bild3, gauss25, 0));

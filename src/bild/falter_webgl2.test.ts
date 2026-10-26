@@ -4,7 +4,14 @@
 import { describe, expect, it, vi } from "vitest";
 import type { Kern } from "../naht/simulationsparameter";
 import { FalterJs, type Falter } from "./falter";
-import { ANZEIGEGRENZE_OHNE_WEBGL2_PX, FalterWebgl2, KontextVerloren, waehleFalter, type Falterwahl } from "./falter_webgl2";
+import {
+  ANZEIGEGRENZE_OHNE_WEBGL2_PX,
+  FalterWebgl2,
+  KontextVerloren,
+  waehleFalter,
+  ZuGrossFuerTextur,
+  type Falterwahl
+} from "./falter_webgl2";
 import { BildFehler } from "./fehler";
 import { neuesRaster, type Raster } from "./raster";
 import { kastenKern } from "./testkerne";
@@ -92,6 +99,20 @@ describe("waehleFalter", () => {
     expect(wahl.art).toBe("javascript");
     expect(wahl.grund).toBe("webgl2-fehler");
     warnung.mockRestore();
+  });
+
+  it("Raster zu gross fuer eine Textur: dieser Auftrag mit JavaScript, WebGL2 bleibt gewaehlt", () => {
+    const attrappe = new FalterAttrappe();
+    const wechsel: Falterwahl[] = [];
+    const wahl = waehleFalter({ erzeugeWebgl2: () => attrappe, beiWechsel: (w) => wechsel.push(w) });
+    attrappe.fehler = new ZuGrossFuerTextur(9000, 10, 8192);
+    const raster = testRaster();
+    expect(Array.from(wahl.falte(raster, kastenKern(3)).daten)).toEqual(Array.from(js.falte(raster, kastenKern(3)).daten));
+    expect(wahl.art).toBe("webgl2");
+    expect(wahl.grund).toBe("webgl2");
+    expect(wechsel).toEqual([]);
+    attrappe.fehler = null;
+    expect(wahl.falte(raster, kastenKern(3)).daten[0]).toBe(42);
   });
 
   it("BildFehler (unstimmiges Raster oder Kern) wird weitergeworfen, WebGL2 bleibt gewaehlt", () => {

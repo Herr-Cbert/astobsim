@@ -5,7 +5,7 @@
 // Kontextverlust fuehrt zu FalterJs ohne Fehler. Die Zeit wird protokolliert; ueber 250 ms gibt
 // es nur einen Hinweis, weil SwiftShader-Zeiten vom Rechner abhaengen.
 //
-// Chrome: Umgebungsvariable CHROME (Pfad), sonst google-chrome. Volles JSON mit --json.
+// Chrome: Umgebungsvariable CHROME (Pfad), sonst google-chrome. Volles JSON mit --json, echte GPU mit --gpu.
 import { spawn } from "node:child_process";
 import { existsSync, mkdtempSync, readFileSync, rmSync } from "node:fs";
 import { createServer } from "node:http";
@@ -43,8 +43,8 @@ const url = `http://127.0.0.1:${typeof adresse === "object" && adresse ? adresse
 const profil = mkdtempSync(join(tmpdir(), "astobsim-chrome-"));
 const argumente = [
   "--headless=new",
-  "--use-angle=swiftshader",
-  "--enable-unsafe-swiftshader",
+  // Standard SwiftShader (ueberall vorhanden, Zeiten sind obere Schranken); mit --gpu die echte GPU ueber OpenGL.
+  ...(process.argv.includes("--gpu") ? ["--use-angle=gl"] : ["--use-angle=swiftshader", "--enable-unsafe-swiftshader"]),
   "--no-first-run",
   "--no-default-browser-check",
   "--disable-extensions",
@@ -100,7 +100,7 @@ for (const v of e.vergleiche) {
   if (!(v.maxStufen <= grenzeStufen) || v.maxStufenGerundet > grenzeStufen) fehler.push(`${v.name}: Abweichung ueber ${grenzeStufen} Stufe`);
 }
 
-console.log(`\nZeit WebGL2 (SwiftShader), erster Aufruf mit Uebersetzen / Median, Ziel unter ${zielMs} ms:`);
+console.log(`\nZeit WebGL2 (${process.argv.includes("--gpu") ? "GPU" : "SwiftShader"}), erster Aufruf mit Uebersetzen / Median, Ziel unter ${zielMs} ms:`);
 const hinweise = [];
 for (const z of e.zeitenWebgl2) {
   console.log(`  ${z.name}: ${f(z.ersterMs, 1)} ms / ${f(z.medianMs, 1)} ms (${z.laeufe} Laeufe)`);

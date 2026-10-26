@@ -16,7 +16,7 @@ Simulation des Anblicks von Himmelsobjekten durch ein Fernrohr unter gegebenen B
 - TypeScript, Vite, Vitest. Kein UI-Framework: Vanilla DOM, Canvas, WebGL2 fuer die Faltung.
 - Node 22 ueber nvm (`source ~/.nvm/nvm.sh`, in neuen Shells automatisch).
 - `npm install` einmalig, `npm run dev` startet den Dev-Server, `npm test` fuehrt Vitest einmal aus, `npm run build` baut nach `dist/`, kopiert `daten/` nach `dist/daten/` und bricht ab, wenn das Erstladen (alles in `dist/` ohne `daten/`) 5 MB uebersteigt (A-X6), `npm run preview` zeigt den Build unter `http://localhost:4173/astobsim/` (Dev-Server unter `/`).
-- `npm run test:browser` baut `test/browser/` (eigene Vite-Konfiguration, nach `test/browser/dist/`) und startet Chrome headless mit SwiftShader (`scripts/browser-test.mjs`, Chrome ueber `CHROME` oder `google-chrome`): Gleichheit FalterWebgl2 gegen FalterJs, Zeit, Kontextverlust. Nicht Teil von `npm test` und CI; bei Aenderungen am WebGL2-Falter von Hand laufen lassen.
+- `npm run test:browser` baut `test/browser/` (eigene Vite-Konfiguration, nach `test/browser/dist/`) und startet Chrome headless mit SwiftShader (`scripts/browser-test.mjs`, Chrome ueber `CHROME` oder `google-chrome`, mit `-- --gpu` echte GPU statt SwiftShader): Gleichheit FalterWebgl2 gegen FalterJs, Zeit, Kontextverlust. Nicht Teil von `npm test` und CI; bei Aenderungen am WebGL2-Falter von Hand laufen lassen.
 - Daten zur Laufzeit immer ueber `import.meta.env.BASE_URL + "daten/..."` laden, nie ueber einen festen Pfad `/astobsim/`.
 - Vor jedem Commit: `npm test` und `npm run build` muessen durchlaufen.
 
