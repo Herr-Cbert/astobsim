@@ -12,7 +12,7 @@ import { pruefeRaster, type Raster } from "./raster";
 
 /**
  * Das Ergebnisbild (GLOSSARY: Anblick). Noch nicht in src/naht definiert, deshalb hier.
- * raster hat fenster.px x fenster.px Pixel, lineare Anzeigewerte (1 = Bildschirmweiss, Quellweiss
+ * raster hat fenster.px x fenster.px Pixel, Anzeigehelligkeiten (linear, 1 = Bildschirmweiss, Quellweiss
  * erscheint als helligkeit.faktorObjekt), nicht negativ, koennen 1 ueberschreiten; Begrenzung und
  * Bit-Tiefe erst beim Zeichnen. Zeile 0 ist Norden.
  */

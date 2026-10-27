@@ -78,8 +78,11 @@ export const BORTLE_MAG_PRO_ARCSEC2: readonly number[] = [21.9, 21.7, 21.4, 21.0
  */
 export const ANZEIGE_WEISS_MAG_PRO_ARCSEC2 = 3.35;
 
-/** Exponent der Helligkeitsempfindung nach Stevens 1961 (5-Grad-Feld, Abschnitt 12, [53]): 0,33, als 1/3. */
-export const STEVENS_EXPONENT = 1 / 3;
+/**
+ * Kompressionsexponent der Abbildung auf den Bildschirm (Abschnitt 12): Groessenordnung nach Stevens
+ * 1961 (Helligkeit eines 5-Grad-Felds 0,33, [53]), keine Gleichheit der Empfindung. Offen fuer Phase 6.
+ */
+export const KOMPRESSIONSEXPONENT = 1 / 3;
 
 /** Wortstufen des Seeings (A-B1). */
 export const SEEING_WORTSTUFEN = ["ausgezeichnet", "gut", "mittel", "schlecht"] as const;

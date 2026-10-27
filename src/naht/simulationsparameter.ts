@@ -96,11 +96,11 @@ export interface Kernbeschreibung {
 }
 
 /**
- * Stufe 3: Tonwert, nur Multiplikation und Addition. Beide Faktoren sind lineare Anzeigewerte
- * (1 = Bildschirmweiss vor der sRGB-Kodierung), nicht die physikalische Daempfung (Issue #55,
- * docs/recherche/physik.md Abschnitt 12): faktorObjekt in (0, 1] ist der Anzeigewert von
- * Quellweiss aus der Flaechenhelligkeit im Okular (Transmission, Abschattung, Extinktion,
- * Austrittspupille), hintergrundRelativ der Anzeigewert des Himmels im Okular (Grauton des
+ * Stufe 3: Tonwert, nur Multiplikation und Addition. Beide Faktoren sind Anzeigehelligkeiten
+ * (GLOSSARY: linear, 1 = Bildschirmweiss vor der sRGB-Kodierung), nicht die physikalische Daempfung
+ * (Issue #55, docs/recherche/physik.md Abschnitt 12): faktorObjekt in (0, 1] ist die
+ * Anzeigehelligkeit von Quellweiss aus der Flaechenhelligkeit im Okular (Transmission, Abschattung,
+ * Extinktion, Austrittspupille), hintergrundRelativ die des Himmels im Okular (Grauton des
  * Gesichtsfelds). Das Quellbild bleibt linear: Pixel mal faktorObjekt plus hintergrundRelativ.
  * hintergrundMagProArcsec2 ist physikalisch und dient nur Anzeige und Hilfetext.
  */

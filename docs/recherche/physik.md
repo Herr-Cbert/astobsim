@@ -458,7 +458,7 @@ Beide Wege sind physikalisch gleichwertig (Langzeit-Kolmogorov); der Frequenzrau
 50. Wikipedia "Fried parameter" (Einstieg, Bibliographie Fried 1966), https://en.wikipedia.org/wiki/Fried_parameter
 51. Abramowitz, M., Stegun, I. A. (Hrsg.): *Handbook of Mathematical Functions*, Dover 1972 (Nachdruck der NBS-Ausgabe 1964), Formeln 9.4.4 und 9.4.6 (Polynomnaeherungen fuer $J_1$, $|x| < 3$ bzw. $|x| \ge 3$, Fehler unter $1{,}3 \cdot 10^{-8}$), Tabelle 9.1 (Tafelwerte), https://personal.math.ubc.ca/~cbm/aands/page_370.htm
 52. Weisstein, E. W.: "Circle-Circle Intersection", MathWorld, https://mathworld.wolfram.com/Circle-CircleIntersection.html (Linsenflaeche zweier Kreise fuer die Pupillenautokorrelation, Abschnitt 1.3 Rezept B).
-53. Stevens, S. S.: "To Honor Fechner and Repeal His Law", Science 133, 80 (1961), https://doi.org/10.1126/science.133.3446.80 ; Volltext http://languagelog.ldc.upenn.edu/myl/Science-1961-Stevens-80-6.pdf (Tabelle 1 "Representative exponents": Helligkeit 0,33 fuer ein etwa 5 Grad grosses Feld, dunkeladaptiertes Auge; 0,5 fuer eine Punktquelle; Text S. 81 und S. 83: 0,33 bei Verhaeltnisskalierung leuchtender Felder im Dunkeln, Bisektion ergibt etwa 0,3).
+53. Stevens, S. S.: "To Honor Fechner and Repeal His Law", Science 133, 80 (1961), https://doi.org/10.1126/science.133.3446.80 ; Volltext http://languagelog.ldc.upenn.edu/myl/Science-1961-Stevens-80-6.pdf (S. 84, Tabelle 1 "Representative exponents": Helligkeit 0,33 fuer ein etwa 5 Grad grosses Feld, dunkeladaptiertes Auge, 0,5 fuer eine Punktquelle; S. 83: Exponent 0,5 fuer Punktquellen gegen 0,33 fuer groessere Felder; S. 81: 0,33 bei Verhaeltnisskalierung leuchtender Felder im Dunkeln, Bisektion ergibt etwa 0,3).
 54. Stevens, S. S., Stevens, J. C.: "Brightness Function: Parametric Effects of Adaptation and Contrast", J. Opt. Soc. Am. (Abstract), zitiert nach [56] als "vol. 53, p. 1139, 1960" (Band und Jahr passen nicht zusammen; nicht eingesehen). Inhalt nach [56]: der Zusammenhang Helligkeit zu Leuchtdichte verschiebt sich mit dem Adaptionsniveau.
 55. Tumblin, J., Rushmeier, H.: "Tone Reproduction for Realistic Images", IEEE Computer Graphics and Applications 13(6), 42 (1993), https://doi.org/10.1109/38.252554 (nicht eingesehen; Inhalt nach [56] und [58]).
 56. Ward Larson, G., Rushmeier, H., Piatko, C.: "A Visibility Matching Tone Reproduction Operator for High Dynamic Range Scenes", IEEE Trans. Visualization and Computer Graphics 3(4), 291 (1997), https://graphics.cs.yale.edu/sites/default/files/1997tvcg_hdr_tonemapping.pdf (Abschn. 2: Einordnung von Tumblin & Rushmeier [55] und Ward [57]; Abschn. 4: Steigung begrenzt auf das Verhaeltnis der Schwellen, bei Ward ein globaler Skalierungsfaktor).
@@ -474,7 +474,7 @@ Beide Wege sind physikalisch gleichwertig (Langzeit-Kolmogorov); der Frequenzrau
 
 ### 12.1 Problem
 
-Bis Issue #9 multipliziert bild das lineare Quellbild (1,0 = Quellweiss) mit dem physikalischen Faktor aus Abschnitt 9 und zeichnet das Ergebnis mit der sRGB-Kennlinie [59]. Die Leuchtdichte im Okular reicht ueber fast vier Dekaden (Umrechnung $\mu_V = 12{,}58 - 2{,}5\log_{10} L$ mit $L$ in cd/m$^2$ [32, Abschn. 1.3]):
+Bis Issue #9 multipliziert bild das lineare Quellbild (1,0 = Quellweiss) mit dem physikalischen Faktor aus Abschnitt 9 und zeichnet das Ergebnis mit der sRGB-Kennlinie [59]. Die Leuchtdichte im Okular reicht bei den Objekten ueber 2,4 Dekaden, mit dem Himmel ueber etwa 8 (Umrechnung $\mu_V = 12{,}58 - 2{,}5\log_{10} L$ mit $L$ in cd/m$^2$ [32, Abschn. 1.3]):
 
 | Anblick (45 Grad, klar) | $\mu$ im Okular | $L$ [cd/m$^2$] | physikalischer Faktor | sRGB linear abgebildet |
 |---|---|---|---|---|
@@ -483,7 +483,7 @@ Bis Issue #9 multipliziert bild das lineare Quellbild (1,0 = Quellweiss) mit dem
 | Mond A-D9 (80/600, 10 mm, AP 1,33 mm) | 7,01 | 169 | 0,0343 | 52 |
 | Mars 14'' an 80 mm bei 120x (AP 0,67 mm) | 9,27 | 21 | 0,0086 (relativ zu 4,1) | 23 |
 | Mond an 80 mm bei 200x (AP 0,4 mm) | 9,63 | 15 | 0,0031 | 10 |
-| Himmel Bortle 5 bei A-D9 | 23,4 | 0,0005 | | 0 |
+| Himmel Bortle 5 bei A-D9 | 23,4 | 4,7e-5 | | 0 |
 
 (Eigene Rechnung mit Abschnitt 9: Refraktor $\tau$ = 0,90, Fernglas 0,85, $X$ = 1,4126, $k$ = 0,20, Quellweiss Mond 3,35, Mars 14'' 4,1 mag/arcsec$^2$ aus `daten/objekte.json`.)
 
@@ -499,16 +499,16 @@ Linear relativ zu Quellweiss wirkt der Mond in A-D9 dunkelgrau, bei 200x ist er 
 
 ### 12.3 Entscheidung
 
-Je Ebene (Objekt, Himmel) wird die Flaechenhelligkeit im Okular $\mu$ (Abschnitt 9) mit einer Potenz nach Stevens auf einen linearen Anzeigewert abgebildet (1 = Bildschirmweiss, danach sRGB in ui):
+Je Ebene (Objekt, Himmel) wird die Flaechenhelligkeit im Okular $\mu$ (Abschnitt 9) mit einer Potenz nach Stevens auf eine Anzeigehelligkeit abgebildet (GLOSSARY: linear, 1 = Bildschirmweiss, danach sRGB in ui):
 
 $$w(\mu) = \min\!\left(1,\ \left(\frac{L}{L_\mathrm{weiss}}\right)^{n}\right) = \min\!\left(1,\ 10^{-0{,}4\,n\,(\mu - \mu_\mathrm{weiss})}\right), \qquad n = \tfrac13,\ \mu_\mathrm{weiss} = 3{,}35\ \mathrm{mag/arcsec^2}$$
 
-- **Objekt:** $\mu_\mathrm{obj} = \mu_\mathrm{Quellweiss} - 2{,}5\log_{10} F$ mit dem physikalischen Faktor $F$ aus Abschnitt 9; der Anzeigewert von Quellweiss ist $w(\mu_\mathrm{obj})$. Das Quellbild bleibt linear: ein Pixel mit Wert $q$ relativ zu Quellweiss wird $q \cdot w(\mu_\mathrm{obj})$. Nur das Niveau wird komprimiert, nicht der Kontrast im Bild (Faltung, Tabellen-Tests T1 bis T5 und das Aussehen des Quellbilds bleiben unberuehrt).
+- **Objekt:** $\mu_\mathrm{obj} = \mu_\mathrm{Quellweiss} - 2{,}5\log_{10} F$ mit dem physikalischen Faktor $F$ aus Abschnitt 9; die Anzeigehelligkeit von Quellweiss ist $w(\mu_\mathrm{obj})$. Das Quellbild bleibt linear: ein Pixel mit Wert $q$ relativ zu Quellweiss wird $q \cdot w(\mu_\mathrm{obj})$. Nur das Niveau wird komprimiert, nicht der Kontrast innerhalb des Quellbilds (Faltung, Tabellen-Tests T1 bis T5 und das Aussehen des Quellbilds bleiben unberuehrt).
 - **Himmel:** $w(\mu_\mathrm{ok})$ mit $\mu_\mathrm{ok}$ aus Abschnitt 6.2, additiv wie bisher (A-B2).
 - **Weiss:** $\mu_\mathrm{weiss}$ = 3,35 ist der Vollmond ohne Verluste (etwa 4900 cd/m$^2$), das hellste Objekt in Version 1; ohne Verluste waere er gerade Bildschirmweiss. Hellere Flaechen (etwa Venus) wuerden auf 1 begrenzt (A-P4: nach oben begrenzt).
-- **Exponent:** $n$ = 1/3 ist Stevens' Exponent fuer ausgedehnte Felder [53]. Er dient als Kompressionsstaerke, nicht als Modell des Auges am Okular: gleiche Leuchtdichteverhaeltnisse ergeben gleiche Anzeigeverhaeltnisse ($r \mapsto r^{1/3}$), unabhaengig von Objekt und Geraet. Die Spanne vom Mond mit blossem Auge bis Mars bei 200x (Faktor 500, 2,7 Dekaden) wird zu Faktor 8 (0,92 bis 0,116 linear, sRGB 245 bis 95), passt also in den Bereich, in dem das Bild auf dem Bildschirm noch erkennbar ist.
-- **Monotonie:** $w$ faellt streng in $\mu$; da $\mu_\mathrm{obj}$ in der Austrittspupille bis 6 mm streng faellt (Abschnitt 5.1), steigt der Anzeigewert streng mit der Austrittspupille bis 6 mm und bleibt darueber konstant.
-- **Hintergrund dunkler als das Objekt:** der Himmel ist im Okular mindestens 10 mag dunkler als jedes Quellweiss der Version 1 (17,0 gegen hoechstens etwa 7 mag/arcsec$^2$), angezeigt also mindestens um $10^{4/3} \approx 21$ dunkler.
+- **Exponent:** $n$ = 1/3 ist Stevens' Exponent fuer ausgedehnte Felder [53]. Er dient als Kompressionsstaerke, nicht als Modell des Auges am Okular; Stevens begruendet nur die Groessenordnung der Kompression, keine Gleichheit der Empfindung, denn der Betrachter komprimiert den Bildschirm selbst noch einmal. Im Code heisst er `KOMPRESSIONSEXPONENT`. Eigenschaft: gleiche Leuchtdichteverhaeltnisse ergeben gleiche Anzeigeverhaeltnisse ($r \mapsto r^{1/3}$), unabhaengig von Objekt und Geraet. Die Spanne vom Mond mit blossem Auge bis Mars bei 200x (Faktor 500, 2,7 Dekaden) wird zu Faktor 8 (0,92 bis 0,116 linear, sRGB 245 bis 95), passt also in den Bereich, in dem das Bild auf dem Bildschirm noch erkennbar ist.
+- **Monotonie:** $w$ faellt streng in $\mu$; da $\mu_\mathrm{obj}$ in der Austrittspupille bis 6 mm streng faellt (Abschnitt 5.1), steigt die Anzeigehelligkeit streng mit der Austrittspupille bis 6 mm und bleibt darueber konstant.
+- **Hintergrund dunkler als das Objekt:** Transmission, Abschattung und Austrittspupille wirken auf beide Ebenen gleich, die Extinktion nur auf das Objekt (Abschnitt 6.2). Damit ist $\mu_\mathrm{Himmel,ok} - \mu_\mathrm{obj,ok} = \mu_\mathrm{Bortle} - \mu_\mathrm{Quellweiss} - k X$, unabhaengig vom Geraet. In Version 1 fuer Mond und Mars mindestens $17{,}0 - 4{,}5 - 2{,}51 = 10{,}0$ mag (Bortle 9, Mars 6'', diesig, 10 Grad Hoehe: $X$ = 5,586, $kX$ = 2,514), angezeigt also mindestens um den Faktor $10^{0{,}4 \cdot 10{,}0/3} = 21{,}5$ dunkler. Gilt nur fuer Mond und Mars: Jupiter (Quellweiss etwa 5,4) und Saturn (etwa 6,6) erreichen im selben Grenzfall nur Faktor 16 bzw. 11.
 
 Verworfen:
 
@@ -542,3 +542,5 @@ Eigene Rechnung, 45 Grad, klar, Bortle 5, Quellweiss Mond 3,35, Mars 14'' 4,1 ma
 1. **Stevens & Stevens [54]:** Bibliographie nur aus [56], Band und Jahr widersprechen sich; fuer die Entscheidung nicht noetig, weil kein Adaptionsniveau eingeht.
 2. **Exponent fuer Planetenscheibchen:** Mars mit 14'' erscheint bei 120x unter etwa 0,5 Grad, kleiner als Stevens' 5-Grad-Feld; fuer kleine Felder naehert sich der Exponent dem Punktquellenwert 0,5 [53]. Fuer die Anzeige bleibt ein Exponent fuer alle Objekte, damit Verhaeltnisse zwischen Objekten erhalten bleiben.
 3. **Wahl von $\mu_\mathrm{weiss}$:** Bildschirm, Umgebungslicht und Helligkeitseinstellung des Nutzers sind unbekannt; die Wahl ist am Bild in Phase 6 zu pruefen. Eine Konstante in `src/physik/konstanten.ts` aendert alle Anzeigewerte gemeinsam.
+4. **Schleier des Himmels:** Weil Objekt und Himmel getrennt komprimiert werden, hebt die Abbildung den Himmel relativ zum Objekt um den Faktor $(L_\mathrm{obj}/L_\mathrm{Himmel})^{2/3}$ an. Ueber dunklen Bildteilen wirkt er wie ein Schleier: in A-D9 zeigt ein Pixel mit $q$ = 0,01 (relativ zu Quellweiss) 0,0032, der Himmel 0,0021. Physikalisch waere der Himmel dort um Groessenordnungen dunkler. Am Bild in Phase 6 pruefen (Abhilfe waere etwa, den Himmel mit der Anzeigehelligkeit des Objekts linear mitzufuehren).
+5. **Exponent:** 1/3 ist eine Groessenordnung nach Stevens, keine Herleitung; wie $\mu_\mathrm{weiss}$ in Phase 6 am Bild zu pruefen.

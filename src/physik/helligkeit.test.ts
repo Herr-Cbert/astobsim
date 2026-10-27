@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import type { Fernglas, Konfiguration, Objektzustand } from "../naht/konfiguration";
+import type { Auge, Fernglas, Konfiguration, Objektzustand } from "../naht/konfiguration";
 import type { Atmosphaere } from "./atmosphaere";
 import { auswerten } from "./auswerten";
 import { PhysikFehler } from "./fehler";
@@ -100,7 +100,7 @@ describe("anzeigefaktor: Stevens-Potenz 1/3 relativ zu 3,35 mag/arcsec2", () => 
   });
 });
 
-describe("helligkeit: Naht-Werte sind Anzeigewerte", () => {
+describe("helligkeit: Naht-Werte sind Anzeigehelligkeiten", () => {
   it("Quellweiss 3,4, AP 0,8 mm ohne Verluste: 7,775 mag/arcsec2, Anzeige 10^(-0,4/3 * 4,425) = 0,2570", () => {
     const ok = okularhelligkeit(optikMit({}), KLAR, 5, MOND);
     expect(ok.objektMagProArcsec2).toBeCloseTo(7.775, 3);
@@ -118,6 +118,9 @@ describe("helligkeit: Naht-Werte sind Anzeigewerte", () => {
 const MOND_EV: Objektzustand = { ...MOND, quelle: { ...MOND.quelle, weissMagProArcsec2: 3.35 } };
 /** Mars 14'' mit Quellweiss 4,1 (daten/objekte.json mars_14). */
 const MARS_14: Objektzustand = { kennung: "mars-14", durchmesserArcsec: 14, magnitude: -1, quelle: { breitePx: 1000, hoehePx: 1000, massstabArcsecProPx: 0.04, weissMagProArcsec2: 4.1 }, trabanten: [] };
+/** Mars 6'' mit Quellweiss 4,5 (daten/objekte.json mars_6), der dunkelste Zustand der Version 1. */
+const MARS_6: Objektzustand = { ...MARS_14, kennung: "mars-6", durchmesserArcsec: 6, quelle: { ...MARS_14.quelle, weissMagProArcsec2: 4.5 } };
+const AUGE: Auge = { art: "auge" };
 const FERNGLAS_10X50: Fernglas = { art: "fernglas", oeffnungMm: 50, vergroesserung: 10, wahresGesichtsfeldGrad: 6.5 };
 
 function konfig(geraet: Konfiguration["geraet"], objekt: Objektzustand, bortle = 5): Konfiguration {
@@ -141,6 +144,11 @@ describe("helligkeit: Akzeptanz Issue #55 (Tabelle 12.4)", () => {
     expect(v200.faktorObjekt).toBeCloseTo(0.1456, 3);
     expect(srgb8(fernglas.faktorObjekt) - srgb8(ad9.faktorObjekt)).toBeGreaterThan(40);
     expect(srgb8(ad9.faktorObjekt) - srgb8(v200.faktorObjekt)).toBeGreaterThan(40);
+  });
+  it("Mond mit blossem Auge: 0,9169 (sRGB 245)", () => {
+    const auge = anzeige(konfig(AUGE, MOND_EV)).faktorObjekt;
+    expect(auge).toBeCloseTo(0.9169, 3);
+    expect(srgb8(auge)).toBe(245);
   });
   it("Mars 14'' an 80 mm bei 120x: 0,1625 (sRGB 112)", () => {
     expect(anzeige(konfig(refraktorMitVergroesserung(80, 120), MARS_14)).faktorObjekt).toBeCloseTo(0.1625, 3);
@@ -167,6 +175,14 @@ describe("helligkeit: Akzeptanz Issue #55 (Tabelle 12.4)", () => {
           vorher = h.hintergrundRelativ;
         }
       }
+    }
+  });
+  it("Grenzfall Mars 6'', Bortle 9, diesig, 10 Grad: Himmel 10,0 mag unter dem Objekt, Faktor 21,5 (physik.md 12.3)", () => {
+    for (const geraet of [AUGE, FERNGLAS_10X50, refraktorMitVergroesserung(80, 200)]) {
+      const k: Konfiguration = { geraet, objekt: MARS_6, bedingungen: { ...BEDINGUNGEN_A_D9, bortle: 9, transparenz: "diesig", hoeheGrad: 10 } };
+      const h = anzeige(k);
+      expect(h.faktorObjekt / h.hintergrundRelativ).toBeCloseTo(21.45, 1);
+      expect(h.hintergrundRelativ * 20).toBeLessThan(h.faktorObjekt);
     }
   });
   it("Hintergrund Fernglas 10x50: Bortle 1 0,0028 (sRGB 9), Bortle 9 0,0127 (sRGB 30)", () => {

@@ -7,7 +7,7 @@ import type { Helligkeit } from "../naht/simulationsparameter";
 import { type Atmosphaere, extinktionFaktor } from "./atmosphaere";
 import { PhysikFehler } from "./fehler";
 import type { Objektzustand } from "../naht/konfiguration";
-import { ANZEIGE_WEISS_MAG_PRO_ARCSEC2, BORTLE_MAG_PRO_ARCSEC2, STEVENS_EXPONENT } from "./konstanten";
+import { ANZEIGE_WEISS_MAG_PRO_ARCSEC2, BORTLE_MAG_PRO_ARCSEC2, KOMPRESSIONSEXPONENT } from "./konstanten";
 import { flaechenhelligkeitsfaktor, type Optik } from "./optik";
 import { schluessel } from "./schluessel";
 
@@ -50,20 +50,21 @@ export function okularhelligkeit(optik: Optik, atmosphaere: Atmosphaere, bortle:
 }
 
 /**
- * Abschnitt 12: Flaechenhelligkeit mu im Okular (mag/arcsec^2) als linearer Anzeigewert 0..1
- * (1 = Bildschirmweiss, vor der sRGB-Kodierung). w = (L / L_weiss)^n = 10^(-0,4 n (mu - mu_weiss))
- * mit n = 1/3 (Stevens) und mu_weiss = 3,35 (Vollmond ohne Verluste), nach oben 1. Streng
+ * Abschnitt 12: Flaechenhelligkeit mu im Okular (mag/arcsec^2) als Anzeigehelligkeit 0..1
+ * (GLOSSARY: linear, 1 = Bildschirmweiss, vor der sRGB-Kodierung). w = (L / L_weiss)^n =
+ * 10^(-0,4 n (mu - mu_weiss)) mit n = 1/3 (Groessenordnung nach Stevens) und mu_weiss = 3,35 (Vollmond ohne Verluste), nach oben 1. Streng
  * monoton fallend in mu; gleiche Leuchtdichteverhaeltnisse geben gleiche Anzeigeverhaeltnisse.
  */
 export function anzeigefaktor(magProArcsec2: number): number {
   if (Number.isNaN(magProArcsec2)) throw new PhysikFehler("magProArcsec2", magProArcsec2, "ist keine Zahl");
-  return Math.min(1, Math.pow(10, -0.4 * STEVENS_EXPONENT * (magProArcsec2 - ANZEIGE_WEISS_MAG_PRO_ARCSEC2)));
+  return Math.min(1, Math.pow(10, -0.4 * KOMPRESSIONSEXPONENT * (magProArcsec2 - ANZEIGE_WEISS_MAG_PRO_ARCSEC2)));
 }
 
 /**
- * Naht-Stufe 3 fuer bild: faktorObjekt ist der Anzeigewert von Quellweiss, hintergrundRelativ der
- * Anzeigewert des Himmels im Okular, beide aus anzeigefaktor(). Das Objektbild bleibt linear
- * (Pixel relativ zu Quellweiss mal faktorObjekt), nur das Niveau wird komprimiert.
+ * Naht-Stufe 3 fuer bild: faktorObjekt ist die Anzeigehelligkeit von Quellweiss, hintergrundRelativ
+ * die des Himmels im Okular, beide aus anzeigefaktor(). Das Objektbild bleibt linear (Pixel relativ
+ * zu Quellweiss mal faktorObjekt), nur das Niveau wird komprimiert; der Kontrast innerhalb des
+ * Quellbilds bleibt, der zwischen Objekt und Himmel nicht (physik.md 12.5).
  * hintergrundMagProArcsec2 ist physikalisch und dient Anzeige und Hilfetext.
  */
 export function helligkeit(optik: Optik, atmosphaere: Atmosphaere, bortle: number, zustand: Objektzustand): Helligkeit {
