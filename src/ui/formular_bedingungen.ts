@@ -31,6 +31,29 @@ export function rundeAuf(wert: number, stellen: number): number {
   return Math.round(wert * faktor) / faktor;
 }
 
+/**
+ * Eingabe auf die Feldstellen gerundet, wenn der gerundete Wert in [min, max] liegt; sonst
+ * ungerundet, damit begrenze die echte Eingabe schneidet und im Hinweis meldet.
+ */
+export function rundeImBereich(wert: number, stellen: number, grenze: { min: number; max: number }): number {
+  const gerundet = rundeAuf(wert, stellen);
+  return gerundet >= grenze.min && gerundet <= grenze.max ? gerundet : wert;
+}
+
+/**
+ * Bedingungen auf das Raster der Felder gerundet (Seeing 0,1, Bortle und Hoehe 1). Ein Link kann
+ * Zwischenwerte tragen (?s=1.25&h=45.5); ohne Rundung zeigten die Felder 1,3 und 46, waehrend
+ * Rechnung, URL und Luftmasse 1,25 und 45,5 nutzten.
+ */
+export function aufRaster(b: Bedingungen): Bedingungen {
+  return {
+    ...b,
+    seeingFwhmArcsec: rundeImBereich(b.seeingFwhmArcsec, STELLEN.seeing, GRENZEN.seeingFwhmArcsec),
+    bortle: rundeImBereich(b.bortle, STELLEN.bortle, GRENZEN.bortle),
+    hoeheGrad: rundeImBereich(b.hoeheGrad, STELLEN.hoehe, GRENZEN.hoeheGrad)
+  };
+}
+
 /** Kopie von k mit geaenderten Bedingungen. */
 export function mitBedingungen(k: Konfiguration, teil: Partial<Bedingungen>): Konfiguration {
   return { ...k, bedingungen: { ...k.bedingungen, ...teil } };
@@ -86,6 +109,10 @@ export function baueFormularBedingungen(platz: HTMLElement, steuerung: Steuerung
   const d = platz.ownerDocument;
   const H = TEXTE.hilfe;
   const E = TEXTE.einheiten;
+  // Startwerte aus einem Link einmal aufs Raster der Felder bringen (Rechnung, URL und Anzeige gleich).
+  const roh = steuerung.konfiguration.bedingungen;
+  const gerastert = aufRaster(roh);
+  if (JSON.stringify(gerastert) !== JSON.stringify(roh)) steuerung.aendere(mitBedingungen(steuerung.konfiguration, gerastert));
   const start = steuerung.konfiguration.bedingungen;
   const aendere = (teil: Partial<Bedingungen>) => steuerung.aendere(mitBedingungen(steuerung.konfiguration, teil));
 
@@ -105,7 +132,7 @@ export function baueFormularBedingungen(platz: HTMLElement, steuerung: Steuerung
     schritt: 0.1,
     stellen: STELLEN.seeing,
     wert: start.seeingFwhmArcsec,
-    beiAenderung: (wert) => aendere({ seeingFwhmArcsec: rundeAuf(wert, STELLEN.seeing) })
+    beiAenderung: (wert) => aendere({ seeingFwhmArcsec: rundeImBereich(wert, STELLEN.seeing, g.seeingFwhmArcsec) })
   });
   const seeingStufe = anzeigezeile(d, seeing, "bedingungen-seeing-stufe");
 
@@ -120,7 +147,7 @@ export function baueFormularBedingungen(platz: HTMLElement, steuerung: Steuerung
     stellen: STELLEN.bortle,
     wert: start.bortle,
     // Gerundet, bevor begrenze schneidet: sonst meldet begrenze das Runden von 4,6 auf 5 als Schnitt.
-    beiAenderung: (wert) => aendere({ bortle: rundeAuf(wert, STELLEN.bortle) })
+    beiAenderung: (wert) => aendere({ bortle: rundeImBereich(wert, STELLEN.bortle, g.bortle) })
   });
   const bortleStufe = anzeigezeile(d, bortle, "bedingungen-bortle-stufe");
 
@@ -146,7 +173,7 @@ export function baueFormularBedingungen(platz: HTMLElement, steuerung: Steuerung
     schritt: 1,
     stellen: STELLEN.hoehe,
     wert: start.hoeheGrad,
-    beiAenderung: (wert) => aendere({ hoeheGrad: rundeAuf(wert, STELLEN.hoehe) })
+    beiAenderung: (wert) => aendere({ hoeheGrad: rundeImBereich(wert, STELLEN.hoehe, g.hoeheGrad) })
   });
   const hoeheLuftmasse = anzeigezeile(d, hoehe, "bedingungen-hoehe-luftmasse");
 

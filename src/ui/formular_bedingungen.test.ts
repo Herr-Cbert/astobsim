@@ -1,7 +1,8 @@
 import { describe, expect, it } from "vitest";
 import { BEDINGUNGEN_A_D9 } from "../physik/testdaten";
 import type { Konfiguration } from "../physik";
-import { bortleanzeige, istTransparenz, luftmasseanzeige, mitBedingungen, rundeAuf, seeinganzeige } from "./formular_bedingungen";
+import { TEXTE } from "../texte";
+import { aufRaster, bortleanzeige, istTransparenz, luftmasseanzeige, mitBedingungen, rundeAuf, rundeImBereich, seeinganzeige } from "./formular_bedingungen";
 
 describe("seeinganzeige", () => {
   it("nennt Wortstufe und Pickering nach physik.md 2.5", () => {
@@ -15,9 +16,10 @@ describe("seeinganzeige", () => {
 
 describe("bortleanzeige", () => {
   it("nennt Kurzbeschreibung und Himmelshelligkeit je Stufe", () => {
-    expect(bortleanzeige(1)).toBe("ausgezeichneter Dunkelhimmel, 21,9 mag/″²");
-    expect(bortleanzeige(5)).toBe("vorstädtisch, 20,0 mag/″²");
-    expect(bortleanzeige(9)).toBe("Innenstadt, 17,0 mag/″²");
+    const T = TEXTE.bedingungen;
+    expect(bortleanzeige(1)).toBe(T.bortleStufe(T.bortleStufen[0], "21,9"));
+    expect(bortleanzeige(5)).toBe(T.bortleStufe(T.bortleStufen[4], "20,0"));
+    expect(bortleanzeige(9)).toBe(T.bortleStufe(T.bortleStufen[8], "17,0"));
   });
 
   it("hat fuer jede Stufe 1 bis 9 einen Text und sonst keinen", () => {
@@ -57,5 +59,24 @@ describe("istTransparenz", () => {
   it("kennt genau die drei Stufen", () => {
     for (const t of ["klar", "leicht-diesig", "diesig"]) expect(istTransparenz(t)).toBe(true);
     expect(istTransparenz("neblig")).toBe(false);
+  });
+});
+
+describe("rundeImBereich", () => {
+  it("rundet nur, wenn der gerundete Wert in den Grenzen liegt", () => {
+    const g = { min: 0.5, max: 5 };
+    expect(rundeImBereich(1.25, 1, g)).toBe(1.3);
+    expect(rundeImBereich(0.44, 1, g)).toBe(0.44);
+    expect(rundeImBereich(5.04, 1, g)).toBe(5);
+    expect(rundeImBereich(9.6, 0, { min: 1, max: 9 })).toBe(9.6);
+    expect(rundeImBereich(9.4, 0, { min: 1, max: 9 })).toBe(9);
+  });
+});
+
+describe("aufRaster", () => {
+  it("bringt Zwischenwerte aus einem Link aufs Raster der Felder", () => {
+    const b = { ...BEDINGUNGEN_A_D9, seeingFwhmArcsec: 1.25, hoeheGrad: 45.5 };
+    expect(aufRaster(b)).toEqual({ ...BEDINGUNGEN_A_D9, seeingFwhmArcsec: 1.3, hoeheGrad: 46 });
+    expect(aufRaster(BEDINGUNGEN_A_D9)).toEqual(BEDINGUNGEN_A_D9);
   });
 });

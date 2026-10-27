@@ -111,6 +111,8 @@ export function baueFormularObjekt(platz: HTMLElement, steuerung: Steuerung): vo
   laedt.className = "objekt-laedt";
   laedt.textContent = T.laedt;
   laedt.hidden = true;
+  // Die Statuszeile meldet das Laden schon per aria-live; hier nur fuer das Auge.
+  laedt.setAttribute("aria-hidden", "true");
 
   platz.replaceChildren(ueberschrift, objekt.element, zustand.element, laedt);
 

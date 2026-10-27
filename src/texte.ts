@@ -49,7 +49,7 @@ export const TEXTE = {
       "Das Himmelsobjekt, das betrachtet wird. Jedes Objekt hat einen oder mehrere feste Zustände, die zeigen, wie es typischerweise am Himmel erscheint.",
     zustand:
       "Ein Zustand ist eine feste, typische Erscheinung des Objekts mit seiner scheinbaren Größe in Bogensekunden (″). " +
-      "Mond: Das Bild hat 0,643″ je Pixel; ab etwa 200 mm Öffnung bei sehr gutem Seeing begrenzt das Bild und nicht das Fernrohr die Schärfe. " +
+      "Mond: Die Bildvorlage hat 0,643″ je Pixel; ab etwa 200 mm Öffnung bei sehr gutem Seeing begrenzt die Bildvorlage und nicht das Fernrohr die Schärfe. " +
       "Mars 6″ ist in Wirklichkeit nicht voll beleuchtet (etwa 90 Prozent), wird hier aber vereinfacht als volle Scheibe gezeigt. " +
       "Jupiter 35″ und Saturn 16″ zeigen den Planeten fern von der Opposition, so wie man ihn die meiste Zeit des Jahres sieht.",
     seeing:
@@ -62,7 +62,8 @@ export const TEXTE = {
       "Die Bortle-Skala beschreibt, wie hell der Nachthimmel ist: 1 ist ein ausgezeichneter dunkler Himmel fern jeder Stadt, 9 der Himmel einer Innenstadt. " +
       "Daneben steht die Himmelshelligkeit in Magnituden je Quadratbogensekunde (größer ist dunkler). " +
       "In dieser Version wirkt die Stufe nur auf die Helligkeit des Hintergrunds im Gesichtsfeld: Mond und Planeten sind so viel heller als der Himmel, dass sie sich kaum ändern. " +
-      "Ihre volle Wirkung hätte die Stufe erst bei lichtschwachen Objekten wie Nebeln und Galaxien.",
+      "Ihre volle Wirkung hätte die Stufe erst bei lichtschwachen Objekten wie Nebeln und Galaxien. " +
+      "Die Werte für Stufe 8 und 9 sind Schätzungen.",
     transparenz:
       "Wie klar die Luft ist. Dunst und Feuchtigkeit schlucken Licht: Das Objekt wird dunkler, je diesiger die Luft und je tiefer es steht. " +
       "Klar entspricht 0,20 Magnituden Lichtverlust je Luftmasse, leicht diesig 0,30, diesig 0,45.",
@@ -74,7 +75,7 @@ export const TEXTE = {
     /** Hilfetexte zu den Zahlen des Infopanels (A-D6), Schluessel wie in TEXTE.info. */
     anzeige: {
       vergroesserung:
-        "Wie viel größer das Objekt erscheint als mit bloßem Auge: Brennweite des Fernrohrs geteilt durch die Brennweite des Okulars. " +
+        "Wie viel größer das Objekt erscheint als mit bloßem Auge: Brennweite des Fernrohrs geteilt durch die Brennweite des Okulars; bei Fernglas und bloßem Auge fest. " +
         "Mehr als das Doppelte der Öffnung in Millimetern zeigt keine weiteren Einzelheiten, das Bild wird nur größer und dunkler.",
       wahresGesichtsfeld:
         "Wie groß der Ausschnitt des Himmels ist, der im Okular zu sehen ist, in Grad und Bogenminuten (1° = 60′). " +
@@ -82,13 +83,14 @@ export const TEXTE = {
       austrittspupille:
         "Der Durchmesser des Lichtbündels, das aus dem Okular ins Auge fällt: Öffnung geteilt durch Vergrößerung. " +
         "Über 6 mm passt nicht alles Licht in die Pupille des Auges, unter 0,5 mm wird das Bild dunkel und unscharf. " +
-        "Je kleiner die Austrittspupille, desto dunkler erscheinen Flächen wie Mond und Planeten.",
+        "Unter 6 mm gilt: Je kleiner die Austrittspupille, desto dunkler erscheinen Flächen wie Mond und Planeten.",
       rayleigh:
         "Die Beugungsgrenze: Wegen der Wellennatur des Lichts zeigt auch ein perfektes Fernrohr einen Stern als kleines Scheibchen. " +
         "Nach Rayleigh lassen sich zwei Punkte gerade noch trennen, wenn sie 138″ geteilt durch die Öffnung in mm auseinander liegen. Größere Öffnung heißt feinere Grenze.",
       dawes:
         "Eine zweite, aus Beobachtung gewonnene Beugungsgrenze für gleich helle Doppelsterne: 116″ geteilt durch die Öffnung in mm. " +
         "Sie ist etwas feiner als die Rayleigh-Grenze; ihr Wert gilt nur für solche Doppelsterne.",
+      // Folgerung "hilft mehr Oeffnung kaum": docs/recherche/physik.md 2.3 (Testfall T4).
       seeing:
         "Wie stark die Luftunruhe das Bild in der eingestellten Höhe verschmiert: das Seeing im Zenit, vergrößert durch den längeren Weg durch die Luft. " +
         "Ist dieser Wert die größte Grenze, hilft mehr Öffnung kaum.",
