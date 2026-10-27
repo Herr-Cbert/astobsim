@@ -30,8 +30,6 @@ export interface Fenster {
  */
 export interface Quellbild {
   schluessel: string;
-  /** Kennung des Objektzustands, z. B. "mond-q1"; bild laedt danach das Quellbild. */
-  objekt: string;
   /** Arbeitsmassstab in Bogensekunden je Arbeitspixel. */
   massstabArcsecProPx: number;
   /** Kantenlaenge des quadratischen Arbeitsrasters in Arbeitspixeln. */

@@ -34,7 +34,7 @@ export { type Optik, austrittspupilleMm, flaechenhelligkeitsfaktor, okularBrennw
 export { airyProfil, gaussProfil, moffatProfil, quadratur } from "./profile";
 export { type Aufloesung, type Aufloesungsgrenze, aufloesung } from "./aufloesung";
 export { anzeigefaktor, bortleMagProArcsec2, helligkeit, leuchtdichteRelativ, type Okularhelligkeit, okularhelligkeit } from "./helligkeit";
-export { arbeitsmassstab, kernSchluessel, kernbeschreibung } from "./arbeitsmassstab";
+export { arbeitsmassstab, arbeitsmassstabOhneFenster, kernSchluessel, kernbeschreibung } from "./arbeitsmassstab";
 export { geblendet, helligkeitRelativ, punktquellen, scheibenFlaechenhelligkeit } from "./punktquellen";
 export { GRENZEN, type Grenze, type Hinweis, aufSchritt, begrenze } from "./begrenze";
 export { baueKern, kernFwhmArcsec, kontrastUebertragung, type Profilstufe, profilDelle } from "./kern";

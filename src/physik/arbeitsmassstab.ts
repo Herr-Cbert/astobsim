@@ -12,6 +12,14 @@ import type { Optik } from "./optik";
 import { rundeSignifikant, schluessel } from "./schluessel";
 
 /**
+ * Arbeitsmassstab ohne Anzeige: max(Quellmassstab, Gesamt-FWHM / 2,5) (ADR-0002). Der feinste
+ * Massstab, den ein Fenster bekommen kann; die UI waehlt damit die kleinste Zoombreite.
+ */
+export function arbeitsmassstabOhneFenster(aufloesung: Aufloesung, quelle: Objektzustand["quelle"]): number {
+  return Math.max(quelle.massstabArcsecProPx, aufloesung.gesamtFwhmArcsec / ARBEITSPIXEL_PRO_FWHM);
+}
+
+/**
  * ADR-0002: Arbeitsmassstab = max(Quellmassstab, Gesamt-FWHM / 2,5, Fenstermassstab). Nie feiner
  * als das Quellbild, nie feiner als noetig fuer die Gesamt-PSF, nie feiner als die Anzeige.
  * Folge: die Gesamt-FWHM ist hoechstens 2,5 Arbeitspixel breit, der Kern bleibt klein.
@@ -20,7 +28,7 @@ import { rundeSignifikant, schluessel } from "./schluessel";
 export function arbeitsmassstab(aufloesung: Aufloesung, quelle: Objektzustand["quelle"], fenster: Fenster): number {
   pruefeBereich("fenster.px", fenster.px, FENSTER_MIN_PX, Infinity);
   pruefeBereich("fenster.breiteArcsec", fenster.breiteArcsec, Number.MIN_VALUE, Infinity);
-  return Math.max(quelle.massstabArcsecProPx, aufloesung.gesamtFwhmArcsec / ARBEITSPIXEL_PRO_FWHM, fenster.breiteArcsec / fenster.px);
+  return Math.max(arbeitsmassstabOhneFenster(aufloesung, quelle), fenster.breiteArcsec / fenster.px);
 }
 
 /**

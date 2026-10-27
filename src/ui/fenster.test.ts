@@ -24,7 +24,6 @@ describe("ausschnittsanfrage", () => {
   it("nimmt Mitte, rasterPx * Massstab und Massstab aus dem Quellbild", () => {
     const a = ausschnittsanfrage({
       schluessel: "q",
-      objekt: "mond_ev",
       massstabArcsecProPx: 1.5,
       rasterPx: 200,
       mitteXArcsec: 10,

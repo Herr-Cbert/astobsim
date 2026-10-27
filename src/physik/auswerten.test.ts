@@ -41,7 +41,6 @@ describe("auswerten: Rundreise A-D9", () => {
     expect(warnungen).toEqual([]);
   });
   it("Simulationsparameter: Mond, Kreismaske 3000'', Punktquellen leer, Kernmassstab gleich Arbeitsmassstab", () => {
-    expect(parameter.quellbild.objekt).toBe("mond-q1");
     expect(parameter.quellbild.punktquellen).toEqual([]);
     expect(parameter.gesichtsfeld).toEqual({ form: "kreis", breiteArcsec: 3000, hoeheArcsec: 3000 });
     expect(parameter.kern.massstabArcsecProPx).toBe(parameter.quellbild.massstabArcsecProPx);

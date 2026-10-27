@@ -2,7 +2,8 @@ import { describe, expect, it } from "vitest";
 import type { Bedingungen, Geraet, Objektzustand } from "../naht/konfiguration";
 import type { Kern } from "../naht/simulationsparameter";
 import { auswerten } from "./auswerten";
-import { ARBEITSPIXEL_PRO_FWHM, KOMPRESSIONSEXPONENT, SCHWELLE_ERKENNBAR } from "./konstanten";
+import { arbeitsmassstabOhneFenster } from "./arbeitsmassstab";
+import { KOMPRESSIONSEXPONENT, SCHWELLE_ERKENNBAR } from "./konstanten";
 import { type Profilstufe, profilDelle } from "./kern";
 import { fenster, JUPITER_47, MARS_6, MARS_14, MOND_Q1, refraktorMitVergroesserung, SATURN_20, zenit } from "./testdaten";
 
@@ -61,7 +62,7 @@ interface Fall {
 function kern(f: Fall): Kern {
   const breite = f.geraet.art === "fernrohr" ? 100 : 2000;
   const a = auswerten({ geraet: f.geraet, objekt: f.objekt, bedingungen: f.bedingungen }, { fenster: fenster(breite, 1024) });
-  const ohneFenster = Math.max(f.objekt.quelle.massstabArcsecProPx, a.anzeige.aufloesung.gesamtFwhmArcsec / ARBEITSPIXEL_PRO_FWHM);
+  const ohneFenster = arbeitsmassstabOhneFenster(a.anzeige.aufloesung, f.objekt.quelle);
   // Das Arbeitsraster rundet die Pixelzahl im Fenster ab, der Massstab wird daher hoechstens etwas groeber.
   expect(a.parameter.kern.massstabArcsecProPx).toBeGreaterThanOrEqual(ohneFenster);
   expect(a.parameter.kern.massstabArcsecProPx).toBeLessThan(1.02 * ohneFenster);

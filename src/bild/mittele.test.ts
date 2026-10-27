@@ -5,7 +5,7 @@ import { QuelleAusRaster } from "./quelle";
 import { neuesRaster, pixelIndex, summe, type Raster } from "./raster";
 
 function quellbild(teil: Partial<Quellbild> = {}): Quellbild {
-  return { schluessel: "test", objekt: "test", massstabArcsecProPx: 1, rasterPx: 4, mitteXArcsec: 0, mitteYArcsec: 0, punktquellen: [], ...teil };
+  return { schluessel: "test", massstabArcsecProPx: 1, rasterPx: 4, mitteXArcsec: 0, mitteYArcsec: 0, punktquellen: [], ...teil };
 }
 
 /** Raster mit Wert zeile * 10 + spalte. */
