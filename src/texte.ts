@@ -10,8 +10,9 @@ export const TEXTE = {
   /** Beschriftung der Formularspalte. */
   formular: "Einstellungen",
   nordenOben: "Norden oben",
-  /** Namensnennung des Quellbilds unter dem Gesichtsfeld (aus bilder.json). */
-  bildnachweis: (namensnennung: string, lizenz: string): string => `Bild: ${namensnennung} Lizenz: ${lizenz}.`,
+  /** Namensnennung des Quellbilds unter dem Gesichtsfeld (aus bilder.json); Punkt ergaenzt, falls sie keinen hat. */
+  bildnachweis: (namensnennung: string, lizenz: string): string =>
+    `Bild: ${namensnennung}${/[.!?]$/.test(namensnennung) ? "" : "."} Lizenz: ${lizenz}.`,
   /** Platzhalter fuer einen nicht endlichen Zahlenwert. */
   fehlwert: "–",
   gesichtsfeld: "Anblick im wahren Gesichtsfeld",
