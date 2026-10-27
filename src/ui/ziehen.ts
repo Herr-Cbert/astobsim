@@ -8,7 +8,7 @@ import { type Mitte, mitteNachTaste, mitteNachZiehen } from "./verschieben";
 import type { Verschiebelage } from "./zoom";
 
 /** Ab dieser Bewegung in CSS-Pixeln ist ein Druck ein Ziehen und kein Klick. */
-export const KLICK_TOLERANZ_PX = 4;
+const KLICK_TOLERANZ_PX = 4;
 
 export interface Bildbedienung {
   steuerung: Steuerung;

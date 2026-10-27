@@ -28,7 +28,7 @@ export const OBSTRUKTION_VORSCHLAG_PROZENT = {
 } as const satisfies Record<Bauart, number>;
 
 /** Verfeinerung fuer kleine schnelle Newtons: Oeffnung bis 150 mm und Blendenzahl f/D bis 5. */
-export const OBSTRUKTION_VORSCHLAG_NEWTON_KLEIN = {
+const OBSTRUKTION_VORSCHLAG_NEWTON_KLEIN = {
   prozent: 32,
   maxOeffnungMm: 150,
   maxBlendenzahl: 5

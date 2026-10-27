@@ -21,7 +21,7 @@ import type { Bildnachweis } from "./bildnachweise";
 import { DatenFehler } from "./fehler";
 
 /** Eine Stufe der Pyramide in Anzeige-Bogensekunden (schon auf den Zustand skaliert). */
-export interface Stufengeometrie {
+interface Stufengeometrie {
   breitePx: number;
   hoehePx: number;
   massstabArcsecProPx: number;
@@ -53,7 +53,7 @@ interface Pixelbereich {
 }
 
 /** Standardgroesse des Caches: 64 volle Kacheln 512 px mit 3 Kanaelen sind rund 200 MB Float32. */
-export const MAX_KACHELN_STANDARD = 64;
+const MAX_KACHELN_STANDARD = 64;
 
 /** Relative Toleranz der Stufenwahl gegen Rundung (gewuenschter Massstab gleich Stufenmassstab). */
 const TOLERANZ_STUFE = 1e-9;

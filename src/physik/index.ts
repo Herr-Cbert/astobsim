@@ -7,27 +7,6 @@
 // importieren nur von hier; bild importiert physik nicht (docs/architektur.md Abschnitt 4).
 
 export * from "../naht/konfiguration";
-export {
-  ANZEIGE_PX_STANDARD,
-  ARCSEC_PRO_RAD,
-  AUGE_AUFLOESUNG_ARCSEC,
-  AUGE_GESICHTSFELD_GRAD,
-  AUSTRITTSPUPILLE_MIN_MM,
-  BETA_MOFFAT,
-  BLENDUNG_ABSTAND_SCHEINBAR_ARCSEC,
-  BLENDUNG_DELTA_MAG,
-  BORTLE_MAG_PRO_ARCSEC2,
-  EXTINKTION_MAG_PRO_LUFTMASSE,
-  KERN_GROESSE_MAX,
-  KERN_RADIUS_MIN,
-  KERN_RADIUS_PRO_FWHM,
-  PUPILLE_MM,
-  SEEING_STUFEN,
-  SEEING_WORTSTUFEN,
-  type Seeingwortstufe,
-  TRANSMISSION,
-  WELLENLAENGE_M
-} from "./konstanten";
 export { PhysikFehler } from "./fehler";
 export { besselJ1 } from "./bessel";
 export {

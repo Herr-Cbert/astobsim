@@ -16,7 +16,7 @@ export const FREI = "frei";
 export const VERGROESSERUNG_FELD = "geraet.okular.vergroesserung";
 
 /** Gruppen der Auswahlliste in fester Reihenfolge: Auge, Fernglaeser, Fernrohre (A-F2). */
-export const GRUPPEN = ["auge", "fernglas", "fernrohr"] as const satisfies readonly Geraet["art"][];
+const GRUPPEN = ["auge", "fernglas", "fernrohr"] as const satisfies readonly Geraet["art"][];
 export type Gruppe = (typeof GRUPPEN)[number];
 
 /** Eintraege je Gruppe in der Reihenfolge der Datei; leere Gruppen fallen weg. */

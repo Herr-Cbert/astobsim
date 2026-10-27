@@ -19,7 +19,7 @@ import type { Kataloge } from "./kataloge";
 import { VOREINSTELLUNG, voreinstellung } from "./voreinstellung";
 
 /** Version des URL-Formats; ausUrl liest heute jede Version wie Version 1. */
-export const URL_VERSION = 1;
+const URL_VERSION = 1;
 
 /** Kurze Parameternamen der URL (Tabelle mit Einheiten in LIESMICH.md). */
 export const PARAMETER = {

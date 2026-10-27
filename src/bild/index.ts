@@ -3,7 +3,6 @@
 export { BildFehler } from "./fehler";
 export { FalterJs, type Falter } from "./falter";
 export {
-  ANZEIGEGRENZE_OHNE_WEBGL2_PX,
   waehleFalter,
   type FalterArt,
   type FalterGrund,

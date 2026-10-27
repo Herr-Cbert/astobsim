@@ -44,7 +44,7 @@ function ungefaehrGleich(a: number, b: number): boolean {
 }
 
 /** Wirft BildFehler bei Parametern, die den Invarianten der Naht widersprechen. */
-export function pruefeParameter(p: Simulationsparameter): void {
+function pruefeParameter(p: Simulationsparameter): void {
   const { quellbild, kern, helligkeit, fenster } = p;
   pruefePositivGanz("fenster.px", fenster.px);
   if (!(fenster.breiteArcsec > 0)) throw new BildFehler(`fenster.breiteArcsec muss positiv sein, nicht ${fenster.breiteArcsec}`);
