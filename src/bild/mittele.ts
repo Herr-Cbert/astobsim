@@ -133,16 +133,25 @@ export function skaliere(raster: Raster, px: number): Raster {
   const z = ziel.daten;
   const fx = raster.breite / px;
   const fy = raster.hoehe / px;
+  // Spaltenpositionen haengen nur von i ab: einmal rechnen statt in jeder Zeile (gleiche Arithmetik).
+  const spalte0 = new Int32Array(px);
+  const spalte1 = new Int32Array(px);
+  const gewichtX = new Float64Array(px);
+  for (let i = 0; i < px; i++) {
+    const sx = Math.min(raster.breite - 1, Math.max(0, (i + 0.5) * fx - 0.5));
+    spalte0[i] = Math.floor(sx);
+    spalte1[i] = Math.min(raster.breite - 1, spalte0[i]! + 1);
+    gewichtX[i] = sx - spalte0[i]!;
+  }
   for (let j = 0; j < px; j++) {
     const sy = Math.min(raster.hoehe - 1, Math.max(0, (j + 0.5) * fy - 0.5));
     const y0 = Math.floor(sy);
     const y1 = Math.min(raster.hoehe - 1, y0 + 1);
     const ty = sy - y0;
     for (let i = 0; i < px; i++) {
-      const sx = Math.min(raster.breite - 1, Math.max(0, (i + 0.5) * fx - 0.5));
-      const x0 = Math.floor(sx);
-      const x1 = Math.min(raster.breite - 1, x0 + 1);
-      const tx = sx - x0;
+      const x0 = spalte0[i]!;
+      const x1 = spalte1[i]!;
+      const tx = gewichtX[i]!;
       const i00 = (y0 * raster.breite + x0) * k;
       const i01 = (y0 * raster.breite + x1) * k;
       const i10 = (y1 * raster.breite + x0) * k;

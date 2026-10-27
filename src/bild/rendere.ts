@@ -103,9 +103,20 @@ export function tonwert(raster: Raster, punktebene: Raster | undefined, helligke
  * ((i + 0,5) - px/2, px/2 - (j + 0,5)) * massstab.
  */
 export function maskiere(raster: Raster, gesichtsfeld: Gesichtsfeld, fenster: Fenster): Raster {
+  const kopie = { ...raster, daten: new Float32Array(raster.daten) };
+  maskiereAn(kopie, gesichtsfeld, fenster);
+  return kopie;
+}
+
+/**
+ * Wie maskiere, aber auf dem Raster selbst. rendere nutzt es fuer das Ergebnis von skaliere, das
+ * der Pipeline allein gehoert (tonwert legt immer ein neues Raster an): spart eine Kopie des
+ * Anzeigebilds je Reglerzug (bei 2048 px und drei Kanaelen 50 MB).
+ */
+function maskiereAn(raster: Raster, gesichtsfeld: Gesichtsfeld, fenster: Fenster): void {
   const { breite, hoehe, kanaele } = raster;
   const massstab = fenster.breiteArcsec / breite;
-  const ergebnis = new Float32Array(raster.daten);
+  const ergebnis = raster.daten;
   const halbeBreite = gesichtsfeld.breiteArcsec / 2;
   const halbeHoehe = gesichtsfeld.hoeheArcsec / 2;
   const kreis = gesichtsfeld.form === "kreis";
@@ -119,7 +130,6 @@ export function maskiere(raster: Raster, gesichtsfeld: Gesichtsfeld, fenster: Fe
       if (!innen) ergebnis.fill(0, (j * breite + i) * kanaele, (j * breite + i + 1) * kanaele);
     }
   }
-  return { ...raster, daten: ergebnis };
 }
 
 /**
@@ -155,6 +165,7 @@ export function rendere(parameter: Simulationsparameter, quelle: Quelle, falter:
   }
 
   const getont = tonwert(stufe2.raster, stufe2.punktebene, helligkeit);
-  const raster = maskiere(skaliere(getont, fenster.px), gesichtsfeld, fenster);
+  const raster = skaliere(getont, fenster.px);
+  maskiereAn(raster, gesichtsfeld, fenster);
   return { fenster, massstabArcsecProPx: fenster.breiteArcsec / fenster.px, raster };
 }

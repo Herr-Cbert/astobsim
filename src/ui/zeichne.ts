@@ -49,8 +49,10 @@ export function rasterZuRgba(raster: Raster): Uint8ClampedArray<ArrayBuffer> {
 /** Zeichnet den Anblick 1:1 in das Canvas (Canvasgroesse = fenster.px) mit der Form des Gesichtsfelds. */
 export function zeichneAnblick(canvas: HTMLCanvasElement, anblick: Anblick, gesichtsfeld: Gesichtsfeld): void {
   const { raster } = anblick;
-  canvas.width = raster.breite;
-  canvas.height = raster.hoehe;
+  // Groesse nur bei Aenderung setzen: jede Zuweisung leert Bitmap und Kontext. putImageData deckt
+  // das ganze Canvas deckend ab, das Ergebnis bleibt gleich.
+  if (canvas.width !== raster.breite) canvas.width = raster.breite;
+  if (canvas.height !== raster.hoehe) canvas.height = raster.hoehe;
   const kontext = canvas.getContext("2d", { colorSpace: "srgb" });
   if (kontext === null) throw new Error("ui: kein 2D-Kontext fuer das Gesichtsfeld verfuegbar");
   kontext.putImageData(new ImageData(rasterZuRgba(raster), raster.breite, raster.hoehe), 0, 0);

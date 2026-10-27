@@ -187,6 +187,14 @@ export class FalterWebgl2 implements Falter {
     this.gl = gl;
     this.maxTextur = gl.getParameter(gl.MAX_TEXTURE_SIZE) as number;
     this.maxUniformVektoren = gl.getParameter(gl.MAX_FRAGMENT_UNIFORM_VECTORS) as number;
+    // Fester Zustand: der Kontext gehoert dem Falter allein, also einmal setzen statt je Faltung.
+    gl.pixelStorei(gl.UNPACK_ALIGNMENT, 1);
+    gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, false);
+    gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, false);
+    gl.pixelStorei(gl.PACK_ALIGNMENT, 4);
+    gl.disable(gl.BLEND);
+    gl.disable(gl.DEPTH_TEST);
+    gl.disable(gl.SCISSOR_TEST);
     flaeche.addEventListener("webglcontextlost", () => {
       this.verlorenFlag = true;
     });
@@ -262,7 +270,7 @@ export class FalterWebgl2 implements Falter {
     }
 
     const gl = this.gl;
-    const p = this.programm(`a|${n}|${kanaele}`, () => ausgerollterShader(n, kanaele));
+    const p = this.programm(`a|${n}|${kanaele}`, "kern", () => ausgerollterShader(n, kanaele));
     this.ladeBild(gl.RGBA32F, gl.RGBA, texelBreite, texelHoehe, gepolstert);
     gl.useProgram(p.programm);
     const gewichte = new Float32Array(Math.ceil((n * n) / 4) * 4);
@@ -284,7 +292,7 @@ export class FalterWebgl2 implements Falter {
     const n = kern.groesse;
     this.pruefeGroesse(breite, hoehe);
     const gl = this.gl;
-    const p = this.programm(`s|${n}|${kanaele}`, () => schleifenShader(n, kanaele));
+    const p = this.programm(`s|${n}|${kanaele}`, "kernTextur", () => schleifenShader(n, kanaele));
     if (kanaele === 1) this.ladeBild(gl.R32F, gl.RED, breite, hoehe, raster.daten);
     else this.ladeBild(gl.RGB32F, gl.RGB, breite, hoehe, raster.daten);
     gl.activeTexture(gl.TEXTURE1);
@@ -311,9 +319,6 @@ export class FalterWebgl2 implements Falter {
 
   private ladeBild(format: number, quellformat: number, breite: number, hoehe: number, daten: Float32Array): void {
     const gl = this.gl;
-    gl.pixelStorei(gl.UNPACK_ALIGNMENT, 1);
-    gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, false);
-    gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, false);
     gl.activeTexture(gl.TEXTURE0);
     gl.bindTexture(gl.TEXTURE_2D, this.texBild);
     gl.texImage2D(gl.TEXTURE_2D, 0, format, breite, hoehe, 0, quellformat, gl.FLOAT, daten);
@@ -324,15 +329,11 @@ export class FalterWebgl2 implements Falter {
     const gl = this.gl;
     this.bereiteZielVor(breite, hoehe);
     gl.viewport(0, 0, breite, hoehe);
-    gl.disable(gl.BLEND);
-    gl.disable(gl.DEPTH_TEST);
-    gl.disable(gl.SCISSOR_TEST);
     gl.uniform1i(p.bild, 0);
     gl.bindVertexArray(this.vao);
     gl.drawArrays(gl.TRIANGLES, 0, 3);
     // readPixels wartet auf das Ende der Faltung. RGBA/FLOAT ist fuer RGBA32F immer erlaubt.
     const rgba = new Float32Array(breite * hoehe * 4);
-    gl.pixelStorei(gl.PACK_ALIGNMENT, 4);
     gl.readPixels(0, 0, breite, hoehe, gl.RGBA, gl.FLOAT, rgba);
     gl.bindFramebuffer(gl.FRAMEBUFFER, null);
     gl.bindVertexArray(null);
@@ -340,7 +341,7 @@ export class FalterWebgl2 implements Falter {
   }
 
   /** Programm nach Schluessel, beim ersten Gebrauch uebersetzt. */
-  private programm(schluessel: string, quelltext: () => string): Programm {
+  private programm(schluessel: string, kernUniform: string, quelltext: () => string): Programm {
     const vorhanden = this.programme.get(schluessel);
     if (vorhanden) return vorhanden;
     const gl = this.gl;
@@ -367,7 +368,7 @@ export class FalterWebgl2 implements Falter {
     const p: Programm = {
       programm,
       bild: gl.getUniformLocation(programm, "bild"),
-      kern: gl.getUniformLocation(programm, schluessel.startsWith("a|") ? "kern" : "kernTextur")
+      kern: gl.getUniformLocation(programm, kernUniform)
     };
     this.programme.set(schluessel, p);
     return p;
