@@ -1,6 +1,6 @@
 // Punktquellen (Stufe 1): Trabanten eines Objektzustands als Punktquellen der Naht, mit Helligkeit
 // relativ zu Quellweiss und Blendungsregel (A-P6, A-X2). Quelle: docs/recherche/physik.md,
-// Abschnitte 7, 9 und 13 (Herleitung 13.1, Blendungsregel 13.3). Bild malt sie vor der Faltung als Scheibchen in die Punktebene (ADR-0002, Abschnitt 14).
+// Abschnitte 7, 9 und 13 (Herleitung 13.1, Blendungsregel 13.3). Das Modul bild malt sie vor der Faltung als Scheibchen in die Punktebene (ADR-0002, Nachtrag 2026-10-27; physik.md Abschnitt 14).
 
 import type { Objektzustand, Trabant } from "../naht/konfiguration";
 import type { Punktquelle } from "../naht/simulationsparameter";

@@ -82,7 +82,7 @@ export interface Trabant {
  * alle Helligkeiten an der Naht sind relativ dazu.
  */
 export interface Objektzustand {
-  /** Kennung des Zustands, z. B. "jupiter-47", "mond-q1"; bild laedt danach das Quellbild. */
+  /** Kennung des Zustands (id aus daten/objekte.json), z. B. "jup_47", "mond_ev"; ui waehlt danach die Bildquelle. */
   kennung: string;
   durchmesserArcsec: number;
   magnitude: number;

@@ -67,7 +67,7 @@ export interface Punktquelle {
  */
 export interface Kern {
   schluessel: string;
-  /** Fuer Tests und Anzeige, nicht fuer bild. */
+  /** Fuer Tests und zum Ableiten des Vergleichskerns (ui/zoom.ts), nicht fuer bild. */
   beschreibung: Kernbeschreibung;
   groesse: number;
   radius: number;
@@ -110,7 +110,8 @@ export interface Kernbeschreibung {
  * eigene Flaeche abgebildet und addiert: min(1, (punktFaktor * p)^punktExponent). punktFaktor ist die
  * Leuchtdichte von Quellweiss im Okular relativ zu Anzeigeweiss (linear, nicht komprimiert),
  * punktExponent der Kompressionsexponent; es gilt faktorObjekt = punktFaktor^punktExponent.
- * hintergrundMagProArcsec2 ist physikalisch und dient nur Anzeige und Hilfetext.
+ * hintergrundMagProArcsec2 ist physikalisch; heute liest es niemand ausser dem Schluessel (die UI zeigt
+ * die Himmelshelligkeit ueber bortleMagProArcsec2).
  */
 export interface Helligkeit {
   schluessel: string;
