@@ -4,7 +4,7 @@
 // nennt) und einen Rueckruf; was eine Aenderung bedeutet, entscheidet das Formular ueber die
 // Steuerung. Zahlen erscheinen mit Dezimalkomma (format.ts), gelesen wird Komma oder Punkt.
 
-import { aufSchritt, type Hinweis } from "../physik";
+import type { Hinweis } from "../physik";
 import { TEXTE } from "../texte";
 import { zahl } from "./format";
 import { hilfesymbol } from "./hilfe";
@@ -17,14 +17,14 @@ export function leseDezimal(text: string): number {
 }
 
 /**
- * Wert, den das Feld nach einer Eingabe zeigt: bei einem Schnitt der Wert aus dem Hinweis, sonst
- * die Eingabe, auf das Raster von begrenze gerundet (raster = GRENZEN.schritt), wenn das Feld es
- * kennt. So zeigt die Hoehe nach der Eingabe 47 die verwendeten 45, auch wenn sich die
- * Konfiguration dadurch nicht aendert und kein Beobachter das Feld nachzieht.
+ * Wert, den das Feld nach einer Eingabe zeigt: der Wert, mit dem gerechnet wird (verwendet, aus
+ * der begrenzten Konfiguration), sonst bei einem Schnitt der Wert aus dem Hinweis, sonst die
+ * Eingabe. So zeigt die Hoehe nach der Eingabe 47 die verwendeten 45 und das Seeing nach 1,15
+ * die verwendeten 1,2 (toFixed allein zeigte 1,1), auch wenn sich die Konfiguration nicht aendert
+ * und kein Beobachter das Feld nachzieht.
  */
-export function angezeigterWert(eingabe: number, hinweis: Hinweis | undefined, raster?: number): number {
-  if (hinweis !== undefined) return hinweis.wert;
-  return raster === undefined ? eingabe : aufSchritt(eingabe, raster);
+export function angezeigterWert(eingabe: number, hinweis: Hinweis | undefined, verwendet?: number): number {
+  return verwendet ?? hinweis?.wert ?? eingabe;
 }
 
 /** Der Hinweis von begrenze zu genau diesem Feld, sonst undefined. */
@@ -49,14 +49,15 @@ export interface ZahlOptionen extends Feldbasis {
   schritt: number;
   /** Nachkommastellen der Anzeige. */
   stellen: number;
-  /**
-   * Raster, auf das begrenze diesen Wert rundet (GRENZEN.schritt), wenn es groeber ist als die
-   * Anzeige (Hoehe 5 Grad bei 0 Stellen); ohne Angabe zeigt das Feld die Eingabe.
-   */
-  raster?: number;
   wert: number;
   /** Gueltige Eingabe uebernehmen; liefert die Hinweise von Steuerung.aendere. */
   beiAenderung(wert: number): readonly Hinweis[];
+  /**
+   * Wert im Mass des Felds, mit dem nach beiAenderung gerechnet wird (begrenzt und auf den
+   * Schritt gerundet); das Feld zeigt ihn statt der Eingabe. Ohne Angabe oder bei undefined
+   * zeigt es den Wert aus dem Hinweis oder die Eingabe.
+   */
+  verwendet?(): number | undefined;
 }
 
 export interface Zahlenfeld {
@@ -152,7 +153,7 @@ function zahlteil(d: Document, o: ZahlOptionen, zeile: HTMLElement, element: HTM
   const uebernimm = (wert: number): void => {
     const h = hinweisFuer(o.beiAenderung(wert), o.feld);
     zeigeHinweis(h);
-    zeigeWert(angezeigterWert(wert, h, o.raster));
+    zeigeWert(angezeigterWert(wert, h, o.verwendet?.()));
   };
 
   zeigeWert(o.wert);

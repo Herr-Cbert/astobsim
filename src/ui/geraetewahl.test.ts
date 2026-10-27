@@ -1,7 +1,9 @@
 import { describe, expect, it } from "vitest";
 import geraeteJson from "../../daten/geraete.json";
 import { pruefeGeraete } from "../daten";
+import { KONFIGURATION_A_D9 } from "../physik/testdaten";
 import { begrenze, type Fernrohr, GRENZEN, optik } from "../physik";
+import { zahl } from "./format";
 import {
   auswahlNach,
   eintragZu,
@@ -10,6 +12,7 @@ import {
   geraetegruppen,
   geraetZuEintrag,
   mitBauart,
+  obstruktionProzent,
   okularBrennweiteFuer,
   skaliereHinweise,
   VERGROESSERUNG_FELD,
@@ -116,5 +119,21 @@ describe("skaliereHinweise", () => {
     expect(s[0]?.eingabe).toBeCloseTo(60, 12);
     expect(s[0]?.wert).toBe(50);
     expect(s[1]).toEqual(h[1]);
+  });
+});
+
+describe("obstruktionProzent", () => {
+  it("zeigt den verwendeten Wert: 0,15 Prozent wird 0,2 (toFixed allein zeigte 0,1)", () => {
+    const k = begrenze({ ...KONFIGURATION_A_D9, geraet: { ...START, obstruktion: 0.15 / 100 } }).konfiguration;
+    const prozent = obstruktionProzent(k.geraet as Fernrohr);
+    expect(prozent).toBe(0.2);
+    expect(zahl(prozent!, 1)).toBe("0,2");
+    expect(zahl(0.15, 1)).toBe("0,1");
+  });
+
+  it("rechnet ohne Gleitkommareste und liefert ohne Fernrohr undefined", () => {
+    expect(obstruktionProzent({ ...START, obstruktion: 0.271 })).toBe(27.1);
+    expect(obstruktionProzent({ ...START, obstruktion: 0.5 })).toBe(50);
+    expect(obstruktionProzent(undefined)).toBeUndefined();
   });
 });

@@ -21,6 +21,7 @@ import {
   geraetegruppen,
   geraetZuEintrag,
   mitBauart,
+  obstruktionProzent,
   okularBrennweiteFuer,
   skaliereHinweise,
   VERGROESSERUNG_FELD,
@@ -97,10 +98,11 @@ export function baueFormularGeraet(platz: HTMLElement, steuerung: Steuerung): vo
     einheit: TEXTE.einheiten.mm,
     min: GRENZEN.oeffnungMm.min,
     max: GRENZEN.oeffnungMm.max,
-    schritt: 1,
+    schritt: GRENZEN.oeffnungMm.schritt,
     stellen: 0,
     wert: fernrohr()?.oeffnungMm ?? 0,
-    beiAenderung: (wert) => aendereFernrohr((f) => ({ ...f, oeffnungMm: wert }))
+    beiAenderung: (wert) => aendereFernrohr((f) => ({ ...f, oeffnungMm: wert })),
+    verwendet: () => fernrohr()?.oeffnungMm
   });
   const brennweite = zahlenfeld(d, {
     id: "geraet-brennweite",
@@ -110,10 +112,11 @@ export function baueFormularGeraet(platz: HTMLElement, steuerung: Steuerung): vo
     einheit: TEXTE.einheiten.mm,
     min: GRENZEN.brennweiteMm.min,
     max: GRENZEN.brennweiteMm.max,
-    schritt: 1,
+    schritt: GRENZEN.brennweiteMm.schritt,
     stellen: 0,
     wert: fernrohr()?.brennweiteMm ?? 0,
-    beiAenderung: (wert) => aendereFernrohr((f) => ({ ...f, brennweiteMm: wert }))
+    beiAenderung: (wert) => aendereFernrohr((f) => ({ ...f, brennweiteMm: wert })),
+    verwendet: () => fernrohr()?.brennweiteMm
   });
   const bauart = auswahl(d, {
     id: "geraet-bauart",
@@ -134,10 +137,11 @@ export function baueFormularGeraet(platz: HTMLElement, steuerung: Steuerung): vo
     einheit: T.prozent,
     min: GRENZEN.obstruktion.min * 100,
     max: GRENZEN.obstruktion.max * 100,
-    schritt: 1,
+    schritt: GRENZEN.obstruktion.schritt * 100,
     stellen: 1,
     wert: (fernrohr()?.obstruktion ?? 0) * 100,
-    beiAenderung: (prozent) => skaliereHinweise(aendereFernrohr((f) => ({ ...f, obstruktion: prozent / 100 })), GRENZEN.obstruktion.feld, 100)
+    beiAenderung: (prozent) => skaliereHinweise(aendereFernrohr((f) => ({ ...f, obstruktion: prozent / 100 })), GRENZEN.obstruktion.feld, 100),
+    verwendet: () => obstruktionProzent(fernrohr())
   });
   frei.append(oeffnung.element, brennweite.element, bauart.element, obstruktion.element);
 
@@ -154,10 +158,13 @@ export function baueFormularGeraet(platz: HTMLElement, steuerung: Steuerung): vo
     einheit: TEXTE.einheiten.mm,
     min: GRENZEN.okularBrennweiteMm.min,
     max: GRENZEN.okularBrennweiteMm.max,
+    // Der Regler zieht in halben Millimetern (Okulare gibt es nicht feiner); eingegeben und
+    // gerechnet wird auf GRENZEN.okularBrennweiteMm.schritt (0,01 mm, Vergroesserung als Eingabe, A-F7).
     schritt: 0.5,
     stellen: 1,
     wert: okular.brennweiteMm,
-    beiAenderung: (wert) => aendereFernrohr((f) => ({ ...f, okular: { ...f.okular, brennweiteMm: wert } }))
+    beiAenderung: (wert) => aendereFernrohr((f) => ({ ...f, okular: { ...f.okular, brennweiteMm: wert } })),
+    verwendet: () => fernrohr()?.okular.brennweiteMm
   });
   const gesichtsfeld = zahlenfeld(d, {
     id: "geraet-okular-gesichtsfeld",
@@ -167,10 +174,11 @@ export function baueFormularGeraet(platz: HTMLElement, steuerung: Steuerung): vo
     einheit: TEXTE.einheiten.grad,
     min: GRENZEN.scheinbaresGesichtsfeldGrad.min,
     max: GRENZEN.scheinbaresGesichtsfeldGrad.max,
-    schritt: 1,
+    schritt: GRENZEN.scheinbaresGesichtsfeldGrad.schritt,
     stellen: 0,
     wert: okular.scheinbaresGesichtsfeldGrad,
-    beiAenderung: (wert) => aendereFernrohr((f) => ({ ...f, okular: { ...f.okular, scheinbaresGesichtsfeldGrad: wert } }))
+    beiAenderung: (wert) => aendereFernrohr((f) => ({ ...f, okular: { ...f.okular, scheinbaresGesichtsfeldGrad: wert } })),
+    verwendet: () => fernrohr()?.okular.scheinbaresGesichtsfeldGrad
   });
   const presets = d.createElement("div");
   presets.className = "geraet-presets";
@@ -209,6 +217,10 @@ export function baueFormularGeraet(platz: HTMLElement, steuerung: Steuerung): vo
       if (f === undefined) return [];
       const hinweise = aendereGeraet({ ...f, okular: { ...f.okular, brennweiteMm: okularBrennweiteFuer(f.brennweiteMm, v) } });
       return vergroesserungsHinweis(hinweise, f.brennweiteMm, v);
+    },
+    verwendet: () => {
+      const f = fernrohr();
+      return f === undefined ? undefined : optik(f).vergroesserung;
     }
   });
   okularTeil.append(legende, okularBrennweite.element, gesichtsfeld.element, vergroesserung.element);

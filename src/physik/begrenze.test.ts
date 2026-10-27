@@ -43,7 +43,15 @@ describe("begrenze (A-F8)", () => {
     ["Seeing 0,44 wird gerundet 0,4 und geschnitten 0,5", mitBedingungen({ seeingFwhmArcsec: 0.44 }), "bedingungen.seeingFwhmArcsec", 0.44, 0.5],
     ["Hoehe 5 wird 10", mitBedingungen({ hoeheGrad: 5 }), "bedingungen.hoeheGrad", 5, 10],
     ["Hoehe 95 wird 90", mitBedingungen({ hoeheGrad: 95 }), "bedingungen.hoeheGrad", 95, 90],
-    ["Hoehe 7 wird gerundet 5 und geschnitten 10", mitBedingungen({ hoeheGrad: 7 }), "bedingungen.hoeheGrad", 7, 10]
+    ["Hoehe 7 wird gerundet 5 und geschnitten 10", mitBedingungen({ hoeheGrad: 7 }), "bedingungen.hoeheGrad", 7, 10],
+    // Schnitt an der rohen Eingabe: auch wenn das Runden schon in den Bereich fuehrt.
+    ["Hoehe 7,5 wird 10", mitBedingungen({ hoeheGrad: 7.5 }), "bedingungen.hoeheGrad", 7.5, 10],
+    ["Hoehe 92 wird 90", mitBedingungen({ hoeheGrad: 92 }), "bedingungen.hoeheGrad", 92, 90],
+    ["Seeing 0,45 wird 0,5", mitBedingungen({ seeingFwhmArcsec: 0.45 }), "bedingungen.seeingFwhmArcsec", 0.45, 0.5],
+    ["Bortle 9,4 wird 9", mitBedingungen({ bortle: 9.4 }), "bedingungen.bortle", 9.4, 9],
+    ["Oeffnung 300,4 wird 300", mitFernrohr({ oeffnungMm: 300.4 }), "geraet.oeffnungMm", 300.4, 300],
+    ["Bortle 0,5 wird 1", mitBedingungen({ bortle: 0.5 }), "bedingungen.bortle", 0.5, 1],
+    ["Obstruktion 0,5004 wird 0,5", mitFernrohr({ obstruktion: 0.5004 }), "geraet.obstruktion", 0.5004, 0.5]
   ])("%s mit genau einem Hinweis", (_name, eingabe, feld, vorher, nachher) => {
     const { konfiguration, hinweise } = begrenze(eingabe);
     expect(hinweise).toEqual([{ feld, eingabe: vorher, wert: nachher }]);
@@ -51,8 +59,8 @@ describe("begrenze (A-F8)", () => {
     expect(() => atmosphaere(konfiguration.bedingungen)).not.toThrow();
   });
 
-  it("Fernglas: Vergroesserung 0,4 wird 1, Oeffnung 400 wird 300, Gesichtsfeld 0 wird 1 Grad", () => {
-    const { konfiguration, hinweise } = begrenze({ ...START, geraet: { ...FERNGLAS, vergroesserung: 0.4, oeffnungMm: 400, wahresGesichtsfeldGrad: 0 } });
+  it("Fernglas: Vergroesserung 0,5 wird 1, Oeffnung 400 wird 300, Gesichtsfeld 0 wird 1 Grad", () => {
+    const { konfiguration, hinweise } = begrenze({ ...START, geraet: { ...FERNGLAS, vergroesserung: 0.5, oeffnungMm: 400, wahresGesichtsfeldGrad: 0 } });
     expect(konfiguration.geraet).toEqual({ ...FERNGLAS, vergroesserung: 1, oeffnungMm: 300, wahresGesichtsfeldGrad: 1 });
     expect(hinweise.map((h) => h.feld)).toEqual(["geraet.oeffnungMm", "geraet.vergroesserung", "geraet.wahresGesichtsfeldGrad"]);
   });
@@ -119,13 +127,13 @@ describe("begrenze rundet auf den Schritt ohne Hinweis (A-F8, A-B1, A-B2, A-B4)"
   it.each([
     ["Seeing 2,3000000000000003 wird genau 2,3", mitBedingungen({ seeingFwhmArcsec: 2.3000000000000003 }), (k: Konfiguration) => k.bedingungen.seeingFwhmArcsec, 2.3],
     ["Seeing 1,15 wird 1,2", mitBedingungen({ seeingFwhmArcsec: 1.15 }), (k: Konfiguration) => k.bedingungen.seeingFwhmArcsec, 1.2],
-    ["Seeing 5,04 wird 5", mitBedingungen({ seeingFwhmArcsec: 5.04 }), (k: Konfiguration) => k.bedingungen.seeingFwhmArcsec, 5],
+    ["Seeing 4,96 wird 5", mitBedingungen({ seeingFwhmArcsec: 4.96 }), (k: Konfiguration) => k.bedingungen.seeingFwhmArcsec, 5],
+    ["Hoehe 87,5 wird 90", mitBedingungen({ hoeheGrad: 87.5 }), (k: Konfiguration) => k.bedingungen.hoeheGrad, 90],
     ["Bortle 5,4 wird 5", mitBedingungen({ bortle: 5.4 }), (k: Konfiguration) => k.bedingungen.bortle, 5],
-    ["Bortle 9,4 wird 9", mitBedingungen({ bortle: 9.4 }), (k: Konfiguration) => k.bedingungen.bortle, 9],
+    ["Bortle 8,6 wird 9", mitBedingungen({ bortle: 8.6 }), (k: Konfiguration) => k.bedingungen.bortle, 9],
     ["Hoehe 47,5 wird 50", mitBedingungen({ hoeheGrad: 47.5 }), (k: Konfiguration) => k.bedingungen.hoeheGrad, 50],
-    ["Hoehe 92 wird 90", mitBedingungen({ hoeheGrad: 92 }), (k: Konfiguration) => k.bedingungen.hoeheGrad, 90],
     ["Hoehe 33,3 wird 35", mitBedingungen({ hoeheGrad: 33.333333333333336 }), (k: Konfiguration) => k.bedingungen.hoeheGrad, 35],
-    ["Oeffnung 300,4 wird 300", mitFernrohr({ oeffnungMm: 300.4 }), (k: Konfiguration) => (k.geraet as Fernrohr).oeffnungMm, 300],
+    ["Oeffnung 299,6 wird 300", mitFernrohr({ oeffnungMm: 299.6 }), (k: Konfiguration) => (k.geraet as Fernrohr).oeffnungMm, 300],
     ["Brennweite 987,6 wird 988", mitFernrohr({ brennweiteMm: 987.6 }), (k: Konfiguration) => (k.geraet as Fernrohr).brennweiteMm, 988],
     ["Obstruktion 0,2714 wird 0,271", mitFernrohr({ obstruktion: 0.2714 }), (k: Konfiguration) => (k.geraet as Fernrohr).obstruktion, 0.271],
     ["Okular 16,216 mm wird 16,22", mitFernrohr({}, { brennweiteMm: 600 / 37 }), (k: Konfiguration) => (k.geraet as Fernrohr).okular.brennweiteMm, 16.22],
@@ -142,7 +150,7 @@ describe("begrenze rundet auf den Schritt ohne Hinweis (A-F8, A-B1, A-B2, A-B4)"
     expect(konfiguration.geraet).toEqual(FERNGLAS);
   });
 
-  it("min und max jedes Felds liegen auf seinem Raster", () => {
+  it("min und max jedes Felds sind Vielfache seines Schritts", () => {
     for (const g of Object.values(GRENZEN)) {
       expect(aufSchritt(g.min, g.schritt), g.feld).toBe(g.min);
       expect(aufSchritt(g.max, g.schritt), g.feld).toBe(g.max);
@@ -151,7 +159,7 @@ describe("begrenze rundet auf den Schritt ohne Hinweis (A-F8, A-B1, A-B2, A-B4)"
 });
 
 describe("aufSchritt", () => {
-  it("rundet ohne Gleitkommareste auf das Raster", () => {
+  it("rundet ohne Gleitkommareste auf den Schritt", () => {
     expect(aufSchritt(1.25, 0.1)).toBe(1.3);
     expect(aufSchritt(0.55, 0.1)).toBe(0.6);
     expect(aufSchritt(1.15, 0.1)).toBe(1.2);

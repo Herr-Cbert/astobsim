@@ -1,7 +1,8 @@
 import { describe, expect, it } from "vitest";
-import { BEDINGUNGEN_A_D9 } from "../physik/testdaten";
-import type { Konfiguration } from "../physik";
+import { BEDINGUNGEN_A_D9, KONFIGURATION_A_D9 } from "../physik/testdaten";
+import { begrenze, type Konfiguration } from "../physik";
 import { TEXTE } from "../texte";
+import { zahl } from "./format";
 import { bortleanzeige, istTransparenz, luftmasseanzeige, mitBedingungen, seeinganzeige } from "./formular_bedingungen";
 
 describe("seeinganzeige", () => {
@@ -50,5 +51,15 @@ describe("istTransparenz", () => {
   it("kennt genau die drei Stufen", () => {
     for (const t of ["klar", "leicht-diesig", "diesig"]) expect(istTransparenz(t)).toBe(true);
     expect(istTransparenz("neblig")).toBe(false);
+  });
+});
+
+describe("Seeingfeld zeigt den verwendeten Wert", () => {
+  it("1,15 wird 1,2 (toFixed allein zeigte 1,1)", () => {
+    for (const [eingabe, anzeige] of [[1.15, "1,2"], [0.85, "0,9"], [0.95, "1,0"], [1.45, "1,5"], [1.65, "1,7"]] as const) {
+      const k = begrenze(mitBedingungen(KONFIGURATION_A_D9, { seeingFwhmArcsec: eingabe })).konfiguration;
+      expect(zahl(k.bedingungen.seeingFwhmArcsec, 1), String(eingabe)).toBe(anzeige);
+    }
+    expect(zahl(1.15, 1)).toBe("1,1");
   });
 });

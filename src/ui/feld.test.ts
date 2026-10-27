@@ -28,13 +28,13 @@ describe("hinweisFuer", () => {
 });
 
 describe("angezeigterWert", () => {
-  it("zeigt bei einem Schnitt den Wert aus dem Hinweis", () => {
-    expect(angezeigterWert(95, { feld: "bedingungen.hoeheGrad", eingabe: 95, wert: 90 }, 5)).toBe(90);
+  it("zeigt den verwendeten Wert, wenn das Feld ihn kennt", () => {
+    expect(angezeigterWert(47, undefined, 45)).toBe(45);
+    expect(angezeigterWert(95, { feld: "bedingungen.hoeheGrad", eingabe: 95, wert: 90 }, 90)).toBe(90);
   });
 
-  it("zeigt sonst die Eingabe, auf das Raster gerundet, wenn das Feld es kennt", () => {
-    expect(angezeigterWert(47, undefined, 5)).toBe(45);
-    expect(angezeigterWert(48, undefined, 5)).toBe(50);
+  it("zeigt sonst den Wert aus dem Hinweis oder die Eingabe", () => {
+    expect(angezeigterWert(95, { feld: "bedingungen.hoeheGrad", eingabe: 95, wert: 90 })).toBe(90);
     expect(angezeigterWert(16.216, undefined)).toBe(16.216);
   });
 });

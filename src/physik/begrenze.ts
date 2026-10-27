@@ -1,7 +1,7 @@
-// Begrenzung freier Eingaben (A-F8, A-B1, A-B2, A-B4): auf das Raster des Felds runden, dann
-// schneiden statt ablehnen, je Schnitt ein Hinweis; das Runden allein meldet nichts. Die einzige
-// Stelle, die Nutzereingaben in eine gueltige Konfiguration bringt; wirft nie, auch nicht bei NaN.
-// Danach werfen optik() und atmosphaere() nicht mehr.
+// Begrenzung freier Eingaben (A-F8, A-B1, A-B2, A-B4): auf den Schritt des Felds runden, dann
+// schneiden statt ablehnen, je Eingabe ausserhalb des Bereichs ein Hinweis; Runden meldet nichts.
+// Die einzige Stelle, die Nutzereingaben in eine gueltige Konfiguration bringt; wirft nie, auch
+// nicht bei NaN. Danach werfen optik() und atmosphaere() nicht mehr.
 //
 // Zur Invariante "optik() ist die einzige Stelle, die ueber Geraet.art verzweigt": begrenze()
 // muss die Felder je Geraeteart kennen, um sie zu schneiden; es rechnet aber nichts aus der Art
@@ -23,8 +23,9 @@ export interface Grenze {
   min: number;
   max: number;
   /**
-   * Raster der Eingabe: begrenze rundet darauf, bevor es schneidet. min und max liegen auf dem
-   * Raster. Ein Schritt mit Nachkommastellen ist eine Zehnerpotenz mal einer ganzen Zahl (0,1; 0,001).
+   * Schritt der Eingabe: begrenze rundet darauf, bevor es schneidet. min und max sind Vielfache
+   * des Schritts. Ein Schritt mit Nachkommastellen ist eine Zehnerpotenz mal einer ganzen Zahl
+   * (0,1; 0,001).
    */
   schritt: number;
 }
@@ -33,7 +34,7 @@ export interface Grenze {
  * Bereiche nach A-F8 (Geraet und Okular), A-B1 (Seeing), A-B2 (Bortle), A-B4 (Hoehe), Schritte
  * nach dem, was die Formularfelder anzeigen: Seeing 0,1, Bortle 1, Hoehe 5 Grad, Obstruktion
  * 0,1 Prozent. Die Okularbrennweite hat 0,01 mm, weil die Vergroesserung als Eingabe (A-F7) sie
- * auf 0,01 mm genau berechnet; ein groeberes Raster veraenderte die eingegebene Vergroesserung.
+ * auf 0,01 mm genau berechnet; ein groeberer Schritt veraenderte die eingegebene Vergroesserung.
  * Vergroesserung und wahres Gesichtsfeld gelten nur fuer das Fernglas: Die Werte kommen aus der
  * Geraeteliste (A-F4) oder aus einem Link; die Obergrenzen 1000 und 30 Grad schuetzen vor
  * unsinnigen Links (wie pruefeGeraete fuer die Liste). Die Vergroesserung eines Fernrohrs ist
@@ -53,7 +54,7 @@ export const GRENZEN = {
 } as const satisfies Record<string, Grenze>;
 
 /**
- * wert auf das Raster schritt gerundet (halbe Schritte nach oben), ohne Gleitkommareste: Das
+ * wert auf ein Vielfaches von schritt gerundet (halbe Schritte nach oben), ohne Gleitkommareste: Das
  * Ergebnis ist genau die Zahl, die das Feld anzeigt (1,3 statt 1,3000000000000003). Gerechnet wird
  * in ganzen Vielfachen der kleinsten Stelle; mal 10 ist genauer als durch 0,1 (1,15 wird 1,2).
  * NaN und Unendlich bleiben, wie sie sind.
@@ -74,21 +75,19 @@ function nachkommastellen(schritt: number): number {
 
 /**
  * Liefert eine begrenzte Kopie der Konfiguration und je Schnitt einen Hinweis; ohne Schnitt ist
- * die Liste leer. Jeder Wert wird zuerst auf den Schritt seines Felds gerundet, das allein meldet
- * nichts; nur ein Schnitt an min oder max meldet die Eingabe (ungerundet) und den neuen Wert. NaN
- * wird auf die Untergrenze gesetzt und ebenfalls gemeldet. Das Objekt kommt aus den Daten, nicht
+ * die Liste leer. Jeder Wert wird auf den Schritt seines Felds gerundet und in [min, max]
+ * gehalten. Gemeldet wird eine Eingabe, die vor dem Runden ausserhalb [min, max] liegt (mit der
+ * ungerundeten Eingabe und dem neuen Wert); Runden innerhalb des Bereichs meldet nichts. NaN wird
+ * auf die Untergrenze gesetzt und ebenfalls gemeldet. Das Objekt kommt aus den Daten, nicht
  * vom Nutzer, und wird unveraendert uebernommen.
  */
 export function begrenze(konfiguration: Konfiguration): { konfiguration: Konfiguration; hinweise: Hinweis[] } {
   const hinweise: Hinweis[] = [];
   const schneide = (wert: number, grenze: Grenze): number => {
-    const gerundet = aufSchritt(wert, grenze.schritt);
-    if (Number.isNaN(gerundet)) {
-      hinweise.push({ feld: grenze.feld, eingabe: wert, wert: grenze.min });
-      return grenze.min;
-    }
-    const neu = Math.min(grenze.max, Math.max(grenze.min, gerundet));
-    if (neu !== gerundet) hinweise.push({ feld: grenze.feld, eingabe: wert, wert: neu });
+    // Ob geschnitten wird, entscheidet die rohe Eingabe: 7,5 Grad liegt unter 10, auch wenn es
+    // auf 10 rundet. min und max sind Vielfache des Schritts, eine Eingabe im Bereich rundet also in ihn.
+    const neu = Number.isNaN(wert) ? grenze.min : Math.min(grenze.max, Math.max(grenze.min, aufSchritt(wert, grenze.schritt)));
+    if (Number.isNaN(wert) || wert < grenze.min || wert > grenze.max) hinweise.push({ feld: grenze.feld, eingabe: wert, wert: neu });
     return neu;
   };
 

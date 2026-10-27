@@ -99,7 +99,8 @@ export function baueFormularBedingungen(platz: HTMLElement, steuerung: Steuerung
     schritt: g.seeingFwhmArcsec.schritt,
     stellen: STELLEN.seeing,
     wert: start.seeingFwhmArcsec,
-    beiAenderung: (wert) => aendere({ seeingFwhmArcsec: wert })
+    beiAenderung: (wert) => aendere({ seeingFwhmArcsec: wert }),
+    verwendet: () => steuerung.konfiguration.bedingungen.seeingFwhmArcsec
   });
   const seeingStufe = anzeigezeile(d, seeing, "bedingungen-seeing-stufe");
 
@@ -113,7 +114,8 @@ export function baueFormularBedingungen(platz: HTMLElement, steuerung: Steuerung
     schritt: g.bortle.schritt,
     stellen: STELLEN.bortle,
     wert: start.bortle,
-    beiAenderung: (wert) => aendere({ bortle: wert })
+    beiAenderung: (wert) => aendere({ bortle: wert }),
+    verwendet: () => steuerung.konfiguration.bedingungen.bortle
   });
   const bortleStufe = anzeigezeile(d, bortle, "bedingungen-bortle-stufe");
 
@@ -138,9 +140,9 @@ export function baueFormularBedingungen(platz: HTMLElement, steuerung: Steuerung
     max: g.hoeheGrad.max,
     schritt: g.hoeheGrad.schritt,
     stellen: STELLEN.hoehe,
-    raster: g.hoeheGrad.schritt,
     wert: start.hoeheGrad,
-    beiAenderung: (wert) => aendere({ hoeheGrad: wert })
+    beiAenderung: (wert) => aendere({ hoeheGrad: wert }),
+    verwendet: () => steuerung.konfiguration.bedingungen.hoeheGrad
   });
   const hoeheLuftmasse = anzeigezeile(d, hoehe, "bedingungen-hoehe-luftmasse");
 
