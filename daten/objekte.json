@@ -117,7 +117,7 @@
           }
         ],
         "hinweis_hilfe": "Jupiter steht bei 35 Bogensekunden fern der Opposition, etwa vier Monate davor oder danach; so zeigt er sich den groessten Teil des Jahres.",
-        "kommentar": "Werte aus objekte.md 6.1, Phasenwinkel 10 Grad aus 5.1 (Phaseneffekt vernachlaessigbar). Trabanten aus 3.3: Stellung von jup_47 linear mit 35/47 skaliert (Abstaende und Durchmesser), Magnituden +0,6 mag Entfernungskorrektur (3.1). Kein eigenes Bild: nutzt das Bild von jup_47 (Hubble 2019, 45,65\", bilder.json); die Anwendung skaliert die Scheibe auf 35\". weiss_mag_arcsec2 5,4 aus 5.2."
+        "kommentar": "Werte aus objekte.md 6.1, Phasenwinkel 10 Grad aus 5.1 (Phaseneffekt vernachlaessigbar). Trabanten aus 3.3: Stellung von jup_47 linear mit 35/47 skaliert, Durchmesser aus objekte.md 3.2, Magnituden +0,6 mag Entfernungskorrektur (3.1). Kein eigenes Bild: nutzt das Bild von jup_47 (Hubble 2019, 45,65\", bilder.json); die Anwendung skaliert die Scheibe auf 35\". weiss_mag_arcsec2 5,4 aus 5.2."
       },
       {
         "id": "jup_47",

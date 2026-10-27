@@ -10,12 +10,12 @@
   "roh_bytes": 6170714,
   "roh_abruf": "2026-10-27",
   "original_pixel": "3050x3050",
-  "drehung_grad": -49.3,
+  "drehung_grad": -41.7,
   "roh_mitte_px": [
-    2108.6,
-    2165.2
+    2121.8,
+    2175.7
   ],
-  "roh_durchmesser_px": 2229.2,
+  "roh_durchmesser_px": 2210.4,
   "ziel_durchmesser_px": 1200,
   "leinwand_px": 1264,
   "qualitaet": 95,
@@ -34,7 +34,7 @@
   "sub_erde_breite_grad": -3.1,
   "phase": 0.999,
   "positionswinkel_achse_grad": 5.0,
-  "orientierung": "Norden oben heisst hier Planetennorden oben (Rotationsachse senkrecht, ADR-0003). Die Pressefassung ist gedreht: eine Ellipse, an den Rand angepasst (Halbwertskante, 360 Randpunkte), hat das Achsenverhaeltnis 0,936 (Abplattung 0,065) und ihre grosse Achse (Aequator) 49,3 Grad gegen den Uhrzeigersinn ueber der Waagerechten; daher um 49,3 Grad im Uhrzeigersinn gedreht. Danach liegen die Baender und die Reihe weisser Ovale suedlich des GRF waagerecht, gemessenes Achsenverhaeltnis 0,940 (erwartet 0,935 bei Sub-Erde-Breite -3 Grad). Norden oben: der Grosse Rote Fleck liegt in der Suedhaelfte. Nicht gespiegelt: die turbulente Nachlaufregion nordwestlich des GRF liegt links von ihm, und bei Planetennorden oben liegt der planetare Westen links (Ansicht von aussen, Rotation nach rechts). Positionswinkel der Nordpolachse am Himmel 5,0 Grad: Himmelsnorden liegt im Bild 5,0 Grad im Uhrzeigersinn von oben.",
+  "orientierung": "Norden oben heisst hier Planetennorden oben (Rotationsachse senkrecht, also Baender waagerecht, ADR-0003). Die Pressefassung ist gedreht; der Winkel ist ueber die Baender bestimmt: nach Drehung um den Winkel w werden die Helligkeitsprofile zweier Spalten symmetrisch zur Mitte (Abstand 100 bis 280 px bei halber Aufloesung) gegeneinander verschoben und korreliert; die Verschiebung mit der hoechsten Korrelation ergibt die Restneigung. Sie ist bei 41,7 Grad im Uhrzeigersinn null (Mittel +0,06 Grad, Einzelwerte -1,0 bis +0,7 Grad; bei 49,3 Grad noch +5,9 Grad). Daher um 41,7 Grad im Uhrzeigersinn gedreht. Die Randellipse allein bestimmt den Winkel nur auf einige Grad (Abplattung 0,065, ihre grosse Achse laege bei 49 Grad); nach der Drehung ist das gemessene Verhaeltnis polar zu aequatorial 0,949 (erwartet 0,935). Norden oben: der Grosse Rote Fleck liegt in der Suedhaelfte. Nicht gespiegelt: die turbulente Nachlaufregion nordwestlich des GRF liegt links von ihm, und bei Planetennorden oben liegt der planetare Westen links (Ansicht von aussen, Rotation nach rechts). Positionswinkel der Nordpolachse am Himmel 5,0 Grad: Himmelsnorden liegt im Bild 5,0 Grad im Uhrzeigersinn von oben.",
   "hinweise": "Lizenz-Lesart (docs/recherche/bilder.md 6.3): Datei von esahubble.org unter CC BY 4.0 (https://esahubble.org/copyright/, Credit-Zeile unveraendert zu nennen, Aenderungsvermerk dahinter nach bilder.md Abschnitt 9, Schritt 8); NASA veroeffentlicht dasselbe Bild in derselben Drehung mit derselben Credit-Zeile auf https://science.nasa.gov/asset/hubble/jupiter-2019/ nur mit halber Aufloesung (TIFF 1525x1525, https://assets.science.nasa.gov/content/dam/science/missions/hubble/releases/2019/08/STScI-01EVSV9JYWYARC4A8336KMKNTQ.tif, SHA-256 8dce3952fc5eacc919f1ef031f212f15d7ed28a44f094899ab1d19827f70fae2), gemeinfrei nach den NASA Media Usage Guidelines; beide Angaben gefuehrt. Wird auch fuer den Zustand jup_35 verwendet (kein eigenes Bild). Aufnahmezeit am 27.06.2019 nicht angegeben; Geometrie aus JPL Horizons fuer 12:00 UT (Aenderung ueber den Tag unter 0,05\"): Durchmesser aequatorial 45,65\", Sub-Erde-Breite -3,12 Grad (planetodetisch), Positionswinkel der Nordpolachse 5,02 Grad, Phasenwinkel 3,4 Grad (phase 0,999). OPAL-Programm, Filter laut Bildseite 395, 502 und 631 nm.",
   "entfernt": "nur Randdunst ausserhalb der Scheibe; Monde, Beschriftungen oder Massstabsbalken enthaelt das Quellbild nicht (geprueft: ausserhalb der Scheibe hoechstens Helligkeit 36 von 255, nur am Rand)"
 }
