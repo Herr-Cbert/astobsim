@@ -96,10 +96,13 @@ export interface Kernbeschreibung {
 }
 
 /**
- * Stufe 3: Tonwert, nur Multiplikation und Addition.
- * faktorObjekt in (0, 1]: Transmission mal (1 - Obstruktion^2) mal Extinktion mal
- * min(1, (Austrittspupille / Augenpupille)^2). hintergrundRelativ ist der Grauton des
- * Gesichtsfelds relativ zu Quellweiss; hintergrundMagProArcsec2 dient nur Anzeige und Hilfetext.
+ * Stufe 3: Tonwert, nur Multiplikation und Addition. Beide Faktoren sind lineare Anzeigewerte
+ * (1 = Bildschirmweiss vor der sRGB-Kodierung), nicht die physikalische Daempfung (Issue #55,
+ * docs/recherche/physik.md Abschnitt 12): faktorObjekt in (0, 1] ist der Anzeigewert von
+ * Quellweiss aus der Flaechenhelligkeit im Okular (Transmission, Abschattung, Extinktion,
+ * Austrittspupille), hintergrundRelativ der Anzeigewert des Himmels im Okular (Grauton des
+ * Gesichtsfelds). Das Quellbild bleibt linear: Pixel mal faktorObjekt plus hintergrundRelativ.
+ * hintergrundMagProArcsec2 ist physikalisch und dient nur Anzeige und Hilfetext.
  */
 export interface Helligkeit {
   schluessel: string;

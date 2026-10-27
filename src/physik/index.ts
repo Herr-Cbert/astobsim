@@ -51,7 +51,7 @@ export {
 export { type Optik, austrittspupilleMm, flaechenhelligkeitsfaktor, optik, vergroesserungsgrenzen } from "./optik";
 export { airyProfil, gaussProfil, moffatProfil, quadratur } from "./profile";
 export { type Aufloesung, type Aufloesungsgrenze, aufloesung } from "./aufloesung";
-export { bortleMagProArcsec2, helligkeit } from "./helligkeit";
+export { anzeigefaktor, bortleMagProArcsec2, helligkeit, type Okularhelligkeit, okularhelligkeit } from "./helligkeit";
 export { arbeitsmassstab, kernSchluessel, kernbeschreibung } from "./arbeitsmassstab";
 export { GRENZEN, type Grenze, type Hinweis, begrenze } from "./begrenze";
 export { baueKern, kernFwhmArcsec, kontrastUebertragung } from "./kern";
