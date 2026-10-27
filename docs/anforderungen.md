@@ -1,6 +1,6 @@
 # Anforderungen astobsim
 
-Ergebnis von Phase 1 (Interview am 2026-10-23). Dieses Dokument ist der einzige Input fuer Phase 2 (Recherche) und die Referenz fuer alle Issues. Am 2026-10-23 nach Phase 2 angepasst (A-F2, A-F4, A-P6, A-D9, A-X1, A-X9) und nach Phase 3 (A-X5), Begruendung in `docs/recherche/README.md`. Jede Anforderung hat eine Kennung, eine Stufe und einen pruefbaren Satz.
+Ergebnis von Phase 1 (Interview am 2026-10-23). Dieses Dokument ist der einzige Input fuer Phase 2 (Recherche) und die Referenz fuer alle Issues. Am 2026-10-23 nach Phase 2 angepasst (A-F2, A-F4, A-P6, A-D9, A-X1, A-X9) und nach Phase 3 (A-X5), Begruendung in `docs/recherche/README.md`; am 2026-10-27 A-P6 praezisiert (scheinbarer Abstand, Issue #14, ADR-0002 Nachtrag). Jede Anforderung hat eine Kennung, eine Stufe und einen pruefbaren Satz.
 
 Stufen: **Muss** (Version 1 ist ohne sie nicht fertig), **Kann** (nach Version 1, wird als Issue angelegt, nicht umgesetzt), **Nicht-Ziel** (bewusst ausgeschlossen).
 
@@ -57,7 +57,7 @@ Kennungen: A-Z Zweck, A-F Fernrohr und Geraete, A-B Bedingungen, A-P Physik und 
 | A-P3 | Muss | Die Kontrastuebertragung beruecksichtigt die Obstruktion (Absenkung mittlerer Ortsfrequenzen). |
 | A-P4 | Muss | Die Bildhelligkeit skaliert mit der Austrittspupille relativ zur festen Augenpupille von 6 mm und mit der Extinktion aus Transparenz und Hoehe. Nach oben ist sie begrenzt; Blendung wird nicht simuliert. |
 | A-P5 | Muss | Der Nutzer sieht den typischen Anblick (Langzeitmittel), nicht den besten Moment. |
-| A-P6 | Muss | Punktquellen (Monde) werden ueber ein eigenes Modell dargestellt: Airy-Scheibchen plus Seeing-PSF, Helligkeit aus der Magnitude, bei grossen Oeffnungen als kleine Scheibchen mit ihrem Winkeldurchmesser. Da Blendung nicht simuliert wird (A-P9), gilt eine Blendungsregel: eine Punktquelle wird nicht gezeigt, wenn sie weniger als 10 Bogenminuten von einem Objekt entfernt steht, das mehr als 6 Magnituden heller ist (Jupitermonde mit blossem Auge). |
+| A-P6 | Muss | Punktquellen (Monde) werden ueber ein eigenes Modell dargestellt: Airy-Scheibchen plus Seeing-PSF, Helligkeit aus der Magnitude, bei grossen Oeffnungen als kleine Scheibchen mit ihrem Winkeldurchmesser. Da Blendung nicht simuliert wird (A-P9), gilt eine Blendungsregel: eine Punktquelle wird nicht gezeigt, wenn sie scheinbar (Abstand am Himmel mal Vergroesserung) weniger als 10 Bogenminuten von einem Objekt entfernt steht, das mehr als 6 Magnituden heller ist (Jupitermonde mit blossem Auge). Nachtrag 2026-10-27 (Issue #14): "scheinbar" ergaenzt, Begruendung in ADR-0002. |
 | A-P7 | Muss | Die Physik ist als reine, einzeln testbare Funktionen implementiert (siehe A-Q1). |
 | A-P8 | Kann | Farbsaettigung nimmt bei dunklem Bild ab (Purkinje-Effekt). |
 | A-P9 | Nicht-Ziel | Alter des Beobachters, variable Augenpupille, Blendung, Dunkeladaption, beidaeugiges Sehen. |

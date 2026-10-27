@@ -1,6 +1,6 @@
 // Einstieg des Moduls physik (docs/architektur.md Abschnitt 3). Stufe 0: Einzelformeln,
 // jede einzeln getestet gegen docs/recherche/physik.md Abschnitt 8 (A-Q1). Stufe 1:
-// Konfiguration zu Zwischengroessen (optik, atmosphaere, aufloesung, helligkeit,
+// Konfiguration zu Zwischengroessen (optik, atmosphaere, aufloesung, helligkeit, punktquellen,
 // arbeitsmassstab, kernbeschreibung) und begrenze. Stufe 2: baueKern mit den Testhelfern
 // kontrastUebertragung und kernFwhmArcsec (Issue #4). Stufe 3: auswerten mit Anzeigewerten,
 // Warnungen und Wiederverwendung des Kerns (Issue #5). ui und bild importieren nur von hier.
@@ -13,6 +13,8 @@ export {
   AUGE_GESICHTSFELD_GRAD,
   AUSTRITTSPUPILLE_MIN_MM,
   BETA_MOFFAT,
+  BLENDUNG_ABSTAND_SCHEINBAR_ARCSEC,
+  BLENDUNG_DELTA_MAG,
   BORTLE_MAG_PRO_ARCSEC2,
   EXTINKTION_MAG_PRO_LUFTMASSE,
   KERN_GROESSE_MAX,
@@ -53,6 +55,7 @@ export { airyProfil, gaussProfil, moffatProfil, quadratur } from "./profile";
 export { type Aufloesung, type Aufloesungsgrenze, aufloesung } from "./aufloesung";
 export { anzeigefaktor, bortleMagProArcsec2, helligkeit, type Okularhelligkeit, okularhelligkeit } from "./helligkeit";
 export { arbeitsmassstab, kernSchluessel, kernbeschreibung } from "./arbeitsmassstab";
+export { geblendet, helligkeitRelativ, punktquellen, scheibenFlaechenhelligkeit } from "./punktquellen";
 export { GRENZEN, type Grenze, type Hinweis, aufSchritt, begrenze } from "./begrenze";
 export { baueKern, kernFwhmArcsec, kontrastUebertragung } from "./kern";
 export { type Anzeigewerte, type Auswertoptionen, type Auswertung, type Warnung, auswerten } from "./auswerten";

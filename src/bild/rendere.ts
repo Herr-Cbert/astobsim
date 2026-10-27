@@ -3,9 +3,10 @@
 // maskiert mit gesichtsfeld, gezeichnet in fenster. Zwischenergebnisse der Stufen 1 und 2 werden
 // nach Stufenschluessel wiederverwendet; der Aufrufer haelt dazu einen Zwischenspeicher.
 
-import type { Fenster, Gesichtsfeld, Helligkeit, Quellbild, Simulationsparameter } from "../naht/simulationsparameter";
+import type { Fenster, Gesichtsfeld, Helligkeit, Simulationsparameter } from "../naht/simulationsparameter";
 import type { Falter } from "./falter";
 import { BildFehler, pruefePositivGanz } from "./fehler";
+import { malePunktquellen } from "./male";
 import { mittele, skaliere } from "./mittele";
 import type { Quelle } from "./quelle";
 import { pruefeRaster, type Raster } from "./raster";
@@ -53,15 +54,6 @@ export function pruefeParameter(p: Simulationsparameter): void {
   if (!(helligkeit.faktorObjekt >= 0) || !(helligkeit.hintergrundRelativ >= 0)) {
     throw new BildFehler(`Helligkeit: faktorObjekt ${helligkeit.faktorObjekt} und hintergrundRelativ ${helligkeit.hintergrundRelativ} muessen >= 0 sein`);
   }
-}
-
-/**
- * Trabanten als Scheibchen ins Arbeitsraster malen. Platzhalter: kommt mit #14, bis dahin bleibt
- * das Raster unveraendert. Vorgesehen: fuer jede Punktquelle mit sichtbar true ein Scheibchen
- * mit durchmesserArcsec / massstab Pixeln an (xArcsec, yArcsec), Wert helligkeitRelativ.
- */
-export function malePunktquellen(raster: Raster, _quellbild: Quellbild): Raster {
-  return raster;
 }
 
 /** Stufe 3: Tonwert, nur Multiplikation und Addition. Himmel liegt additiv ueber allem. */

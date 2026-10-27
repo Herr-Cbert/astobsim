@@ -130,3 +130,11 @@ export const FENSTER_MIN_PX = 16;
 
 /** Rundung der Naht-Schluessel und der Kernbeschreibung auf 4 signifikante Stellen (docs/architektur.md Abschnitt 3). */
 export const SIGNIFIKANTE_STELLEN = 4;
+
+/**
+ * Blendungsregel (A-P6, Abschnitt 13): eine Punktquelle wird unterdrueckt, wenn sie scheinbar (V mal
+ * Abstand am Himmel) weniger als 10 Bogenminuten von einem Objekt entfernt steht, das mehr als
+ * 6 Magnituden heller ist. Ersatz fuer die nicht simulierte Blendung (A-P9).
+ */
+export const BLENDUNG_ABSTAND_SCHEINBAR_ARCSEC = 600;
+export const BLENDUNG_DELTA_MAG = 6;
