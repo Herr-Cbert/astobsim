@@ -9,6 +9,7 @@ import { GRENZEN } from "../physik";
 import { PARAMETER, voreinstellung, type Kataloge } from "../zustand";
 import type { Ausschnittsanfrage } from "./fenster";
 import { type Bildquelle, type Stand, Steuerung, type Umgebung } from "./steuerung";
+import { zoombreiteArcsec } from "./zoom";
 
 const nachweise = pruefeBildnachweise(bilderJson);
 const objekte = pruefeObjekte(objekteJson);
@@ -66,7 +67,10 @@ class Testumgebung implements Umgebung {
   schreibeUrl(suche: string): void {
     this.urls.push(suche);
   }
-  anzeigePx(): number {
+  /** Ansicht je Aufruf von anzeigePx (true: Zoom). */
+  readonly anzeigen: boolean[] = [];
+  anzeigePx(zoom: boolean): number {
+    this.anzeigen.push(zoom);
     return ANZEIGE_PX;
   }
   uhr(): number {
@@ -308,5 +312,117 @@ describe("Steuerung", () => {
     await u.frame();
     expect(s.stand.phase).toBe("fehler");
     expect(s.stand.fehler?.art).toBe("rechnen");
+  });
+});
+
+describe("Steuerung, Zoomansicht (A-D3)", () => {
+  it("rechnet im Zoom Anblick und Vergleichsbild im Zoomfenster, ohne URL und ohne die Uebersicht zu ersetzen", async () => {
+    const { u, s } = neu();
+    await u.frame();
+    const uebersicht = s.stand.anblick;
+    s.zoome(true);
+    expect(s.stand.zoom).toBe(true);
+    await u.frame();
+    expect(u.urls).toHaveLength(1);
+    expect(u.anzeigen).toEqual([false, true]);
+    expect(s.stand.phase).toBe("fertig");
+    expect(s.stand.nummer).toBe(2);
+    expect(s.stand.anblick).toBe(uebersicht);
+    const zb = s.stand.zoombilder;
+    expect(zb).toBeDefined();
+    const breite = zoombreiteArcsec(s.konfiguration);
+    expect(s.stand.auswertung?.parameter.fenster).toEqual({ breiteArcsec: breite, mitteXArcsec: 0, mitteYArcsec: 0, px: ANZEIGE_PX });
+    expect(zb?.anblick.fenster).toEqual(zb?.vergleich.fenster);
+    expect(zb?.vergleich.raster.breite).toBe(ANZEIGE_PX);
+    // Testquelle: gleichmaessig 0,5 in Quellweiss; das Vergleichsbild zeigt das unveraendert.
+    const mitte = (ANZEIGE_PX / 2) * ANZEIGE_PX + ANZEIGE_PX / 2;
+    expect(zb?.vergleich.raster.daten[mitte * 3]).toBeCloseTo(0.5, 5);
+    // Zwei Anfragen an die Quelle: Arbeitsraster des Anblicks und das feinere des Vergleichsbilds.
+    expect(u.anfragen.slice(1).map((a) => a.breiteArcsec)).toEqual([breite, breite].map((b) => expect.closeTo(b, 6)));
+    // Bei 64 Anzeigepixeln begrenzt die Anzeige beide Raster gleich; feiner wird es in zoom.test.ts.
+    expect(u.anfragen[2]!.massstabArcsecProPx).toBeLessThanOrEqual(u.anfragen[1]!.massstabArcsecProPx);
+
+    s.zoome(false);
+    await u.frame();
+    expect(s.stand.zoom).toBe(false);
+    expect(s.stand.anblick).not.toBe(uebersicht);
+    expect(s.stand.zoombilder).toBe(zb);
+    expect(u.urls).toHaveLength(1);
+  });
+
+  it("aendert nichts, wenn die Ansicht schon gilt", async () => {
+    const { u, s } = neu();
+    await u.frame();
+    s.zoome(false);
+    expect(u.geplanteFrames).toBe(0);
+  });
+
+  it("verschiebt im Zoom beide Bilder gemeinsam und holt die Mitte beim Wechsel zur Uebersicht zurueck", async () => {
+    // Voreinstellung: Mond 1865" im Feld 3000", in der Uebersicht fest, im Zoom (1500") verschiebbar.
+    const { u, s } = neu();
+    await u.frame();
+    s.zoome(true);
+    s.verschiebe(400, -300);
+    await u.frame();
+    const zb = s.stand.zoombilder;
+    expect(zb?.anblick.fenster).toMatchObject({ mitteXArcsec: 400, mitteYArcsec: -300 });
+    expect(zb?.vergleich.fenster).toMatchObject({ mitteXArcsec: 400, mitteYArcsec: -300 });
+
+    s.zoome(false);
+    expect(s.stand.mitte).toEqual({ xArcsec: 0, yArcsec: 0 });
+    await u.frame();
+    expect(s.stand.auswertung?.parameter.fenster).toMatchObject({ mitteXArcsec: 0, mitteYArcsec: 0 });
+  });
+
+  it("behaelt die Mitte beim Wechsel in den Zoom, wenn die Uebersicht schon verschoben ist", async () => {
+    // Okular 4 mm: 150-fach, Feld 1200" kleiner als der Mond, Uebersicht verschiebbar.
+    const { u, s } = neu();
+    const k = s.konfiguration;
+    if (k.geraet.art !== "fernrohr") throw new Error("Voreinstellung ist kein Fernrohr");
+    s.aendere({ ...k, geraet: { ...k.geraet, okular: { ...k.geraet.okular, brennweiteMm: 4 } } });
+    s.verschiebe(500, 200);
+    await u.frame();
+    s.zoome(true);
+    expect(s.stand.mitte).toEqual({ xArcsec: 500, yArcsec: 200 });
+    await u.frame();
+    expect(s.stand.zoombilder?.anblick.fenster).toMatchObject({ mitteXArcsec: 500, mitteYArcsec: 200 });
+  });
+
+  it("verwirft die Zoombilder bei Objekt- oder Geraetewechsel, nicht bei anderen Aenderungen", async () => {
+    const { u, s } = neu();
+    await u.frame();
+    s.zoome(true);
+    await u.frame();
+    const zb = s.stand.zoombilder;
+    expect(zb).toBeDefined();
+    // Innerhalb des Zooms: altes Bild bleibt bis zum neuen (kein Flackern).
+    s.aendere(mitSeeing(s.konfiguration, 3));
+    expect(s.stand.zoombilder).toBe(zb);
+    await u.frame();
+    // Zurueck zur Uebersicht, anderes Objekt, wieder in den Zoom: kein Mond neben dem Jupiter-Nachweis.
+    s.zoome(false);
+    await u.frame();
+    s.aendere(mitZustand(s.konfiguration, "jup_47"));
+    expect(s.stand.zoombilder).toBeUndefined();
+    s.zoome(true);
+    expect(s.stand.zoombilder).toBeUndefined();
+    await u.frame();
+    expect(s.stand.zoombilder?.anblick.fenster.breiteArcsec).toBeCloseTo(zoombreiteArcsec(s.konfiguration), 9);
+    // Geraetewechsel verwirft ebenso.
+    const k = s.konfiguration;
+    if (k.geraet.art !== "fernrohr") throw new Error("Voreinstellung ist kein Fernrohr");
+    s.aendere({ ...k, geraet: { ...k.geraet, okular: { ...k.geraet.okular, brennweiteMm: 6 } } });
+    expect(s.stand.zoombilder).toBeUndefined();
+  });
+
+  it("bleibt beim Objektwechsel im Zoom und zeigt das neue Objekt", async () => {
+    const { u, s } = neu();
+    await u.frame();
+    s.zoome(true);
+    await u.frame();
+    s.aendere(mitZustand(s.konfiguration, "jup_47"));
+    await u.frame();
+    expect(s.stand.zoom).toBe(true);
+    expect(s.stand.zoombilder?.anblick.fenster.breiteArcsec).toBeCloseTo(zoombreiteArcsec(s.konfiguration), 9);
   });
 });

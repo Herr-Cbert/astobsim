@@ -149,8 +149,19 @@ _Vermeiden_: Simulation (ist der Vorgang), Ergebnis, Rendering
 Linearer Wert, mit dem bild ein Pixel zeichnet: 1 = Bildschirmweiss, vor der sRGB-Kodierung. physik bildet die Flaechenhelligkeit im Okular darauf ab (physik.md Abschnitt 12); `Helligkeit.faktorObjekt` ist die Anzeigehelligkeit von Quellweiss, `hintergrundRelativ` die des Himmels.
 _Vermeiden_: Anzeigewert (der Typ `Anzeigewerte` sind die Zahlen neben dem Bild), Tonwert (ist der Arbeitsschritt in bild)
 
+**Uebersicht**:
+Die Grundansicht: der Anblick im ganzen wahren Gesichtsfeld (Standardfenster, verschiebbar nach A-D2). Gegenstueck zur Zoomansicht; die Steuerung wechselt mit `zoome` zwischen beiden.
+_Vermeiden_: Normalansicht, Hauptansicht
+
 **Zoomansicht**:
-Vergroesserte Ansicht des Objekts im Anblick neben dem unverschlechterten Quellbild zum Vergleich.
+Vergroesserte Ansicht des Objekts im Anblick neben dem unverschlechterten Quellbild zum Vergleich (A-D3). Kein URL-Parameter.
+
+**Zoomfenster**:
+Das Fenster der Zoomansicht: das Objekt (Ausdehnung inklusive Ringe, aus dem Quellbild) mit 5 % Rand je Seite, hoechstens ein halbes Gesichtsfeld breit, mindestens 16 Arbeitspixel; Mitte wie in der Uebersicht (`src/ui/zoom.ts`).
+
+**Vergleichsbild**:
+Das Quellbild rechts in der Zoomansicht: dasselbe Zoomfenster, dieselbe Maske und dieselben Punktquellen wie der Anblick, aber ohne Faltung (1x1-Delta-Kern) und ohne Helligkeitsanpassung (Quellweiss = Bildschirmweiss), auf einem Raster so fein wie Quelle und Anzeige es hergeben. Technisch ein `Anblick` aus `rendere`, inhaltlich kein Anblick.
+_Vermeiden_: Originalbild, Referenzbild
 
 ### Daten
 

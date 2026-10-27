@@ -17,6 +17,7 @@ import { baueFormularObjekt } from "./formular_objekt";
 import { baueGesichtsfeld, type GesichtsfeldPlaetze } from "./gesichtsfeld";
 import { type Bildquelle, type Stand, Steuerung } from "./steuerung";
 import { waermeVor } from "./vorwaermen";
+import { baueZoomansicht } from "./zoomansicht";
 
 /**
  * Groesste Anzeige mit WebGL2 (Kantenlaenge in Geraetepixeln). Die Bildspalte ist hoechstens
@@ -31,6 +32,10 @@ interface Seite extends GesichtsfeldPlaetze {
   objekt: HTMLElement;
   bedingungen: HTMLElement;
   status: HTMLElement;
+  /** Gesichtsfeld mit Nachweis und Warnungen (Uebersicht). */
+  bild: HTMLElement;
+  /** Platz der Zoomansicht (A-D3), ersetzt im Zoom das Gesichtsfeld. */
+  zoom: HTMLElement;
 }
 
 /** Baut das Grundgeruest der Seite in wurzel auf (ersetzt den bisherigen Inhalt). */
@@ -55,7 +60,8 @@ function baueSeite(wurzel: HTMLElement): Seite {
   formular.append(geraet, objekt, bedingungen);
 
   const canvas = element("canvas", "gesichtsfeld");
-  canvas.setAttribute("role", "img");
+  // Klickbar (oeffnet die Zoomansicht): Schaltflaeche, die Beschriftung nennt Bild und Bedienung.
+  canvas.setAttribute("role", "button");
   canvas.setAttribute("aria-label", TEXTE.gesichtsfeld);
   const bild = element("figure", "bild");
   const nachweis = element("figcaption", "nachweis");
@@ -67,14 +73,18 @@ function baueSeite(wurzel: HTMLElement): Seite {
   info.setAttribute("aria-label", TEXTE.info.ueberschrift);
 
   const ansicht = element("main", "ansicht");
-  ansicht.append(formular, bild, info);
+  // Zoomansicht (#20) an der Stelle des Gesichtsfelds; baueZoomansicht fuellt und verbirgt sie.
+  const zoom = element("section", "zoom");
+  zoom.hidden = true;
+
+  ansicht.append(formular, bild, zoom, info);
 
   const status = element("p", "status");
   status.setAttribute("role", "status");
   status.setAttribute("aria-live", "polite");
 
   wurzel.replaceChildren(kopf, ansicht, status);
-  return { canvas, info, nachweis, warnungen, geraet, objekt, bedingungen, status };
+  return { canvas, info, nachweis, warnungen, geraet, objekt, bedingungen, status, bild, zoom };
 }
 
 function zeigeStatus(seite: Seite, text: string): void {
@@ -187,9 +197,16 @@ export async function starte(wurzel: HTMLElement): Promise<void> {
 
   // Der Falter meldet den Wechsel auf JavaScript (Kontextverlust, WebGL2-Fehler): dann gilt die
   // Anzeigegrenze, und die Steuerung rechnet mit der kleineren Anzeige neu.
+  // Im Zoom zaehlt die Breite eines der beiden Bilder; die Zoomansicht entsteht erst nach der
+  // Steuerung, bis dahin gilt das Gesichtsfeld.
   let steuerungFuerWechsel: Steuerung | undefined;
-  const anzeigePx = (): number =>
-    waehleAnzeigePx(seite.canvas.getBoundingClientRect().width, window.devicePixelRatio, falter.anzeigeGrenzePx ?? ANZEIGEGRENZE_WEBGL2_PX);
+  let zoomCanvas: HTMLCanvasElement | undefined;
+  const anzeigePx = (zoom: boolean): number =>
+    waehleAnzeigePx(
+      (zoom && zoomCanvas !== undefined ? zoomCanvas : seite.canvas).getBoundingClientRect().width,
+      window.devicePixelRatio,
+      falter.anzeigeGrenzePx ?? ANZEIGEGRENZE_WEBGL2_PX
+    );
   const falter = waehleFalter({ beiWechsel: () => steuerungFuerWechsel?.rechneNeu() });
   const steuerung = new Steuerung(
     {
@@ -231,18 +248,25 @@ export async function starte(wurzel: HTMLElement): Promise<void> {
     }
   });
 
-  // Neue Breite der Bildspalte: nur wenn sich die Anzeigegroesse aendert, neu rechnen.
-  let px = anzeigePx();
+  baueGesichtsfeld(seite, steuerung);
+  zoomCanvas = baueZoomansicht({ zoom: seite.zoom, uebersicht: seite.bild, gesichtsfeld: seite.canvas }, steuerung).anblick;
+
+  // Neue Breite der Bildspalte: nur wenn sich die Anzeigegroesse der gezeigten Ansicht gegenueber
+  // ihrer letzten Messung aendert, neu rechnen. Die erste Messung einer Ansicht rechnet nicht: den
+  // Wechsel selbst rechnet zoome, und die Rechnung misst nach warte selbst.
+  const gemessen = new Map<boolean, number>([[steuerung.stand.zoom, anzeigePx(steuerung.stand.zoom)]]);
   if (typeof ResizeObserver === "function") {
-    new ResizeObserver(() => {
-      const neu = anzeigePx();
-      if (neu === px) return;
-      px = neu;
-      steuerung.rechneNeu();
-    }).observe(seite.canvas);
+    const beobachter = new ResizeObserver(() => {
+      const zoom = steuerung.stand.zoom;
+      const neu = anzeigePx(zoom);
+      const alt = gemessen.get(zoom);
+      gemessen.set(zoom, neu);
+      if (alt !== undefined && alt !== neu) steuerung.rechneNeu();
+    });
+    beobachter.observe(seite.canvas);
+    beobachter.observe(zoomCanvas);
   }
 
-  baueGesichtsfeld(seite, steuerung);
   baueFormularGeraet(seite.geraet, steuerung);
   baueFormularObjekt(seite.objekt, steuerung);
   baueFormularBedingungen(seite.bedingungen, steuerung);
