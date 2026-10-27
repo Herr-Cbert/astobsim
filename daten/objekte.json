@@ -14,11 +14,11 @@
         "phasenwinkel_grad": 78.5,
         "kolongitude_grad": 11,
         "magnitude": -10.2,
-        "weiss_mag_arcsec2": 3.35,
+        "weiss_mag_arcsec2": 3.91,
         "entfernung_au": 0.00257,
         "bild": "mond_svs5587_6285",
         "hinweis_hilfe": "Ab etwa 200 mm Objektivdurchmesser begrenzt die Bildvorlage (0,64 Bogensekunden pro Pixel) die Detailtiefe, nicht mehr das Fernrohr.",
-        "kommentar": "Winkelgroesse ist der Jahrbuch-Mittelwert (objekte.md 6.1). Das Quellbild zeigt 1774,4 Bogensekunden (bilder.json, winkelgroesse_arcsec); die Anwendung skaliert die Scheibe von objekt_durchmesser_px auf die Winkelgroesse des Zustands. weiss_mag_arcsec2 ist die Vollmond-Flaechenhelligkeit (objekte.md 5.2), weil das Bild die Tagseite unveraendert in voller Helligkeit zeigt."
+        "kommentar": "Winkelgroesse ist der Jahrbuch-Mittelwert (objekte.md 6.1). Das Quellbild zeigt 1774,4 Bogensekunden (bilder.json, winkelgroesse_arcsec); die Anwendung skaliert die Scheibe von objekt_durchmesser_px auf die Winkelgroesse des Zustands. weiss_mag_arcsec2 ist auf den Pixelwert 1,0 des Quellbilds geeicht (objekte.md 5.3, tools/quellweiss_eichen.py): Gesamtfluss der Stufe 0 bei 1865\" ergibt die Magnitude -10,2 (bis #71: 3,35 als Vollmond-Flaechenhelligkeit)."
       }
     ]
   },
@@ -36,11 +36,11 @@
         "phase": 0.9,
         "phasenwinkel_grad": 37,
         "magnitude": 1.0,
-        "weiss_mag_arcsec2": 4.5,
+        "weiss_mag_arcsec2": 3.1,
         "entfernung_au": 1.56,
         "bild": "mars_hst_20160512",
         "hinweis_hilfe": "Mars ist bei 6 Bogensekunden in Wirklichkeit nicht voll beleuchtet, sondern zu etwa 90 Prozent (gibbos, Phasenwinkel rund 37 Grad); astobsim zeigt ihn vereinfacht als volle Scheibe.",
-        "kommentar": "Werte aus objekte.md 6.1, Phasenwinkel aus 1.2 (36 bis 39 Grad). Kein eigenes Bild: nutzt das Bild von mars_14 (Hubble 2016, Vollscheibe, A-X1); phase und phasenwinkel_grad beschreiben den realen Zustand, nicht das Bild. weiss_mag_arcsec2 4,5 aus 5.2 (k = 0,9)."
+        "kommentar": "Werte aus objekte.md 6.1, Phasenwinkel aus 1.2 (36 bis 39 Grad). Kein eigenes Bild: nutzt das Bild von mars_14 (Hubble 2016, Vollscheibe, A-X1); phase und phasenwinkel_grad beschreiben den realen Zustand, nicht das Bild. weiss_mag_arcsec2 auf den Pixelwert 1,0 geeicht (objekte.md 5.3): der Gesamtfluss der vollen Bildscheibe bei 6\" ergibt die Magnitude 1,0 (bis #71: 4,5 aus 5.2)."
       },
       {
         "id": "mars_14",
@@ -50,10 +50,10 @@
         "phase": 1.0,
         "phasenwinkel_grad": 0,
         "magnitude": -1.4,
-        "weiss_mag_arcsec2": 4.1,
+        "weiss_mag_arcsec2": 2.54,
         "entfernung_au": 0.669,
         "bild": "mars_hst_20160512",
-        "kommentar": "Werte aus objekte.md 6.1, Phasenwinkel 0 wie in 5.1. Quellbild Hubble 12.05.2016 bei 17,51\" (bilder.json); die Anwendung skaliert die Scheibe auf 14\"."
+        "kommentar": "Werte aus objekte.md 6.1, Phasenwinkel 0 wie in 5.1. Quellbild Hubble 12.05.2016 bei 17,51\" (bilder.json); die Anwendung skaliert die Scheibe auf 14\". weiss_mag_arcsec2 auf den Pixelwert 1,0 geeicht (objekte.md 5.3, bis #71: 4,1)."
       },
       {
         "id": "mars_25",
@@ -63,10 +63,10 @@
         "phase": 1.0,
         "phasenwinkel_grad": 0,
         "magnitude": -3.0,
-        "weiss_mag_arcsec2": 3.8,
+        "weiss_mag_arcsec2": 1.68,
         "entfernung_au": 0.375,
         "bild": "mars_hst_20030826",
-        "kommentar": "Werte aus objekte.md 6.1, Phasenwinkel 0 wie in 5.1. Quellbild Hubble 26.08.2003 bei 25,12\" (bilder.json)."
+        "kommentar": "Werte aus objekte.md 6.1, Phasenwinkel 0 wie in 5.1. Quellbild Hubble 26.08.2003 bei 25,12\" (bilder.json). weiss_mag_arcsec2 auf den Pixelwert 1,0 geeicht (objekte.md 5.3, bis #71: 3,8)."
       }
     ]
   },
@@ -84,7 +84,7 @@
         "phase": 0.99,
         "phasenwinkel_grad": 10,
         "magnitude": -2.0,
-        "weiss_mag_arcsec2": 5.4,
+        "weiss_mag_arcsec2": 4.35,
         "entfernung_au": 5.63,
         "bild": "jupiter_hst_20190627",
         "trabanten": [
@@ -118,7 +118,7 @@
           }
         ],
         "hinweis_hilfe": "Jupiter steht bei 35 Bogensekunden fern der Opposition, etwa vier Monate davor oder danach; so zeigt er sich den groessten Teil des Jahres.",
-        "kommentar": "Werte aus objekte.md 6.1, Phasenwinkel 10 Grad aus 5.1 (Phaseneffekt vernachlaessigbar). Trabanten aus 3.3: Stellung von jup_47 linear mit 35/47 skaliert, Durchmesser aus objekte.md 3.2, Magnituden +0,6 mag Entfernungskorrektur (3.1). Kein eigenes Bild: nutzt das Bild von jup_47 (Hubble 2019, 45,65\", bilder.json); die Anwendung skaliert die Scheibe auf 35\". weiss_mag_arcsec2 5,4 aus 5.2."
+        "kommentar": "Werte aus objekte.md 6.1, Phasenwinkel 10 Grad aus 5.1 (Phaseneffekt vernachlaessigbar). Trabanten aus 3.3: Stellung von jup_47 linear mit 35/47 skaliert, Durchmesser aus objekte.md 3.2, Magnituden +0,6 mag Entfernungskorrektur (3.1). Kein eigenes Bild: nutzt das Bild von jup_47 (Hubble 2019, 45,65\", bilder.json); die Anwendung skaliert die Scheibe auf 35\". weiss_mag_arcsec2 auf den Pixelwert 1,0 geeicht (objekte.md 5.3, bis #71: 5,4 aus 5.2)."
       },
       {
         "id": "jup_47",
@@ -128,7 +128,7 @@
         "phase": 1.0,
         "phasenwinkel_grad": 0.5,
         "magnitude": -2.7,
-        "weiss_mag_arcsec2": 5.3,
+        "weiss_mag_arcsec2": 4.29,
         "entfernung_au": 4.195,
         "bild": "jupiter_hst_20190627",
         "trabanten": [
@@ -161,7 +161,7 @@
             "magnitude": 5.7
           }
         ],
-        "kommentar": "Werte aus objekte.md 6.1 (mittlere Opposition), Phasenwinkel 0,5 Grad aus 5.1. Trabanten aus 3.3 (dx positiv = Osten = links, dy positiv = Norden, Bahnneigung 2 Grad, alle vier sichtbar). Quellbild Hubble 27.06.2019 bei 45,65\" (bilder.json), Planetennorden oben. weiss_mag_arcsec2 5,3 aus 5.2."
+        "kommentar": "Werte aus objekte.md 6.1 (mittlere Opposition), Phasenwinkel 0,5 Grad aus 5.1. Trabanten aus 3.3 (dx positiv = Osten = links, dy positiv = Norden, Bahnneigung 2 Grad, alle vier sichtbar). Quellbild Hubble 27.06.2019 bei 45,65\" (bilder.json), Planetennorden oben. weiss_mag_arcsec2 auf den Pixelwert 1,0 geeicht (objekte.md 5.3, bis #71: 5,3 aus 5.2)."
       }
     ]
   },
@@ -181,7 +181,7 @@
         "ringneigung_grad": 19,
         "ring_aussen_arcsec": 36.3,
         "magnitude": 0.6,
-        "weiss_mag_arcsec2": 6.6,
+        "weiss_mag_arcsec2": 5.56,
         "entfernung_au": 10.39,
         "bild": "saturn_hst_20210912",
         "trabanten": [
@@ -201,7 +201,7 @@
           }
         ],
         "hinweis_hilfe": "Saturn steht bei 16 Bogensekunden fern der Opposition, etwa drei Monate vor oder nach der Konjunktion mit der Sonne.",
-        "kommentar": "Werte aus objekte.md 6.1 mit Ringoeffnung 19 Grad (Projektentscheidung, Bild Hubble 2021 mit B = 19,2 Grad) statt 15 Grad: ring_aussen_arcsec = 2,269 x 16\" (1.1); magnitude 0,6 nach Mallama und Hilton (5.1) mit B = 19 Grad (bei 15 Grad 0,7). Trabanten: Stellung von sat_20 linear mit 16/20 skaliert, Magnituden aus 3.3. Kein eigenes Bild: nutzt das Bild von sat_20. weiss_mag_arcsec2 6,6 ist die Kugel (5.2)."
+        "kommentar": "Werte aus objekte.md 6.1 mit Ringoeffnung 19 Grad (Projektentscheidung, Bild Hubble 2021 mit B = 19,2 Grad) statt 15 Grad: ring_aussen_arcsec = 2,269 x 16\" (1.1); magnitude 0,6 nach Mallama und Hilton (5.1) mit B = 19 Grad (bei 15 Grad 0,7). Trabanten: Stellung von sat_20 linear mit 16/20 skaliert, Magnituden aus 3.3. Kein eigenes Bild: nutzt das Bild von sat_20. weiss_mag_arcsec2 auf den Pixelwert 1,0 geeicht, Kugel plus Ring (objekte.md 5.3, bis #71: 6,6 als Kugel aus 5.2)."
       },
       {
         "id": "sat_20",
@@ -213,7 +213,7 @@
         "ringneigung_grad": 19,
         "ring_aussen_arcsec": 45.4,
         "magnitude": -0.1,
-        "weiss_mag_arcsec2": 6.6,
+        "weiss_mag_arcsec2": 5.34,
         "entfernung_au": 8.31,
         "bild": "saturn_hst_20210912",
         "trabanten": [
@@ -232,7 +232,7 @@
             "magnitude": 9.5
           }
         ],
-        "kommentar": "Werte aus objekte.md 6.1 mit Ringoeffnung 19 Grad (Projektentscheidung) statt 15 Grad: ring_aussen_arcsec = 2,269 x 20\" (1.1); magnitude -0,1 nach Mallama und Hilton (5.1) mit B = 19 Grad (bei 15 Grad 0,0). Trabanten nach 3.3 in der Ringebene: dx wie dort (Titan +150, Rhea -60), dy mit der Formel aus 3.3 fuer B = 19 statt 15 Grad neu gerechnet, dy = sqrt(1 - (dx/E)^2) E sin B mit E = 202,7\" bzw. 87,4\" (3.2): Titan -44,4 statt -35, Rhea +20,7 statt +17; Titan vor dem Planeten (suedlich), Rhea dahinter. Quellbild Hubble 12.09.2021 bei 18,11\" (bilder.json), Planetennorden oben. weiss_mag_arcsec2 6,6 ist die Kugel (5.2)."
+        "kommentar": "Werte aus objekte.md 6.1 mit Ringoeffnung 19 Grad (Projektentscheidung) statt 15 Grad: ring_aussen_arcsec = 2,269 x 20\" (1.1); magnitude -0,1 nach Mallama und Hilton (5.1) mit B = 19 Grad (bei 15 Grad 0,0). Trabanten nach 3.3 in der Ringebene: dx wie dort (Titan +150, Rhea -60), dy mit der Formel aus 3.3 fuer B = 19 statt 15 Grad neu gerechnet, dy = sqrt(1 - (dx/E)^2) E sin B mit E = 202,7\" bzw. 87,4\" (3.2): Titan -44,4 statt -35, Rhea +20,7 statt +17; Titan vor dem Planeten (suedlich), Rhea dahinter. Quellbild Hubble 12.09.2021 bei 18,11\" (bilder.json), Planetennorden oben. weiss_mag_arcsec2 auf den Pixelwert 1,0 geeicht, Kugel plus Ring (objekte.md 5.3, bis #71: 6,6 als Kugel aus 5.2)."
       }
     ]
   }

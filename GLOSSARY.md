@@ -170,7 +170,7 @@ Die echte hochaufgeloeste Aufnahme eines Zustands (Raumsonde, Hubble) oder beim 
 _Vermeiden_: Originalbild, Textur, Rohbild (Rohbild ist die unbearbeitete Datei vor der Aufbereitung)
 
 **Quellweiss**:
-Die Flaechenhelligkeit, die der Wert 1,0 (Weiss) im Quellbild eines Zustands bedeutet, in mag/arcsec² (`weissMagProArcsec2`, `daten/objekte.json`). Bezug aller linearen Helligkeiten im Quellbild und der Punktquellen.
+Die Flaechenhelligkeit, die der Wert 1,0 (Weiss) im Quellbild eines Zustands bedeutet, in mag/arcsec² (`weissMagProArcsec2`, `daten/objekte.json`). Bezug aller linearen Helligkeiten im Quellbild und der Punktquellen. Geeicht ueber den Gesamtfluss des Quellbilds: Summe der linearen Pixelwerte mal Massstab² ergibt mit Quellweiss die Magnitude des Zustands (`docs/recherche/objekte.md` 5.3, `tools/quellweiss_eichen.py`). Nicht die mittlere Flaechenhelligkeit der Scheibe.
 
 **Bildnachweis**:
 Der Datensatz zu jedem Quellbild: Quelle, Mission, Lizenz, Namensnennung, Pixelmassstab, Bearbeitung.

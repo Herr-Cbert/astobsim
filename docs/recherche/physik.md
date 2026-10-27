@@ -487,7 +487,7 @@ Bis Issue #9 multipliziert bild das lineare Quellbild (1,0 = Quellweiss) mit dem
 | Mond an 80 mm bei 200x (AP 0,4 mm) | 9,63 | 15 | 0,0031 | 10 |
 | Himmel Bortle 5 bei A-D9 | 23,4 | 4,7e-5 | | 0 |
 
-(Eigene Rechnung mit Abschnitt 9: Refraktor $\tau$ = 0,90, Fernglas 0,85, $X$ = 1,4126, $k$ = 0,20, Quellweiss Mond 3,35, Mars 14'' 4,1 mag/arcsec$^2$ aus `daten/objekte.json`.)
+(Eigene Rechnung mit Abschnitt 9: Refraktor $\tau$ = 0,90, Fernglas 0,85, $X$ = 1,4126, $k$ = 0,20, Quellweiss Mond 3,35, Mars 14'' 4,1 mag/arcsec$^2$ aus `daten/objekte.json`, Stand vor #71; seit Issue #71 ist Quellweiss auf den Pixelwert 1,0 geeicht, Mond 3,91, Mars 14'' 2,54, `objekte.md` 5.3.)
 
 Linear relativ zu Quellweiss wirkt der Mond in A-D9 dunkelgrau, bei 200x ist er fast schwarz; am Fernrohr ist er blendend hell. Eine absolute Abbildung ($L$ auf dem Bildschirm gleich $L$ im Okular) scheitert an der Anzeige: die sRGB-Referenzanzeige hat 80 cd/m$^2$ [59], A-D9 laege mit 169 cd/m$^2$ darueber, Fernglas und blosses Auge ebenfalls; alles ueber 80 cd/m$^2$ wuerde abgeschnitten und verloere das Bild.
 
@@ -507,10 +507,10 @@ $$w(\mu) = \min\!\left(1,\ \left(\frac{L}{L_\mathrm{weiss}}\right)^{n}\right) = 
 
 - **Objekt:** $\mu_\mathrm{obj} = \mu_\mathrm{Quellweiss} - 2{,}5\log_{10} F$ mit dem physikalischen Faktor $F$ aus Abschnitt 9; die Anzeigehelligkeit von Quellweiss ist $w(\mu_\mathrm{obj})$. Das Quellbild bleibt linear: ein Pixel mit Wert $q$ relativ zu Quellweiss wird $q \cdot w(\mu_\mathrm{obj})$. Nur das Niveau wird komprimiert, nicht der Kontrast innerhalb des Quellbilds (Faltung, Tabellen-Tests T1 bis T5 und das Aussehen des Quellbilds bleiben unberuehrt).
 - **Himmel:** $w(\mu_\mathrm{ok})$ mit $\mu_\mathrm{ok}$ aus Abschnitt 6.2, additiv wie bisher (A-B2).
-- **Weiss:** $\mu_\mathrm{weiss}$ = 3,35 ist der Vollmond ohne Verluste (etwa 4900 cd/m$^2$), das hellste Objekt in Version 1; ohne Verluste waere er gerade Bildschirmweiss. Hellere Flaechen (etwa Venus) wuerden auf 1 begrenzt (A-P4: nach oben begrenzt).
-- **Exponent:** $n$ = 1/3 ist Stevens' Exponent fuer ausgedehnte Felder [53]. Er dient als Kompressionsstaerke, nicht als Modell des Auges am Okular; Stevens begruendet nur die Groessenordnung der Kompression, keine Gleichheit der Empfindung, denn der Betrachter komprimiert den Bildschirm selbst noch einmal. Im Code heisst er `KOMPRESSIONSEXPONENT`. Eigenschaft: gleiche Leuchtdichteverhaeltnisse ergeben gleiche Anzeigeverhaeltnisse ($r \mapsto r^{1/3}$), unabhaengig von Objekt und Geraet. Die Spanne vom Mond mit blossem Auge bis Mars bei 200x (Faktor 500, 2,7 Dekaden) wird zu Faktor 8 (0,92 bis 0,116 linear, sRGB 245 bis 95), passt also in den Bereich, in dem das Bild auf dem Bildschirm noch erkennbar ist.
-- **Monotonie:** $w$ faellt streng in $\mu$; da $\mu_\mathrm{obj}$ in der Austrittspupille bis 6 mm streng faellt (Abschnitt 5.1), steigt die Anzeigehelligkeit streng mit der Austrittspupille bis 6 mm und bleibt darueber konstant.
-- **Hintergrund dunkler als das Objekt:** Transmission, Abschattung und Austrittspupille wirken auf beide Ebenen gleich, die Extinktion nur auf das Objekt (Abschnitt 6.2). Damit ist $\mu_\mathrm{Himmel,ok} - \mu_\mathrm{obj,ok} = \mu_\mathrm{Bortle} - \mu_\mathrm{Quellweiss} - k X$, unabhaengig vom Geraet. In Version 1 fuer Mond und Mars mindestens $17{,}0 - 4{,}5 - 2{,}51 = 10{,}0$ mag (Bortle 9, Mars 6'', diesig, 10 Grad Hoehe: $X$ = 5,586, $kX$ = 2,514), angezeigt also mindestens um den Faktor $10^{0{,}4 \cdot 10{,}0/3} = 21{,}5$ dunkler. Gilt nur fuer Mond und Mars: Jupiter (Quellweiss etwa 5,4) und Saturn (etwa 6,6) erreichen im selben Grenzfall nur Faktor 16 bzw. 11.
+- **Weiss:** $\mu_\mathrm{weiss}$ = 3,35 ist der Vollmond ohne Verluste (etwa 4900 cd/m$^2$), das hellste Objekt in Version 1; ohne Verluste waere er gerade Bildschirmweiss. Hellere Flaechen (etwa Venus) wuerden auf 1 begrenzt (A-P4: nach oben begrenzt). Nachtrag Issue #71: 3,35 ist die mittlere Flaechenhelligkeit des Vollmonds (`objekte.md` 5.2), aber nicht mehr Quellweiss des Mondzustands (3,91, `objekte.md` 5.3); ohne Verluste erscheint Quellweiss des Mondes jetzt mit $w(3{,}91)$ = 0,84. Quellweiss von Mars (1,68 bis 3,10) ist seit #71 heller als 3,35 und erreicht die Begrenzung (12.5 Punkt 6).
+- **Exponent:** $n$ = 1/3 ist Stevens' Exponent fuer ausgedehnte Felder [53]. Er dient als Kompressionsstaerke, nicht als Modell des Auges am Okular; Stevens begruendet nur die Groessenordnung der Kompression, keine Gleichheit der Empfindung, denn der Betrachter komprimiert den Bildschirm selbst noch einmal. Im Code heisst er `KOMPRESSIONSEXPONENT`. Eigenschaft: gleiche Leuchtdichteverhaeltnisse ergeben gleiche Anzeigeverhaeltnisse ($r \mapsto r^{1/3}$), unabhaengig von Objekt und Geraet. Die Spanne vom Mond mit blossem Auge bis Mars bei 200x (Faktor 500, 2,7 Dekaden) wird zu Faktor 8 (0,92 bis 0,116 linear, sRGB 245 bis 95), passt also in den Bereich, in dem das Bild auf dem Bildschirm noch erkennbar ist (Stand vor #71; mit Quellweiss nach #71 reicht die Spanne der Faelle aus 12.4 vom Mond mit blossem Auge, 0,772 bzw. sRGB 227, bis zum Mond an 80 mm bei 200x, 0,123 bzw. sRGB 98: Faktor 250 in der Leuchtdichte, 6,3 in der Anzeige).
+- **Monotonie:** $w$ faellt streng in $\mu$; da $\mu_\mathrm{obj}$ in der Austrittspupille bis 6 mm streng faellt (Abschnitt 5.1), steigt die Anzeigehelligkeit streng mit der Austrittspupille bis 6 mm und bleibt darueber konstant, solange $w$ unter der Begrenzung auf 1 bleibt (seit #71 nicht mehr fuer Mars 14'' und 25'' bei grosser Austrittspupille, 12.5 Punkt 6).
+- **Hintergrund dunkler als das Objekt:** Transmission, Abschattung und Austrittspupille wirken auf beide Ebenen gleich, die Extinktion nur auf das Objekt (Abschnitt 6.2). Damit ist $\mu_\mathrm{Himmel,ok} - \mu_\mathrm{obj,ok} = \mu_\mathrm{Bortle} - \mu_\mathrm{Quellweiss} - k X$, unabhaengig vom Geraet. Mit Quellweiss nach Issue #71 (`objekte.md` 5.3) in Version 1 mindestens $17{,}0 - 5{,}56 - 2{,}51 = 8{,}9$ mag (Bortle 9, Saturn 16'', diesig, 10 Grad Hoehe: $X$ = 5,586, $kX$ = 2,514), angezeigt also mindestens um den Faktor $10^{0{,}4 \cdot 8{,}93/3} = 15{,}5$ dunkler als Quellweiss; Saturn 20'' 16,6, Jupiter (35'') 22,5, Mond 25,7, Mars (6'') 33. Stand vor #71 (Quellweiss Mond 3,35, Mars 6'' 4,5, Jupiter 5,4, Saturn 6,6): Mond und Mars mindestens 21,5, Jupiter 16, Saturn 11.
 
 Verworfen:
 
@@ -523,7 +523,7 @@ Verworfen:
 
 ### 12.4 Testwerte (A-Q1)
 
-Eigene Rechnung, 45 Grad, klar, Bortle 5, Quellweiss Mond 3,35, Mars 14'' 4,1 mag/arcsec$^2$; sRGB-Kodewert mit der Kennlinie aus [59] auf 8 Bit gerundet.
+Eigene Rechnung, 45 Grad, klar, Bortle 5, Quellweiss Mond 3,35, Mars 14'' 4,1 mag/arcsec$^2$; sRGB-Kodewert mit der Kennlinie aus [59] auf 8 Bit gerundet. Stand vor #71: die Tabelle sind die festen Eingaben der Unit-Tests (`src/physik/helligkeit.test.ts`) und bleibt so; die Werte nach #71 stehen darunter.
 
 | Fall | $\mu$ | Anzeige $w$ | sRGB | vorher (linear) |
 |---|---|---|---|---|
@@ -539,6 +539,19 @@ Eigene Rechnung, 45 Grad, klar, Bortle 5, Quellweiss Mond 3,35, Mars 14'' 4,1 ma
 | Himmel Fernglas 10x50, Bortle 1 / 9 | 22,47 / 17,57 | 0,00282 / 0,0127 | 9 / 30 | 0 |
 | Himmel 21,875 mag/arcsec$^2$ (Bortle 8, AP 0,8 mm) | 21,875 | 0,003388 | | |
 
+Nach #71 (Quellweiss Mond 3,91, Mars 14'' 2,54, `objekte.md` 5.3; $\mu$ verschiebt sich um die Differenz, der Himmel bleibt):
+
+| Fall | $\mu$ | Anzeige $w$ | sRGB |
+|---|---|---|---|
+| Mond blosses Auge | 4,193 | 0,7720 | 227 |
+| Mond Fernglas 10x50 | 4,765 | 0,6476 | 210 |
+| Mond A-D9 | 7,573 | 0,2735 | 143 |
+| Mars 14'' an 80 mm bei 120x | 7,708 | 0,2624 | 140 |
+| Mond an 80 mm bei 200x | 10,187 | 0,1226 | 98 |
+| Mars 14'' an 80 mm bei 200x | 8,817 | 0,1867 | 120 |
+
+Mond A-D9 und Mars 14'' bei 120x sind mit `rendere` nachgemessen (`faktorObjekt` 0,2735 bzw. 0,2624).
+
 ### 12.5 Unsicher
 
 1. **Stevens & Stevens [54]:** Bibliographie nur aus [56], Band und Jahr widersprechen sich; fuer die Entscheidung nicht noetig, weil kein Adaptionsniveau eingeht.
@@ -546,6 +559,7 @@ Eigene Rechnung, 45 Grad, klar, Bortle 5, Quellweiss Mond 3,35, Mars 14'' 4,1 ma
 3. **Wahl von $\mu_\mathrm{weiss}$:** Bildschirm, Umgebungslicht und Helligkeitseinstellung des Nutzers sind unbekannt; die Wahl ist am Bild in Phase 6 zu pruefen. Eine Konstante in `src/physik/konstanten.ts` aendert alle Anzeigewerte gemeinsam.
 4. **Schleier des Himmels:** Weil Objekt und Himmel getrennt komprimiert werden, hebt die Abbildung den Himmel relativ zum Objekt um den Faktor $(L_\mathrm{obj}/L_\mathrm{Himmel})^{2/3}$ an. Ueber dunklen Bildteilen wirkt er wie ein Schleier: in A-D9 zeigt ein Pixel mit $q$ = 0,01 (relativ zu Quellweiss) 0,0032, der Himmel 0,0021. Physikalisch waere der Himmel dort um Groessenordnungen dunkler. Am Bild in Phase 6 pruefen (Abhilfe waere etwa, den Himmel mit der Anzeigehelligkeit des Objekts linear mitzufuehren).
 5. **Exponent:** 1/3 ist eine Groessenordnung nach Stevens, keine Herleitung; wie $\mu_\mathrm{weiss}$ in Phase 6 am Bild zu pruefen.
+6. **Begrenzung bei Mars (seit Issue #71):** Quellweiss von Mars 25'' (1,68) und 14'' (2,54) ist heller als $\mu_\mathrm{weiss}$ = 3,35. `anzeigefaktor` begrenzt das Niveau auf 1, sobald $\mu_\mathrm{obj} < 3{,}35$: am 80-mm-Refraktor (45 Grad, klar, eigene Rechnung aus `faktorObjekt` bei 60x) fuer Mars 25'' ab etwa 3,3 mm Austrittspupille, fuer Mars 14'' ab etwa 5,0 mm; Mars 6'' (3,10) erreicht die Grenze nicht. Darueber ist die Anzeige konstant, A-P4 (heller mit groesserer Austrittspupille) gilt dort fuer Mars nicht mehr. Kein Pixel wird abgeschnitten, das Scheibenmittel liegt bei 0,14 bis 0,24 (`objekte.md` 5.3). Abhilfe waere, statt des Niveaus erst das Pixel $q \cdot w$ zu begrenzen (Anzeigehelligkeit von Quellweiss darf 1 uebersteigen, `Anblick` erlaubt Werte ueber 1), oder $\mu_\mathrm{weiss}$ heller zu waehlen; offen fuer Herbert, nicht in #71 (`src/` bleibt).
 
 ## 13. Trabanten als Punktquellen (Issue #14)
 
@@ -557,7 +571,7 @@ Die Naht verlangt fuer jede Punktquelle eine Flaechenhelligkeit relativ zu Quell
 
 $$\mu_\mathrm{T} = m + 2{,}5\log_{10}\!\left(\pi\,\frac{d^2}{4}\right), \qquad h_\mathrm{rel} = 10^{-0{,}4\,(\mu_\mathrm{T} - \mu_\mathrm{weiss})}$$
 
-mit $\mu_\mathrm{weiss}$ = `weissMagProArcsec2` des Objektzustands. Das setzt voraus, dass der Wert 1,0 im Quellbild wirklich $\mu_\mathrm{weiss}$ bedeutet; bei Jupiter und Saturn ist das derzeit nicht der Fall (13.5 Punkt 4, Issue #71). Der Fluss der gemalten Scheibe ist $h_\mathrm{rel}\,\pi d^2/4 = 10^{-0{,}4\,(m - \mu_\mathrm{weiss})}$ Quadratbogensekunden Quellweiss, haengt also nur von der Magnitude ab; der Durchmesser bestimmt nur, wie flaechig der Fluss vor der Faltung liegt.
+mit $\mu_\mathrm{weiss}$ = `weissMagProArcsec2` des Objektzustands. Das setzt voraus, dass der Wert 1,0 im Quellbild wirklich $\mu_\mathrm{weiss}$ bedeutet; seit Issue #71 ist Quellweiss so geeicht (`objekte.md` 5.3, 13.5 Punkt 4). Der Fluss der gemalten Scheibe ist $h_\mathrm{rel}\,\pi d^2/4 = 10^{-0{,}4\,(m - \mu_\mathrm{weiss})}$ Quadratbogensekunden Quellweiss, haengt also nur von der Magnitude ab; der Durchmesser bestimmt nur, wie flaechig der Fluss vor der Faltung liegt.
 
 Warum Atmosphaere, Transmission, Abschattung und Oeffnung nicht in $h_\mathrm{rel}$ stehen (das Issue nennt sie): nach Abschnitt 7 und 9 ist der Punktquellenfluss am Auge $\propto 10^{-0{,}4 m}\,a\,\tau\,(1-\epsilon^2)\,D^2$, bei $AP > p$ begrenzt die Augenpupille auf $(pV)^2$. Das Bild auf der Netzhaut ist um $V$ vergroessert, seine Flaeche waechst mit $V^2$. Die Flaechenhelligkeit des Trabantenbilds ist damit $\propto a\,\tau\,(1-\epsilon^2)\,\min(D, pV)^2/V^2 = a\,\tau\,(1-\epsilon^2)\,\min(AP, p)^2$, derselbe Faktor wie fuer die Planetenflaeche (Abschnitt 5.1, 9). Er steckt fuer beide in `faktorObjekt` und wird mit derselben Anzeigeabbildung (Abschnitt 12) auf den Bildschirm gebracht. Die Oeffnung wirkt ueber die PSF: die Faltung verteilt den festen Fluss auf die Flaeche der Gesamt-PSF, kleine Oeffnung und schlechtes Seeing machen den Punkt breiter und dunkler (Abschnitt 7, "Spitzenwert $\propto$ Fluss / Flaeche der PSF").
 
@@ -581,20 +595,22 @@ Blosses Auge ($V$ = 1): alle Trabanten unterdrueckt. 10x50: alle vier Jupitertra
 
 ### 13.4 Testwerte (A-Q1)
 
-| Trabant (Zustand, Quellweiss) | $m$ | $d$ | $\mu_\mathrm{T}$ | $h_\mathrm{rel}$ |
-|---|---|---|---|---|
-| Io (jup_47, 5,3) | 5,0 | 1,20'' | 5,1336 | 1,1656 |
-| Europa | 5,3 | 1,03'' | 5,1019 | 1,2002 |
-| Ganymed | 4,6 | 1,73'' | 5,5280 | 0,8106 |
-| Kallisto | 5,7 | 1,58'' | 6,4310 | 0,3529 |
-| Titan (sat_20, 6,6) | 8,3 | 0,85'' | 7,6848 | 0,3682 |
-| Rhea (sat_20, 6,6) | 9,5 | 0,25'' | 6,2274 | 1,4094 |
+Spalte "vor #71": Quellweiss jup_47 5,3 und sat_20 6,6, Stand vor #71; das sind die festen Eingaben der Unit-Tests (`src/physik/punktquellen.test.ts`) und bleiben so. Spalte "nach #71": Quellweiss 4,29 bzw. 5,34 (`objekte.md` 5.3).
 
-$h_\mathrm{rel} > 1$ ist erlaubt (Io, Europa, Rhea haben hoehere Albedo als die mittlere Planetenscheibe); begrenzt wird erst beim Zeichnen.
+| Trabant (Zustand) | $m$ | $d$ | $\mu_\mathrm{T}$ | $h_\mathrm{rel}$ vor #71 | $h_\mathrm{rel}$ nach #71 |
+|---|---|---|---|---|---|
+| Io (jup_47) | 5,0 | 1,20'' | 5,1336 | 1,1656 | 0,4598 |
+| Europa | 5,3 | 1,03'' | 5,1019 | 1,2002 | 0,4734 |
+| Ganymed | 4,6 | 1,73'' | 5,5280 | 0,8106 | 0,3198 |
+| Kallisto | 5,7 | 1,58'' | 6,4310 | 0,3529 | 0,1392 |
+| Titan (sat_20) | 8,3 | 0,85'' | 7,6848 | 0,3682 | 0,1154 |
+| Rhea (sat_20) | 9,5 | 0,25'' | 6,2274 | 1,4094 | 0,4416 |
+
+$h_\mathrm{rel} > 1$ ist erlaubt (begrenzt wird erst beim Zeichnen); vor #71 kam es vor, weil Quellweiss zu dunkel geeicht war, nach #71 liegen alle Trabanten unter 1.
 
 ### 13.5 Unsicher und offen
 
 1. **Ergaenzung im Issue zu T6 ("80 mm zeigt Titan, Rhea nur bei groesserer Oeffnung als Punkt"):** stand nicht in T6 (`docs/anforderungen.md`) und folgt nicht aus der Blendungsregel, denn die haengt an der Vergroesserung, nicht an der Oeffnung: an 80 mm ist Rhea (Saturn 20'') ab $V$ = 9,45 sichtbar, also bei jeder Austrittspupille bis 8,5 mm; nach der Grenzgroesse (Abschnitt 7, $7{,}7 + 5\log_{10} 8 = 12{,}2$ mag) ebenfalls. Der Satz ist im Issue gestrichen (Herbert, 2026-10-27). Getestet ist, was das Modell hergibt: Titan und Rhea sichtbar bei $V \ge 9{,}45$, Rhea geblendet darunter.
-2. **Sichtbarkeit im Bild:** Gemessen mit `rendere` (Fenster 400'', 1024 px, 45 Grad, klar, Bortle 5, Anzeigewert nach sRGB): Saturn 20'' an 80 mm bei 60x und 2'' Seeing Himmel 7, Titan 11, Rhea 9; an 300 mm bei 200x und 1'' Himmel 8, Titan 25, Rhea 15. Jupiter 47'' im 10x50 im ganzen Gesichtsfeld (22,85''/Arbeitspixel): Himmel 16, Trabanten 17 bis 18; an 80 mm bei 60x (2,9''/px) Himmel 7, Trabanten 18 bis 36. Am Fernrohr sind diese Trabanten leicht zu sehen. Hauptursachen (Review PR #69): (a) Die Anzeigeabbildung (Abschnitt 12) bildet Objekt und Himmel je Ebene ab und hebt den Himmel dabei relativ um $(L_\mathrm{obj}/L_\mathrm{Himmel})^{2/3}$ an (12.5 Punkt 4), waehrend verduennte Teile der Objektebene linear klein bleiben; ein Io-Pixel im 10x50, selbst mit $w(\mu)$ abgebildet, gaebe etwa sRGB 67 statt 17. (b) Im 10x50-Standardfenster ist ein Arbeitspixel 22,85'' und damit rund viermal groeber als die Augenaufloesung $60''/V$ = 6''; der Fluss verteilt sich auf ein viel zu grosses Pixel. Die Loesung kommt mit Issue #72, nicht in #14.
+2. **Sichtbarkeit im Bild:** Gemessen mit `rendere` (Fenster 400'', 1024 px, 45 Grad, klar, Bortle 5, Anzeigewert nach sRGB): Saturn 20'' an 80 mm bei 60x und 2'' Seeing Himmel 7, Titan 11, Rhea 9; an 300 mm bei 200x und 1'' Himmel 8, Titan 25, Rhea 15. Jupiter 47'' im 10x50 im ganzen Gesichtsfeld (22,85''/Arbeitspixel): Himmel 16, Trabanten 17 bis 18; an 80 mm bei 60x (2,9''/px) Himmel 7, Trabanten 18 bis 36. Am Fernrohr sind diese Trabanten leicht zu sehen. Hauptursachen (Review PR #69): (a) Die Anzeigeabbildung (Abschnitt 12) bildet Objekt und Himmel je Ebene ab und hebt den Himmel dabei relativ um $(L_\mathrm{obj}/L_\mathrm{Himmel})^{2/3}$ an (12.5 Punkt 4), waehrend verduennte Teile der Objektebene linear klein bleiben; ein Io-Pixel im 10x50, selbst mit $w(\mu)$ abgebildet, gaebe etwa sRGB 67 statt 17. (b) Im 10x50-Standardfenster ist ein Arbeitspixel 22,85'' und damit rund viermal groeber als die Augenaufloesung $60''/V$ = 6''; der Fluss verteilt sich auf ein viel zu grosses Pixel. Die Loesung kommt mit Issue #72, nicht in #14. Nachtrag Issue #71: Mit dem geeichten Quellweiss sinkt $h_\mathrm{rel}$ um $\Delta\mu_\mathrm{weiss}$, die Anzeigehelligkeit von Quellweiss steigt nur um $\Delta\mu_\mathrm{weiss}/3$; die Trabanten werden in der Anzeige um $2/3\,\Delta\mu_\mathrm{weiss}$ dunkler (Jupiter 0,67 mag, Saturn 20'' 0,84 mag), der Planet um $\Delta\mu_\mathrm{weiss}/3$ heller. Nachgemessen wie oben (Fenster 400'', 1024 px, 80 mm bei 60x, Spitze im Gruenkanal, sRGB): Io 32 auf 23, Europa 31 auf 23, Titan 11 auf 9, Rhea 9 auf 8. Das Verhaeltnis Trabant zu Planet stimmt jetzt; die Sichtbarkeit bleibt Aufgabe von #72.
 3. **Gleichmaessig helle Scheibe:** keine Randverdunklung, keine Phase; bei Durchmessern unter der Gesamt-FWHM ohne sichtbaren Einfluss.
-4. **Quellweiss bei Jupiter und Saturn falsch geeicht (Review PR #69, Issue #71):** `weiss_mag_arcsec2` in `daten/objekte.json` ist die mittlere Flaechenhelligkeit der Scheibe (`objekte.md` 5.2), das Scheibenmittel im Quellbild liegt aber bei etwa 0,38 statt 1,0. Folge: die Planetenflaeche ist im Arbeitsraster um 1,07 mag (Jupiter) bzw. 1,27 mag (Saturn, Kugel plus Ring) zu dunkel, die Trabanten sind gegenueber dem Planeten 2,7- bis 3,2-mal zu hell. Die Formel in 13.1 bleibt richtig; falsch ist der Bezug $\mu_\mathrm{weiss}$. Die Korrektur der Eichung kommt mit Issue #71, `objekte.json` bleibt in #14 unveraendert.
+4. **Erledigt mit Issue #71 (2026-10-27):** Quellweiss ist fuer alle Zustaende auf den Pixelwert 1,0 geeicht (`objekte.md` 5.3, Werkzeug `tools/quellweiss_eichen.py`, Probe 0,05 mag): Jupiter 4,29 / 4,35, Saturn 5,34 / 5,56 (Kugel plus Ring), dazu Mond 3,91 und Mars 1,68 bis 3,10. Die Werte in 13.4 sind nachgetragen, der urspruengliche Befund folgt. **Quellweiss bei Jupiter und Saturn falsch geeicht (Review PR #69, Issue #71):** `weiss_mag_arcsec2` in `daten/objekte.json` ist die mittlere Flaechenhelligkeit der Scheibe (`objekte.md` 5.2), das Scheibenmittel im Quellbild liegt aber bei etwa 0,38 statt 1,0. Folge: die Planetenflaeche ist im Arbeitsraster um 1,07 mag (Jupiter) bzw. 1,27 mag (Saturn, Kugel plus Ring) zu dunkel, die Trabanten sind gegenueber dem Planeten 2,7- bis 3,2-mal zu hell. Die Formel in 13.1 bleibt richtig; falsch ist der Bezug $\mu_\mathrm{weiss}$. Die Korrektur der Eichung kommt mit Issue #71, `objekte.json` bleibt in #14 unveraendert.
