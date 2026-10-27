@@ -68,5 +68,171 @@
         "kommentar": "Werte aus objekte.md 6.1, Phasenwinkel 0 wie in 5.1. Quellbild Hubble 26.08.2003 bei 25,12\" (bilder.json)."
       }
     ]
+  },
+  {
+    "id": "jupiter",
+    "name": "Jupiter",
+    "typ": "planet",
+    "quelle_physik": "docs/recherche/objekte.md",
+    "zustaende": [
+      {
+        "id": "jup_35",
+        "name": "Jupiter fern (35\")",
+        "winkelgroesse_arcsec": 35.0,
+        "polar_arcsec": 32.7,
+        "phase": 0.99,
+        "phasenwinkel_grad": 10,
+        "magnitude": -2.0,
+        "weiss_mag_arcsec2": 5.4,
+        "entfernung_au": 5.63,
+        "bild": "jupiter_hst_20190627",
+        "trabanten": [
+          {
+            "name": "Io",
+            "dx_arcsec": -82.0,
+            "dy_arcsec": 2.2,
+            "durchmesser_arcsec": 0.89,
+            "magnitude": 5.6
+          },
+          {
+            "name": "Europa",
+            "dx_arcsec": 130.0,
+            "dy_arcsec": -3.5,
+            "durchmesser_arcsec": 0.76,
+            "magnitude": 5.9
+          },
+          {
+            "name": "Ganymed",
+            "dx_arcsec": 246.0,
+            "dy_arcsec": 3.2,
+            "durchmesser_arcsec": 1.29,
+            "magnitude": 5.2
+          },
+          {
+            "name": "Kallisto",
+            "dx_arcsec": -387.0,
+            "dy_arcsec": -8.7,
+            "durchmesser_arcsec": 1.18,
+            "magnitude": 6.3
+          }
+        ],
+        "hinweis_hilfe": "Jupiter steht bei 35 Bogensekunden fern der Opposition, etwa vier Monate davor oder danach; so zeigt er sich den groessten Teil des Jahres.",
+        "kommentar": "Werte aus objekte.md 6.1, Phasenwinkel 10 Grad aus 5.1 (Phaseneffekt vernachlaessigbar). Trabanten aus 3.3: Stellung von jup_47 linear mit 35/47 skaliert (Abstaende und Durchmesser), Magnituden +0,6 mag Entfernungskorrektur (3.1). Kein eigenes Bild: nutzt das Bild von jup_47 (Hubble 2019, 45,65\", bilder.json); die Anwendung skaliert die Scheibe auf 35\". weiss_mag_arcsec2 5,4 aus 5.2."
+      },
+      {
+        "id": "jup_47",
+        "name": "Jupiter Opposition (47\")",
+        "winkelgroesse_arcsec": 47.0,
+        "polar_arcsec": 44.0,
+        "phase": 1.0,
+        "phasenwinkel_grad": 0.5,
+        "magnitude": -2.7,
+        "weiss_mag_arcsec2": 5.3,
+        "entfernung_au": 4.195,
+        "bild": "jupiter_hst_20190627",
+        "trabanten": [
+          {
+            "name": "Io",
+            "dx_arcsec": -110.0,
+            "dy_arcsec": 2.9,
+            "durchmesser_arcsec": 1.2,
+            "magnitude": 5.0
+          },
+          {
+            "name": "Europa",
+            "dx_arcsec": 175.0,
+            "dy_arcsec": -4.7,
+            "durchmesser_arcsec": 1.03,
+            "magnitude": 5.3
+          },
+          {
+            "name": "Ganymed",
+            "dx_arcsec": 330.0,
+            "dy_arcsec": 4.3,
+            "durchmesser_arcsec": 1.73,
+            "magnitude": 4.6
+          },
+          {
+            "name": "Kallisto",
+            "dx_arcsec": -520.0,
+            "dy_arcsec": -11.7,
+            "durchmesser_arcsec": 1.58,
+            "magnitude": 5.7
+          }
+        ],
+        "kommentar": "Werte aus objekte.md 6.1 (mittlere Opposition), Phasenwinkel 0,5 Grad aus 5.1. Trabanten aus 3.3 (dx positiv = Osten = links, dy positiv = Norden, Bahnneigung 2 Grad, alle vier sichtbar). Quellbild Hubble 27.06.2019 bei 45,65\" (bilder.json), Planetennorden oben. weiss_mag_arcsec2 5,3 aus 5.2."
+      }
+    ]
+  },
+  {
+    "id": "saturn",
+    "name": "Saturn",
+    "typ": "planet",
+    "quelle_physik": "docs/recherche/objekte.md",
+    "zustaende": [
+      {
+        "id": "sat_16",
+        "name": "Saturn fern (16\")",
+        "winkelgroesse_arcsec": 16.0,
+        "polar_arcsec": 14.4,
+        "phase": 1.0,
+        "phasenwinkel_grad": 6,
+        "ringneigung_grad": 19,
+        "ring_aussen_arcsec": 36.3,
+        "magnitude": 0.6,
+        "weiss_mag_arcsec2": 6.6,
+        "entfernung_au": 10.39,
+        "bild": "saturn_hst_20210912",
+        "trabanten": [
+          {
+            "name": "Titan",
+            "dx_arcsec": 120.0,
+            "dy_arcsec": -35.5,
+            "durchmesser_arcsec": 0.68,
+            "magnitude": 8.8
+          },
+          {
+            "name": "Rhea",
+            "dx_arcsec": -48.0,
+            "dy_arcsec": 16.6,
+            "durchmesser_arcsec": 0.2,
+            "magnitude": 10.0
+          }
+        ],
+        "hinweis_hilfe": "Saturn steht bei 16 Bogensekunden fern der Opposition, etwa drei Monate vor oder nach der Konjunktion mit der Sonne.",
+        "kommentar": "Werte aus objekte.md 6.1 mit Ringoeffnung 19 Grad (Projektentscheidung, Bild Hubble 2021 mit B = 19,2 Grad) statt 15 Grad: ring_aussen_arcsec = 2,269 x 16\" (1.1); magnitude 0,6 nach Mallama und Hilton (5.1) mit B = 19 Grad (bei 15 Grad 0,7). Trabanten: Stellung von sat_20 linear mit 16/20 skaliert, Magnituden aus 3.3. Kein eigenes Bild: nutzt das Bild von sat_20. weiss_mag_arcsec2 6,6 ist die Kugel (5.2)."
+      },
+      {
+        "id": "sat_20",
+        "name": "Saturn Opposition (20\")",
+        "winkelgroesse_arcsec": 20.0,
+        "polar_arcsec": 18.0,
+        "phase": 1.0,
+        "phasenwinkel_grad": 0.5,
+        "ringneigung_grad": 19,
+        "ring_aussen_arcsec": 45.4,
+        "magnitude": -0.1,
+        "weiss_mag_arcsec2": 6.6,
+        "entfernung_au": 8.31,
+        "bild": "saturn_hst_20210912",
+        "trabanten": [
+          {
+            "name": "Titan",
+            "dx_arcsec": 150.0,
+            "dy_arcsec": -44.4,
+            "durchmesser_arcsec": 0.85,
+            "magnitude": 8.3
+          },
+          {
+            "name": "Rhea",
+            "dx_arcsec": -60.0,
+            "dy_arcsec": 20.7,
+            "durchmesser_arcsec": 0.25,
+            "magnitude": 9.5
+          }
+        ],
+        "kommentar": "Werte aus objekte.md 6.1 mit Ringoeffnung 19 Grad (Projektentscheidung) statt 15 Grad: ring_aussen_arcsec = 2,269 x 20\" (1.1); magnitude -0,1 nach Mallama und Hilton (5.1) mit B = 19 Grad (bei 15 Grad 0,0). Trabanten nach 3.3 in der Ringebene: dx wie dort (Titan +150, Rhea -60), dy mit der Formel aus 3.3 fuer B = 19 statt 15 Grad neu gerechnet, dy = sqrt(1 - (dx/E)^2) E sin B mit E = 202,7\" bzw. 87,4\" (3.2): Titan -44,4 statt -35, Rhea +20,7 statt +17; Titan vor dem Planeten (suedlich), Rhea dahinter. Quellbild Hubble 12.09.2021 bei 18,11\" (bilder.json), Planetennorden oben. weiss_mag_arcsec2 6,6 ist die Kugel (5.2)."
+      }
+    ]
   }
 ]
