@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { PhysikFehler } from "./fehler";
 import { BAUARTEN, type Fernrohr } from "../naht/konfiguration";
 import { ARCSEC_PRO_GRAD, TRANSMISSION } from "./konstanten";
-import { austrittspupilleMm, flaechenhelligkeitsfaktor, optik, vergroesserungsgrenzen } from "./optik";
+import { austrittspupilleMm, flaechenhelligkeitsfaktor, okularBrennweiteFuer, optik, vergroesserungsgrenzen } from "./optik";
 
 // Testwerte aus docs/recherche/physik.md, Abschnitt 8.
 describe("Optikgroessen", () => {
@@ -13,6 +13,20 @@ describe("Optikgroessen", () => {
     const grenzen = vergroesserungsgrenzen(200);
     expect(grenzen.min).toBeCloseTo(33.33, 2);
     expect(grenzen.max).toBe(400);
+  });
+});
+
+describe("okularBrennweiteFuer (A-F7, Abschnitt 4: V = F / f)", () => {
+  it("f = F / V auf 0,01 mm gerundet, optik liefert die Vergroesserung zurueck", () => {
+    expect(okularBrennweiteFuer(600, 40)).toBe(15);
+    expect(okularBrennweiteFuer(600, 37)).toBe(16.22);
+    expect(okularBrennweiteFuer(1000, 150)).toBe(6.67);
+    const f: Fernrohr = { art: "fernrohr", oeffnungMm: 80, brennweiteMm: 600, obstruktion: 0, bauart: "refraktor", okular: { brennweiteMm: okularBrennweiteFuer(600, 40), scheinbaresGesichtsfeldGrad: 50 } };
+    expect(optik(f).vergroesserung).toBeCloseTo(40, 12);
+  });
+  it("Vergroesserung 0 oder negativ ergibt Unendlich (begrenze schneidet es)", () => {
+    expect(okularBrennweiteFuer(600, 0)).toBe(Infinity);
+    expect(okularBrennweiteFuer(600, -3)).toBe(Infinity);
   });
 });
 

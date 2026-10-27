@@ -9,7 +9,7 @@
 // eigenen Feldpfad zurueck (zahlenfeld erwartet hinweis.wert im Mass des Felds). Ebenso zeigt das
 // Feld Obstruktion Prozent (A-F1), die Konfiguration traegt das Verhaeltnis.
 
-import { BAUARTEN, type Fernrohr, type Geraet, GRENZEN, type Hinweis, type Okular, optik } from "../physik";
+import { BAUARTEN, type Fernrohr, type Geraet, GRENZEN, type Hinweis, type Okular, okularBrennweiteFuer, optik } from "../physik";
 import { TEXTE } from "../texte";
 import { VOREINSTELLUNG } from "../zustand";
 import { auswahl, regler, type Zahlenfeld, zahlenfeld } from "./feld";
@@ -22,7 +22,6 @@ import {
   geraetZuEintrag,
   mitBauart,
   obstruktionProzent,
-  okularBrennweiteFuer,
   skaliereHinweise,
   VERGROESSERUNG_FELD,
   vergroesserungsHinweis

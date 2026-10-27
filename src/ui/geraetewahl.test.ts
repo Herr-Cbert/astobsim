@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import geraeteJson from "../../daten/geraete.json";
 import { pruefeGeraete } from "../daten";
 import { KONFIGURATION_A_D9 } from "../physik/testdaten";
-import { begrenze, type Fernrohr, GRENZEN, optik } from "../physik";
+import { begrenze, type Fernrohr, GRENZEN, okularBrennweiteFuer, optik } from "../physik";
 import { zahl } from "./format";
 import {
   auswahlNach,
@@ -13,7 +13,6 @@ import {
   geraetZuEintrag,
   mitBauart,
   obstruktionProzent,
-  okularBrennweiteFuer,
   skaliereHinweise,
   VERGROESSERUNG_FELD,
   vergroesserungsHinweis

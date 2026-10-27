@@ -50,7 +50,7 @@ export {
   seeingAmObjektArcsec,
   seeingstufe
 } from "./atmosphaere";
-export { type Optik, austrittspupilleMm, flaechenhelligkeitsfaktor, optik, vergroesserungsgrenzen } from "./optik";
+export { type Optik, austrittspupilleMm, flaechenhelligkeitsfaktor, okularBrennweiteFuer, optik, vergroesserungsgrenzen } from "./optik";
 export { airyProfil, gaussProfil, moffatProfil, quadratur } from "./profile";
 export { type Aufloesung, type Aufloesungsgrenze, aufloesung } from "./aufloesung";
 export { anzeigefaktor, bortleMagProArcsec2, helligkeit, leuchtdichteRelativ, type Okularhelligkeit, okularhelligkeit } from "./helligkeit";

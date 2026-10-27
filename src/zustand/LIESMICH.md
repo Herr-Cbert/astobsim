@@ -10,6 +10,7 @@ interface Kataloge { geraete: readonly Geraeteeintrag[]; objekte: readonly Objek
 voreinstellung(kataloge: Kataloge): Konfiguration
 inUrl(konfiguration: Konfiguration, kataloge: Kataloge): string   // "?v=1&g=...", mit fuehrendem "?", schreibt begrenze(k)
 ausUrl(search: string, kataloge: Kataloge): { konfiguration: Konfiguration; hinweise: Hinweis[] }  // search mit oder ohne "?"
+listeneintragZu(geraete: readonly Geraeteeintrag[], geraet: Geraet): Geraeteeintrag | undefined   // Listeneintrag zum Geraet, Okular egal (#63; auch fuer die Auswahlliste in ui)
 ```
 
 Abweichungen von Issue #16 (`voreinstellung()`, `inUrl(k)`, `ausUrl(search) -> Konfiguration`): `ausUrl` liefert zusaetzlich die Hinweise von `begrenze` (`Hinweis` aus physik), damit die UI geschnittene Link-Werte anzeigen kann (Entscheidung Herbert 2026-10-26); ein Rueckfall auf die Voreinstellung erzeugt keinen Hinweis. Zweitens: Die Konfiguration traegt das volle `Geraet` und den vollen `Objektzustand`, die URL nur ids und Zahlen. Um daraus eine Konfiguration zu bauen, brauchen die Funktionen die geladenen Listen aus `daten`. `inUrl` braucht die Geraeteliste, um ein Listengeraet als id zu schreiben; der Einheitlichkeit halber bekommen alle drei denselben Parameter `Kataloge`.
