@@ -13,6 +13,16 @@ export function austrittspupilleMm(oeffnungMm: number, vergroesserung: number): 
 }
 
 /**
+ * Okularbrennweite zur gewuenschten Vergroesserung (A-F7, Abschnitt 4: V = F / f): f = F / V,
+ * gerundet auf 0,01 mm, damit die URL kurz bleibt (ok=16.22 statt 16.216216216216218). Eine
+ * Vergroesserung bis 0 ergibt Unendlich; begrenze schneidet das auf die laengste Okularbrennweite
+ * (kleinste Vergroesserung).
+ */
+export function okularBrennweiteFuer(brennweiteMm: number, vergroesserung: number): number {
+  return vergroesserung > 0 ? Math.round((brennweiteMm / vergroesserung) * 100) / 100 : Number.POSITIVE_INFINITY;
+}
+
+/**
  * Sinnvolle Vergroesserungen (Abschnitt 4, [35]): min = D / 6 mm (Austrittspupille gleich
  * Augenpupille), max = 2 D (Austrittspupille 0,5 mm). Die Warnschwellen in A-D5.
  */

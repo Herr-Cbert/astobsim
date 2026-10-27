@@ -6,7 +6,7 @@ import { type Bildnachweis, type Objekt, pruefeBildnachweise, pruefeGeraete, pru
 import type { Fernglas, Fernrohr, Konfiguration } from "../naht/konfiguration";
 import { begrenze, GRENZEN } from "../physik";
 import type { Kataloge } from "./kataloge";
-import { ausUrl, inUrl, PARAMETER } from "./url";
+import { ausUrl, inUrl, listeneintragZu, PARAMETER } from "./url";
 import { voreinstellung } from "./voreinstellung";
 
 // Echte Kataloge aus daten/ (heute nur der Mond) und ein synthetischer mit allen vier Objekten
@@ -264,5 +264,21 @@ describe("ausUrl: Begrenzung und Rueckfall", () => {
 
   it("liest den Suchteil auch ohne fuehrendes Fragezeichen", () => {
     expect(aus(inUrl(START, ECHT).slice(1), ECHT)).toEqual(START);
+  });
+});
+
+describe("listeneintragZu (Issue #63, gemeinsam mit ui/geraetewahl.ts)", () => {
+  it("findet jedes Listengeraet mit beliebigem Okular wieder, und inUrl schreibt genau diese id", () => {
+    for (const eintrag of ECHT.geraete) {
+      for (const okular of [{ brennweiteMm: 25, scheinbaresGesichtsfeldGrad: 52 }, { brennweiteMm: 6.67, scheinbaresGesichtsfeldGrad: 82 }]) {
+        const geraet = "okular" in eintrag.geraet || eintrag.geraet.art === "fernrohr" ? { ...(eintrag.geraet as Omit<Fernrohr, "okular">), okular } : eintrag.geraet;
+        expect(listeneintragZu(ECHT.geraete, geraet as Konfiguration["geraet"])?.id).toBe(eintrag.id);
+        expect(parameter(mitGeraet(geraet as Konfiguration["geraet"]))["g"]).toBe(eintrag.id);
+      }
+    }
+  });
+  it("ein abweichender Wert ergibt keinen Eintrag", () => {
+    expect(listeneintragZu(ECHT.geraete, FREIES_FERNROHR)).toBeUndefined();
+    expect(listeneintragZu(ECHT.geraete, FREIES_FERNGLAS)).toBeUndefined();
   });
 });

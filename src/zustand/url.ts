@@ -11,7 +11,7 @@
 // Geraeteart andere Felder schreiben und lesen. Das Erkennen eines Listengeraets vergleicht
 // die Felder dagegen generisch, ohne die Art zu kennen.
 
-import { type Listengeraet, mitOkular, objektzustand, vorschlagObstruktionProzent } from "../daten";
+import { type Geraeteeintrag, type Listengeraet, mitOkular, objektzustand, vorschlagObstruktionProzent } from "../daten";
 import { BAUARTEN, TRANSPARENZEN } from "../naht/konfiguration";
 import type { Bauart, Fernglas, Fernrohr, Geraet, Konfiguration, Okular } from "../naht/konfiguration";
 import { begrenze, type Hinweis } from "../physik";
@@ -94,8 +94,7 @@ export function ausUrl(search: string, kataloge: Kataloge): { konfiguration: Kon
 // Geraet schreiben
 
 function schreibeGeraet(q: URLSearchParams, geraet: Geraet, kataloge: Kataloge): void {
-  const ohne = ohneOkular(geraet);
-  const eintrag = kataloge.geraete.find((e) => gleicheWerte(e.geraet, ohne));
+  const eintrag = listeneintragZu(kataloge.geraete, geraet);
   if (eintrag !== undefined) {
     q.set(P.geraet, eintrag.id);
   } else {
@@ -133,6 +132,16 @@ function ohneOkular(geraet: Geraet): Listengeraet {
     return rest;
   }
   return geraet;
+}
+
+/**
+ * Der Listeneintrag mit genau diesem Geraet (Okular egal), sonst undefined. Dieselbe Erkennung
+ * nutzen die URL (g=id) und die Auswahlliste des Formulars (ui/geraetewahl.ts), damit beide
+ * denselben Eintrag zeigen.
+ */
+export function listeneintragZu(geraete: readonly Geraeteeintrag[], geraet: Geraet): Geraeteeintrag | undefined {
+  const ohne = ohneOkular(geraet);
+  return geraete.find((e) => gleicheWerte(e.geraet, ohne));
 }
 
 /** Gleiche Feldnamen und gleiche Werte (alle Felder eines Listengeraets sind Zahlen oder Texte). */

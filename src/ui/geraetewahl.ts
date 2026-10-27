@@ -1,11 +1,13 @@
 // Reine Logik des Formulars Geraet und Okular (#17), ohne DOM, damit Vitest sie in Node prueft:
 // Gruppen der Auswahlliste (A-F2), welcher Eintrag zu einer Konfiguration gehoert, freie Eingabe
-// eines Fernrohrs mit Obstruktions-Vorschlag (A-F1) und die Vergroesserung als Eingabe (A-F7).
-// Bereiche schneidet weiterhin nur begrenze() in physik; hier wird nur umgerechnet.
+// eines Fernrohrs mit Obstruktions-Vorschlag (A-F1) und Hinweise zur Vergroesserung als Eingabe
+// (A-F7). Bereiche schneidet weiterhin nur begrenze() in physik; die Umrechnung V -> Okular steht in
+// physik (okularBrennweiteFuer), der Vergleich mit der Geraeteliste in zustand (listeneintragZu).
 
-import { type Geraeteeintrag, type Listengeraet, mitOkular, vorschlagObstruktionProzent } from "../daten";
+import { type Geraeteeintrag, mitOkular, vorschlagObstruktionProzent } from "../daten";
 import type { Bauart, Fernrohr, Geraet, Hinweis, Okular } from "../physik";
 import { aufSchritt, GRENZEN } from "../physik";
+import { listeneintragZu } from "../zustand";
 
 /** Wert des Eintrags "Frei eingeben" in der Auswahlliste; keine Geraete-id (die sind a-z, 0-9, -). */
 export const FREI = "frei";
@@ -22,28 +24,9 @@ export function geraetegruppen(eintraege: readonly Geraeteeintrag[]): { gruppe: 
   return GRUPPEN.map((gruppe) => ({ gruppe, eintraege: eintraege.filter((e) => e.geraet.art === gruppe) })).filter((g) => g.eintraege.length > 0);
 }
 
-// ohneOkular und gleicheWerte sind Kopien aus src/zustand/url.ts (dort nicht exportiert); beide
-// muessen gleich bleiben, sonst zeigt die Liste einen anderen Eintrag als die URL. Folge-Issue: Export aus zustand.
-
-/** Das Geraet ohne Okular, so wie es in der Geraeteliste steht. */
-function ohneOkular(geraet: Geraet): Listengeraet {
-  if ("okular" in geraet) {
-    const { okular: _okular, ...rest } = geraet;
-    return rest;
-  }
-  return geraet;
-}
-
-/** Gleiche Feldnamen und gleiche Werte, wie zustand ein Listengeraet in der URL erkennt. */
-function gleicheWerte(a: Listengeraet, b: Listengeraet): boolean {
-  const ka = Object.keys(a) as (keyof Listengeraet)[];
-  return ka.length === Object.keys(b).length && ka.every((k) => k in b && a[k] === b[k]);
-}
-
 /** id des Listeneintrags mit genau diesem Geraet (Okular egal), sonst FREI. */
 export function eintragZu(eintraege: readonly Geraeteeintrag[], geraet: Geraet): string {
-  const ohne = ohneOkular(geraet);
-  return eintraege.find((e) => gleicheWerte(e.geraet, ohne))?.id ?? FREI;
+  return listeneintragZu(eintraege, geraet)?.id ?? FREI;
 }
 
 /**
@@ -74,14 +57,6 @@ export function freiesFernrohr(aktuell: Geraet, ersatz: Fernrohr, okular: Okular
 /** Neue Bauart mit dem Vorschlagswert der Obstruktion (A-F1, Tabelle aus #11); bleibt danach editierbar. */
 export function mitBauart(fernrohr: Fernrohr, bauart: Bauart): Fernrohr {
   return { ...fernrohr, bauart, obstruktion: vorschlagObstruktionProzent(bauart, fernrohr.oeffnungMm, fernrohr.brennweiteMm) / 100 };
-}
-
-/**
- * Okularbrennweite zur gewuenschten Vergroesserung (A-F7): f = F / V, gerundet auf 0,01 mm, damit
- * die URL kurz bleibt (ok=16.22 statt 16.216216216216218). Eine Vergroesserung bis 0 ergibt Unendlich; begrenze schneidet das auf die laengste Okularbrennweite (kleinste Vergroesserung).
- */
-export function okularBrennweiteFuer(brennweiteMm: number, vergroesserung: number): number {
-  return vergroesserung > 0 ? Math.round((brennweiteMm / vergroesserung) * 100) / 100 : Number.POSITIVE_INFINITY;
 }
 
 /**
