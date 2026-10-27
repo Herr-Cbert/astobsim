@@ -4,7 +4,7 @@
 // nennt) und einen Rueckruf; was eine Aenderung bedeutet, entscheidet das Formular ueber die
 // Steuerung. Zahlen erscheinen mit Dezimalkomma (format.ts), gelesen wird Komma oder Punkt.
 
-import type { Hinweis } from "../physik";
+import { aufSchritt, type Hinweis } from "../physik";
 import { TEXTE } from "../texte";
 import { zahl } from "./format";
 import { hilfesymbol } from "./hilfe";
@@ -14,6 +14,17 @@ export function leseDezimal(text: string): number {
   const t = text.trim().replace(",", ".");
   if (!/^[+-]?(\d+\.?\d*|\.\d+)$/.test(t)) return Number.NaN;
   return Number(t);
+}
+
+/**
+ * Wert, den das Feld nach einer Eingabe zeigt: bei einem Schnitt der Wert aus dem Hinweis, sonst
+ * die Eingabe, auf das Raster von begrenze gerundet (raster = GRENZEN.schritt), wenn das Feld es
+ * kennt. So zeigt die Hoehe nach der Eingabe 47 die verwendeten 45, auch wenn sich die
+ * Konfiguration dadurch nicht aendert und kein Beobachter das Feld nachzieht.
+ */
+export function angezeigterWert(eingabe: number, hinweis: Hinweis | undefined, raster?: number): number {
+  if (hinweis !== undefined) return hinweis.wert;
+  return raster === undefined ? eingabe : aufSchritt(eingabe, raster);
 }
 
 /** Der Hinweis von begrenze zu genau diesem Feld, sonst undefined. */
@@ -38,6 +49,11 @@ export interface ZahlOptionen extends Feldbasis {
   schritt: number;
   /** Nachkommastellen der Anzeige. */
   stellen: number;
+  /**
+   * Raster, auf das begrenze diesen Wert rundet (GRENZEN.schritt), wenn es groeber ist als die
+   * Anzeige (Hoehe 5 Grad bei 0 Stellen); ohne Angabe zeigt das Feld die Eingabe.
+   */
+  raster?: number;
   wert: number;
   /** Gueltige Eingabe uebernehmen; liefert die Hinweise von Steuerung.aendere. */
   beiAenderung(wert: number): readonly Hinweis[];
@@ -136,7 +152,7 @@ function zahlteil(d: Document, o: ZahlOptionen, zeile: HTMLElement, element: HTM
   const uebernimm = (wert: number): void => {
     const h = hinweisFuer(o.beiAenderung(wert), o.feld);
     zeigeHinweis(h);
-    zeigeWert(h === undefined ? wert : h.wert);
+    zeigeWert(angezeigterWert(wert, h, o.raster));
   };
 
   zeigeWert(o.wert);

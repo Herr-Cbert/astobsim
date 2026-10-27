@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { hinweisFuer, leseDezimal } from "./feld";
+import { angezeigterWert, hinweisFuer, leseDezimal } from "./feld";
 
 describe("leseDezimal", () => {
   it("liest Komma und Punkt", () => {
@@ -24,5 +24,17 @@ describe("hinweisFuer", () => {
     ];
     expect(hinweisFuer(hinweise, "bedingungen.hoeheGrad")?.wert).toBe(10);
     expect(hinweisFuer(hinweise, "bedingungen.seeingFwhmArcsec")).toBeUndefined();
+  });
+});
+
+describe("angezeigterWert", () => {
+  it("zeigt bei einem Schnitt den Wert aus dem Hinweis", () => {
+    expect(angezeigterWert(95, { feld: "bedingungen.hoeheGrad", eingabe: 95, wert: 90 }, 5)).toBe(90);
+  });
+
+  it("zeigt sonst die Eingabe, auf das Raster gerundet, wenn das Feld es kennt", () => {
+    expect(angezeigterWert(47, undefined, 5)).toBe(45);
+    expect(angezeigterWert(48, undefined, 5)).toBe(50);
+    expect(angezeigterWert(16.216, undefined)).toBe(16.216);
   });
 });

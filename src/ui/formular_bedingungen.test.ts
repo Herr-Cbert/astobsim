@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { BEDINGUNGEN_A_D9 } from "../physik/testdaten";
 import type { Konfiguration } from "../physik";
 import { TEXTE } from "../texte";
-import { aufRaster, bortleanzeige, istTransparenz, luftmasseanzeige, mitBedingungen, rundeAuf, rundeImBereich, seeinganzeige } from "./formular_bedingungen";
+import { bortleanzeige, istTransparenz, luftmasseanzeige, mitBedingungen, seeinganzeige } from "./formular_bedingungen";
 
 describe("seeinganzeige", () => {
   it("nennt Wortstufe und Pickering nach physik.md 2.5", () => {
@@ -37,15 +37,6 @@ describe("luftmasseanzeige", () => {
   });
 });
 
-describe("rundeAuf", () => {
-  it("rundet ohne Gleitkommareste", () => {
-    expect(rundeAuf(2.3000000000000003, 1)).toBe(2.3);
-    expect(rundeAuf(0.55, 1)).toBe(0.6);
-    expect(rundeAuf(4.6, 0)).toBe(5);
-    expect(rundeAuf(12, 0)).toBe(12);
-  });
-});
-
 describe("mitBedingungen", () => {
   it("aendert nur den genannten Teil", () => {
     const k = { bedingungen: BEDINGUNGEN_A_D9 } as Konfiguration;
@@ -59,24 +50,5 @@ describe("istTransparenz", () => {
   it("kennt genau die drei Stufen", () => {
     for (const t of ["klar", "leicht-diesig", "diesig"]) expect(istTransparenz(t)).toBe(true);
     expect(istTransparenz("neblig")).toBe(false);
-  });
-});
-
-describe("rundeImBereich", () => {
-  it("rundet nur, wenn der gerundete Wert in den Grenzen liegt", () => {
-    const g = { min: 0.5, max: 5 };
-    expect(rundeImBereich(1.25, 1, g)).toBe(1.3);
-    expect(rundeImBereich(0.44, 1, g)).toBe(0.44);
-    expect(rundeImBereich(5.04, 1, g)).toBe(5);
-    expect(rundeImBereich(9.6, 0, { min: 1, max: 9 })).toBe(9.6);
-    expect(rundeImBereich(9.4, 0, { min: 1, max: 9 })).toBe(9);
-  });
-});
-
-describe("aufRaster", () => {
-  it("bringt Zwischenwerte aus einem Link aufs Raster der Felder", () => {
-    const b = { ...BEDINGUNGEN_A_D9, seeingFwhmArcsec: 1.25, hoeheGrad: 45.5 };
-    expect(aufRaster(b)).toEqual({ ...BEDINGUNGEN_A_D9, seeingFwhmArcsec: 1.3, hoeheGrad: 46 });
-    expect(aufRaster(BEDINGUNGEN_A_D9)).toEqual(BEDINGUNGEN_A_D9);
   });
 });

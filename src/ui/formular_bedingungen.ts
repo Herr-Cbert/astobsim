@@ -22,37 +22,8 @@ import type { Steuerung } from "./steuerung";
 
 const T = TEXTE.bedingungen;
 
-/** Nachkommastellen der Felder; die Eingabe wird darauf gerundet (Seeing in Schritten von 0,1, A-B1). */
+/** Nachkommastellen der Felder; den Schritt und das Runden darauf kennt GRENZEN (begrenze in physik). */
 const STELLEN = { seeing: 1, bortle: 0, hoehe: 0 } as const;
-
-/** wert auf stellen Nachkommastellen gerundet, ohne Gleitkommareste (2,3 statt 2,3000000000000003). */
-export function rundeAuf(wert: number, stellen: number): number {
-  const faktor = 10 ** stellen;
-  return Math.round(wert * faktor) / faktor;
-}
-
-/**
- * Eingabe auf die Feldstellen gerundet, wenn der gerundete Wert in [min, max] liegt; sonst
- * ungerundet, damit begrenze die echte Eingabe schneidet und im Hinweis meldet.
- */
-export function rundeImBereich(wert: number, stellen: number, grenze: { min: number; max: number }): number {
-  const gerundet = rundeAuf(wert, stellen);
-  return gerundet >= grenze.min && gerundet <= grenze.max ? gerundet : wert;
-}
-
-/**
- * Bedingungen auf das Raster der Felder gerundet (Seeing 0,1, Bortle und Hoehe 1). Ein Link kann
- * Zwischenwerte tragen (?s=1.25&h=45.5); ohne Rundung zeigten die Felder 1,3 und 46, waehrend
- * Rechnung, URL und Luftmasse 1,25 und 45,5 nutzten.
- */
-export function aufRaster(b: Bedingungen): Bedingungen {
-  return {
-    ...b,
-    seeingFwhmArcsec: rundeImBereich(b.seeingFwhmArcsec, STELLEN.seeing, GRENZEN.seeingFwhmArcsec),
-    bortle: rundeImBereich(b.bortle, STELLEN.bortle, GRENZEN.bortle),
-    hoeheGrad: rundeImBereich(b.hoeheGrad, STELLEN.hoehe, GRENZEN.hoeheGrad)
-  };
-}
 
 /** Kopie von k mit geaenderten Bedingungen. */
 export function mitBedingungen(k: Konfiguration, teil: Partial<Bedingungen>): Konfiguration {
@@ -109,10 +80,6 @@ export function baueFormularBedingungen(platz: HTMLElement, steuerung: Steuerung
   const d = platz.ownerDocument;
   const H = TEXTE.hilfe;
   const E = TEXTE.einheiten;
-  // Startwerte aus einem Link einmal aufs Raster der Felder bringen (Rechnung, URL und Anzeige gleich).
-  const roh = steuerung.konfiguration.bedingungen;
-  const gerastert = aufRaster(roh);
-  if (JSON.stringify(gerastert) !== JSON.stringify(roh)) steuerung.aendere(mitBedingungen(steuerung.konfiguration, gerastert));
   const start = steuerung.konfiguration.bedingungen;
   const aendere = (teil: Partial<Bedingungen>) => steuerung.aendere(mitBedingungen(steuerung.konfiguration, teil));
 
@@ -129,10 +96,10 @@ export function baueFormularBedingungen(platz: HTMLElement, steuerung: Steuerung
     einheit: E.bogensekunde,
     min: g.seeingFwhmArcsec.min,
     max: g.seeingFwhmArcsec.max,
-    schritt: 0.1,
+    schritt: g.seeingFwhmArcsec.schritt,
     stellen: STELLEN.seeing,
     wert: start.seeingFwhmArcsec,
-    beiAenderung: (wert) => aendere({ seeingFwhmArcsec: rundeImBereich(wert, STELLEN.seeing, g.seeingFwhmArcsec) })
+    beiAenderung: (wert) => aendere({ seeingFwhmArcsec: wert })
   });
   const seeingStufe = anzeigezeile(d, seeing, "bedingungen-seeing-stufe");
 
@@ -143,11 +110,10 @@ export function baueFormularBedingungen(platz: HTMLElement, steuerung: Steuerung
     hilfe: H.bortle,
     min: g.bortle.min,
     max: g.bortle.max,
-    schritt: 1,
+    schritt: g.bortle.schritt,
     stellen: STELLEN.bortle,
     wert: start.bortle,
-    // Gerundet, bevor begrenze schneidet: sonst meldet begrenze das Runden von 4,6 auf 5 als Schnitt.
-    beiAenderung: (wert) => aendere({ bortle: rundeImBereich(wert, STELLEN.bortle, g.bortle) })
+    beiAenderung: (wert) => aendere({ bortle: wert })
   });
   const bortleStufe = anzeigezeile(d, bortle, "bedingungen-bortle-stufe");
 
@@ -170,10 +136,11 @@ export function baueFormularBedingungen(platz: HTMLElement, steuerung: Steuerung
     einheit: E.grad,
     min: g.hoeheGrad.min,
     max: g.hoeheGrad.max,
-    schritt: 1,
+    schritt: g.hoeheGrad.schritt,
     stellen: STELLEN.hoehe,
+    raster: g.hoeheGrad.schritt,
     wert: start.hoeheGrad,
-    beiAenderung: (wert) => aendere({ hoeheGrad: rundeImBereich(wert, STELLEN.hoehe, g.hoeheGrad) })
+    beiAenderung: (wert) => aendere({ hoeheGrad: wert })
   });
   const hoeheLuftmasse = anzeigezeile(d, hoehe, "bedingungen-hoehe-luftmasse");
 
