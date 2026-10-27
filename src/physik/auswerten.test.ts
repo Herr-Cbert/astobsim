@@ -180,6 +180,14 @@ describe("auswerten: Punktquellen im Quellbild (Issue #14)", () => {
     expect(b.punktquellen.map((q) => q.sichtbar)).toEqual([true, true]);
     expect(b.schluessel).not.toBe(a.schluessel);
   });
+  it("andere Sichtbarkeit eines Trabanten ausserhalb des Fensters aendert den Schluessel nicht", () => {
+    // Fenster 160'' um Titan (150, -44,4): Rhea bei (-60, 20,7) liegt weit draussen.
+    const umTitan = { breiteArcsec: 160, mitteXArcsec: 150, mitteYArcsec: -44.4, px: 16 };
+    const a = auswerten(saturn(8), { fenster: umTitan }).parameter.quellbild;
+    const b = auswerten(saturn(10), { fenster: umTitan }).parameter.quellbild;
+    expect(a.punktquellen[1]!.sichtbar).not.toBe(b.punktquellen[1]!.sichtbar);
+    expect(b.schluessel).toBe(a.schluessel);
+  });
   it("gleiche Sichtbarkeit bei gleichem Fenster gibt denselben Quellbild-Schluessel", () => {
     expect(auswerten(saturn(10), { fenster: f }).parameter.quellbild.schluessel).toBe(auswerten(saturn(12), { fenster: f }).parameter.quellbild.schluessel);
   });

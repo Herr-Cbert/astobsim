@@ -51,7 +51,11 @@ export function fenster(breiteArcsec: number, px: number): Fenster {
   return { breiteArcsec, mitteXArcsec: 0, mitteYArcsec: 0, px };
 }
 
-/** Jupiter 47'' mit den vier Galileischen Trabanten, Werte aus daten/objekte.json (jup_47). */
+/**
+ * Jupiter 47'' mit den vier Galileischen Trabanten, Objekt- und Trabantenwerte aus daten/objekte.json
+ * (jup_47). quelle.massstabArcsecProPx 0,047 ist ein Testwert (JUPITER_QUELLE), nicht der des
+ * Quellbilds in daten/ (etwa 0,039''/px).
+ */
 export const JUPITER_47: Objektzustand = {
   kennung: "jup_47",
   durchmesserArcsec: 47,
@@ -65,7 +69,10 @@ export const JUPITER_47: Objektzustand = {
   ]
 };
 
-/** Saturn 20'' mit Titan und Rhea, Werte aus daten/objekte.json (sat_20). */
+/**
+ * Saturn 20'' mit Titan und Rhea, Objekt- und Trabantenwerte aus daten/objekte.json (sat_20).
+ * quelle (1000 px, 0,05''/px) ist ein Testwert, nicht das Quellbild in daten/ (etwa 0,033''/px).
+ */
 export const SATURN_20: Objektzustand = {
   kennung: "sat_20",
   durchmesserArcsec: 20,
