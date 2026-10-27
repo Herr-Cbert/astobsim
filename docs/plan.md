@@ -77,7 +77,7 @@ Umgesetzt ab 2026-10-27: Vorbereitungs-PR `vorbereitung-welle-3` (Steuerung mit 
 
 **Welle 4a (M2, Folge-Issues aus Welle 3b):** #71 (Quellweiss eichen) und #51 (Kachelstufen linear) parallel, danach #72 (Trabanten als eigene Punktebene, Ansatz 2026-10-27 im Plan-Modus mit Herbert geklaert; loest auch die Begrenzung von Mars am Anzeigeweiss). Umgesetzt 2026-10-27, PRs #73 bis #75.
 
-**Welle 4 (M3):** #21, #22, #23 sequentiell; #21 braucht Herberts Urteil zu den Testfaellen. #21 am 2026-10-27 im Plan-Modus geklaert (Masszahl Profildelle statt MTF, Screenshots per Skript), Ergebnis `docs/validierung.md`, gemerged mit PR #80. Die Abweichungen #76 bis #79 (Cassini/Seeing, Mond-Zoom, Mars-Polkappe, Jupiter-Kontrast) gehoeren zu M3. Reihenfolge (Herbert, 2026-10-27): #22, #76, #79, danach #77 und #78, zuletzt #23.
+**Welle 4 (M3):** #21, #22, #23 sequentiell; #21 braucht Herberts Urteil zu den Testfaellen. #21 am 2026-10-27 im Plan-Modus geklaert (Masszahl Profildelle statt MTF, Screenshots per Skript), Ergebnis `docs/validierung.md`, gemerged mit PR #80. Die Abweichungen #76 bis #79 (Cassini/Seeing, Mond-Zoom, Mars-Polkappe, Jupiter-Kontrast) gehoeren zu M3. Reihenfolge (Herbert, 2026-10-27): #22, #76, #79, danach #66 (Kachel-Cache), #77 und #78, zuletzt #23. #22 erledigt 2026-10-27 mit PRs #81 bis #86 (Sicherheit, #63, Vereinfachungen A bis D).
 
 Merge-Konflikte in Stufe B zeigen, wo der Modulschnitt nicht sauber war; sie werden in der Retrospektive (#23) festgehalten.
 
