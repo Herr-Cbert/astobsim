@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import type { Kern, Simulationsparameter } from "../naht/simulationsparameter";
+import type { Kern, Punktquelle, Simulationsparameter } from "../naht/simulationsparameter";
 import { FalterJs, type Falter } from "./falter";
 import { BildFehler } from "./fehler";
 import { QuelleAusRaster } from "./quelle";
@@ -159,6 +159,34 @@ describe("rendere", () => {
     rendere(parameter(), q, f);
     rendere(parameter(), q, f);
     expect([q.aufrufe, f.aufrufe]).toEqual([2, 2]);
+  });
+
+  it("Trabanten (Issue #14): im Fenster, aber ausserhalb der Quellbild-Flaeche gemalt, Fluss bleibt bei Deltakern", () => {
+    // Fenster 48'' bei 1''/px, Quelle 16'' (Wert 1, Punkt 5): Trabant bei x = -19,5'' liegt jenseits der Quelle.
+    const trabant: Punktquelle = { name: "Io", xArcsec: -19.5, yArcsec: 0.5, durchmesserArcsec: 0.5, helligkeitRelativ: 2, sichtbar: true };
+    const aussen: Punktquelle = { ...trabant, name: "Kallisto", xArcsec: 30 };
+    const geblendet: Punktquelle = { ...trabant, name: "Europa", xArcsec: 19.5, sichtbar: false, grund: "blendung" };
+    const p = parameter({
+      quellbild: { schluessel: "q|t", objekt: "test", massstabArcsecProPx: 1, rasterPx: 48, mitteXArcsec: 0, mitteYArcsec: 0, punktquellen: [trabant, aussen, geblendet] },
+      fenster: { breiteArcsec: 48, mitteXArcsec: 0, mitteYArcsec: 0, px: 48 }
+    });
+    const r = rendere(p, quelle(), falter).raster;
+    const fluss = 2 * Math.PI * 0.25 ** 2;
+    expect(r.daten[pixelIndex(r, 4, 23)]).toBeCloseTo(fluss, 6);
+    expect(r.daten[pixelIndex(r, 43, 23)]).toBe(0);
+    expect(summe(r)).toBeCloseTo(N * N + 4 + fluss, 3);
+  });
+
+  it("Trabanten liegen in Stufe 1: neuer Quellbild-Schluessel malt neu, gleicher nicht", () => {
+    const q = quelle();
+    const f = new FalterZaehlend();
+    const zwischen: Zwischenspeicher = {};
+    const p = parameter();
+    const trabant: Punktquelle = { name: "Io", xArcsec: -5.5, yArcsec: 0.5, durchmesserArcsec: 1, helligkeitRelativ: 1, sichtbar: true };
+    const ohne = rendere(p, q, f, zwischen).raster;
+    const mit = rendere(parameter({ quellbild: { ...p.quellbild, schluessel: "q|io", punktquellen: [trabant] } }), q, f, zwischen).raster;
+    expect([q.aufrufe, f.aufrufe]).toEqual([2, 2]);
+    expect(summe(mit) - summe(ohne)).toBeCloseTo(Math.PI / 4, 4);
   });
 
   it("wirft BildFehler bei verletzten Invarianten der Naht", () => {

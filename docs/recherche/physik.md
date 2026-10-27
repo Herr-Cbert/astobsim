@@ -343,6 +343,7 @@ Alle mit $\lambda$ = 550 nm, 1 rad = 206 264,8''.
 | Obstruktion im Airy-Kern | `kontrastUebertragung`($\epsilon$ = 0,33) / `kontrastUebertragung`($\epsilon$ = 0) bei $\nu$ = 0,35 | gleich `mtfPupille`(0,35; 0,33) / `mtfPupille`(0,35; 0) = 0,70, Toleranz 0,05 (abgeschnittene Fluegel heben niedrige Frequenzen an) |
 | Sub-Pixel-Kern | 3'' Gesamt-FWHM bei 70''/px | Groesse 5, Mitte > 0,999, Summe 1 |
 | Anzeige der Leuchtdichte (Issue #55) | $w(\mu) = \min(1, 10^{-0{,}4(\mu - 3{,}35)/3})$ | Tabelle 12.4 (A-D9: 0,3248; Fernglas 10x50: 0,7692; 80 mm bei 200x: 0,1456) |
+| Trabanten (Issue #14) | $\mu = m + 2{,}5\log_{10}(\pi d^2/4)$, relativ $10^{-0{,}4(\mu - \mu_\mathrm{weiss})}$ | Tabelle 13.4 (Io 5,1336 mag/arcsec$^2$, 1,1656; Rhea 6,2274, 1,4094) |
 
 ---
 
@@ -376,7 +377,7 @@ Beide Wege sind physikalisch gleichwertig (Langzeit-Kolmogorov); der Frequenzrau
 **Helligkeit (A-P4):**
 - Flaechenhelligkeit Objekt: $L = L_0\,a\,\tau\,(1-\epsilon^2)\,\min(1,(AP/p)^2)$ mit $AP = D/V$ aus dem vollen Durchmesser $D$; der Abschattungsfaktor $(1-\epsilon^2)$ steht genau einmal hier (nicht zusaetzlich in $\tau$).
 - Hintergrund: $\mu_\mathrm{ok} = \mu(b) - 2{,}5\log_{10}[\tau\,(1-\epsilon^2)\,\min(1,(AP/p)^2)]$, $\mu(b)$ aus Tabelle 6.1 (Spalte "Vorschlag astobsim").
-- Punktquelle (Mond) mit Magnitude $m$: Fluss $\propto 10^{-0{,}4m}\,a\,\tau\,(1-\epsilon^2)\,D^2$, als Scheibe mit Winkeldurchmesser gerendert und mit derselben PSF gefaltet; Umrechnung in Pixelhelligkeit relativ zur Planetenflaeche ueber dieselbe Skala (Phase 3).
+- Punktquelle (Mond) mit Magnitude $m$: Fluss $\propto 10^{-0{,}4m}\,a\,\tau\,(1-\epsilon^2)\,D^2$, als Scheibe mit Winkeldurchmesser gerendert und mit derselben PSF gefaltet; Umrechnung in Pixelhelligkeit relativ zur Planetenflaeche ueber dieselbe Skala (Phase 3). Umgesetzt in Issue #14, Herleitung und Blendungsregel in Abschnitt 13.
 - Obergrenze: Faktor 1 bei $AP \ge p$, keine Blendung.
 
 **Anzeige der Helligkeit (A-P4, Issue #55):** Objekt und Himmel werden je Ebene mit $w(\mu) = \min(1, 10^{-0{,}4 (\mu - 3{,}35)/3})$ auf lineare Anzeigewerte abgebildet, das Quellbild bleibt linear; Begruendung und Testwerte in Abschnitt 12.
@@ -465,6 +466,7 @@ Beide Wege sind physikalisch gleichwertig (Langzeit-Kolmogorov); der Frequenzrau
 57. Ward, G.: "A Contrast-Based Scalefactor for Luminance Display", in Heckbert, P. S. (Hrsg.): *Graphics Gems IV*, Academic Press 1994 (nicht eingesehen; Inhalt nach [56]: linearer Skalierungsfaktor, der die Sichtbarkeit am Adaptionspunkt erhaelt, sehr helle und dunkle Werte werden abgeschnitten).
 58. Reinhard, E., Stark, M., Shirley, P., Ferwerda, J.: "Photographic Tone Reproduction for Digital Images", ACM Trans. Graphics 21(3), 267 (2002); Technischer Bericht UUCS-02-001, University of Utah, https://users.cs.utah.edu/docs/techreports/2002/pdf/UUCS-02-001.pdf (Gl. 1: logarithmischer Mittelwert der Leuchtdichte als "Key"; Gl. 2: $L = a\,L_w/\bar L_w$ mit $a$ = 0,18; Gl. 3: $L_d = L/(1+L)$; Gl. 4 mit $L_\mathrm{white}$).
 59. IEC 61966-2-1:1999, Multimedia systems and equipment, Colour measurement and management, Part 2-1: Default RGB colour space, sRGB (Referenzanzeige 80 cd/m$^2$, Kennlinie wie in `src/ui/zeichne.ts`).
+60. Wikipedia: "Surface brightness", https://en.wikipedia.org/wiki/Surface_brightness (Flaechenhelligkeit $S = m + 2{,}5\log_{10} A$ mit $A$ der Flaeche in Quadratbogensekunden, folgt direkt aus der Definition der Magnitude; dieselbe Rechnung wie fuer die Quellweiss-Werte in `docs/recherche/objekte.md` 5.2).
 
 ---
 
@@ -544,3 +546,54 @@ Eigene Rechnung, 45 Grad, klar, Bortle 5, Quellweiss Mond 3,35, Mars 14'' 4,1 ma
 3. **Wahl von $\mu_\mathrm{weiss}$:** Bildschirm, Umgebungslicht und Helligkeitseinstellung des Nutzers sind unbekannt; die Wahl ist am Bild in Phase 6 zu pruefen. Eine Konstante in `src/physik/konstanten.ts` aendert alle Anzeigewerte gemeinsam.
 4. **Schleier des Himmels:** Weil Objekt und Himmel getrennt komprimiert werden, hebt die Abbildung den Himmel relativ zum Objekt um den Faktor $(L_\mathrm{obj}/L_\mathrm{Himmel})^{2/3}$ an. Ueber dunklen Bildteilen wirkt er wie ein Schleier: in A-D9 zeigt ein Pixel mit $q$ = 0,01 (relativ zu Quellweiss) 0,0032, der Himmel 0,0021. Physikalisch waere der Himmel dort um Groessenordnungen dunkler. Am Bild in Phase 6 pruefen (Abhilfe waere etwa, den Himmel mit der Anzeigehelligkeit des Objekts linear mitzufuehren).
 5. **Exponent:** 1/3 ist eine Groessenordnung nach Stevens, keine Herleitung; wie $\mu_\mathrm{weiss}$ in Phase 6 am Bild zu pruefen.
+
+## 13. Trabanten als Punktquellen (Issue #14)
+
+**Datum:** 2026-10-27. **Kennungen:** A-P6, A-X2, T6. Ergaenzt Abschnitt 7 und 9 (Punktquelle).
+
+### 13.1 Helligkeit relativ zu Quellweiss
+
+Die Naht verlangt fuer jede Punktquelle eine Flaechenhelligkeit relativ zu Quellweiss, ohne den gemeinsamen Faktor `Helligkeit.faktorObjekt` (`docs/architektur.md` Abschnitt 3). bild malt den Trabanten als gleichmaessig helle Scheibe mit seinem Winkeldurchmesser $d$ ins Arbeitsraster. Seine mittlere Flaechenhelligkeit folgt aus Magnitude und Flaeche [60], genauso wie Quellweiss in `objekte.md` 5.2:
+
+$$\mu_\mathrm{T} = m + 2{,}5\log_{10}\!\left(\pi\,\frac{d^2}{4}\right), \qquad h_\mathrm{rel} = 10^{-0{,}4\,(\mu_\mathrm{T} - \mu_\mathrm{weiss})}$$
+
+mit $\mu_\mathrm{weiss}$ = `weissMagProArcsec2` des Objektzustands. Der Fluss der gemalten Scheibe ist $h_\mathrm{rel}\,\pi d^2/4 = 10^{-0{,}4\,(m - \mu_\mathrm{weiss})}$ Quadratbogensekunden Quellweiss, haengt also nur von der Magnitude ab; der Durchmesser bestimmt nur, wie flaechig der Fluss vor der Faltung liegt.
+
+Warum Atmosphaere, Transmission, Abschattung und Oeffnung nicht in $h_\mathrm{rel}$ stehen (das Issue nennt sie): nach Abschnitt 7 und 9 ist der Punktquellenfluss am Auge $\propto 10^{-0{,}4 m}\,a\,\tau\,(1-\epsilon^2)\,D^2$, bei $AP > p$ begrenzt die Augenpupille auf $(pV)^2$. Das Bild auf der Netzhaut ist um $V$ vergroessert, seine Flaeche waechst mit $V^2$. Die Flaechenhelligkeit des Trabantenbilds ist damit $\propto a\,\tau\,(1-\epsilon^2)\,\min(D, pV)^2/V^2 = a\,\tau\,(1-\epsilon^2)\,\min(AP, p)^2$, derselbe Faktor wie fuer die Planetenflaeche (Abschnitt 5.1, 9). Er steckt fuer beide in `faktorObjekt` und wird mit derselben Anzeigeabbildung (Abschnitt 12) auf den Bildschirm gebracht. Die Oeffnung wirkt ueber die PSF: die Faltung verteilt den festen Fluss auf die Flaeche der Gesamt-PSF, kleine Oeffnung und schlechtes Seeing machen den Punkt breiter und dunkler (Abschnitt 7, "Spitzenwert $\propto$ Fluss / Flaeche der PSF").
+
+### 13.2 Malen ins Arbeitsraster
+
+Ein Trabant ist kleiner als die Gesamt-FWHM, oft kleiner als ein Arbeitspixel (Rhea 0,25'' gegen 1 bis 25''/px). bild verteilt den Fluss $h_\mathrm{rel}\,\pi (d/2s)^2$ ($s$ Arbeitsmassstab) nach Flaechenanteilen auf die Pixel eines Kreises mit Durchmesser $\max(d/s, 1)$ Arbeitspixel (Unterabtastung 8 x 8 je Pixel, normiert auf den Fluss). So bleibt der Fluss auch unter einem Pixel erhalten und die Lage ist subpixelgenau; ab $d/s > 1$ zeigt das Raster die Scheibe mit $h_\mathrm{rel}$. Danach faltet bild mit derselben Gesamt-PSF wie das Objekt (ADR-0002), "Scheibchen oder Punkt" ergibt sich ohne Fallunterscheidung (Abschnitt 7).
+
+### 13.3 Blendungsregel
+
+A-P6: unterdrueckt, wenn der Trabant weniger als 10' von einem mehr als 6 mag helleren Objekt entfernt steht (Vorschlag `objekte.md` Punkt 13, `docs/recherche/README.md` Punkt 8). Der Abstand ist der **scheinbare**, $V \cdot r$ mit $r$ dem Mittenabstand am Himmel, wie in `docs/entwuerfe/naht-variante-3.md` Abschnitt 3. Mit dem Abstand am Himmel waeren auch im 10x50 alle vier Jupitertrabanten (1,8' bis 8,7') unterdrueckt, entgegen T6. Blender sind das Objekt (Mitte 0/0) und die anderen Trabanten; in Version 1 erfuellt nur der Planet $\Delta m > 6$. Kein Quellenbeleg fuer die Schwellen 10' und 6 mag: sie sind die Modellentscheidung aus A-P6, Ersatz fuer die nicht simulierte Blendung (A-P9).
+
+Grenzvergroesserung $V_\mathrm{grenz} = 600''/r$ (eigene Rechnung, Werte `daten/objekte.json`):
+
+| Zustand | Trabant | $r$ | $\Delta m$ | $V_\mathrm{grenz}$ |
+|---|---|---|---|---|
+| Jupiter 47'' (-2,7) | Io / Europa / Ganymed / Kallisto | 110,0 / 175,1 / 330,0 / 520,1'' | 7,7 / 8,0 / 7,3 / 8,4 | 5,45 / 3,43 / 1,82 / 1,15 |
+| Saturn 20'' (-0,1) | Titan / Rhea | 156,4 / 63,5'' | 8,4 / 9,6 | 3,84 / 9,45 |
+| Saturn 16'' (0,6) | Titan / Rhea | 125,1 / 50,8'' | 8,2 / 9,4 | 4,79 / 11,81 |
+
+Blosses Auge ($V$ = 1): alle Trabanten unterdrueckt. 10x50: alle vier Jupitertrabanten sichtbar, bei Saturn 20'' auch Rhea (knapp), bei Saturn 16'' ist Rhea unterdrueckt.
+
+### 13.4 Testwerte (A-Q1)
+
+| Trabant (Zustand, Quellweiss) | $m$ | $d$ | $\mu_\mathrm{T}$ | $h_\mathrm{rel}$ |
+|---|---|---|---|---|
+| Io (jup_47, 5,3) | 5,0 | 1,20'' | 5,1336 | 1,1656 |
+| Europa | 5,3 | 1,03'' | 5,1019 | 1,2002 |
+| Ganymed | 4,6 | 1,73'' | 5,5280 | 0,8106 |
+| Kallisto | 5,7 | 1,58'' | 6,4310 | 0,3529 |
+| Titan (sat_20, 6,6) | 8,3 | 0,85'' | 7,6848 | 0,3682 |
+| Rhea (sat_20, 6,6) | 9,5 | 0,25'' | 6,2274 | 1,4094 |
+
+$h_\mathrm{rel} > 1$ ist erlaubt (Io, Europa, Rhea haben hoehere Albedo als die mittlere Planetenscheibe); begrenzt wird erst beim Zeichnen.
+
+### 13.5 Unsicher und offen
+
+1. **Ergaenzung im Issue zu T6 ("80 mm zeigt Titan, Rhea nur bei groesserer Oeffnung als Punkt"):** steht nicht in T6 (`docs/anforderungen.md`) und folgt nicht aus der Blendungsregel, denn die haengt an der Vergroesserung, nicht an der Oeffnung: an 80 mm ist Rhea (Saturn 20'') ab $V$ = 9,45 sichtbar, also bei jeder Austrittspupille bis 8,5 mm. Nach der Grenzgroesse (Abschnitt 7, $7{,}7 + 5\log_{10} 8 = 12{,}2$ mag) ist Rhea mit 9,5 bis 10,0 mag an 80 mm ebenfalls sichtbar. Umgesetzt und getestet ist, was das Modell hergibt: Titan und Rhea sichtbar bei $V \ge 9{,}45$, Rhea geblendet darunter.
+2. **Sichtbarkeit im Bild:** Die Faltung verteilt den Fluss auf die Flaeche der Gesamt-PSF, beim Standardfenster auf ein Arbeitspixel, wenn das groesser ist. Gemessen mit `rendere` (Fenster 400'', 1024 px, 45 Grad, klar, Bortle 5, Anzeigewert nach sRGB): Saturn 20'' an 80 mm bei 60x und 2'' Seeing Himmel 7, Titan 11, Rhea 9; an 300 mm bei 200x und 1'' Himmel 8, Titan 25, Rhea 15. Jupiter 47'' im 10x50 im ganzen Gesichtsfeld (22,9''/Arbeitspixel): Himmel 16, Trabanten 17 bis 18; an 80 mm bei 60x (2,9''/px) Himmel 7, Trabanten 18 bis 36. Am Fernrohr sind diese Trabanten leicht zu sehen; auf dem Bildschirm verschwinden sie fast. Ursache: die Anzeigeabbildung (Abschnitt 12) komprimiert nur das Niveau, der Punkt ist aber um das Verhaeltnis Scheibe zu PSF- bzw. Pixelflaeche verduennt, und das Auge sieht Punktquellen ueber ihren Gesamtfluss (Stevens: Exponent 0,5 fuer Punktquellen [53]). Ob und wie Punktquellen fuer die Anzeige angehoben werden (eigene Abbildung der Spitze, Mindestgroesse in Anzeigepixeln), ist eine Modellentscheidung fuer Herbert bzw. Phase 6 (#21), nicht Teil von #14.
+3. **Gleichmaessig helle Scheibe:** keine Randverdunklung, keine Phase; bei Durchmessern unter der Gesamt-FWHM ohne sichtbaren Einfluss.

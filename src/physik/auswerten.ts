@@ -2,7 +2,7 @@
 // einem Aufruf (docs/architektur.md Abschnitt 3, docs/entwuerfe/naht-variante-3.md Abschnitt 1.3,
 // A-D4, A-D5, A-D7). Reihenfolge: optik -> atmosphaere -> aufloesung -> fenster -> arbeitsmassstab
 // -> Arbeitsraster -> kernbeschreibung; dann nur bei geaendertem Kernschluessel baueKern; dann
-// Quellbild mit Schluessel (Punktquellen ab #14), helligkeit, Anzeigewerte, Warnungen. Formeln stehen in den Stufe-1-Funktionen, hier kommt keine neue hinzu.
+// punktquellen, Quellbild mit Schluessel, helligkeit, Anzeigewerte, Warnungen. Formeln stehen in den Stufe-1-Funktionen, hier kommt keine neue hinzu.
 //
 // Keine Memoisierung: Wiederverwendet wird nur der Kern aus vorher (architektur.md: ein vorher
 // statt Cache). Bortle, Transparenz und Verschieben bauen keinen Kern; Seeing, Hoehe, Oeffnung,
@@ -18,6 +18,7 @@ import { helligkeit } from "./helligkeit";
 import { baueKern } from "./kern";
 import { ANZEIGE_PX_STANDARD, ARCSEC_PRO_GRAD, AUSTRITTSPUPILLE_MIN_MM, PUPILLE_MM, type Seeingwortstufe } from "./konstanten";
 import { type Optik, optik, vergroesserungsgrenzen } from "./optik";
+import { punktquellen } from "./punktquellen";
 import { schluessel } from "./schluessel";
 
 /**
@@ -138,15 +139,27 @@ export function auswerten(k: Konfiguration, optionen: Auswertoptionen = {}): Aus
 
   // Massstab und Mitte gehen ungerundet in den Schluessel, damit gleicher Schluessel gleiches
   // Ergebnis heisst: Verschieben um weniger als die vierte Stelle ist bei feinem Massstab mehrere
-  // Arbeitspixel weit, und bild fragt mit rasterPx * massstab an. Punktquellen kommen mit Issue #14.
+  // Arbeitspixel weit, und bild fragt mit rasterPx * massstab an. Die sichtbaren Punktquellen gehen
+  // mit allen Feldern ein, die bild malt: die Blendungsregel haengt von der Vergroesserung ab, ein
+  // Okularwechsel kann also Stufe 1 aendern, ohne Ausschnitt oder Massstab zu aendern.
+  const punkte = punktquellen(k.objekt, o);
+  const gemalt = punkte.filter((p) => p.sichtbar).flatMap((p) => [p.name, p.xArcsec, p.yArcsec, p.durchmesserArcsec, p.helligkeitRelativ]);
   const quellbild: Quellbild = {
-    schluessel: schluessel("quellbild", k.objekt.kennung, String(massstabArcsecProPx), rasterPx, String(fenster.mitteXArcsec), String(fenster.mitteYArcsec)),
+    schluessel: schluessel(
+      "quellbild",
+      k.objekt.kennung,
+      String(massstabArcsecProPx),
+      rasterPx,
+      String(fenster.mitteXArcsec),
+      String(fenster.mitteYArcsec),
+      ...gemalt
+    ),
     objekt: k.objekt.kennung,
     massstabArcsecProPx,
     rasterPx,
     mitteXArcsec: fenster.mitteXArcsec,
     mitteYArcsec: fenster.mitteYArcsec,
-    punktquellen: []
+    punktquellen: punkte
   };
 
   const stufe = seeingstufe(k.bedingungen.seeingFwhmArcsec);

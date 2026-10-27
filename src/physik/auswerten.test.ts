@@ -3,7 +3,7 @@ import type { Fernglas, Konfiguration } from "../naht/konfiguration";
 import { auswerten } from "./auswerten";
 import { PhysikFehler } from "./fehler";
 import * as physik from "./index";
-import { BEDINGUNGEN_A_D9, fenster, KONFIGURATION_A_D9, REFRAKTOR_A_D9 } from "./testdaten";
+import { BEDINGUNGEN_A_D9, fenster, KONFIGURATION_A_D9, REFRAKTOR_A_D9, refraktorMitVergroesserung, SATURN_20 } from "./testdaten";
 
 // Testwerte: Startkonfiguration A-D9 (80/600, 10 mm 50 Grad, Mond, Seeing 2'', Bortle 5, klar,
 // 45 Grad) nach docs/recherche/physik.md Abschnitt 8; Warnschwellen A-D5 nach Abschnitt 4.
@@ -161,6 +161,30 @@ describe("auswerten: Wiederverwendung des Kerns ueber vorher", () => {
   });
 });
 
+describe("auswerten: Punktquellen im Quellbild (Issue #14)", () => {
+  // Saturn 20'' an 80 mm: bei V = 8 ist Rhea geblendet, bei V = 10 nicht (Grenze V = 9,45).
+  const saturn = (v: number): Konfiguration => ({ ...KONFIGURATION_A_D9, geraet: refraktorMitVergroesserung(80, v), objekt: SATURN_20 });
+  // 64 px: der Anzeigemassstab 9,4''/px bestimmt den Arbeitsmassstab, nicht die Augen-FWHM 60'' / V.
+  const f = fenster(600, 64);
+
+  it("fuellt quellbild.punktquellen mit den Trabanten des Objektzustands", () => {
+    const p = auswerten(saturn(60), { fenster: f }).parameter.quellbild.punktquellen;
+    expect(p.map((q) => q.name)).toEqual(["Titan", "Rhea"]);
+    expect(p.every((q) => q.sichtbar)).toBe(true);
+  });
+  it("andere Sichtbarkeit bei gleichem Fenster gibt einen anderen Quellbild-Schluessel", () => {
+    const a = auswerten(saturn(8), { fenster: f }).parameter.quellbild;
+    const b = auswerten(saturn(10), { fenster: f }).parameter.quellbild;
+    expect(a.massstabArcsecProPx).toBe(b.massstabArcsecProPx);
+    expect(a.punktquellen.map((q) => q.sichtbar)).toEqual([true, false]);
+    expect(b.punktquellen.map((q) => q.sichtbar)).toEqual([true, true]);
+    expect(b.schluessel).not.toBe(a.schluessel);
+  });
+  it("gleiche Sichtbarkeit bei gleichem Fenster gibt denselben Quellbild-Schluessel", () => {
+    expect(auswerten(saturn(10), { fenster: f }).parameter.quellbild.schluessel).toBe(auswerten(saturn(12), { fenster: f }).parameter.quellbild.schluessel);
+  });
+});
+
 describe("auswerten: Fehlerfaelle sind Programmierfehler", () => {
   it("wirft PhysikFehler mit feld und wert bei NaN, Oeffnung 0 und Fenster unter 16 px", () => {
     const faelle: [Konfiguration, Parameters<typeof auswerten>[1], string][] = [
@@ -193,7 +217,7 @@ describe("auswerten: Fehlerfaelle sind Programmierfehler", () => {
 
 describe("physik/index.ts", () => {
   it("exportiert Stufe 0 bis 3 und die Testhelfer", () => {
-    for (const name of ["rayleighArcsec", "luftmasse", "optik", "atmosphaere", "aufloesung", "helligkeit", "arbeitsmassstab", "kernbeschreibung", "begrenze", "baueKern", "auswerten", "kontrastUebertragung", "kernFwhmArcsec"]) {
+    for (const name of ["rayleighArcsec", "luftmasse", "optik", "atmosphaere", "aufloesung", "helligkeit", "arbeitsmassstab", "kernbeschreibung", "begrenze", "baueKern", "auswerten", "kontrastUebertragung", "kernFwhmArcsec", "punktquellen"]) {
       expect(typeof (physik as Record<string, unknown>)[name], name).toBe("function");
     }
   });
