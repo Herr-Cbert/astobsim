@@ -53,6 +53,6 @@ export { airyProfil, gaussProfil, moffatProfil, quadratur } from "./profile";
 export { type Aufloesung, type Aufloesungsgrenze, aufloesung } from "./aufloesung";
 export { anzeigefaktor, bortleMagProArcsec2, helligkeit, type Okularhelligkeit, okularhelligkeit } from "./helligkeit";
 export { arbeitsmassstab, kernSchluessel, kernbeschreibung } from "./arbeitsmassstab";
-export { GRENZEN, type Grenze, type Hinweis, begrenze } from "./begrenze";
+export { GRENZEN, type Grenze, type Hinweis, aufSchritt, begrenze } from "./begrenze";
 export { baueKern, kernFwhmArcsec, kontrastUebertragung } from "./kern";
 export { type Anzeigewerte, type Auswertoptionen, type Auswertung, type Warnung, auswerten } from "./auswerten";

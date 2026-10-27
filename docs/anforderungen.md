@@ -32,7 +32,7 @@ Kennungen: A-Z Zweck, A-F Fernrohr und Geraete, A-B Bedingungen, A-P Physik und 
 | A-F5 | Muss | Die Geraeteliste liegt als eine von Hand erweiterbare Datendatei im Repo (Name, Typ, Bauart, Oeffnung, Brennweite, Obstruktion, bei Fernglaesern Vergroesserung und Gesichtsfeld). |
 | A-F6 | Muss | Das Okular wird durch Brennweite (mm) und scheinbares Gesichtsfeld (Grad) beschrieben, mit Presets (z. B. Ploessl 50 Grad, Weitwinkel 68 Grad, 82 Grad). Vergroesserung und wahres Gesichtsfeld werden daraus berechnet. |
 | A-F7 | Muss | Die Vergroesserung ist alternativ direkt editierbar; die Okularbrennweite wird dann angepasst. |
-| A-F8 | Muss | Freie Eingaben werden auf sinnvolle Bereiche begrenzt und bei Ueberschreitung abgeschnitten, mit Hinweis, nicht abgelehnt: Oeffnung 6 bis 300 mm, Brennweite 200 bis 4000 mm, Obstruktion 0 bis 50 Prozent, Okularbrennweite 2 bis 50 mm, scheinbares Gesichtsfeld 40 bis 100 Grad, Vergroesserung mindestens 1. |
+| A-F8 | Muss | Freie Eingaben werden auf sinnvolle Bereiche begrenzt und bei Ueberschreitung abgeschnitten, mit Hinweis, nicht abgelehnt: Oeffnung 6 bis 300 mm, Brennweite 200 bis 4000 mm, Obstruktion 0 bis 50 Prozent, Okularbrennweite 2 bis 50 mm, scheinbares Gesichtsfeld 40 bis 100 Grad, Vergroesserung mindestens 1; beim Fernglas Vergroesserung 1 bis 1000 und wahres Gesichtsfeld 1 bis 30 Grad. |
 | A-F9 | Kann | Optikqualitaet als Strehl-Wert unter "Erweitert", Standard 0,95. |
 | A-F10 | Nicht-Ziel | Farbfehler von Achromaten, Koma, Justagefehler, Barlow-Linse (durch Okularbrennweite abgedeckt), Herstellernamen und Produktmodelle. |
 
@@ -43,7 +43,7 @@ Kennungen: A-Z Zweck, A-F Fernrohr und Geraete, A-B Bedingungen, A-P Physik und 
 | A-B1 | Muss | Seeing wird als Halbwertsbreite der Langzeit-PSF in Bogensekunden eingegeben (Bereich 0,5 bis 5). Daneben werden Wortstufe (ausgezeichnet, gut, mittel, schlecht) und Pickering-Stufe angezeigt. |
 | A-B2 | Muss | Himmelshelligkeit wird als Bortle-Stufe 1 bis 9 eingegeben. In Version 1 wirkt sie auf die Hintergrundhelligkeit im Gesichtsfeld und den Kontrast des Objekts gegen den Hintergrund. Das Dokument und der Hilfetext sagen, dass die volle Wirkung erst mit Deep-Sky-Objekten kommt. |
 | A-B3 | Muss | Transparenz wird dreistufig gewaehlt (klar, leicht diesig, diesig) und als zusaetzliche Extinktion in Magnituden umgesetzt: Helligkeitsverlust und leichter Kontrastverlust. |
-| A-B4 | Muss | Hoehe ueber dem Horizont wird in Grad eingegeben (10 bis 90). Sie erhoeht die Luftmasse (Extinktion) und verschlechtert das Seeing. |
+| A-B4 | Muss | Hoehe ueber dem Horizont wird in Grad eingegeben (10 bis 90, in Schritten von 5 Grad). Sie erhoeht die Luftmasse (Extinktion) und verschlechtert das Seeing. |
 | A-B5 | Kann | Atmosphaerische Dispersion bei niedriger Hoehe als Farbverschiebung (oben blau, unten rot). |
 | A-B6 | Kann | Umschalter "ruhiger Moment", der den Seeing-Anteil reduziert und den Anblick in kurzen ruhigen Phasen zeigt. |
 | A-B7 | Nicht-Ziel | Flackern, Animation des Seeings, Zeitverlauf. |

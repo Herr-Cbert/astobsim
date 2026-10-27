@@ -16,6 +16,17 @@ export function leseDezimal(text: string): number {
   return Number(t);
 }
 
+/**
+ * Wert, den das Feld nach einer Eingabe zeigt: der Wert, mit dem gerechnet wird (verwendet, aus
+ * der begrenzten Konfiguration), sonst bei einem Schnitt der Wert aus dem Hinweis, sonst die
+ * Eingabe. So zeigt die Hoehe nach der Eingabe 47 die verwendeten 45 und das Seeing nach 1,15
+ * die verwendeten 1,2 (toFixed allein zeigte 1,1), auch wenn sich die Konfiguration nicht aendert
+ * und kein Beobachter das Feld nachzieht.
+ */
+export function angezeigterWert(eingabe: number, hinweis: Hinweis | undefined, verwendet?: number): number {
+  return verwendet ?? hinweis?.wert ?? eingabe;
+}
+
 /** Der Hinweis von begrenze zu genau diesem Feld, sonst undefined. */
 export function hinweisFuer(hinweise: readonly Hinweis[], feld: string): Hinweis | undefined {
   return hinweise.find((h) => h.feld === feld);
@@ -41,6 +52,12 @@ export interface ZahlOptionen extends Feldbasis {
   wert: number;
   /** Gueltige Eingabe uebernehmen; liefert die Hinweise von Steuerung.aendere. */
   beiAenderung(wert: number): readonly Hinweis[];
+  /**
+   * Wert im Mass des Felds, mit dem nach beiAenderung gerechnet wird (begrenzt und auf den
+   * Schritt gerundet); das Feld zeigt ihn statt der Eingabe. Ohne Angabe oder bei undefined
+   * zeigt es den Wert aus dem Hinweis oder die Eingabe.
+   */
+  verwendet?(): number | undefined;
 }
 
 export interface Zahlenfeld {
@@ -136,7 +153,7 @@ function zahlteil(d: Document, o: ZahlOptionen, zeile: HTMLElement, element: HTM
   const uebernimm = (wert: number): void => {
     const h = hinweisFuer(o.beiAenderung(wert), o.feld);
     zeigeHinweis(h);
-    zeigeWert(h === undefined ? wert : h.wert);
+    zeigeWert(angezeigterWert(wert, h, o.verwendet?.()));
   };
 
   zeigeWert(o.wert);

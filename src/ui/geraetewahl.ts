@@ -5,7 +5,7 @@
 
 import { type Geraeteeintrag, type Listengeraet, mitOkular, vorschlagObstruktionProzent } from "../daten";
 import type { Bauart, Fernrohr, Geraet, Hinweis, Okular } from "../physik";
-import { GRENZEN } from "../physik";
+import { aufSchritt, GRENZEN } from "../physik";
 
 /** Wert des Eintrags "Frei eingeben" in der Auswahlliste; keine Geraete-id (die sind a-z, 0-9, -). */
 export const FREI = "frei";
@@ -91,6 +91,14 @@ export function okularBrennweiteFuer(brennweiteMm: number, vergroesserung: numbe
 export function vergroesserungsHinweis(hinweise: readonly Hinweis[], brennweiteMm: number, vergroesserung: number): Hinweis[] {
   const h = hinweise.find((x) => x.feld === GRENZEN.okularBrennweiteMm.feld);
   return h === undefined ? [] : [{ feld: VERGROESSERUNG_FELD, eingabe: vergroesserung, wert: brennweiteMm / h.wert }];
+}
+
+/**
+ * Obstruktion eines Fernrohrs in Prozent, wie das Feld sie zeigt (A-F1): das Verhaeltnis aus der
+ * begrenzten Konfiguration mal 100, ohne Gleitkommareste auf 0,1 Prozent; ohne Fernrohr undefined.
+ */
+export function obstruktionProzent(fernrohr: Fernrohr | undefined): number | undefined {
+  return fernrohr === undefined ? undefined : aufSchritt(fernrohr.obstruktion * 100, GRENZEN.obstruktion.schritt * 100);
 }
 
 /** Hinweise mit einem Feld in anderem Mass (z. B. Obstruktion als Verhaeltnis -> Prozent). */

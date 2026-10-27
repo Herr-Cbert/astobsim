@@ -74,7 +74,7 @@ function parameter(k: Konfiguration, kataloge: Kataloge = ECHT): Record<string, 
 
 const FREIES_FERNROHR: Fernrohr = {
   art: "fernrohr",
-  oeffnungMm: 133.5,
+  oeffnungMm: 133,
   brennweiteMm: 987,
   obstruktion: 0.271,
   bauart: "maksutov",
@@ -90,7 +90,7 @@ describe("inUrl", () => {
 
   it("schreibt ein freies Fernrohr als Zahlen, Obstruktion als Verhaeltnis", () => {
     const p = parameter(mitGeraet(FREIES_FERNROHR));
-    expect(p).toMatchObject({ a: "fernrohr", ba: "maksutov", d: "133.5", f: "987", o: "0.271", ok: "7.3", sg: "82" });
+    expect(p).toMatchObject({ a: "fernrohr", ba: "maksutov", d: "133", f: "987", o: "0.271", ok: "7.3", sg: "82" });
     expect(p[PARAMETER.geraet]).toBeUndefined();
   });
 
@@ -195,6 +195,16 @@ describe("ausUrl: Begrenzung und Rueckfall", () => {
       { feld: "bedingungen.hoeheGrad", eingabe: -Infinity, wert: 10 }
     ]);
   });
+
+  it("schneidet Vergroesserung und Gesichtsfeld eines Fernglases (vg=1e400, wg=1e400) auf 1000 und 30 Grad", () => {
+    const { konfiguration, hinweise } = ausUrl("?a=fernglas&d=50&vg=1e400&wg=1e400", ECHT);
+    expect(konfiguration.geraet).toEqual({ art: "fernglas", oeffnungMm: 50, vergroesserung: 1000, wahresGesichtsfeldGrad: 30 });
+    expect(hinweise).toEqual([
+      { feld: "geraet.vergroesserung", eingabe: Infinity, wert: 1000 },
+      { feld: "geraet.wahresGesichtsfeldGrad", eingabe: Infinity, wert: 30 }
+    ]);
+  });
+
   it("schneidet Werte ausserhalb A-F8 ueber begrenze", () => {
     const k = aus("?a=fernrohr&ba=newton&d=1000&f=50&o=50&ok=1&sg=120&s=9&b=12&h=-5", ECHT);
     expect(k.geraet).toEqual({ art: "fernrohr", bauart: "newton", oeffnungMm: 300, brennweiteMm: 200, obstruktion: 0.5, okular: { brennweiteMm: 2, scheinbaresGesichtsfeldGrad: 100 } });
@@ -204,6 +214,12 @@ describe("ausUrl: Begrenzung und Rueckfall", () => {
 
   it("rundet die Bortle-Stufe", () => {
     expect(aus("?b=3.6", ECHT).bedingungen.bortle).toBe(4);
+  });
+
+  it("rundet Zwischenwerte aufs Raster der Felder ohne Hinweis (s=1.25&h=45.5&b=4.6)", () => {
+    const { konfiguration, hinweise } = ausUrl("?s=1.25&h=45.5&b=4.6", ECHT);
+    expect(hinweise).toEqual([]);
+    expect(konfiguration.bedingungen).toMatchObject({ seeingFwhmArcsec: 1.3, hoeheGrad: 45, bortle: 5 });
   });
 
   it("liefert die Voreinstellung fuer eine leere oder unsinnige URL", () => {
