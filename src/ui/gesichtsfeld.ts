@@ -7,7 +7,7 @@
 // keine URL). Grenzen und Richtungen in verschieben.ts, Zeiger und Tasten in ziehen.ts. Klick
 // oder Eingabetaste oeffnet die Zoomansicht (A-D3, zoomansicht.ts).
 
-import { findeZustand } from "../daten";
+import { nachweisZu } from "../daten";
 import type { Anblick } from "../bild";
 import type { Auswertung } from "../physik";
 import { TEXTE } from "../texte";
@@ -30,8 +30,7 @@ export interface GesichtsfeldPlaetze {
 
 /** Namensnennung zum Quellbild des Zustands (A-X3); leer, wenn der Zustand keinen Nachweis hat. */
 export function nachweistext(kataloge: Kataloge, kennung: string): string {
-  const bild = findeZustand(kataloge.objekte, kennung)?.zustand.bild;
-  const nachweis = kataloge.nachweise.find((n) => n.id === bild);
+  const nachweis = nachweisZu(kataloge.objekte, kataloge.nachweise, kennung);
   return nachweis === undefined ? "" : TEXTE.bildnachweis(nachweis.namensnennung, nachweis.lizenz);
 }
 

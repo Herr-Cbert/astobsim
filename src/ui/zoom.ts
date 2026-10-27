@@ -6,7 +6,7 @@
 // Koordinaten wie in der Naht: Objektmitte 0/0, +x rechts, +y Norden (A-D11), Bogensekunden.
 
 import type { Kern, Simulationsparameter } from "../naht/simulationsparameter";
-import { atmosphaere, aufloesung, type Konfiguration, optik } from "../physik";
+import { arbeitsmassstabOhneFenster, atmosphaere, aufloesung, type Konfiguration, optik } from "../physik";
 import type { Mitte } from "./verschieben";
 import { verschiebbar } from "./verschieben";
 
@@ -24,8 +24,6 @@ const ZOOM_ANTEIL_GESICHTSFELD_MAX = 0.5;
  * ein Arbeitspixel (sonst PhysikFehler in auswerten).
  */
 export const ZOOM_ARBEITSPIXEL_MIN = 16;
-/** Arbeitspixel je Gesamt-FWHM, wie arbeitsmassstab in physik (ADR-0002). */
-const ARBEITSPIXEL_PRO_FWHM = 2.5;
 
 /**
  * Ausdehnung des Objekts in Bogensekunden: der groessere Wert aus Durchmesser und Quellbild
@@ -45,7 +43,7 @@ export function zoombreiteArcsec(k: Konfiguration): number {
   const o = optik(k.geraet);
   const feld = Math.min(o.gesichtsfeld.breiteArcsec, o.gesichtsfeld.hoeheArcsec);
   const aufl = aufloesung(o, atmosphaere(k.bedingungen));
-  const arbeitspixel = Math.max(k.objekt.quelle.massstabArcsecProPx, aufl.gesamtFwhmArcsec / ARBEITSPIXEL_PRO_FWHM);
+  const arbeitspixel = arbeitsmassstabOhneFenster(aufl, k.objekt.quelle);
   const breite = Math.min(objektausdehnungArcsec(k) * (1 + 2 * ZOOM_RAND), feld * ZOOM_ANTEIL_GESICHTSFELD_MAX);
   return Math.max(breite, arbeitspixel * ZOOM_ARBEITSPIXEL_MIN);
 }

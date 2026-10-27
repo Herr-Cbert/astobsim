@@ -6,7 +6,7 @@
 
 import "./stil.css";
 import { type Falterwahl, waehleFalter } from "../bild";
-import { findeZustand, ladeBildnachweise, ladeGeraete, ladeObjekte, quelleEinzelbildBrowser, quelleKachelnBrowser } from "../daten";
+import { ladeBildnachweise, ladeGeraete, ladeObjekte, nachweisZu, quelleEinzelbildBrowser, quelleKachelnBrowser } from "../daten";
 import type { Objektzustand } from "../naht/konfiguration";
 import { TEXTE } from "../texte";
 import { ausUrl, type Kataloge } from "../zustand";
@@ -166,8 +166,7 @@ async function ladeKataloge(): Promise<Kataloge> {
 
 /** Bildquelle im Browser: Kachelpyramide, wenn der Nachweis eine hat, sonst ein Einzelbild. */
 async function bildquelleBrowser(kataloge: Kataloge, objekt: Objektzustand): Promise<Bildquelle> {
-  const bild = findeZustand(kataloge.objekte, objekt.kennung)?.zustand.bild;
-  const nachweis = kataloge.nachweise.find((n) => n.id === bild);
+  const nachweis = nachweisZu(kataloge.objekte, kataloge.nachweise, objekt.kennung);
   if (nachweis === undefined) throw new Error(`ui: kein Bildnachweis zum Zustand "${objekt.kennung}"`);
   if (nachweis.kacheln !== undefined) {
     const quelle = quelleKachelnBrowser(nachweis, objekt.durchmesserArcsec);

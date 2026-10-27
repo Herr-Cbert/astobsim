@@ -167,7 +167,6 @@ export function auswerten(k: Konfiguration, optionen: Auswertoptionen = {}): Aus
       String(fenster.mitteYArcsec),
       ...gemalt
     ),
-    objekt: k.objekt.kennung,
     massstabArcsecProPx,
     rasterPx,
     mitteXArcsec: fenster.mitteXArcsec,

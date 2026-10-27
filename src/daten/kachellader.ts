@@ -1,4 +1,4 @@
-// Bild-Lader fuer den Browser (Kacheln und Einzelbilder): fetch ueber BASE_URL + "daten/bilder/",
+// Bild-Lader fuer den Browser (Kacheln und Einzelbilder): fetch ueber BASE_URL + "daten/bilder/" (holeDaten),
 // Dekodierung mit createImageBitmap, Pixel ueber einen (Offscreen-)Canvas, Umrechnung in ein Raster.
 //
 // Kacheln und Einzelbilder sind 8-Bit-WebP ohne Farbprofil, also sRGB-kodiert (das SVS-Rendering
@@ -11,6 +11,7 @@ import type { Raster } from "../naht/raster";
 import type { Bildnachweis } from "./bildnachweise";
 import { DatenFehler } from "./fehler";
 import { kachelPfad, pyramidengeometrie, QuelleKacheln, type KachelLader } from "./kacheln";
+import { holeDaten } from "./pruefe";
 import { quelleEinzelbild, type QuelleEinzelbild } from "./quelle_einzelbild";
 
 /** sRGB-Kodewert 0..1 in lineare Helligkeit 0..1 (IEC 61966-2-1). */
@@ -40,14 +41,7 @@ export function rgbaZuRaster(rgba: Uint8ClampedArray | Uint8Array, breite: numbe
 
 /** Laedt daten/bilder/<pfad> (nur im Browser) und liefert es als lineares Raster mit drei Kanaelen. */
 async function ladeRasterBrowser(pfad: string, nachweisId: string): Promise<Raster> {
-  const url = import.meta.env.BASE_URL + "daten/bilder/" + pfad;
-  let antwort: Response;
-  try {
-    antwort = await fetch(url);
-  } catch (e) {
-    throw new DatenFehler(pfad, nachweisId, "-", `nicht erreichbar (${String(e)})`);
-  }
-  if (!antwort.ok) throw new DatenFehler(pfad, nachweisId, "-", `HTTP ${antwort.status}`);
+  const antwort = await holeDaten("bilder/" + pfad, pfad, nachweisId);
   let bitmap: ImageBitmap;
   try {
     // Kein Farbmanagement und kein Vormultiplizieren: die Kodewerte sollen unveraendert ankommen.

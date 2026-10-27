@@ -29,7 +29,7 @@ function quelle(): QuelleAusRaster {
 
 function parameter(teil: Partial<Simulationsparameter> = {}): Simulationsparameter {
   return {
-    quellbild: { schluessel: "q|0|0", objekt: "test", massstabArcsecProPx: 1, rasterPx: N, mitteXArcsec: 0, mitteYArcsec: 0, punktquellen: [] },
+    quellbild: { schluessel: "q|0|0", massstabArcsecProPx: 1, rasterPx: N, mitteXArcsec: 0, mitteYArcsec: 0, punktquellen: [] },
     kern: deltaKern(5),
     helligkeit: { schluessel: "h1", faktorObjekt: 1, hintergrundRelativ: 0, hintergrundMagProArcsec2: 20, punktFaktor: 1, punktExponent: 1 },
     gesichtsfeld: { form: "kreis", breiteArcsec: 100, hoeheArcsec: 100 },
@@ -87,7 +87,7 @@ describe("rendere", () => {
   it("Maske bleibt bei verschobenem Fenster in der Fenstermitte, das Objekt wandert (A-D2)", () => {
     // 16''-Fenster um 8'' nach rechts verschoben, Kreis 16'': ganzer Kreis sichtbar, Ecken schwarz.
     const p = parameter({
-      quellbild: { schluessel: "q|8|0", objekt: "test", massstabArcsecProPx: 1, rasterPx: N, mitteXArcsec: 8, mitteYArcsec: 0, punktquellen: [] },
+      quellbild: { schluessel: "q|8|0", massstabArcsecProPx: 1, rasterPx: N, mitteXArcsec: 8, mitteYArcsec: 0, punktquellen: [] },
       fenster: { breiteArcsec: N, mitteXArcsec: 8, mitteYArcsec: 0, px: N },
       gesichtsfeld: { form: "kreis", breiteArcsec: N, hoeheArcsec: N }
     });
@@ -168,7 +168,7 @@ describe("rendere", () => {
     const aussen: Punktquelle = { ...trabant, name: "Kallisto", xArcsec: 30 };
     const geblendet: Punktquelle = { ...trabant, name: "Europa", xArcsec: 19.5, sichtbar: false, grund: "blendung" };
     const p = parameter({
-      quellbild: { schluessel: "q|t", objekt: "test", massstabArcsecProPx: 1, rasterPx: 48, mitteXArcsec: 0, mitteYArcsec: 0, punktquellen: [trabant, aussen, geblendet] },
+      quellbild: { schluessel: "q|t", massstabArcsecProPx: 1, rasterPx: 48, mitteXArcsec: 0, mitteYArcsec: 0, punktquellen: [trabant, aussen, geblendet] },
       fenster: { breiteArcsec: 48, mitteXArcsec: 0, mitteYArcsec: 0, px: 48 }
     });
     const r = rendere(p, quelle(), falter).raster;

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { arbeitsmassstab, kernbeschreibung, kernSchluessel } from "./arbeitsmassstab";
+import { arbeitsmassstab, arbeitsmassstabOhneFenster, kernbeschreibung, kernSchluessel } from "./arbeitsmassstab";
 import { atmosphaere } from "./atmosphaere";
 import { aufloesung } from "./aufloesung";
 import { PhysikFehler } from "./fehler";
@@ -14,6 +14,12 @@ function stufe1(oeffnungMm: number, vergroesserung: number, bedingungen: Bedingu
 }
 
 describe("arbeitsmassstab (ADR-0002)", () => {
+  it("ohne Fenster: max(Quelle, Gesamt-FWHM / 2,5), mit beliebig feinem Fenster gleich arbeitsmassstab", () => {
+    const { aufl } = stufe1(80, 60, KLAR_45);
+    expect(arbeitsmassstabOhneFenster(aufl, JUPITER_QUELLE)).toBeCloseTo(aufl.gesamtFwhmArcsec / 2.5, 12);
+    expect(arbeitsmassstabOhneFenster(aufl, { ...JUPITER_QUELLE, massstabArcsecProPx: 5 })).toBe(5);
+    expect(arbeitsmassstab(aufl, JUPITER_QUELLE, fenster(1, 1024))).toBe(arbeitsmassstabOhneFenster(aufl, JUPITER_QUELLE));
+  });
   it("Anzeige gewinnt: Mond 3000'' auf 1024 px ist 2,93''/px, groeber als FWHM/2,5 und Quelle", () => {
     const { aufl } = stufe1(80, 60, KLAR_45);
     expect(arbeitsmassstab(aufl, MOND_QUELLE, fenster(3000, 1024))).toBeCloseTo(3000 / 1024, 12);

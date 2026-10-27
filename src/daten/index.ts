@@ -8,6 +8,6 @@ export { DatenFehler } from "./fehler";
 export { quelleEinzelbildBrowser, quelleKachelnBrowser } from "./kachellader";
 export { QuelleKacheln } from "./kacheln";
 export { ladeObjekte, OBJEKTE_DATEI, pruefeObjekte, pruefeVerweise, type Objekt, type ZustandEintrag } from "./objekte";
-export { findeZustand, objektzustand } from "./objektzustand";
+export { findeZustand, nachweisZu, objektzustand } from "./objektzustand";
 export { QuelleEinzelbild } from "./quelle_einzelbild";
 export * from "./geraete";

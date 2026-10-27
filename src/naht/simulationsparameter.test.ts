@@ -9,7 +9,6 @@ describe("Naht-Typen sind strukturiert klonbar", () => {
     const parameter: Simulationsparameter = {
       quellbild: {
         schluessel: "mond-q1|1.2|853|0|0",
-        objekt: "mond-q1",
         massstabArcsecProPx: 1.2,
         rasterPx: 853,
         mitteXArcsec: 0,

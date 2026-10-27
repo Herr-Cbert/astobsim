@@ -17,8 +17,9 @@
 
 import type { Objektpunkt, Quellausschnitt, Quelle } from "../naht/quelle";
 import type { Kanaele, Raster } from "../naht/raster";
-import type { Bildnachweis } from "./bildnachweise";
+import { BILDER_DATEI, type Bildnachweis } from "./bildnachweise";
 import { DatenFehler } from "./fehler";
+import { massstabFuerZustand, type Pixelbereich, pixelbereich, schwarz } from "./pixelbereich";
 
 /** Eine Stufe der Pyramide in Anzeige-Bogensekunden (schon auf den Zustand skaliert). */
 interface Stufengeometrie {
@@ -44,13 +45,6 @@ export interface Kacheladresse {
   y: number;
 }
 
-/** Pixelbereich einer Stufe, halboffen [x0, x1) x [y0, y1), auf das Bild begrenzt. */
-interface Pixelbereich {
-  x0: number;
-  x1: number;
-  y0: number;
-  y1: number;
-}
 
 /** Standardgroesse des Caches: 64 volle Kacheln 512 px mit 3 Kanaelen sind rund 200 MB Float32. */
 const MAX_KACHELN_STANDARD = 64;
@@ -111,7 +105,11 @@ export class QuelleKacheln implements Quelle {
   /** Die Kacheln, die ausschnitt mit denselben Argumenten braucht, zeilenweise von Nordwest. */
   kachelnFuer(mitte: Objektpunkt, breiteArcsec: number, massstabArcsecProPx: number): Kacheladresse[] {
     const stufe = this.stufeFuer(massstabArcsecProPx);
-    const bereich = this.bereich(mitte, breiteArcsec, stufe);
+    return this.kachelnIn(stufe, this.bereich(mitte, breiteArcsec, stufe).bereich);
+  }
+
+  /** Kacheln der Stufe, die den Bereich beruehren. */
+  private kachelnIn(stufe: number, bereich: Pixelbereich | null): Kacheladresse[] {
     if (bereich === null) return [];
     const k = this.geometrie.kachelPx;
     const liste: Kacheladresse[] = [];
@@ -149,19 +147,16 @@ export class QuelleKacheln implements Quelle {
 
   ausschnitt(mitte: Objektpunkt, breiteArcsec: number, massstabArcsecProPx: number): Quellausschnitt {
     const stufe = this.stufeFuer(massstabArcsecProPx);
-    const geo = this.geometrie.stufen[stufe]!;
-    const ms = geo.massstabArcsecProPx;
-    const links = -(geo.breitePx * ms) / 2;
-    const oben = (geo.hoehePx * ms) / 2;
+    const ms = this.geometrie.stufen[stufe]!.massstabArcsecProPx;
     const { kanaele, kachelPx: k } = this.geometrie;
-    const bereich = this.bereich(mitte, breiteArcsec, stufe);
+    const { links, oben, bereich } = this.bereich(mitte, breiteArcsec, stufe);
     if (bereich === null) {
       // Bereich liegt ganz ausserhalb der Pyramide: ein schwarzes Pixel genuegt.
       return { raster: schwarz(1, 1, kanaele), massstabArcsecProPx: ms, linksXArcsec: links, obenYArcsec: oben };
     }
     const { x0, x1, y0, y1 } = bereich;
     const raster = schwarz(x1 - x0, y1 - y0, kanaele);
-    for (const adresse of this.kachelnFuer(mitte, breiteArcsec, massstabArcsecProPx)) {
+    for (const adresse of this.kachelnIn(stufe, bereich)) {
       const kachel = this.cache.get(kachelSchluessel(adresse));
       if (kachel === undefined) continue; // nicht geladen: bleibt Schwarz
       // Schnitt von Kachel und Bereich in Stufenpixeln.
@@ -178,20 +173,10 @@ export class QuelleKacheln implements Quelle {
     return { raster, massstabArcsecProPx: ms, linksXArcsec: links + x0 * ms, obenYArcsec: oben - y0 * ms };
   }
 
-  /**
-   * Angefragter Bereich in Pixeln der Stufe, mit einem Pixel Rand (wie QuelleAusRaster in bild,
-   * fuer das bilineare Vergroessern), auf das Bild begrenzt; null, wenn er das Bild nicht trifft.
-   */
-  private bereich(mitte: Objektpunkt, breiteArcsec: number, stufe: number): Pixelbereich | null {
+  /** Angefragter Bereich in Pixeln der Stufe mit einem Pixel Rand (pixelbereich.ts). */
+  private bereich(mitte: Objektpunkt, breiteArcsec: number, stufe: number): ReturnType<typeof pixelbereich> {
     const geo = this.geometrie.stufen[stufe]!;
-    const ms = geo.massstabArcsecProPx;
-    const links = -(geo.breitePx * ms) / 2;
-    const oben = (geo.hoehePx * ms) / 2;
-    const x0 = klemme(Math.floor((mitte.xArcsec - breiteArcsec / 2 - links) / ms) - 1, 0, geo.breitePx);
-    const x1 = klemme(Math.ceil((mitte.xArcsec + breiteArcsec / 2 - links) / ms) + 1, 0, geo.breitePx);
-    const y0 = klemme(Math.floor((oben - (mitte.yArcsec + breiteArcsec / 2)) / ms) - 1, 0, geo.hoehePx);
-    const y1 = klemme(Math.ceil((oben - (mitte.yArcsec - breiteArcsec / 2)) / ms) + 1, 0, geo.hoehePx);
-    return x1 <= x0 || y1 <= y0 ? null : { x0, x1, y0, y1 };
+    return pixelbereich(mitte, breiteArcsec, geo.breitePx, geo.hoehePx, geo.massstabArcsecProPx);
   }
 
   private async ladeKachel(adresse: Kacheladresse): Promise<Raster> {
@@ -255,9 +240,8 @@ export class QuelleKacheln implements Quelle {
  * wird hier nicht verwendet.
  */
 export function pyramidengeometrie(nachweis: Bildnachweis, winkelgroesseArcsec: number, kanaele: Kanaele = 3): Pyramidengeometrie {
-  if (nachweis.kacheln === undefined) throw new DatenFehler("bilder.json", nachweis.id, "kacheln", "keine Kachelpyramide");
-  if (!(winkelgroesseArcsec > 0)) throw new DatenFehler("objekte.json", nachweis.zustand, "winkelgroesse_arcsec", "muss positiv sein");
-  const massstab0 = winkelgroesseArcsec / nachweis.objektDurchmesserPx;
+  if (nachweis.kacheln === undefined) throw new DatenFehler(BILDER_DATEI, nachweis.id, "kacheln", "keine Kachelpyramide");
+  const massstab0 = massstabFuerZustand(nachweis, winkelgroesseArcsec);
   return {
     kachelPx: nachweis.kacheln.kachelPx,
     kanaele,
@@ -271,22 +255,14 @@ export function pyramidengeometrie(nachweis: Bildnachweis, winkelgroesseArcsec: 
 
 /** Pfad einer Kachel relativ zu daten/bilder/ nach dem Muster des Nachweises. */
 export function kachelPfad(nachweis: Bildnachweis, adresse: Kacheladresse): string {
-  if (nachweis.kacheln === undefined) throw new DatenFehler("bilder.json", nachweis.id, "kacheln", "keine Kachelpyramide");
+  if (nachweis.kacheln === undefined) throw new DatenFehler(BILDER_DATEI, nachweis.id, "kacheln", "keine Kachelpyramide");
   return (
     nachweis.datei +
     nachweis.kacheln.muster.replace("{stufe}", String(adresse.stufe)).replace("{x}", String(adresse.x)).replace("{y}", String(adresse.y))
   );
 }
 
-function kachelSchluessel(a: Kacheladresse): string {
+/** Schluessel einer Kachel im Cache und in Meldungen: "stufe/x_y". */
+export function kachelSchluessel(a: Kacheladresse): string {
   return `${a.stufe}/${a.x}_${a.y}`;
-}
-
-function schwarz(breite: number, hoehe: number, kanaele: Kanaele): Raster {
-  return { breite, hoehe, kanaele, daten: new Float32Array(breite * hoehe * kanaele) };
-}
-
-/** Klemmt wert auf [min, max]; nicht begrenze, das ist der Nahtbegriff aus physik. */
-function klemme(wert: number, min: number, max: number): number {
-  return Math.min(max, Math.max(min, wert));
 }

@@ -15,7 +15,7 @@ import type { Objektpunkt, Quellausschnitt, Quelle } from "../naht/quelle";
 import type { Kanaele, Raster } from "../naht/raster";
 import { BILDER_DATEI, type Bildnachweis } from "./bildnachweise";
 import { DatenFehler } from "./fehler";
-import { OBJEKTE_DATEI } from "./objekte";
+import { massstabFuerZustand, pixelbereich, schwarz } from "./pixelbereich";
 
 export class QuelleEinzelbild implements Quelle {
   constructor(
@@ -41,15 +41,11 @@ export class QuelleEinzelbild implements Quelle {
   ausschnitt(mitte: Objektpunkt, breiteArcsec: number, _massstabArcsecProPx: number): Quellausschnitt {
     const ms = this.massstabArcsecProPx;
     const { breite, hoehe, kanaele, daten } = this.raster;
-    const links = -(breite * ms) / 2;
-    const oben = (hoehe * ms) / 2;
-    const x0 = klemme(Math.floor((mitte.xArcsec - breiteArcsec / 2 - links) / ms) - 1, 0, breite);
-    const x1 = klemme(Math.ceil((mitte.xArcsec + breiteArcsec / 2 - links) / ms) + 1, 0, breite);
-    const y0 = klemme(Math.floor((oben - (mitte.yArcsec + breiteArcsec / 2)) / ms) - 1, 0, hoehe);
-    const y1 = klemme(Math.ceil((oben - (mitte.yArcsec - breiteArcsec / 2)) / ms) + 1, 0, hoehe);
-    if (x1 <= x0 || y1 <= y0) {
+    const { links, oben, bereich } = pixelbereich(mitte, breiteArcsec, breite, hoehe, ms);
+    if (bereich === null) {
       return { raster: schwarz(1, 1, kanaele), massstabArcsecProPx: ms, linksXArcsec: links, obenYArcsec: oben };
     }
+    const { x0, x1, y0, y1 } = bereich;
     const teil = schwarz(x1 - x0, y1 - y0, kanaele);
     const zeilenLaenge = (x1 - x0) * kanaele;
     for (let y = y0; y < y1; y++) {
@@ -63,8 +59,7 @@ export class QuelleEinzelbild implements Quelle {
 /** Massstab des Einzelbilds fuer einen Zustand: Winkelgroesse des Zustands / objekt_durchmesser_px. */
 export function einzelbildMassstab(nachweis: Bildnachweis, winkelgroesseArcsec: number): number {
   if (nachweis.kacheln !== undefined) throw new DatenFehler(BILDER_DATEI, nachweis.id, "kacheln", "Kachelpyramide, kein Einzelbild (QuelleKacheln)");
-  if (!(winkelgroesseArcsec > 0)) throw new DatenFehler(OBJEKTE_DATEI, nachweis.zustand, "winkelgroesse_arcsec", "muss positiv sein");
-  return winkelgroesseArcsec / nachweis.objektDurchmesserPx;
+  return massstabFuerZustand(nachweis, winkelgroesseArcsec);
 }
 
 /**
@@ -82,13 +77,4 @@ export function quelleEinzelbild(nachweis: Bildnachweis, winkelgroesseArcsec: nu
     );
   }
   return new QuelleEinzelbild(raster, massstab);
-}
-
-function schwarz(breite: number, hoehe: number, kanaele: Kanaele): Raster {
-  return { breite, hoehe, kanaele, daten: new Float32Array(breite * hoehe * kanaele) };
-}
-
-/** Klemmt wert auf [min, max]; nicht begrenze, das ist der Nahtbegriff aus physik. */
-function klemme(wert: number, min: number, max: number): number {
-  return Math.min(max, Math.max(min, wert));
 }

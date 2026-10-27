@@ -128,7 +128,6 @@ export class Steuerung {
   /** Suchteil der URL, der zuletzt geschrieben wurde oder werden soll. */
   private url = "";
   private urlGeschrieben = false;
-  private vorher: Simulationsparameter | undefined;
   private aktuell: AktuelleQuelle | undefined;
   /** Faltet das Vergleichsbild: der 1x1-Delta-Kern braucht keine GPU und kein Kontextrisiko. */
   private readonly vergleichsfalter = new FalterJs();
@@ -312,14 +311,13 @@ export class Steuerung {
       const fenster = zoom
         ? zoomfenster(k, mitte, px)
         : { breiteArcsec: optik(k.geraet).gesichtsfeld.breiteArcsec, mitteXArcsec: mitte.xArcsec, mitteYArcsec: mitte.yArcsec, px };
-      auswertung = auswerten(k, { fenster, vorher: this.vorher });
+      // Der Kern der letzten Auswertung wird bei gleichem Schluessel wiederverwendet (auswerten, vorher).
+      auswertung = auswerten(k, { fenster, vorher: this.zustand.auswertung?.parameter });
       if (zoom) vergleich = vergleichsparameter(auswertung.parameter, k.objekt.quelle.massstabArcsecProPx);
     } catch (e) {
       this.setze({ phase: "fehler", fehler: { art: "rechnen", ursache: e } });
       return;
     }
-    this.vorher = auswertung.parameter;
-
     const neueQuelle = this.aktuell?.kennung !== k.objekt.kennung;
     const aktuell = this.quelleFuer(k.objekt);
     this.setze(neueQuelle ? { auswertung, phase: "laedt" } : { auswertung });
