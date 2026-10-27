@@ -48,9 +48,9 @@ describe("pruefeObjekte", () => {
     const mars = pruefeObjekte(objekteJson).find((o) => o.id === "mars");
     expect(mars?.typ).toBe("planet");
     expect(mars?.zustaende.map((z) => [z.id, z.winkelgroesseArcsec, z.weissMagProArcsec2])).toEqual([
-      ["mars_6", 6, 4.5],
-      ["mars_14", 14, 4.1],
-      ["mars_25", 25, 3.8]
+      ["mars_6", 6, 3.1],
+      ["mars_14", 14, 2.54],
+      ["mars_25", 25, 1.68]
     ]);
     expect(mars?.zustaende[0]?.hinweisHilfe).toContain("gibbos");
     expect(mars?.zustaende[1]?.hinweisHilfe).toBeUndefined();

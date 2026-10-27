@@ -19,7 +19,7 @@ describe("objektzustand", () => {
     expect(z.quelle.hoehePx).toBe(3072);
     // 1865'' / 2758 px, Faktor 1,051 gegen den Nachweis (0,643''/px)
     expect(z.quelle.massstabArcsecProPx).toBeCloseTo(0.67621, 5);
-    expect(z.quelle.weissMagProArcsec2).toBe(3.35);
+    expect(z.quelle.weissMagProArcsec2).toBe(3.91);
     expect(z.trabanten).toEqual([]);
   });
 
