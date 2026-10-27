@@ -41,8 +41,66 @@ export const TEXTE = {
   /** Infosymbol (src/ui/hilfe.ts); die Hilfetexte selbst stehen im Abschnitt hilfe und bei den Formularen. */
   hilfe: {
     symbol: "i",
-    beschriftung: (thema: string): string => `Hilfe zu ${thema}`
-    // Issue #18: Hilfetexte zu Parametern und Anzeigezahlen (A-D6), Hinweise A-X5, A-X1, A-B2.
+    beschriftung: (thema: string): string => `Hilfe zu ${thema}`,
+
+    // Hilfetexte zu den Parametern (A-D6, A-Z2). Zahlen aus docs/recherche/physik.md und
+    // docs/recherche/objekte.md, Entscheidungen aus docs/anforderungen.md und docs/adr/.
+    objekt:
+      "Das Himmelsobjekt, das betrachtet wird. Jedes Objekt hat einen oder mehrere feste Zustände, die zeigen, wie es typischerweise am Himmel erscheint.",
+    zustand:
+      "Ein Zustand ist eine feste, typische Erscheinung des Objekts mit seiner scheinbaren Größe in Bogensekunden (″). " +
+      "Mond: Die Bildvorlage hat 0,643″ je Pixel; ab etwa 200 mm Öffnung bei sehr gutem Seeing begrenzt die Bildvorlage und nicht das Fernrohr die Schärfe. " +
+      "Mars 6″ ist in Wirklichkeit nicht voll beleuchtet (etwa 90 Prozent), wird hier aber vereinfacht als volle Scheibe gezeigt. " +
+      "Jupiter 35″ und Saturn 16″ zeigen den Planeten fern von der Opposition, so wie man ihn die meiste Zeit des Jahres sieht.",
+    seeing:
+      "Seeing ist die Luftunruhe: Warme und kalte Luftschichten lassen das Bild flimmern und verschmieren. " +
+      "Angegeben wird, wie breit ein Stern im Zenit verschmiert erscheint (Halbwertsbreite in Bogensekunden); kleiner ist besser. " +
+      "Unter 1″ ist ausgezeichnet, 1 bis 2″ gut, 2 bis 3″ mittel, darüber schlecht. Bei Hobbybeobachtern sind 2 bis 5″ üblich, 2″ ist ein durchschnittlicher Abend. " +
+      "Die Pickering-Stufe (1 bis 10, 10 ist am ruhigsten) ist eine Schätzskala von Beobachtern; die Zuordnung zu Bogensekunden ist nur ungefähr. " +
+      "Gezeigt wird der Anblick über längere Zeit, nicht der beste ruhige Moment.",
+    bortle:
+      "Die Bortle-Skala beschreibt, wie hell der Nachthimmel ist: 1 ist ein ausgezeichneter dunkler Himmel fern jeder Stadt, 9 der Himmel einer Innenstadt. " +
+      "Daneben steht die Himmelshelligkeit in Magnituden je Quadratbogensekunde (größer ist dunkler). " +
+      "In dieser Version wirkt die Stufe nur auf die Helligkeit des Hintergrunds im Gesichtsfeld: Mond und Planeten sind so viel heller als der Himmel, dass sie sich kaum ändern. " +
+      "Ihre volle Wirkung hätte die Stufe erst bei lichtschwachen Objekten wie Nebeln und Galaxien. " +
+      "Die Werte für Stufe 8 und 9 sind Schätzungen.",
+    transparenz:
+      "Wie klar die Luft ist. Dunst und Feuchtigkeit schlucken Licht: Das Objekt wird dunkler, je diesiger die Luft und je tiefer es steht. " +
+      "Klar entspricht 0,20 Magnituden Lichtverlust je Luftmasse, leicht diesig 0,30, diesig 0,45.",
+    hoehe:
+      "Wie hoch das Objekt über dem Horizont steht, in Grad (90° ist der Zenit, senkrecht über dem Beobachter). " +
+      "Je tiefer es steht, desto länger ist der Weg des Lichts durch die Luft: Das Seeing wird schlechter und das Objekt dunkler. " +
+      "Die Luftmasse gibt diesen Weg an, 1 im Zenit, bei 30° etwa 2, bei 10° etwa 5,6.",
+
+    /** Hilfetexte zu den Zahlen des Infopanels (A-D6), Schluessel wie in TEXTE.info. */
+    anzeige: {
+      vergroesserung:
+        "Wie viel größer das Objekt erscheint als mit bloßem Auge: Brennweite des Fernrohrs geteilt durch die Brennweite des Okulars; bei Fernglas und bloßem Auge fest. " +
+        "Mehr als das Doppelte der Öffnung in Millimetern zeigt keine weiteren Einzelheiten, das Bild wird nur größer und dunkler.",
+      wahresGesichtsfeld:
+        "Wie groß der Ausschnitt des Himmels ist, der im Okular zu sehen ist, in Grad und Bogenminuten (1° = 60′). " +
+        "Zum Vergleich: Der Mond ist etwa ein halbes Grad groß. Ungefähr das scheinbare Gesichtsfeld des Okulars geteilt durch die Vergrößerung.",
+      austrittspupille:
+        "Der Durchmesser des Lichtbündels, das aus dem Okular ins Auge fällt: Öffnung geteilt durch Vergrößerung. " +
+        "Über 6 mm passt nicht alles Licht in die Pupille des Auges, unter 0,5 mm wird das Bild dunkel und unscharf. " +
+        "Unter 6 mm gilt: Je kleiner die Austrittspupille, desto dunkler erscheinen Flächen wie Mond und Planeten.",
+      rayleigh:
+        "Die Beugungsgrenze: Wegen der Wellennatur des Lichts zeigt auch ein perfektes Fernrohr einen Stern als kleines Scheibchen. " +
+        "Nach Rayleigh lassen sich zwei Punkte gerade noch trennen, wenn sie 138″ geteilt durch die Öffnung in mm auseinander liegen. Größere Öffnung heißt feinere Grenze.",
+      dawes:
+        "Eine zweite, aus Beobachtung gewonnene Beugungsgrenze für gleich helle Doppelsterne: 116″ geteilt durch die Öffnung in mm. " +
+        "Sie ist etwas feiner als die Rayleigh-Grenze; ihr Wert gilt nur für solche Doppelsterne.",
+      // Folgerung "hilft mehr Oeffnung kaum": docs/recherche/physik.md 2.3 (Testfall T4).
+      seeing:
+        "Wie stark die Luftunruhe das Bild in der eingestellten Höhe verschmiert: das Seeing im Zenit, vergrößert durch den längeren Weg durch die Luft. " +
+        "Ist dieser Wert die größte Grenze, hilft mehr Öffnung kaum.",
+      auge:
+        "Das Auge trennt etwa eine Bogenminute (60″). Am Objekt ist das 60″ geteilt durch die Vergrößerung. " +
+        "Feine, kontrastarme Einzelheiten auf Planeten braucht das Auge eher zwei- bis dreimal so groß; deshalb lohnt mehr Vergrößerung, als die Beugung allein verlangt.",
+      dominant:
+        "Welche der drei Grenzen (Beugung, Seeing, Auge) das Bild am stärksten verschmiert. " +
+        "Sie zeigt, was am meisten bringt: mehr Öffnung bei der Beugung, ruhigere Luft bei Seeing, mehr Vergrößerung beim Auge."
+    }
   },
 
   /** Formular Gerät und Okular (src/ui/formular_geraet.ts). */
@@ -77,12 +135,51 @@ export const TEXTE = {
 
   /** Formular Objekt und Zustand (src/ui/formular_objekt.ts). */
   objekt: {
-    // Issue #18
+    ueberschrift: "Objekt",
+    objekt: "Objekt",
+    zustand: "Zustand",
+    /** Steht unter der Auswahl, solange das Bild des gewaehlten Zustands nachgeladen wird. */
+    laedt: "Lade Bild …"
   },
 
   /** Formular Bedingungen (src/ui/formular_bedingungen.ts). */
   bedingungen: {
-    // Issue #18
+    ueberschrift: "Bedingungen",
+    seeing: "Seeing",
+    /** Wortstufen nach SEEING_WORTSTUFEN in physik (A-B1). */
+    wortstufen: {
+      ausgezeichnet: "ausgezeichnet",
+      gut: "gut",
+      mittel: "mittel",
+      schlecht: "schlecht"
+    },
+    /** Anzeige neben dem Seeing-Regler: Wortstufe und Pickering-Bereich. */
+    seeingstufe: (wortstufe: string, von: number, bis: number): string => `${wortstufe}, Pickering ${von} bis ${bis}`,
+    bortle: "Himmelshelligkeit (Bortle)",
+    /** Kurzbeschreibung je Bortle-Stufe 1 bis 9 (Index = Stufe - 1), nach docs/recherche/physik.md 6.1. */
+    bortleStufen: [
+      "ausgezeichneter Dunkelhimmel",
+      "typischer dunkler Standort",
+      "ländlich",
+      "ländlich bis vorstädtisch",
+      "vorstädtisch",
+      "helle Vorstadt",
+      "Vorstadt bis Stadt",
+      "Stadt",
+      "Innenstadt"
+    ],
+    /** Anzeige neben dem Bortle-Regler: Kurzbeschreibung und Himmelshelligkeit. */
+    bortleStufe: (beschreibung: string, mag: string): string => `${beschreibung}, ${mag} mag/″²`,
+    transparenz: "Transparenz",
+    /** Anzeigetexte zu TRANSPARENZEN (A-B3). */
+    transparenzen: {
+      klar: "klar",
+      "leicht-diesig": "leicht diesig",
+      diesig: "diesig"
+    },
+    hoehe: "Höhe über dem Horizont",
+    /** Anzeige neben dem Hoehen-Regler (A-B4). */
+    luftmasse: (wert: string): string => `Luftmasse ${wert}`
   },
 
   /** Warnungen neben dem Gesichtsfeld (A-D5, src/ui/gesichtsfeld.ts). */
