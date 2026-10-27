@@ -12,7 +12,7 @@ Labels nach Modul: `physik`, `bild`, `daten`, `ui` (umfasst `zustand`), `infra`;
 |---|---|---|
 | M1 Mond im 80 mm Refraktor sichtbar | Erster durchgehender Pfad (architektur.md Abschnitt 3): Mond, feste Startkonfiguration A-D9, JavaScript-Falter, ein Fenster, ohne Trabanten, online auf GitHub Pages | #1 bis #10 geschlossen, Seite zeigt den Mond, Bild entspricht dem Prototyp (Fall T3) |
 | M2 Alle Objekte und volle Bedienung | Alle Muss-Anforderungen: vier Objekte mit Trabanten, Geraeteliste, Bedingungen, Gesichtsfeld mit Verschieben, Zoom, URL, WebGL2 | #11 bis #20 geschlossen, jede Muss-Kennung einem PR zuordenbar |
-| M3 Version 1 | Validierung der Testfaelle (Phase 6), Sicherheit und Vereinfachung, Abschluss (Phase 7) | #21 bis #23 geschlossen, A-Q3 erfuellt |
+| M3 Version 1 | Validierung der Testfaelle (Phase 6), Sicherheit und Vereinfachung, Abschluss (Phase 7) | #21 bis #23 und #76 bis #79 geschlossen, A-Q3 erfuellt |
 | Nach Version 1 | Kann-Anforderungen, angelegt, nicht umgesetzt (A-Q3) | nicht Teil von Version 1 |
 
 ## 2. Issues fuer Version 1
@@ -77,7 +77,7 @@ Umgesetzt ab 2026-10-27: Vorbereitungs-PR `vorbereitung-welle-3` (Steuerung mit 
 
 **Welle 4a (M2, Folge-Issues aus Welle 3b):** #71 (Quellweiss eichen) und #51 (Kachelstufen linear) parallel, danach #72 (Trabanten als eigene Punktebene, Ansatz 2026-10-27 im Plan-Modus mit Herbert geklaert; loest auch die Begrenzung von Mars am Anzeigeweiss). Umgesetzt 2026-10-27, PRs #73 bis #75.
 
-**Welle 4 (M3):** #21, #22, #23 sequentiell; #21 braucht Herberts Urteil zu den Testfaellen. #21 am 2026-10-27 im Plan-Modus geklaert (Masszahl Profildelle statt MTF, Screenshots per Skript), Ergebnis `docs/validierung.md`.
+**Welle 4 (M3):** #21, #22, #23 sequentiell; #21 braucht Herberts Urteil zu den Testfaellen. #21 am 2026-10-27 im Plan-Modus geklaert (Masszahl Profildelle statt MTF, Screenshots per Skript), Ergebnis `docs/validierung.md`. Die Abweichungen #76 bis #79 (Cassini/Seeing, Mond-Zoom, Mars-Polkappe, Jupiter-Kontrast) gehoeren zu M3 und kommen nach #21, vor #23.
 
 Merge-Konflikte in Stufe B zeigen, wo der Modulschnitt nicht sauber war; sie werden in der Retrospektive (#23) festgehalten.
 

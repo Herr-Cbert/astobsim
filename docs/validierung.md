@@ -104,7 +104,7 @@ Die Schwelle ist eine Kalibrierkonstante fuer die Tests, keine Physik: das Bild 
 
 ## 4. Abweichungen
 
-Als Issues angelegt am 2026-10-27, ohne Milestone:
+Als Issues angelegt am 2026-10-27, Milestone M3 (Herbert, 2026-10-27):
 
 1. **#76, T2: Cassini-Teilung bei 100 mm und Seeing 1,5'' nicht sichtbar.** Das Modell faltet mit dem Langzeit-Seeing (Moffat mit voller FWHM); Beobachter sehen die Teilung in Momenten ruhiger Luft. Zu klaeren, ob die Erwartung fuer Langzeit-Seeing zu optimistisch ist oder ob das Seeing-Modell fuer visuelle Beobachtung zu streng ist. Bezug: #29 (Kann: Umschalter ruhiger Moment), physik.md 2.
 2. **#77, T3: Mond-Zoom zu grob fuer die Aufloesungsgrenze.** Der Zoom zeigt beim Mond das halbe Gesichtsfeld (`ZOOM_ANTEIL_GESICHTSFELD_MAX`); bei 80 mm und 100-fach sind das etwa 1,7'' je Anzeigepixel, die Optik loest etwa 1'' je Arbeitspixel auf. Die Grenze von A-Q2 (Krater ab 4 km) ist so nicht zu sehen. Vorschlag: zweite Zoomstufe oder Zoom bis zum Arbeitsmassstab.
