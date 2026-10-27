@@ -24,13 +24,13 @@
     "phase": 0.593,
     "kolongitude_grad": 11.2,
     "positionswinkel_achse_grad": 357.8,
-    "bearbeitung": "Quadratischer Ausschnitt 3072 px um die Scheibenmitte (Pixel 2877/1622 des Rohbilds), Alphakanal auf Schwarz gelegt, ausserhalb der Scheibe plus 4 px Rand auf Schwarz gesetzt, nicht gedreht oder gespiegelt (Himmelsnorden oben laut SVS, Positionswinkel der Achse 357.8 Grad), keine Farb- oder Kontrastaenderung, in Kacheln von 512 px mit 3 Stufen zerlegt (WebP, Qualitaet 95). Stufe n hat das 2^n-fache Pixelmass von Stufe 0.",
+    "bearbeitung": "Quadratischer Ausschnitt 3072 px um die Scheibenmitte (Pixel 2877/1622 des Rohbilds), Alphakanal auf Schwarz gelegt, ausserhalb der Scheibe plus 4 px Rand auf Schwarz gesetzt, nicht gedreht oder gespiegelt (Himmelsnorden oben laut SVS, Positionswinkel der Achse 357.8 Grad), keine Farb- oder Kontrastaenderung, in Kacheln von 512 px mit 3 Stufen zerlegt (WebP, Qualitaet 95). Stufe n hat das 2^n-fache Pixelmass von Stufe 0 und ist das Flaechenmittel in linearer Helligkeit (sRGB-Kennlinie IEC 61966-2-1), nach sRGB 8 Bit zurueckkodiert.",
     "kacheln": {
       "kachel_px": 512,
       "format": "webp",
       "qualitaet": 95,
       "muster": "{stufe}/{x}_{y}.webp",
-      "gesamt_bytes": 1764664,
+      "gesamt_bytes": 1767214,
       "stufen": [
         {
           "stufe": 0,

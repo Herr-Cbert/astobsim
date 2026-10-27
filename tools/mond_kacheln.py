@@ -9,7 +9,11 @@ Kacheln von 512 px in Stufen halbierender Aufloesung nach
     daten/bilder/mond/<stufe>/<x>_<y>.webp
 Stufe 0 ist die volle Aufloesung (0,643"/px, 3072 px), jede weitere Stufe
 halbiert (1536 px, 768 px); es wird abgebrochen, sobald eine Stufe unter
-1024 px Gesamtbreite liegt. Danach wird der Eintrag fuer den Mond in
+1024 px Gesamtbreite liegt. Halbiert wird in linearer Helligkeit: sRGB-
+Kodewerte nach IEC 61966-2-1 linearisieren, 2x2 mitteln, zurueck nach sRGB
+8 Bit (Issue #51); vor dem Schreiben prueft eine Probe, dass jeder 2x2-Block
+einer Stufe linear gemittelt bis auf eine 8-Bit-Stufe das Pixel der naechsten
+Stufe ergibt. Danach wird der Eintrag fuer den Mond in
 daten/bilder.json geschrieben (bestehende andere Eintraege bleiben erhalten).
 
 Verwendung (aus dem Repo-Root, nur numpy und Pillow noetig):
@@ -19,6 +23,7 @@ Verwendung (aus dem Repo-Root, nur numpy und Pillow noetig):
     python3 tools/mond_kacheln.py --ziel daten/bilder/mond          # Zielordner der Kacheln
     python3 tools/mond_kacheln.py --bildnachweis daten/bilder.json  # Datei fuer den Bildnachweis
     python3 tools/mond_kacheln.py --messen              # nur Qualitaet messen, nichts schreiben
+    python3 tools/mond_kacheln.py --pruefen             # nur Pyramide rechnen und Probe, nichts schreiben
 
 Das Skript ist idempotent: der Zielordner wird vorher geleert (nur Stufen-
 ordner mit .webp-Kacheln), der Mond-Eintrag in bilder.json wird ersetzt.
@@ -39,7 +44,7 @@ ausserhalb der Scheibe plus Rand (Ringing ins Schwarze), Pyramide alle Stufen:
     q80: Terminator max 30, mittel 2,04; Ostrand max 25, mittel 1,34; Hintergrund 14; 0,56 MB
     q85: Terminator max 24, mittel 1,79; Ostrand max 21, mittel 1,15; Hintergrund 11; 0,74 MB
     q90: Terminator max 18, mittel 1,36; Ostrand max 17, mittel 0,92; Hintergrund  7; 1,09 MB
-    q95: Terminator max 16, mittel 0,96; Ostrand max 12, mittel 0,67; Hintergrund  8; 1,76 MB
+    q95: Terminator max 16, mittel 0,96; Ostrand max 12, mittel 0,67; Hintergrund  8; 1,77 MB
     q98: Terminator max 11, mittel 0,76; Hintergrund 4; 2,32 MB
     verlustfrei: Fehler 0; 6,06 MB
 Gewaehlt ist q95: mittlerer Fehler unter einer Stufe, Maximalfehler nur an
@@ -180,22 +185,65 @@ def zentriere_und_schwaerze(rgba):
     return np.rint(bild).clip(0, 255).astype(np.uint8)
 
 
-def halbiere(bild):
-    """Flaechenmittel 2x2; Breite und Hoehe muessen gerade sein."""
-    h, w = bild.shape[:2]
+def srgb_zu_linear(kodewert):
+    """sRGB-Kodewert 0..255 in lineare Helligkeit 0..1 (IEC 61966-2-1), float64."""
+    w = np.asarray(kodewert, dtype=np.float64) / 255.0
+    return np.where(w <= 0.04045, w / 12.92, ((w + 0.055) / 1.055) ** 2.4)
+
+
+def linear_zu_srgb(linear):
+    """Lineare Helligkeit 0..1 in sRGB-Kodewert 0..255 (IEC 61966-2-1), gerundet auf 8 Bit."""
+    w = np.clip(linear, 0.0, 1.0)
+    k = np.where(w <= 0.0031308, w * 12.92, 1.055 * w ** (1.0 / 2.4) - 0.055)
+    return np.rint(k * 255.0).clip(0, 255).astype(np.uint8)
+
+
+def halbiere(linear):
+    """Flaechenmittel 2x2 in linearer Helligkeit; Breite und Hoehe muessen gerade sein."""
+    h, w = linear.shape[:2]
     if h % 2 or w % 2:
         raise SystemExit(f"Stufe mit ungerader Groesse {w}x{h} laesst sich nicht halbieren")
-    b = bild.reshape(h // 2, 2, w // 2, 2, 3).astype(np.float32).mean(axis=(1, 3))
-    return np.rint(b).clip(0, 255).astype(np.uint8)
+    return linear.reshape(h // 2, 2, w // 2, 2, 3).mean(axis=(1, 3))
 
 
 def stufen(bild0):
-    """Liste (stufe, bild) von voller Aufloesung bis unter MIN_BREITE_PX."""
+    """Liste (stufe, bild) von voller Aufloesung bis unter MIN_BREITE_PX.
+
+    Stufe 0 ist bild0 unveraendert. Jede weitere Stufe entsteht aus der ungerundeten
+    linearen Helligkeit der vorigen (2x2-Mittel), erst danach wird nach sRGB 8 Bit
+    kodiert; so mittelt Stufe n linear ueber 2^n x 2^n Pixel von Stufe 0, ohne dass
+    sich Rundungsfehler der Zwischenstufen aufaddieren. QuelleKacheln linearisiert
+    beim Laden mit derselben Kennlinie und erwartet in allen Stufen dieselbe lineare
+    Helligkeit (Issue #51).
+    """
     liste = [(0, bild0)]
+    linear = srgb_zu_linear(bild0)
     while liste[-1][1].shape[1] >= MIN_BREITE_PX:
-        s, b = liste[-1]
-        liste.append((s + 1, halbiere(b)))
+        linear = halbiere(linear)
+        liste.append((liste[-1][0] + 1, linear_zu_srgb(linear)))
     return liste
+
+
+def pruefe_stufen(liste):
+    """Probe (Issue #51): mittlere lineare Helligkeit jedes 2x2-Blocks einer Stufe gleich
+    dem Pixel der naechsten Stufe, Toleranz eine 8-Bit-Stufe. Verglichen werden die 8-Bit-
+    Werte vor der WebP-Kodierung (deren Fehler bei q95 bis 16 Stufen gehen, siehe oben):
+    Blockmittel zurueck nach sRGB kodiert gegen den Kodewert der groeberen Stufe, und die
+    lineare Abweichung gegen den linearen Abstand einer 8-Bit-Stufe am selben Wert.
+    """
+    for (s, fein), (_, grob) in zip(liste, liste[1:]):
+        mittel = halbiere(srgb_zu_linear(fein))
+        d_kode = np.abs(linear_zu_srgb(mittel).astype(np.int16) - grob.astype(np.int16))
+        lin_grob = srgb_zu_linear(grob)
+        stufe_lin = srgb_zu_linear(np.minimum(grob.astype(np.int16) + 1, 255)) - lin_grob
+        stufe_lin = np.maximum(stufe_lin, lin_grob - srgb_zu_linear(np.maximum(grob.astype(np.int16) - 1, 0)))
+        d_lin = np.abs(mittel - lin_grob)
+        verletzt = int((d_lin > stufe_lin + 1e-12).sum())
+        print(f"Probe Stufe {s} -> {s + 1}: Abweichung max {d_kode.max()} Kodestufen "
+              f"(mittel {d_kode.mean():.4f}), linear max {d_lin.max():.2e}, "
+              f"ueber einer 8-Bit-Stufe: {verletzt} von {d_lin.size} Werten")
+        if d_kode.max() > 1 or verletzt:
+            raise SystemExit(f"Probe verletzt: Stufe {s + 1} ist nicht das lineare 2x2-Mittel von Stufe {s}")
 
 
 def kachel_bytes(kachel, qualitaet):
@@ -332,7 +380,9 @@ def bildnachweis(stufenliste, qualitaet, gesamt_bytes):
             f"auf Schwarz gesetzt, nicht gedreht oder gespiegelt (Himmelsnorden oben laut SVS, "
             f"Positionswinkel der Achse {POSITIONSWINKEL_ACHSE_GRAD} Grad), keine Farb- oder "
             f"Kontrastaenderung, in Kacheln von {KACHEL_PX} px mit {len(stufenliste)} Stufen zerlegt "
-            f"(WebP, Qualitaet {qualitaet}). Stufe n hat das 2^n-fache Pixelmass von Stufe 0."
+            f"(WebP, Qualitaet {qualitaet}). Stufe n hat das 2^n-fache Pixelmass von Stufe 0 und ist "
+            f"das Flaechenmittel in linearer Helligkeit (sRGB-Kennlinie IEC 61966-2-1), nach sRGB 8 Bit "
+            f"zurueckkodiert."
         ),
         "kacheln": {
             "kachel_px": KACHEL_PX,
@@ -355,15 +405,19 @@ def bildnachweis(stufenliste, qualitaet, gesamt_bytes):
 
 
 def schreibe_bildnachweis(pfad, eintrag):
-    """Mond-Eintrag ersetzen oder anhaengen, andere Eintraege erhalten."""
+    """Mond-Eintrag an seiner Stelle ersetzen oder anhaengen, andere Eintraege erhalten."""
     liste = []
     if os.path.isfile(pfad):
         with open(pfad, encoding="utf-8") as f:
             liste = json.load(f)
         if not isinstance(liste, list):
             raise SystemExit(f"{pfad} enthaelt keine Liste")
-    liste = [e for e in liste if e.get("id") != eintrag["id"]]
-    liste.append(eintrag)
+    stellen = [i for i, e in enumerate(liste) if e.get("id") == eintrag["id"]]
+    if stellen:
+        liste[stellen[0]] = eintrag          # an alter Stelle ersetzen, Reihenfolge bleibt
+        liste = [e for i, e in enumerate(liste) if i not in stellen[1:]]
+    else:
+        liste.append(eintrag)
     os.makedirs(os.path.dirname(pfad) or ".", exist_ok=True)
     with open(pfad, "w", encoding="utf-8") as f:
         json.dump(liste, f, ensure_ascii=False, indent=2)
@@ -378,6 +432,8 @@ def main(argv=None):
     p.add_argument("--qualitaet", type=int, default=QUALITAET_STANDARD, help="WebP-Qualitaet 0 bis 100")
     p.add_argument("--messen", action="store_true",
                    help="nur Fehler und Groesse fuer mehrere Qualitaeten ausgeben, nichts schreiben")
+    p.add_argument("--pruefen", action="store_true",
+                   help="nur Pyramide rechnen und die Probe (lineares 2x2-Mittel) ausfuehren, nichts schreiben")
     args = p.parse_args(argv)
 
     print(f"Rohbild: {args.rohbild}")
@@ -391,8 +447,12 @@ def main(argv=None):
         messe_qualitaet(bild0, (80, 85, 90, 95, 98))
         return 0
 
+    liste = stufen(bild0)
+    pruefe_stufen(liste)
+    if args.pruefen:
+        return 0
     leere_ziel(args.ziel)
-    stufenliste, gesamt = schreibe_pyramide(stufen(bild0), args.ziel, args.qualitaet)
+    stufenliste, gesamt = schreibe_pyramide(liste, args.ziel, args.qualitaet)
     print(f"Gesamtgroesse aller Kacheln: {gesamt} Byte ({gesamt / 1e6:.2f} MB)")
     if gesamt > 20e6:
         print("WARNUNG: ueber 20 MB (A-X6)", file=sys.stderr)
