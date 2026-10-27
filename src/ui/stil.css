@@ -204,3 +204,23 @@ body {
   font-size: 0.85rem;
   overflow-wrap: anywhere;
 }
+
+/* Formular Bedingungen und Objekt (#18) */
+
+.formular-objekt .feld-auswahl,
+.formular-bedingungen .feld-auswahl {
+  max-width: 100%;
+}
+
+.formular-objekt .feld-anzeige,
+.formular-bedingungen .feld-anzeige {
+  margin: 2px 0 0;
+  font-size: 0.85rem;
+  color: var(--text-leise);
+}
+
+.objekt-laedt {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--warnung);
+}
