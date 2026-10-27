@@ -5,7 +5,7 @@
 // Ladezustand und Fehler erscheinen als Text in der Statuszeile, nie als leere Seite.
 
 import "./stil.css";
-import { ANZEIGEGRENZE_OHNE_WEBGL2_PX, FalterJs } from "../bild";
+import { type Falterwahl, waehleFalter } from "../bild";
 import { findeZustand, ladeBildnachweise, ladeGeraete, ladeObjekte, quelleEinzelbildBrowser, quelleKachelnBrowser } from "../daten";
 import type { Objektzustand } from "../naht/konfiguration";
 import { TEXTE } from "../texte";
@@ -16,6 +16,14 @@ import { baueFormularGeraet } from "./formular_geraet";
 import { baueFormularObjekt } from "./formular_objekt";
 import { baueGesichtsfeld, type GesichtsfeldPlaetze } from "./gesichtsfeld";
 import { type Bildquelle, type Stand, Steuerung } from "./steuerung";
+import { waermeVor } from "./vorwaermen";
+
+/**
+ * Groesste Anzeige mit WebGL2 (Kantenlaenge in Geraetepixeln). Die Bildspalte ist hoechstens
+ * 720 CSS-Pixel breit, bei devicePixelRatio 2 also 1440; 2048 laesst Luft fuer hoehere
+ * Pixeldichten und haelt den Kern unter 17 px (ADR-0002, Nachtrag Issue #4).
+ */
+const ANZEIGEGRENZE_WEBGL2_PX = 2048;
 
 /** Die Elemente der Seite, die starte nach dem Aufbau beschreibt. */
 interface Seite extends GesichtsfeldPlaetze {
@@ -52,6 +60,7 @@ function baueSeite(wurzel: HTMLElement): Seite {
   const bild = element("figure", "bild");
   const nachweis = element("figcaption", "nachweis");
   const warnungen = element("div", "warnungen");
+  warnungen.hidden = true;
   bild.append(element("div", "norden", TEXTE.nordenOben), canvas, warnungen, nachweis);
 
   const info = element("aside", "info");
@@ -84,8 +93,8 @@ function zeigeFehler(seite: Seite, meldung: string, fehler: unknown): void {
   seite.status.replaceChildren(d.createTextNode(meldung + " "), details);
 }
 
-/** Statuszeile zum Stand der Steuerung. */
-function zeigeStand(seite: Seite, stand: Readonly<Stand>): void {
+/** Statuszeile zum Stand der Steuerung; mit JavaScript-Faltung der kurze Hinweis aus ADR-0002. */
+function zeigeStand(seite: Seite, stand: Readonly<Stand>, falter: Falterwahl): void {
   switch (stand.phase) {
     case "laedt":
       zeigeStatus(seite, TEXTE.status.ladeBild);
@@ -94,12 +103,24 @@ function zeigeStand(seite: Seite, stand: Readonly<Stand>): void {
       zeigeStatus(seite, TEXTE.status.rechne);
       break;
     case "fertig":
-      zeigeStatus(seite, TEXTE.status.fertig(stand.ms ?? 0, TEXTE.falterJs));
+      zeigeStatus(seite, statusFertig(stand.ms ?? 0, falter));
       break;
     case "fehler":
       zeigeFehler(seite, stand.fehler?.art === "bild" ? TEXTE.fehler.bild : TEXTE.fehler.rechnen, stand.fehler?.ursache);
       break;
   }
+}
+
+function statusFertig(ms: number, falter: Falterwahl): string {
+  if (falter.art === "webgl2") return TEXTE.status.fertig(ms, TEXTE.status.falterWebgl2);
+  const hinweis = TEXTE.status.ohneWebgl2(falter.anzeigeGrenzePx ?? 0, falter.grund);
+  return `${TEXTE.status.fertig(ms, TEXTE.falterJs)} ${hinweis}`;
+}
+
+/** Leerlauf fuer das Vorwaermen; requestIdleCallback fehlt in Safari, dann setTimeout. */
+function planeLeerlauf(f: () => void): void {
+  if (typeof requestIdleCallback === "function") requestIdleCallback(() => f(), { timeout: 500 });
+  else setTimeout(f, 50);
 }
 
 /** Rueckfall fuer naechsterFrame in ms: im Hintergrund-Tab ruft der Browser requestAnimationFrame nicht auf. */
@@ -164,29 +185,62 @@ export async function starte(wurzel: HTMLElement): Promise<void> {
     return;
   }
 
+  // Der Falter meldet den Wechsel auf JavaScript (Kontextverlust, WebGL2-Fehler): dann gilt die
+  // Anzeigegrenze, und die Steuerung rechnet mit der kleineren Anzeige neu.
+  let steuerungFuerWechsel: Steuerung | undefined;
+  const anzeigePx = (): number =>
+    waehleAnzeigePx(seite.canvas.getBoundingClientRect().width, window.devicePixelRatio, falter.anzeigeGrenzePx ?? ANZEIGEGRENZE_WEBGL2_PX);
+  const falter = waehleFalter({ beiWechsel: () => steuerungFuerWechsel?.rechneNeu() });
   const steuerung = new Steuerung(
     {
       kataloge,
-      falter: new FalterJs(),
+      falter,
       bildquelle: (objekt) => bildquelleBrowser(kataloge, objekt),
       plane: planeFrame,
       warte: naechsterFrame,
       schreibeUrl: (suche) => window.history.replaceState(null, "", suche + window.location.hash),
-      anzeigePx: () => waehleAnzeigePx(seite.canvas.getBoundingClientRect().width, window.devicePixelRatio, ANZEIGEGRENZE_OHNE_WEBGL2_PX),
+      anzeigePx,
       uhr: () => performance.now()
     },
     start.konfiguration
   );
+  steuerungFuerWechsel = steuerung;
 
   // Geschnittene Werte aus einem Link (A-F8) einmal mit der ersten fertigen Rechnung melden.
   let linkHinweise = start.hinweise.length;
+  // Nach dem ersten Anblick die Shader der wahrscheinlichen Kerngroessen vorwaermen (vorwaermen.ts).
+  let vorgewaermt = false;
   steuerung.beobachte((stand) => {
-    zeigeStand(seite, stand);
+    zeigeStand(seite, stand, falter);
     if (linkHinweise > 0 && stand.phase === "fertig") {
       zeigeStatus(seite, `${TEXTE.status.linkGeschnitten(linkHinweise)} ${seite.status.textContent ?? ""}`);
       linkHinweise = 0;
     }
+    if (!vorgewaermt && stand.phase === "fertig" && stand.anblick !== undefined && falter.art === "webgl2") {
+      vorgewaermt = true;
+      const erste = stand.anblick.raster.kanaele;
+      waermeVor(falter, {
+        kanaele: erste === 3 ? [3, 1] : [1, 3],
+        plane: planeLeerlauf,
+        aktiv: () => falter.art === "webgl2",
+        uhr: () => performance.now(),
+        fertig: (anzahl, ms) => {
+          seite.canvas.dataset["vorgewaermt"] = `${anzahl}|${ms}`;
+        }
+      });
+    }
   });
+
+  // Neue Breite der Bildspalte: nur wenn sich die Anzeigegroesse aendert, neu rechnen.
+  let px = anzeigePx();
+  if (typeof ResizeObserver === "function") {
+    new ResizeObserver(() => {
+      const neu = anzeigePx();
+      if (neu === px) return;
+      px = neu;
+      steuerung.rechneNeu();
+    }).observe(seite.canvas);
+  }
 
   baueGesichtsfeld(seite, steuerung);
   baueFormularGeraet(seite.geraet, steuerung);
