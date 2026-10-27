@@ -42,6 +42,16 @@ export function begrenzeMitte(mitte: Mitte, objektDurchmesserArcsec: number): Mi
 }
 
 /**
+ * Mitte, die zum Stand gehoert: ist Verschieben erlaubt, die begrenzte Mitte, sonst 0/0 (auch ohne
+ * lesbares Objekt). Weicht sie von der aktuellen ab (Zustandswechsel mit kleinerem Objekt, Wechsel
+ * zu einem groesseren Gesichtsfeld), holt die UI sie mit verschiebe zurueck.
+ */
+export function sollMitte(mitte: Mitte, objektDurchmesserArcsec: number | undefined, erlaubt: boolean): Mitte {
+  if (!erlaubt || objektDurchmesserArcsec === undefined) return { xArcsec: 0, yArcsec: 0 };
+  return begrenzeMitte(mitte, objektDurchmesserArcsec);
+}
+
+/**
  * Mitte nach Ziehen um (dxPx, dyPx) Bildschirmpixel seit dem Start des Ziehens: der Inhalt folgt
  * der Maus. Ziehen nach rechts holt den linken Teil ins Feld (Mitte nach -x), Ziehen nach unten
  * den noerdlichen (Mitte nach +y, weil Bildschirm-y nach Sueden zeigt). arcsecProPx ist die

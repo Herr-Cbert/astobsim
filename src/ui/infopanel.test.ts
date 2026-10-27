@@ -25,5 +25,7 @@ describe("austrittspupille", () => {
     expect(austrittspupille(0.267)).toBe("0,27");
     expect(austrittspupille(1.333)).toBe("1,3");
     expect(austrittspupille(6.67)).toBe("6,7");
+    // Stellen nach dem gerundeten Wert: 0,996 wird 1,0, nicht 1,00.
+    expect(austrittspupille(0.996)).toBe("1,0");
   });
 });

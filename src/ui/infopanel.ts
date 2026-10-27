@@ -23,7 +23,12 @@ function bogensekunden(wert: number): string {
 
 /** Austrittspupille ohne Einheit: unter 1 mm zwei Nachkommastellen (0,45 nicht als 0,5), sonst eine. */
 export function austrittspupille(mm: number): string {
-  return zahl(mm, mm < 1 ? 2 : 1);
+  return zahl(mm, apStellen(mm));
+}
+
+/** Stellen der Austrittspupille, gewaehlt am gerundeten Wert (0,996 wird 1,0, nicht 1,00). */
+export function apStellen(mm: number): number {
+  return Number(mm.toFixed(2)) < 1 ? 2 : 1;
 }
 
 /** Die Zeilen des Infopanels in fester Reihenfolge. */

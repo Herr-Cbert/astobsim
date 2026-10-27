@@ -9,6 +9,7 @@ import objekteJson from "../../daten/objekte.json";
 import { FalterJs, neuesRaster, QuelleAusRaster, type Objektpunkt, type Quellausschnitt } from "../bild";
 import { pruefeBildnachweise, pruefeGeraete, pruefeObjekte } from "../daten";
 import type { Konfiguration, Objektzustand } from "../naht/konfiguration";
+import { auswerten, optik } from "../physik";
 import { voreinstellung, type Kataloge } from "../zustand";
 import { type Bildquelle, Steuerung, type Umgebung } from "./steuerung";
 
@@ -78,5 +79,25 @@ describe("Steuerung: Wiederverwendung (Issue #19)", () => {
     // Bei 64 px bestimmt der Anzeigemassstab den Arbeitsmassstab: Stufe 1 bleibt gleich.
     expect(s.stand.auswertung!.parameter.quellbild.schluessel).toBe(quellbild);
     expect(q!.ausschnitte).toBe(1);
+  });
+});
+
+describe("Stufe 1 beim Seeing-Regler (Issue #19, Review PR #62)", () => {
+  const start = voreinstellung(KATALOGE);
+  const schluessel = (seeing: number, px: number): string => {
+    const k = mitSeeing(start, seeing);
+    const fenster = { breiteArcsec: optik(k.geraet).gesichtsfeld.breiteArcsec, mitteXArcsec: 0, mitteYArcsec: 0, px };
+    return auswerten(k, { fenster }).parameter.quellbild.schluessel;
+  };
+  const SEEING = [0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5];
+
+  it("bei 1024 px bestimmt der Anzeigemassstab den Arbeitsmassstab: Stufe 1 bleibt fuer Seeing 0,5 bis 5 gleich", () => {
+    expect(new Set(SEEING.map((s) => schluessel(s, 1024))).size).toBe(1);
+  });
+
+  it("bei 1440 px (devicePixelRatio 2) wechselt Stufe 1 mit dem Seeing: der Ausschnitt wird neu gemittelt", () => {
+    // Dokumentiert das gemessene Verhalten (Review PR #62): Anzeigemassstab 2,08''/px liegt
+    // unter FWHM / 2,5 bei schlechtem Seeing, dann bestimmt die FWHM den Arbeitsmassstab.
+    expect(new Set(SEEING.map((s) => schluessel(s, 1440))).size).toBeGreaterThan(1);
   });
 });

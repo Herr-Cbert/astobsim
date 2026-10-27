@@ -15,6 +15,8 @@ export const TEXTE = {
   /** Platzhalter fuer einen nicht endlichen Zahlenwert. */
   fehlwert: "–",
   gesichtsfeld: "Anblick im wahren Gesichtsfeld",
+  /** Titel und Zusatz zur Beschriftung des Gesichtsfelds, wenn es sich verschieben laesst (A-D2, #19). */
+  gesichtsfeldVerschieben: "Ziehen mit der Maus oder Pfeiltasten verschieben den Ausschnitt, Pos1 zentriert.",
 
   status: {
     ladeDaten: "Lade Geräte- und Objektdaten …",
@@ -24,9 +26,8 @@ export const TEXTE = {
     /** Name des Falters in der Statuszeile (#19). */
     falterWebgl2: "WebGL2-Faltung",
     /** Kurzer Hinweis, solange JavaScript faltet (ADR-0002), je Grund aus waehleFalter. */
-    ohneWebgl2: (grenzePx: number, grund: "kein-webgl2" | "kontextverlust" | "webgl2-fehler"): string =>
+    ohneWebgl2: (grenzePx: number, grund: string): string =>
       `${grund === "kein-webgl2" ? "Kein WebGL2 verfügbar" : grund === "kontextverlust" ? "WebGL2-Kontext verloren" : "WebGL2-Fehler"}: Anzeige auf ${grenzePx} px begrenzt.`,
-    verschieben: "Ziehen mit der Maus oder Pfeiltasten verschieben den Ausschnitt, Pos1 zentriert.",
     /** Werte aus einem Link lagen ausserhalb der Grenzen (A-F8) und wurden geschnitten. */
     linkGeschnitten: (anzahl: number): string =>
       anzahl === 1 ? "Ein Wert aus dem Link lag außerhalb des erlaubten Bereichs und wurde angepasst." : `${anzahl} Werte aus dem Link lagen außerhalb des erlaubten Bereichs und wurden angepasst.`
@@ -51,7 +52,7 @@ export const TEXTE = {
     // Issue #18: Hilfetexte zu Parametern und Anzeigezahlen (A-D6), Hinweise A-X5, A-X1, A-B2.
   },
 
-  /** Formular Gerät und Okular (src/ui/formular_geraet.ts). */
+  /** Formular Geraet und Okular (src/ui/formular_geraet.ts). */
   geraet: {
     // Issue #17
   },
@@ -67,8 +68,8 @@ export const TEXTE = {
   },
 
   /** Warnungen neben dem Gesichtsfeld (A-D5, src/ui/gesichtsfeld.ts). */
-  // Fachtexte nach docs/recherche/physik.md Abschnitt 4 (Schwellen, 2×-Regel) und 5.1
-  // (Flächenhelligkeit mit Austrittspupille), Quellen dort [32, 33, 35, 37].
+  // Fachtexte nach docs/recherche/physik.md Abschnitt 4 (Schwellen, 2x-Regel) und 5.1
+  // (Flaechenhelligkeit mit Austrittspupille), Quellen dort [32, 33, 35, 37].
   warnungen: {
     ueberschrift: "Warnungen",
     apUeber6: (ap: string, grenze: string): string => `Austrittspupille ${ap} mm größer als ${grenze} mm: Das Auge nimmt nicht das ganze Licht auf.`,
@@ -80,7 +81,7 @@ export const TEXTE = {
     apUnter05Hilfe:
       "Die Flächenhelligkeit sinkt mit dem Quadrat der Austrittspupille: Bei 0,5 mm ist sie auf 1/144 des Werts bei 6 mm gefallen. Unter etwa 0,5 mm begrenzt außerdem die Beugung im Auge die Schärfe. Abhilfe: Okular mit längerer Brennweite.",
     vUeber2d: (v: string, grenze: string): string => `Vergrößerung ${v}× über der doppelten Öffnung in mm (${grenze}×): leere Vergrößerung.`,
-    /** Über 2 D und unter 0,5 mm fallen zusammen (AP = D/V); dann eine Zeile mit beiden Werten. */
+    /** Ueber 2 D und unter 0,5 mm fallen zusammen (AP = D/V); dann eine Zeile mit beiden Werten. */
     vUeber2dMitAp: (v: string, grenze: string, ap: string): string =>
       `Vergrößerung ${v}× über der doppelten Öffnung in mm (${grenze}×), Austrittspupille ${ap} mm: leere Vergrößerung.`,
     vUeber2dThema: "leerer Vergrößerung",

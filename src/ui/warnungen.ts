@@ -6,7 +6,7 @@
 import type { Warnung } from "../physik";
 import { TEXTE } from "../texte";
 import { hilfesymbol } from "./hilfe";
-import { austrittspupille } from "./infopanel";
+import { apStellen } from "./infopanel";
 import { zahl } from "./format";
 
 export interface Warnzeile {
@@ -19,7 +19,17 @@ export interface Warnzeile {
 
 const W = TEXTE.warnungen;
 
-const mm = austrittspupille;
+/**
+ * Wert mit stellen Nachkommastellen; sieht der gerundete Wert aus wie die Grenze (6,04 mm als
+ * "6,0" neben 6 mm), so viele Stellen mehr, bis er sich unterscheidet, hoechstens drei mehr.
+ */
+function nebenGrenze(wert: number, stellen: number, grenze: number): string {
+  let s = stellen;
+  while (s < stellen + 3 && Number(wert.toFixed(s)) === grenze) s++;
+  return zahl(wert, s);
+}
+
+const mm = (w: Warnung): string => nebenGrenze(w.wert, apStellen(w.wert), w.grenze);
 
 /** Die Zeilen in fester Reihenfolge (Austrittspupille gross, Vergroesserung, Austrittspupille klein). */
 export function warnzeilen(warnungen: readonly Warnung[]): Warnzeile[] {
@@ -27,18 +37,18 @@ export function warnzeilen(warnungen: readonly Warnung[]): Warnzeile[] {
   const unter05 = warnungen.find((w) => w.art === "ap-unter-0-5");
   const v2d = warnungen.find((w) => w.art === "v-ueber-2d");
   const zeilen: Warnzeile[] = [];
-  if (ueber6) zeilen.push({ art: ueber6.art, text: W.apUeber6(mm(ueber6.wert), zahl(ueber6.grenze, 0)), hilfe: W.apUeber6Hilfe, thema: W.apUeber6Thema });
+  if (ueber6) zeilen.push({ art: ueber6.art, text: W.apUeber6(mm(ueber6), zahl(ueber6.grenze, 0)), hilfe: W.apUeber6Hilfe, thema: W.apUeber6Thema });
   if (v2d) {
-    const v = zahl(v2d.wert, 0);
+    const v = nebenGrenze(v2d.wert, 0, v2d.grenze);
     const grenze = zahl(v2d.grenze, 0);
     zeilen.push({
       art: v2d.art,
-      text: unter05 ? W.vUeber2dMitAp(v, grenze, mm(unter05.wert)) : W.vUeber2d(v, grenze),
+      text: unter05 ? W.vUeber2dMitAp(v, grenze, mm(unter05)) : W.vUeber2d(v, grenze),
       hilfe: unter05 ? `${W.vUeber2dHilfe} ${W.apUnter05Hilfe}` : W.vUeber2dHilfe,
       thema: W.vUeber2dThema
     });
   } else if (unter05) {
-    zeilen.push({ art: unter05.art, text: W.apUnter05(mm(unter05.wert), zahl(unter05.grenze, 1)), hilfe: W.apUnter05Hilfe, thema: W.apUnter05Thema });
+    zeilen.push({ art: unter05.art, text: W.apUnter05(mm(unter05), zahl(unter05.grenze, 1)), hilfe: W.apUnter05Hilfe, thema: W.apUnter05Thema });
   }
   return zeilen;
 }

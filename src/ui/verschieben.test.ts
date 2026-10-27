@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { begrenzeMitte, mitteNachTaste, mitteNachZiehen, TASTENSCHRITT, TASTENSCHRITT_GROSS, verschiebbar } from "./verschieben";
+import { begrenzeMitte, mitteNachTaste, mitteNachZiehen, sollMitte, TASTENSCHRITT, TASTENSCHRITT_GROSS, verschiebbar } from "./verschieben";
 
 const kreis = (breiteArcsec: number) => ({ form: "kreis" as const, breiteArcsec, hoeheArcsec: breiteArcsec });
 
@@ -56,5 +56,16 @@ describe("mitteNachTaste", () => {
   it("haelt die Grenze ein", () => {
     const m = mitteNachTaste({ xArcsec: 490, yArcsec: 0 }, "ArrowRight", true, breite, 1000);
     expect(m).toEqual({ xArcsec: 500, yArcsec: 0 });
+  });
+});
+
+describe("sollMitte", () => {
+  it("nicht erlaubt oder ohne Objekt: 0/0", () => {
+    expect(sollMitte({ xArcsec: 100, yArcsec: 50 }, 1000, false)).toEqual({ xArcsec: 0, yArcsec: 0 });
+    expect(sollMitte({ xArcsec: 100, yArcsec: 50 }, undefined, true)).toEqual({ xArcsec: 0, yArcsec: 0 });
+  });
+  it("erlaubt: begrenzte Mitte, innerhalb unveraendert", () => {
+    expect(sollMitte({ xArcsec: 100, yArcsec: 50 }, 1000, true)).toEqual({ xArcsec: 100, yArcsec: 50 });
+    expect(sollMitte({ xArcsec: 900, yArcsec: 0 }, 1000, true)).toEqual({ xArcsec: 500, yArcsec: 0 });
   });
 });

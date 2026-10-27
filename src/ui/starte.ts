@@ -112,7 +112,7 @@ function zeigeStand(seite: Seite, stand: Readonly<Stand>, falter: Falterwahl): v
 }
 
 function statusFertig(ms: number, falter: Falterwahl): string {
-  if (falter.art === "webgl2" || falter.grund === "webgl2") return TEXTE.status.fertig(ms, TEXTE.status.falterWebgl2);
+  if (falter.art === "webgl2") return TEXTE.status.fertig(ms, TEXTE.status.falterWebgl2);
   const hinweis = TEXTE.status.ohneWebgl2(falter.anzeigeGrenzePx ?? 0, falter.grund);
   return `${TEXTE.status.fertig(ms, TEXTE.falterJs)} ${hinweis}`;
 }
@@ -188,6 +188,8 @@ export async function starte(wurzel: HTMLElement): Promise<void> {
   // Der Falter meldet den Wechsel auf JavaScript (Kontextverlust, WebGL2-Fehler): dann gilt die
   // Anzeigegrenze, und die Steuerung rechnet mit der kleineren Anzeige neu.
   let steuerungFuerWechsel: Steuerung | undefined;
+  const anzeigePx = (): number =>
+    waehleAnzeigePx(seite.canvas.getBoundingClientRect().width, window.devicePixelRatio, falter.anzeigeGrenzePx ?? ANZEIGEGRENZE_WEBGL2_PX);
   const falter = waehleFalter({ beiWechsel: () => steuerungFuerWechsel?.rechneNeu() });
   const steuerung = new Steuerung(
     {
@@ -197,7 +199,7 @@ export async function starte(wurzel: HTMLElement): Promise<void> {
       plane: planeFrame,
       warte: naechsterFrame,
       schreibeUrl: (suche) => window.history.replaceState(null, "", suche + window.location.hash),
-      anzeigePx: () => waehleAnzeigePx(seite.canvas.getBoundingClientRect().width, window.devicePixelRatio, falter.anzeigeGrenzePx ?? ANZEIGEGRENZE_WEBGL2_PX),
+      anzeigePx,
       uhr: () => performance.now()
     },
     start.konfiguration
@@ -229,13 +231,13 @@ export async function starte(wurzel: HTMLElement): Promise<void> {
     }
   });
 
-  // Neue Breite der Bildspalte: neue Anzeigegroesse, also neu rechnen (einmal je Frame, steuerung).
-  let breite = seite.canvas.getBoundingClientRect().width;
+  // Neue Breite der Bildspalte: nur wenn sich die Anzeigegroesse aendert, neu rechnen.
+  let px = anzeigePx();
   if (typeof ResizeObserver === "function") {
     new ResizeObserver(() => {
-      const neu = seite.canvas.getBoundingClientRect().width;
-      if (Math.abs(neu - breite) < 1) return;
-      breite = neu;
+      const neu = anzeigePx();
+      if (neu === px) return;
+      px = neu;
       steuerung.rechneNeu();
     }).observe(seite.canvas);
   }

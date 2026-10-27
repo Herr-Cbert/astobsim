@@ -11,7 +11,7 @@ import { type Auswertung, optik } from "../physik";
 import { TEXTE } from "../texte";
 import { infozeilen, zeigeInfozeilen } from "./infopanel";
 import type { Stand, Steuerung } from "./steuerung";
-import { begrenzeMitte, type Mitte, mitteNachTaste, mitteNachZiehen, verschiebbar } from "./verschieben";
+import { type Mitte, mitteNachTaste, mitteNachZiehen, sollMitte, verschiebbar } from "./verschieben";
 import { warnzeilen, zeigeWarnzeilen } from "./warnungen";
 import { zeichneAnblick } from "./zeichne";
 
@@ -71,8 +71,8 @@ export function baueGesichtsfeld(plaetze: GesichtsfeldPlaetze, steuerung: Steuer
       canvas.classList.toggle("verschiebbar", jetzt);
       if (jetzt) {
         canvas.tabIndex = 0;
-        canvas.title = TEXTE.status.verschieben;
-        canvas.setAttribute("aria-label", `${TEXTE.gesichtsfeld}. ${TEXTE.status.verschieben}`);
+        canvas.title = TEXTE.gesichtsfeldVerschieben;
+        canvas.setAttribute("aria-label", `${TEXTE.gesichtsfeld}. ${TEXTE.gesichtsfeldVerschieben}`);
       } else {
         canvas.removeAttribute("tabindex");
         canvas.removeAttribute("title");
@@ -80,7 +80,7 @@ export function baueGesichtsfeld(plaetze: GesichtsfeldPlaetze, steuerung: Steuer
       }
     }
     const m = stand.mitte;
-    const soll = lage !== undefined && lage.erlaubt ? begrenzeMitte(m, lage.durchmesser) : { xArcsec: 0, yArcsec: 0 };
+    const soll = sollMitte(m, lage?.durchmesser, lage?.erlaubt ?? false);
     if (soll.xArcsec !== m.xArcsec || soll.yArcsec !== m.yArcsec) steuerung.verschiebe(soll.xArcsec, soll.yArcsec);
   });
 
@@ -97,20 +97,26 @@ export function baueGesichtsfeld(plaetze: GesichtsfeldPlaetze, steuerung: Steuer
   });
   canvas.addEventListener("pointermove", (e) => {
     if (ziehen === undefined || e.pointerId !== ziehen.zeiger) return;
+    // Taste los, ohne dass pointerup ankam (z. B. ausserhalb des Fensters losgelassen): Ziehen endet.
+    if (e.buttons === 0) {
+      ende(e);
+      return;
+    }
     const lage = verschiebeLage(steuerung.stand);
     const breitePx = canvas.getBoundingClientRect().width;
     if (lage === undefined || !lage.erlaubt || !(breitePx > 0)) return;
     const m = mitteNachZiehen(ziehen.start, e.clientX - ziehen.x, e.clientY - ziehen.y, lage.breite / breitePx, lage.durchmesser);
     steuerung.verschiebe(m.xArcsec, m.yArcsec);
   });
-  const ende = (e: PointerEvent): void => {
+  function ende(e: PointerEvent): void {
     if (ziehen === undefined || e.pointerId !== ziehen.zeiger) return;
     ziehen = undefined;
     canvas.classList.remove("zieht");
     if (canvas.hasPointerCapture(e.pointerId)) canvas.releasePointerCapture(e.pointerId);
-  };
+  }
   canvas.addEventListener("pointerup", ende);
   canvas.addEventListener("pointercancel", ende);
+  canvas.addEventListener("lostpointercapture", ende);
 
   canvas.addEventListener("keydown", (e) => {
     if (e.altKey || e.ctrlKey || e.metaKey) return;

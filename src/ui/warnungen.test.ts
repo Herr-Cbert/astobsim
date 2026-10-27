@@ -28,6 +28,12 @@ describe("warnzeilen", () => {
     expect(z?.text).toContain("0,5 mm");
   });
 
+  it("an der Grenze eine Stelle mehr, damit Wert und Grenze sich unterscheiden", () => {
+    expect(warnzeilen([{ art: "ap-ueber-6", wert: 6.04, grenze: 6 }])[0]?.text).toContain("6,04 mm");
+    expect(warnzeilen([{ art: "v-ueber-2d", wert: 160.3, grenze: 160 }])[0]?.text).toContain("160,3×");
+    expect(warnzeilen([{ art: "ap-unter-0-5", wert: 0.4996, grenze: 0.5 }])[0]?.text).toContain("0,4996 mm");
+  });
+
   it("ueber 2 D und unter 0,5 mm werden eine Zeile mit beiden Werten und beiden Hilfetexten", () => {
     const zeilen = warnzeilen([
       { art: "ap-unter-0-5", wert: 0.4, grenze: 0.5 },
