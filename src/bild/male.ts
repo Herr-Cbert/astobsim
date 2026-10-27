@@ -9,10 +9,10 @@ import { BildFehler } from "./fehler";
 import { eckeLinksOben } from "./quelle";
 
 /** Unterabtastung je Achse und Pixel fuer die Flaechenanteile des Scheibchens. */
-export const UNTERABTASTUNG = 8;
+const UNTERABTASTUNG = 8;
 
 /** Kleinster gemalter Durchmesser in Arbeitspixeln: kleinere Scheibchen verteilen ihren Fluss auf ein Pixel Flaeche. */
-export const DURCHMESSER_MIN_PX = 1;
+const DURCHMESSER_MIN_PX = 1;
 
 /**
  * Eine gemalte Punktquelle: breite x hoehe Werte (zeilenweise, relativ zu Quellweiss, ein Kanal),

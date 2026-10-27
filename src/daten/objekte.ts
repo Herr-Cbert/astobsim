@@ -11,8 +11,8 @@ import { alsListe, alsObjekt, ladeJson, nurBekannteFelder, optional, text, wahl,
 
 export const OBJEKTE_DATEI = "objekte.json";
 
-export const OBJEKTTYPEN = ["mond", "planet"] as const;
-export type Objekttyp = (typeof OBJEKTTYPEN)[number];
+const OBJEKTTYPEN = ["mond", "planet"] as const;
+type Objekttyp = (typeof OBJEKTTYPEN)[number];
 
 /** Erlaubte Felder je Ebene; alles andere ist ein Tippfehler der Handpflege. */
 const FELDER_OBJEKT = ["id", "name", "typ", "quelle_physik", "zustaende"] as const;

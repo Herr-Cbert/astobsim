@@ -17,7 +17,7 @@ export const ZOOM_RAND = 0.05;
  * mindestens zweifach. So schneidet die Feldblende im Zoom nie (halbe Diagonale < halbes Feld),
  * und grosse Objekte (Mond) werden auch dann vergroessert, wenn sie das Feld ganz fuellen.
  */
-export const ZOOM_ANTEIL_GESICHTSFELD_MAX = 0.5;
+const ZOOM_ANTEIL_GESICHTSFELD_MAX = 0.5;
 /**
  * Kleinste Zoombreite in Arbeitspixeln (Arbeitsmassstab ohne Fenster: Quellpixel oder
  * Gesamt-FWHM / 2,5). Haelt winzige Objekte (Mars 6") beurteilbar und das Fenster breiter als

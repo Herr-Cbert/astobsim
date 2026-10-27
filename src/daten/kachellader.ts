@@ -39,7 +39,7 @@ export function rgbaZuRaster(rgba: Uint8ClampedArray | Uint8Array, breite: numbe
 }
 
 /** Laedt daten/bilder/<pfad> (nur im Browser) und liefert es als lineares Raster mit drei Kanaelen. */
-export async function ladeRasterBrowser(pfad: string, nachweisId: string): Promise<Raster> {
+async function ladeRasterBrowser(pfad: string, nachweisId: string): Promise<Raster> {
   const url = import.meta.env.BASE_URL + "daten/bilder/" + pfad;
   let antwort: Response;
   try {
@@ -66,7 +66,7 @@ export async function ladeRasterBrowser(pfad: string, nachweisId: string): Promi
 }
 
 /** Lader fuer die Kachelpyramide eines Bildnachweises (nur im Browser). */
-export function kachelLaderBrowser(nachweis: Bildnachweis): KachelLader {
+function kachelLaderBrowser(nachweis: Bildnachweis): KachelLader {
   // async, damit auch ein Fehler in kachelPfad als abgelehntes Promise ankommt (Vertrag KachelLader).
   return async (stufe, x, y) => ladeRasterBrowser(kachelPfad(nachweis, { stufe, x, y }), nachweis.id);
 }
@@ -78,8 +78,7 @@ export function quelleKachelnBrowser(nachweis: Bildnachweis, winkelgroesseArcsec
 
 /**
  * QuelleEinzelbild fuer einen Zustand im Browser: laedt das Bild einmal und linearisiert es;
- * ausschnitt ist danach synchron. Zwei Zustaende mit demselben Bild (Mars 14" und 6") koennen das
- * Raster teilen: new QuelleEinzelbild(quelle.raster, einzelbildMassstab(nachweis, winkel)).
+ * ausschnitt ist danach synchron.
  */
 export async function quelleEinzelbildBrowser(nachweis: Bildnachweis, winkelgroesseArcsec: number): Promise<QuelleEinzelbild> {
   return quelleEinzelbild(nachweis, winkelgroesseArcsec, await ladeRasterBrowser(nachweis.datei, nachweis.id));
