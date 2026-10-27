@@ -75,6 +75,8 @@ Zuordnung der Muss-Anforderungen: Geraete A-F1 bis A-F8 in #11, #16, #17 (Begren
 
 Umgesetzt ab 2026-10-27: Vorbereitungs-PR `vorbereitung-welle-3` (Steuerung mit Rechenschleife, Feld- und Hilfemodul, Seitengeruest mit Platzhaltern fuer die Formulare, Abschnitte in `src/texte.ts`), darauf parallel #13, #17, #18, #19 und #55 (Leuchtdichte, neu aus #9). #14 folgt nach #13, #20 nach #19 (Welle 3b).
 
+**Welle 4a (M2, Folge-Issues aus Welle 3b):** #71 (Quellweiss eichen) und #51 (Kachelstufen linear) parallel, danach #72 (Trabanten als eigene Punktebene, Ansatz 2026-10-27 im Plan-Modus mit Herbert geklaert; loest auch die Begrenzung von Mars am Anzeigeweiss). Umgesetzt 2026-10-27, PRs #73 bis #75.
+
 **Welle 4 (M3):** #21, #22, #23 sequentiell; #21 braucht Herberts Urteil zu den Testfaellen.
 
 Merge-Konflikte in Stufe B zeigen, wo der Modulschnitt nicht sauber war; sie werden in der Retrospektive (#23) festgehalten.
