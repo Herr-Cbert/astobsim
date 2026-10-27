@@ -82,7 +82,7 @@ export function leuchtdichteRelativ(magProArcsec2: number): number {
  * und Himmel nicht (physik.md 12.5). Die Punktebene bildet bild je Pixel ab (Issue #72, physik.md
  * Abschnitt 14): punktFaktor ist die Leuchtdichte von Quellweiss im Okular relativ zu Anzeigeweiss,
  * punktExponent der Kompressionsexponent, also faktorObjekt = punktFaktor^punktExponent.
- * hintergrundMagProArcsec2 ist physikalisch und dient Anzeige und Hilfetext.
+ * hintergrundMagProArcsec2 ist physikalisch; ausserhalb von physik liest es heute niemand.
  */
 export function helligkeit(optik: Optik, atmosphaere: Atmosphaere, bortle: number, zustand: Objektzustand): Helligkeit {
   const ok = okularhelligkeit(optik, atmosphaere, bortle, zustand);

@@ -2,8 +2,9 @@
 // jede einzeln getestet gegen docs/recherche/physik.md Abschnitt 8 (A-Q1). Stufe 1:
 // Konfiguration zu Zwischengroessen (optik, atmosphaere, aufloesung, helligkeit, punktquellen,
 // arbeitsmassstab, kernbeschreibung) und begrenze. Stufe 2: baueKern mit den Testhelfern
-// kontrastUebertragung und kernFwhmArcsec (Issue #4). Stufe 3: auswerten mit Anzeigewerten,
-// Warnungen und Wiederverwendung des Kerns (Issue #5). ui und bild importieren nur von hier.
+// kontrastUebertragung und kernFwhmArcsec (Issue #4) sowie profilDelle (Issue #21). Stufe 3:
+// auswerten mit Anzeigewerten, Warnungen und Wiederverwendung des Kerns (Issue #5). ui und zustand
+// importieren nur von hier; bild importiert physik nicht (docs/architektur.md Abschnitt 4).
 
 export * from "../naht/konfiguration";
 export {

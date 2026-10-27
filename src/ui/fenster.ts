@@ -1,7 +1,7 @@
 // Fensterwahl der UI: wie viele Anzeigepixel das Gesichtsfeld bekommt, und welche Anfrage an die
-// Quelle vor rendere geht. Das Fenster selbst baut physik (Standardfenster in auswerten); die UI
-// gibt nur anzeigePx vor. Ein Fenster schmaler als der Arbeitsmassstab waere ein
-// Programmierfehler (PhysikFehler); das Standardfenster ist immer das ganze wahre Gesichtsfeld.
+// Quelle vor rendere geht. Das Fenster baut die Steuerung (Uebersicht: ganzes wahres Gesichtsfeld
+// um die Mitte, Zoom: zoomfenster in zoom.ts) und reicht es an auswerten. Ein Fenster schmaler
+// als der Arbeitsmassstab waere ein Programmierfehler (PhysikFehler).
 
 import type { Objektpunkt } from "../bild";
 import type { Quellbild } from "../naht/simulationsparameter";

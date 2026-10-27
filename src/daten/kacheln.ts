@@ -90,7 +90,7 @@ export class QuelleKacheln implements Quelle {
     if (!(maxKacheln >= 1)) throw new DatenFehler("-", "Kachelpyramide", "maxKacheln", "mindestens 1");
   }
 
-  /** Anzahl der Kacheln im Cache (fuer Tests und Anzeige des Speicherbedarfs). */
+  /** Anzahl der Kacheln im Cache (fuer Tests). */
   get kachelnImCache(): number {
     return this.cache.size;
   }

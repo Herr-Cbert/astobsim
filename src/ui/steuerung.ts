@@ -83,7 +83,7 @@ export interface Stand {
    * anblick, ausser bei Objekt- oder Geraetewechsel (dann undefined bis zur neuen Rechnung).
    */
   zoombilder?: Zoombilder;
-  /** Zaehlt die fertigen Anblicke; ein Beobachter zeichnet nur, wenn sich die Nummer aendert. */
+  /** Zaehlt die fertigen Anblicke, fuer Tests und scripts/validierung-bilder.mjs (data-nummer). */
   nummer: number;
   /** Dauer von rendere fuer den letzten Anblick in ms. */
   ms?: number;
