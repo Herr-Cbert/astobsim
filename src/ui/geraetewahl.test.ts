@@ -84,6 +84,7 @@ describe("Vergroesserung als Eingabe (A-F7)", () => {
     const ok = okularBrennweiteFuer(600, 40);
     expect(ok).toBe(15);
     expect(optik({ ...START, okular: { ...START.okular, brennweiteMm: ok } }).vergroesserung).toBeCloseTo(40, 12);
+    expect(okularBrennweiteFuer(600, 37)).toBe(16.22);
     expect(okularBrennweiteFuer(600, 0)).toBe(Infinity);
     expect(okularBrennweiteFuer(600, -3)).toBe(Infinity);
   });

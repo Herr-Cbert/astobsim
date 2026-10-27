@@ -78,7 +78,10 @@ export function baueFormularGeraet(platz: HTMLElement, steuerung: Steuerung): vo
         modus = wert;
         aendereGeraet(geraet);
       }
-      // Gleiche Werte (Wechsel auf "Frei eingeben") melden die Steuerung nicht; Sichtbarkeit trotzdem nachziehen.
+      // Eine Geraetewahl ist eine gueltige Eingabe: alle Felder neu setzen, damit alte Hinweise
+      // verschwinden. Gleiche Werte (Wechsel auf "Frei eingeben") melden die Steuerung nicht;
+      // Sichtbarkeit und Werte deshalb hier nachziehen.
+      zuletzt.clear();
       zeige();
     }
   });
@@ -89,7 +92,7 @@ export function baueFormularGeraet(platz: HTMLElement, steuerung: Steuerung): vo
   const oeffnung = zahlenfeld(d, {
     id: "geraet-oeffnung",
     beschriftung: T.oeffnung,
-    hilfe: T.oeffnungHilfe,
+    hilfe: T.oeffnungHilfe(GRENZEN.oeffnungMm.min, GRENZEN.oeffnungMm.max),
     feld: GRENZEN.oeffnungMm.feld,
     einheit: TEXTE.einheiten.mm,
     min: GRENZEN.oeffnungMm.min,
@@ -102,7 +105,7 @@ export function baueFormularGeraet(platz: HTMLElement, steuerung: Steuerung): vo
   const brennweite = zahlenfeld(d, {
     id: "geraet-brennweite",
     beschriftung: T.brennweite,
-    hilfe: T.brennweiteHilfe,
+    hilfe: T.brennweiteHilfe(GRENZEN.brennweiteMm.min, GRENZEN.brennweiteMm.max),
     feld: GRENZEN.brennweiteMm.feld,
     einheit: TEXTE.einheiten.mm,
     min: GRENZEN.brennweiteMm.min,
@@ -126,13 +129,13 @@ export function baueFormularGeraet(platz: HTMLElement, steuerung: Steuerung): vo
   const obstruktion = zahlenfeld(d, {
     id: "geraet-obstruktion",
     beschriftung: T.obstruktion,
-    hilfe: T.obstruktionHilfe,
+    hilfe: T.obstruktionHilfe(GRENZEN.obstruktion.min * 100, GRENZEN.obstruktion.max * 100),
     feld: GRENZEN.obstruktion.feld,
     einheit: T.prozent,
     min: GRENZEN.obstruktion.min * 100,
     max: GRENZEN.obstruktion.max * 100,
     schritt: 1,
-    stellen: 0,
+    stellen: 1,
     wert: (fernrohr()?.obstruktion ?? 0) * 100,
     beiAenderung: (prozent) => skaliereHinweise(aendereFernrohr((f) => ({ ...f, obstruktion: prozent / 100 })), GRENZEN.obstruktion.feld, 100)
   });
@@ -146,7 +149,7 @@ export function baueFormularGeraet(platz: HTMLElement, steuerung: Steuerung): vo
   const okularBrennweite = regler(d, {
     id: "geraet-okular-brennweite",
     beschriftung: T.okularBrennweite,
-    hilfe: T.okularBrennweiteHilfe,
+    hilfe: T.okularBrennweiteHilfe(GRENZEN.okularBrennweiteMm.min, GRENZEN.okularBrennweiteMm.max),
     feld: GRENZEN.okularBrennweiteMm.feld,
     einheit: TEXTE.einheiten.mm,
     min: GRENZEN.okularBrennweiteMm.min,
@@ -159,7 +162,7 @@ export function baueFormularGeraet(platz: HTMLElement, steuerung: Steuerung): vo
   const gesichtsfeld = zahlenfeld(d, {
     id: "geraet-okular-gesichtsfeld",
     beschriftung: T.gesichtsfeld,
-    hilfe: T.gesichtsfeldHilfe,
+    hilfe: T.gesichtsfeldHilfe(GRENZEN.scheinbaresGesichtsfeldGrad.min, GRENZEN.scheinbaresGesichtsfeldGrad.max),
     feld: GRENZEN.scheinbaresGesichtsfeldGrad.feld,
     einheit: TEXTE.einheiten.grad,
     min: GRENZEN.scheinbaresGesichtsfeldGrad.min,
@@ -194,6 +197,8 @@ export function baueFormularGeraet(platz: HTMLElement, steuerung: Steuerung): vo
     hilfe: T.vergroesserungHilfe,
     feld: VERGROESSERUNG_FELD,
     einheit: TEXTE.einheiten.fach,
+    // GRENZEN.vergroesserung ist die Grenze des Fernglases; zahlenfeld wertet min und max nicht aus.
+    // Beim Fernrohr begrenzt die Okularbrennweite (begrenze), der Hinweis kommt aus beiAenderung.
     min: GRENZEN.vergroesserung.min,
     max: GRENZEN.vergroesserung.max,
     schritt: 1,
