@@ -204,3 +204,56 @@ body {
   font-size: 0.85rem;
   overflow-wrap: anywhere;
 }
+
+/* Formular Geraet (#17) */
+
+.formular-geraet .formular-ueberschrift {
+  margin: 0 0 8px;
+  font-size: 1.1rem;
+}
+
+.geraet-frei {
+  margin: 0 0 4px 0;
+  padding-left: 10px;
+  border-left: 2px solid var(--rand);
+}
+
+.geraet-okular {
+  margin: 4px 0 0;
+  padding: 6px 10px 2px;
+  border: 1px solid var(--rand);
+}
+
+.geraet-okular legend {
+  padding: 0 4px;
+  color: var(--text-leise);
+}
+
+.geraet-presets {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 4px;
+}
+
+.geraet-preset {
+  padding: 1px 8px;
+  border: 1px solid var(--rand);
+  border-radius: 3px;
+  background: transparent;
+  color: var(--text);
+  font: inherit;
+  font-size: 0.85rem;
+  font-variant-numeric: tabular-nums;
+  cursor: pointer;
+}
+
+.geraet-preset[aria-pressed="true"] {
+  border-color: var(--text-leise);
+  background: var(--rand);
+}
+
+.geraet-preset:focus-visible {
+  outline: 2px solid var(--text);
+  outline-offset: 1px;
+}
