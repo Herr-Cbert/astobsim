@@ -204,3 +204,42 @@ body {
   font-size: 0.85rem;
   overflow-wrap: anywhere;
 }
+
+/* Gesichtsfeld (#19) */
+
+.gesichtsfeld.verschiebbar {
+  cursor: grab;
+  /* Ziehen auf Touch-Geraeten verschiebt den Ausschnitt statt der Seite. */
+  touch-action: none;
+}
+
+.gesichtsfeld.verschiebbar.zieht {
+  cursor: grabbing;
+}
+
+.gesichtsfeld:focus-visible {
+  outline: 2px solid var(--text-leise);
+  outline-offset: 2px;
+}
+
+.warnungen {
+  margin-top: 8px;
+}
+
+.warnungen-liste {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.warnung {
+  margin: 0 0 4px;
+  padding-left: 10px;
+  border-left: 3px solid var(--warnung);
+  color: var(--warnung);
+  font-size: 0.9rem;
+}
+
+.warnung .hilfe-text {
+  color: var(--text);
+}
