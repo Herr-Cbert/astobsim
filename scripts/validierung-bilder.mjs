@@ -4,6 +4,8 @@
 // Node 22). Je Fall: URL laden, warten bis das Gesichtsfeld fertig gerendert ist, Uebersicht
 // speichern (Gesichtsfeld), Zoom per Eingabetaste oeffnen, Zoom speichern (Anblick und Quellbild),
 // beides in der Aufloesung der Canvas (devicePixelRatio 2). Ablage docs/validierung/<fall>-uebersicht.png und -zoom.png.
+// Meldet Chrome einen Verstoss gegen die Content-Security-Policy des Baus (Issue #22) oder einen
+// Fehler auf der Konsole, endet das Skript mit Exit-Code 1.
 //
 // Aufruf: node scripts/validierung-bilder.mjs [--gpu] [fall ...]. Chrome ueber CHROME, sonst google-chrome.
 import { spawn } from "node:child_process";
@@ -139,12 +141,21 @@ async function endpunkt() {
   throw new Error(`Chrome meldet keinen DevTools-Port\n${stoerung.split("\n").slice(-10).join("\n")}`);
 }
 
+/** Fehler und CSP-Verstoesse, die Chrome auf der Konsole meldet (Log.entryAdded, Runtime.exceptionThrown). */
+const konsolenfehler = [];
+
 /** Minimaler CDP-Client: senden(methode, parameter, sitzung) liefert result oder wirft. */
 function cdp(ws) {
   let naechste = 1;
   const offen = new Map();
   ws.addEventListener("message", (e) => {
     const nachricht = JSON.parse(String(e.data));
+    if (nachricht.method === "Log.entryAdded" && nachricht.params.entry.level === "error") {
+      const { text, url } = nachricht.params.entry;
+      // Das favicon fragt Chrome von sich aus an der Wurzel an; astobsim hat keins, auch Pages nicht.
+      if (!url?.endsWith("/favicon.ico")) konsolenfehler.push(url ? `${text} (${url})` : text);
+    }
+    if (nachricht.method === "Runtime.exceptionThrown") konsolenfehler.push(nachricht.params.exceptionDetails.exception?.description ?? nachricht.params.exceptionDetails.text);
     const eintrag = nachricht.id !== undefined ? offen.get(nachricht.id) : undefined;
     if (!eintrag) return;
     offen.delete(nachricht.id);
@@ -174,6 +185,8 @@ try {
     const s = (methode, params) => senden(methode, params, sessionId);
     await s("Emulation.setDeviceMetricsOverride", { width: BREITE, height: HOEHE, deviceScaleFactor: PIXELFAKTOR, mobile: false });
     await s("Page.enable");
+    await s("Log.enable");
+    await s("Runtime.enable");
     await s("Page.navigate", { url: ursprung + fall.such });
 
     const wert = async (ausdruck) => (await s("Runtime.evaluate", { expression: ausdruck, returnByValue: true })).result.value;
@@ -190,7 +203,8 @@ try {
         } else if (nummer !== null && Date.now() - seit >= RUHE_MS) return nummer;
         await warte(200);
       }
-      throw new Error(`${fall.name}: ${selektor} nicht fertig nach ${ZEITLIMIT_FALL_MS / 1000} s (Nummer ${letzte})`);
+      const konsole = konsolenfehler.length > 0 ? `; Konsole:\n  ${konsolenfehler.join("\n  ")}` : "";
+      throw new Error(`${fall.name}: ${selektor} nicht fertig nach ${ZEITLIMIT_FALL_MS / 1000} s (Nummer ${letzte})${konsole}`);
     };
     /** Speichert den Ausschnitt des Elements in voller Aufloesung (PIXELFAKTOR je CSS-Pixel). */
     const speichere = async (teil, selektor) => {
@@ -211,6 +225,7 @@ try {
     const zoom = await speichere("zoom", ".zoom-bilder");
     console.log(`${fall.name}: ${uebersicht.slice(wurzel.length)}, ${zoom.slice(wurzel.length)}  ${ursprung}${fall.such}`);
     await senden("Target.closeTarget", { targetId });
+    if (konsolenfehler.length > 0) throw new Error(`${fall.name}: Fehler auf der Konsole:\n  ${konsolenfehler.join("\n  ")}`);
   }
 } catch (e) {
   console.error(`validierung-bilder: ${e instanceof Error ? e.message : String(e)}`);
