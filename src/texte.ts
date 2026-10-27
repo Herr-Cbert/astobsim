@@ -7,9 +7,8 @@ export const TEXTE = {
   titel: "astobsim",
   untertitel: "Wie sieht ein Himmelsobjekt durch ein Fernrohr aus?",
 
-  /** Beschreibung der festen Startkonfiguration (A-D9), bis das Formular kommt (#17, #18). */
-  startkonfiguration:
-    "Refraktor 80/600, Okular 10 mm mit 50°, Mond kurz nach dem ersten Viertel, Seeing 2″, Bortle 5, klar, Höhe 45°",
+  /** Beschriftung der Formularspalte. */
+  formular: "Einstellungen",
   nordenOben: "Norden oben",
   /** Namensnennung des Quellbilds unter dem Gesichtsfeld (aus bilder.json). */
   bildnachweis: (namensnennung: string, lizenz: string): string => `Bild: ${namensnennung} Lizenz: ${lizenz}.`,
@@ -19,17 +18,51 @@ export const TEXTE = {
 
   status: {
     ladeDaten: "Lade Geräte- und Objektdaten …",
-    ladeKacheln: "Lade Mondbild …",
+    ladeBild: "Lade Bild des Objekts …",
     rechne: "Berechne Anblick …",
-    fertig: (ms: number, falter: string): string => `Anblick berechnet in ${ms} ms (${falter}).`
+    fertig: (ms: number, falter: string): string => `Anblick berechnet in ${ms} ms (${falter}).`,
+    /** Werte aus einem Link lagen ausserhalb der Grenzen (A-F8) und wurden geschnitten. */
+    linkGeschnitten: (anzahl: number): string =>
+      anzahl === 1 ? "Ein Wert aus dem Link lag außerhalb des erlaubten Bereichs und wurde angepasst." : `${anzahl} Werte aus dem Link lagen außerhalb des erlaubten Bereichs und wurden angepasst.`
   },
   falterJs: "JavaScript-Faltung",
 
   fehler: {
     daten: "Die Daten konnten nicht geladen werden.",
-    kacheln: "Das Mondbild ist nicht erreichbar.",
+    bild: "Das Bild des Objekts ist nicht erreichbar.",
     rechnen: "Der Anblick konnte nicht berechnet werden.",
     details: "Details:"
+  },
+
+  /** Formularfelder (src/ui/feld.ts): Hinweis neben dem Feld, wenn begrenze geschnitten hat (A-F8). */
+  feld: {
+    geschnitten: (eingabe: string, wert: string): string => `${eingabe} liegt außerhalb des erlaubten Bereichs, verwendet wird ${wert}.`
+  },
+  /** Infosymbol (src/ui/hilfe.ts); die Hilfetexte selbst stehen im Abschnitt hilfe und bei den Formularen. */
+  hilfe: {
+    symbol: "i",
+    beschriftung: "Hilfe"
+    // Issue #18: Hilfetexte zu Parametern und Anzeigezahlen (A-D6), Hinweise A-X5, A-X1, A-B2.
+  },
+
+  /** Formular Gerät und Okular (src/ui/formular_geraet.ts). */
+  geraet: {
+    // Issue #17
+  },
+
+  /** Formular Objekt und Zustand (src/ui/formular_objekt.ts). */
+  objekt: {
+    // Issue #18
+  },
+
+  /** Formular Bedingungen (src/ui/formular_bedingungen.ts). */
+  bedingungen: {
+    // Issue #18
+  },
+
+  /** Warnungen neben dem Gesichtsfeld (A-D5, src/ui/gesichtsfeld.ts). */
+  warnungen: {
+    // Issue #19
   },
 
   /** Infopanel neben dem Bild (A-D4). */

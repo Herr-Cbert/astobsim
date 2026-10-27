@@ -8,6 +8,7 @@
   --text-leise: #8a90a0;
   --rand: #2a2f3a;
   --fehler: #ff8a80;
+  --warnung: #ffd180;
 }
 
 body {
@@ -45,6 +46,90 @@ body {
   gap: 24px;
   align-items: flex-start;
   margin-top: 16px;
+}
+
+.formular {
+  flex: 0 1 280px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.feld {
+  margin-bottom: 10px;
+}
+
+.feld-kopf {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 2px;
+}
+
+.feld-zeile {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.feld-zahl {
+  width: 6em;
+  font-variant-numeric: tabular-nums;
+}
+
+.feld-regler {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.feld-einheit {
+  color: var(--text-leise);
+}
+
+.feld-hinweis {
+  margin: 2px 0 0;
+  font-size: 0.85rem;
+  color: var(--warnung);
+}
+
+.hilfe {
+  position: relative;
+  display: inline-block;
+}
+
+.hilfe-knopf {
+  width: 1.4em;
+  height: 1.4em;
+  padding: 0;
+  border: 1px solid var(--text-leise);
+  border-radius: 50%;
+  background: transparent;
+  color: var(--text-leise);
+  font: italic 0.8rem serif;
+  cursor: help;
+}
+
+.hilfe-text {
+  display: none;
+  position: absolute;
+  z-index: 10;
+  left: 0;
+  top: 1.8em;
+  width: 18em;
+  padding: 8px;
+  border: 1px solid var(--rand);
+  background: var(--hintergrund);
+  color: var(--text);
+  font-size: 0.85rem;
+}
+
+.hilfe:hover .hilfe-text,
+.hilfe:focus-within .hilfe-text {
+  display: block;
+}
+
+.hilfe.zu .hilfe-text {
+  display: none;
 }
 
 .bild {

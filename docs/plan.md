@@ -73,6 +73,8 @@ Zuordnung der Muss-Anforderungen: Geraete A-F1 bis A-F8 in #11, #16, #17 (Begren
 
 **Welle 3 (M2):** #13 und #14 (Daten, dann Trabanten); #17, #18 parallel (teilen `src/texte.ts` und ein Feld-Hilfsmodul: vorher abstimmen oder #17 zuerst); #19, danach #20.
 
+Umgesetzt ab 2026-10-27: Vorbereitungs-PR `vorbereitung-welle-3` (Steuerung mit Rechenschleife, Feld- und Hilfemodul, Seitengeruest mit Platzhaltern fuer die Formulare, Abschnitte in `src/texte.ts`), darauf parallel #13, #17, #18, #19 und #55 (Leuchtdichte, neu aus #9). #14 folgt nach #13, #20 nach #19 (Welle 3b).
+
 **Welle 4 (M3):** #21, #22, #23 sequentiell; #21 braucht Herberts Urteil zu den Testfaellen.
 
 Merge-Konflikte in Stufe B zeigen, wo der Modulschnitt nicht sauber war; sie werden in der Retrospektive (#23) festgehalten.
