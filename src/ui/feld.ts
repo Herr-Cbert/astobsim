@@ -16,6 +16,17 @@ export function leseDezimal(text: string): number {
   return Number(t);
 }
 
+/**
+ * Text des Hinweises neben dem Feld (A-F8): die Eingabe mit so vielen Nachkommastellen, wie sie
+ * hat (hoechstens 3, ohne Nullen am Ende; 0,44 nicht als 0,4), der verwendete Wert mit den
+ * Stellen des Felds.
+ */
+export function hinweistext(h: Hinweis, stellen: number): string {
+  const eingabe = Math.round(h.eingabe * 1000) / 1000;
+  const nachkomma = /\.(\d+)$/.exec(String(eingabe))?.[1]?.length ?? 0;
+  return TEXTE.feld.geschnitten(zahl(eingabe, nachkomma), zahl(h.wert, stellen));
+}
+
 /** Der Hinweis von begrenze zu genau diesem Feld, sonst undefined. */
 export function hinweisFuer(hinweise: readonly Hinweis[], feld: string): Hinweis | undefined {
   return hinweise.find((h) => h.feld === feld);
@@ -119,7 +130,7 @@ function zahlteil(d: Document, o: ZahlOptionen, zeile: HTMLElement, element: HTM
   let aktuell = o.wert;
   const zeigeHinweis = (h: Hinweis | undefined): void => {
     hinweis.hidden = h === undefined;
-    hinweis.textContent = h === undefined ? "" : TEXTE.feld.geschnitten(zahl(h.eingabe, o.stellen), zahl(h.wert, o.stellen));
+    hinweis.textContent = h === undefined ? "" : hinweistext(h, o.stellen);
     if (h === undefined) eingabe.removeAttribute("aria-describedby");
     else eingabe.setAttribute("aria-describedby", hinweis.id);
   };
