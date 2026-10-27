@@ -60,7 +60,8 @@ function baueSeite(wurzel: HTMLElement): Seite {
   formular.append(geraet, objekt, bedingungen);
 
   const canvas = element("canvas", "gesichtsfeld");
-  canvas.setAttribute("role", "img");
+  // Klickbar (oeffnet die Zoomansicht): Schaltflaeche, die Beschriftung nennt Bild und Bedienung.
+  canvas.setAttribute("role", "button");
   canvas.setAttribute("aria-label", TEXTE.gesichtsfeld);
   const bild = element("figure", "bild");
   const nachweis = element("figcaption", "nachweis");

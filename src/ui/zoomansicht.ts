@@ -40,7 +40,8 @@ function baueBild(d: Document, titel: string, hilfe: string, hilfeId: string, bi
   kopf.append(name, hilfesymbol(d, hilfeId, hilfe, titel));
   const canvas = d.createElement("canvas");
   canvas.className = "zoom-canvas";
-  canvas.setAttribute("role", "img");
+  // Klickbar (zurueck zur Uebersicht): Schaltflaeche, die Beschriftung nennt Bild und Bedienung.
+  canvas.setAttribute("role", "button");
   canvas.setAttribute("aria-label", bildtext);
   canvas.tabIndex = 0;
   huelle.append(kopf, canvas);
@@ -110,6 +111,11 @@ export function baueZoomansicht(plaetze: ZoomPlaetze, steuerung: Steuerung): Zoo
       if (offen && vomGesichtsfeld) a.canvas.focus({ preventScroll: true });
     }
     const zb = stand.zoombilder;
+    if (zb === undefined && gezeichnet !== undefined) {
+      // Objekt oder Geraet gewechselt: leere Bilder statt des alten Objekts neben dem neuen Nachweis.
+      gezeichnet = undefined;
+      for (const canvas of [a.canvas, v.canvas]) canvas.getContext("2d")?.clearRect(0, 0, canvas.width, canvas.height);
+    }
     if (zb !== undefined && zb !== gezeichnet && stand.auswertung !== undefined) {
       gezeichnet = zb;
       zeichneAnblick(a.canvas, zb.anblick, stand.auswertung.parameter.gesichtsfeld);

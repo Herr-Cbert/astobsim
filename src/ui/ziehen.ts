@@ -1,6 +1,6 @@
 // Zeiger und Tastatur fuer ein Bild der Anzeige (Gesichtsfeld, Zoomansicht): Ziehen und
 // Pfeiltasten verschieben die Fenstermitte (A-D2, Grenzen und Richtungen in verschieben.ts), ein
-// Klick ohne Ziehen und die Eingabetaste wechseln die Ansicht (A-D3). Alles laeuft ueber die
+// Klick ohne Ziehen, Eingabe- und Leertaste wechseln die Ansicht (A-D3). Alles laeuft ueber die
 // Steuerung (verschiebe, zoome); hier steckt nur die Zuordnung der Ereignisse.
 
 import type { Steuerung } from "./steuerung";
@@ -78,9 +78,11 @@ export function verbindeBild(element: HTMLElement, b: Bildbedienung): void {
 
   element.addEventListener("keydown", (e) => {
     if (e.altKey || e.ctrlKey || e.metaKey) return;
-    if (e.key === "Enter") {
+    if (e.key === "Enter" || e.key === " ") {
+      // Leertaste wie Eingabetaste (role "button"), ohne die Seite zu rollen. Gehaltene Taste
+      // schaltet nicht hin und her.
       e.preventDefault();
-      b.wechsle();
+      if (!e.repeat) b.wechsle();
       return;
     }
     const lage = b.lage();

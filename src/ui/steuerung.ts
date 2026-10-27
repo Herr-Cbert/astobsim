@@ -78,7 +78,10 @@ export interface Stand {
   zoom: boolean;
   /** Letzter fertiger Anblick der Uebersicht; bleibt stehen, bis der naechste fertig ist, auch bei einem Fehler. */
   anblick?: Anblick;
-  /** Letzte fertige Zoomansicht: Anblick und Vergleichsbild im selben Fenster; bleibt stehen wie anblick. */
+  /**
+   * Letzte fertige Zoomansicht: Anblick und Vergleichsbild im selben Fenster; bleibt stehen wie
+   * anblick, ausser bei Objekt- oder Geraetewechsel (dann undefined bis zur neuen Rechnung).
+   */
   zoombilder?: Zoombilder;
   /** Zaehlt die fertigen Anblicke; ein Beobachter zeichnet nur, wenn sich die Nummer aendert. */
   nummer: number;
@@ -88,11 +91,17 @@ export interface Stand {
   fehler?: { art: "bild" | "rechnen"; ursache: unknown };
 }
 
+/**
+ * Vergleichsbild (GLOSSARY): Quellbild ohne Faltung und ohne Helligkeitsanpassung, Quellweiss =
+ * Bildschirmweiss (zoom.ts). Entsteht ueber rendere und hat deshalb den Typ Anblick, ist aber kein
+ * gefalteter Anblick.
+ */
+export type Vergleichsbild = Anblick;
+
 /** Die beiden Bilder der Zoomansicht, aus einer Rechnung. */
 export interface Zoombilder {
   anblick: Anblick;
-  /** Quellbild ohne Faltung und ohne Helligkeitsanpassung, Quellweiss = Bildschirmweiss (zoom.ts). */
-  vergleich: Anblick;
+  vergleich: Vergleichsbild;
 }
 
 export type Beobachter = (stand: Readonly<Stand>) => void;
@@ -160,7 +169,9 @@ export class Steuerung {
     this.url = url;
     this.urlGeschrieben = false;
     this.ueberhole();
-    this.setze(zurueck ? { konfiguration, mitte: { xArcsec: 0, yArcsec: 0 } } : { konfiguration });
+    // Bei Objekt- oder Geraetewechsel passen die alten Zoombilder nicht mehr zum Nachweis und zum
+    // Fenster: verwerfen, bis die neue Rechnung fertig ist. Sonst bleiben sie (kein Flackern).
+    this.setze(zurueck ? { konfiguration, mitte: { xArcsec: 0, yArcsec: 0 }, zoombilder: undefined } : { konfiguration });
     this.plane();
     return hinweise;
   }

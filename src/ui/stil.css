@@ -168,8 +168,12 @@ body {
   color: var(--text-leise);
 }
 
+/* Mindestens 320 px, sonst so breit wie die laengste Zeile: Bezeichnungen brechen nicht um
+   (z. B. "Beugungsgrenze (Rayleigh)" beim blossen Auge mit langen Werten). */
 .info {
-  flex: 0 1 320px;
+  flex: 0 0 auto;
+  min-width: 320px;
+  max-width: 100%;
 }
 
 .info-liste {
@@ -181,6 +185,7 @@ body {
 
 .info-liste dt {
   color: var(--text-leise);
+  white-space: nowrap;
 }
 
 .info-liste dd {
@@ -327,9 +332,10 @@ body {
    Bildschirmen untereinander. Die Bilder sind quadratisch ohne Feldblende (der Zoom bleibt
    innerhalb des Gesichtsfelds). */
 
+/* Wie das Gesichtsfeld zwischen Formular und Infopanel; die Bilder werden dafuer kleiner. */
 .zoom {
-  flex: 1 1 560px;
-  max-width: 960px;
+  flex: 1 1 400px;
+  max-width: 720px;
   min-width: 0;
 }
 

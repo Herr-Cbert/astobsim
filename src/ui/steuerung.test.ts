@@ -388,6 +388,33 @@ describe("Steuerung, Zoomansicht (A-D3)", () => {
     expect(s.stand.zoombilder?.anblick.fenster).toMatchObject({ mitteXArcsec: 500, mitteYArcsec: 200 });
   });
 
+  it("verwirft die Zoombilder bei Objekt- oder Geraetewechsel, nicht bei anderen Aenderungen", async () => {
+    const { u, s } = neu();
+    await u.frame();
+    s.zoome(true);
+    await u.frame();
+    const zb = s.stand.zoombilder;
+    expect(zb).toBeDefined();
+    // Innerhalb des Zooms: altes Bild bleibt bis zum neuen (kein Flackern).
+    s.aendere(mitSeeing(s.konfiguration, 3));
+    expect(s.stand.zoombilder).toBe(zb);
+    await u.frame();
+    // Zurueck zur Uebersicht, anderes Objekt, wieder in den Zoom: kein Mond neben dem Jupiter-Nachweis.
+    s.zoome(false);
+    await u.frame();
+    s.aendere(mitZustand(s.konfiguration, "jup_47"));
+    expect(s.stand.zoombilder).toBeUndefined();
+    s.zoome(true);
+    expect(s.stand.zoombilder).toBeUndefined();
+    await u.frame();
+    expect(s.stand.zoombilder?.anblick.fenster.breiteArcsec).toBeCloseTo(zoombreiteArcsec(s.konfiguration), 9);
+    // Geraetewechsel verwirft ebenso.
+    const k = s.konfiguration;
+    if (k.geraet.art !== "fernrohr") throw new Error("Voreinstellung ist kein Fernrohr");
+    s.aendere({ ...k, geraet: { ...k.geraet, okular: { ...k.geraet.okular, brennweiteMm: 6 } } });
+    expect(s.stand.zoombilder).toBeUndefined();
+  });
+
   it("bleibt beim Objektwechsel im Zoom und zeigt das neue Objekt", async () => {
     const { u, s } = neu();
     await u.frame();
