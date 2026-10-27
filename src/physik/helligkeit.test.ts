@@ -1,9 +1,11 @@
 import { describe, expect, it } from "vitest";
+import type { Auge, Fernglas, Konfiguration, Objektzustand } from "../naht/konfiguration";
 import type { Atmosphaere } from "./atmosphaere";
+import { auswerten } from "./auswerten";
 import { PhysikFehler } from "./fehler";
-import { bortleMagProArcsec2, helligkeit } from "./helligkeit";
+import { anzeigefaktor, bortleMagProArcsec2, helligkeit, okularhelligkeit } from "./helligkeit";
 import type { Optik } from "./optik";
-import { MOND_Q1 as MOND } from "./testdaten";
+import { BEDINGUNGEN_A_D9, KONFIGURATION_A_D9, MOND_Q1 as MOND, refraktorMitVergroesserung } from "./testdaten";
 
 // Optik und Atmosphaere direkt als Skalare, damit jeder Faktor einzeln sichtbar wird.
 function optikMit(teil: Partial<Optik>): Optik {
@@ -20,34 +22,34 @@ function optikMit(teil: Partial<Optik>): Optik {
 const KLAR: Atmosphaere = { luftmasse: 1, seeingFwhmArcsec: 2, extinktionMag: 0, transmission: 1 };
 
 // Testwerte aus docs/recherche/physik.md, Abschnitte 6.1, 6.2 und 8.
-describe("helligkeit: Objektfaktor", () => {
+describe("okularhelligkeit: Objektfaktor", () => {
   it("Austrittspupille 0,8 mm ohne weitere Verluste ist Faktor 0,01778", () => {
-    expect(helligkeit(optikMit({}), KLAR, 5, MOND).faktorObjekt).toBeCloseTo(0.01778, 5);
+    expect(okularhelligkeit(optikMit({}), KLAR, 5, MOND).faktorObjekt).toBeCloseTo(0.01778, 5);
   });
   it("Austrittspupille 7 mm ist durch die Pupille Faktor 1, nach oben begrenzt", () => {
-    expect(helligkeit(optikMit({ austrittspupilleMm: 7 }), KLAR, 5, MOND).faktorObjekt).toBe(1);
+    expect(okularhelligkeit(optikMit({ austrittspupilleMm: 7 }), KLAR, 5, MOND).faktorObjekt).toBe(1);
   });
   it("Newton mit Obstruktion 0,33 und tau 0,8: Abschattung (1 - 0,33^2) genau einmal, mal Atmosphaere", () => {
     const a: Atmosphaere = { ...KLAR, extinktionMag: 0.3989, transmission: 0.6925 };
-    const h = helligkeit(optikMit({ austrittspupilleMm: 7, obstruktion: 0.33, transmission: 0.8 }), a, 5, MOND);
+    const h = okularhelligkeit(optikMit({ austrittspupilleMm: 7, obstruktion: 0.33, transmission: 0.8 }), a, 5, MOND);
     expect(h.faktorObjekt).toBeCloseTo(0.8 * (1 - 0.33 ** 2) * 0.6925, 10);
   });
 });
 
-describe("helligkeit: Hintergrund", () => {
+describe("okularhelligkeit: Hintergrund", () => {
   it("Bortle 8 (17,5) bei Austrittspupille 0,8 mm ist 21,875 mag je Quadratbogensekunde", () => {
-    const h = helligkeit(optikMit({}), KLAR, 8, MOND);
+    const h = okularhelligkeit(optikMit({}), KLAR, 8, MOND);
     expect(h.hintergrundMagProArcsec2).toBeCloseTo(17.5 + 4.375, 3);
   });
   it("Extinktion dunkelt das Objekt, nicht den Himmel", () => {
     const diesig: Atmosphaere = { ...KLAR, extinktionMag: 0.9, transmission: 0.4365 };
-    const klar = helligkeit(optikMit({}), KLAR, 5, MOND);
-    const dunst = helligkeit(optikMit({}), diesig, 5, MOND);
+    const klar = okularhelligkeit(optikMit({}), KLAR, 5, MOND);
+    const dunst = okularhelligkeit(optikMit({}), diesig, 5, MOND);
     expect(dunst.faktorObjekt).toBeCloseTo(klar.faktorObjekt * 0.4365, 10);
     expect(dunst.hintergrundMagProArcsec2).toBe(klar.hintergrundMagProArcsec2);
   });
-  it("Hintergrund relativ zu Quellweiss 3,4 mag: 10^(-0,4 (21,875 - 3,4))", () => {
-    const h = helligkeit(optikMit({}), KLAR, 8, MOND);
+  it("Hintergrund physikalisch relativ zu Quellweiss 3,4 mag: 10^(-0,4 (21,875 - 3,4))", () => {
+    const h = okularhelligkeit(optikMit({}), KLAR, 8, MOND);
     expect(h.hintergrundRelativ).toBeCloseTo(Math.pow(10, -0.4 * (h.hintergrundMagProArcsec2 - 3.4)), 12);
     expect(h.hintergrundRelativ).toBeCloseTo(4.07e-8, 10);
   });
@@ -68,5 +70,123 @@ describe("helligkeit: Schluessel", () => {
     const h3 = helligkeit(optikMit({}), KLAR, 6, MOND);
     expect(h2.schluessel).toBe(h1.schluessel);
     expect(h3.schluessel).not.toBe(h1.schluessel);
+  });
+});
+
+// Abbildung auf den Bildschirm, docs/recherche/physik.md Abschnitt 12 (Tabelle 12.4).
+describe("anzeigefaktor: Stevens-Potenz 1/3 relativ zu 3,35 mag/arcsec2", () => {
+  it("3,35 ist Weiss, 2,5 mag dunkler ist 10^(-1/3) = 0,4642, 7,5 mag dunkler ist 0,1", () => {
+    expect(anzeigefaktor(3.35)).toBeCloseTo(1, 12);
+    expect(anzeigefaktor(5.85)).toBeCloseTo(0.4642, 4);
+    expect(anzeigefaktor(10.85)).toBeCloseTo(0.1, 12);
+  });
+  it("heller als 3,35 bleibt 1 (keine Blendung, A-P9)", () => {
+    expect(anzeigefaktor(1.5)).toBe(1);
+  });
+  it("streng monoton fallend und verhaeltnistreu: Faktor 2 in der Leuchtdichte ist Faktor 2^(1/3) in der Anzeige", () => {
+    let vorher = Infinity;
+    for (let mu = 3.35; mu <= 26; mu += 0.25) {
+      const w = anzeigefaktor(mu);
+      expect(w).toBeLessThan(vorher);
+      expect(w).toBeGreaterThan(0);
+      vorher = w;
+    }
+    const dmag = 2.5 * Math.log10(2);
+    expect(anzeigefaktor(8 + dmag) / anzeigefaktor(8)).toBeCloseTo(Math.pow(2, -1 / 3), 12);
+    expect(anzeigefaktor(20 + dmag) / anzeigefaktor(20)).toBeCloseTo(Math.pow(2, -1 / 3), 12);
+  });
+  it("NaN ist ein Programmierfehler", () => {
+    expect(() => anzeigefaktor(Number.NaN)).toThrow(PhysikFehler);
+  });
+});
+
+describe("helligkeit: Naht-Werte sind Anzeigehelligkeiten", () => {
+  it("Quellweiss 3,4, AP 0,8 mm ohne Verluste: 7,775 mag/arcsec2, Anzeige 10^(-0,4/3 * 4,425) = 0,2570", () => {
+    const ok = okularhelligkeit(optikMit({}), KLAR, 5, MOND);
+    expect(ok.objektMagProArcsec2).toBeCloseTo(7.775, 3);
+    expect(helligkeit(optikMit({}), KLAR, 5, MOND).faktorObjekt).toBeCloseTo(0.257, 3);
+  });
+  it("Hintergrund ist anzeigefaktor der Himmelshelligkeit im Okular, die Magnitude bleibt physikalisch", () => {
+    const h = helligkeit(optikMit({}), KLAR, 8, MOND);
+    expect(h.hintergrundMagProArcsec2).toBeCloseTo(21.875, 3);
+    expect(h.hintergrundRelativ).toBeCloseTo(anzeigefaktor(h.hintergrundMagProArcsec2), 12);
+    expect(h.hintergrundRelativ).toBeCloseTo(0.003388, 6);
+  });
+});
+
+/** Mond mit dem Quellweiss aus daten/objekte.json (mond_ev, 3,35). */
+const MOND_EV: Objektzustand = { ...MOND, quelle: { ...MOND.quelle, weissMagProArcsec2: 3.35 } };
+/** Mars 14'' mit Quellweiss 4,1 (daten/objekte.json mars_14). */
+const MARS_14: Objektzustand = { kennung: "mars-14", durchmesserArcsec: 14, magnitude: -1, quelle: { breitePx: 1000, hoehePx: 1000, massstabArcsecProPx: 0.04, weissMagProArcsec2: 4.1 }, trabanten: [] };
+/** Mars 6'' mit Quellweiss 4,5 (daten/objekte.json mars_6), der dunkelste Zustand der Version 1. */
+const MARS_6: Objektzustand = { ...MARS_14, kennung: "mars-6", durchmesserArcsec: 6, quelle: { ...MARS_14.quelle, weissMagProArcsec2: 4.5 } };
+const AUGE: Auge = { art: "auge" };
+const FERNGLAS_10X50: Fernglas = { art: "fernglas", oeffnungMm: 50, vergroesserung: 10, wahresGesichtsfeldGrad: 6.5 };
+
+function konfig(geraet: Konfiguration["geraet"], objekt: Objektzustand, bortle = 5): Konfiguration {
+  return { geraet, objekt, bedingungen: { ...BEDINGUNGEN_A_D9, bortle } };
+}
+const anzeige = (k: Konfiguration) => auswerten(k, { anzeigePx: 256 }).parameter.helligkeit;
+/** sRGB-Kennlinie (IEC 61966-2-1) wie src/ui/zeichne.ts, nur um die Testwerte in 8 Bit zu nennen. */
+const srgb8 = (w: number) => Math.round(255 * (w <= 0.0031308 ? 12.92 * w : 1.055 * w ** (1 / 2.4) - 0.055));
+
+describe("helligkeit: Akzeptanz Issue #55 (Tabelle 12.4)", () => {
+  const ad9 = anzeige({ ...KONFIGURATION_A_D9, objekt: MOND_EV });
+  const fernglas = anzeige(konfig(FERNGLAS_10X50, MOND_EV));
+  const v200 = anzeige(konfig(refraktorMitVergroesserung(80, 200), MOND_EV));
+
+  it("A-D9: Quellweiss 0,3248 (sRGB 154) statt bisher 0,0343 (sRGB 52)", () => {
+    expect(ad9.faktorObjekt).toBeCloseTo(0.3248, 3);
+    expect(srgb8(ad9.faktorObjekt)).toBe(154);
+  });
+  it("Fernglas 10x50 0,7692 (sRGB 227) und 80 mm bei 200x 0,1456 (sRGB 106) bleiben unterscheidbar", () => {
+    expect(fernglas.faktorObjekt).toBeCloseTo(0.7692, 3);
+    expect(v200.faktorObjekt).toBeCloseTo(0.1456, 3);
+    expect(srgb8(fernglas.faktorObjekt) - srgb8(ad9.faktorObjekt)).toBeGreaterThan(40);
+    expect(srgb8(ad9.faktorObjekt) - srgb8(v200.faktorObjekt)).toBeGreaterThan(40);
+  });
+  it("Mond mit blossem Auge: 0,9169 (sRGB 245)", () => {
+    const auge = anzeige(konfig(AUGE, MOND_EV)).faktorObjekt;
+    expect(auge).toBeCloseTo(0.9169, 3);
+    expect(srgb8(auge)).toBe(245);
+  });
+  it("Mars 14'' an 80 mm bei 120x: 0,1625 (sRGB 112)", () => {
+    expect(anzeige(konfig(refraktorMitVergroesserung(80, 120), MARS_14)).faktorObjekt).toBeCloseTo(0.1625, 3);
+  });
+  it("monoton in der Austrittspupille: 80 mm von 400x bis 14x, Anzeige steigt bis AP 6 mm und bleibt dann", () => {
+    let vorher = 0;
+    for (const v of [400, 300, 200, 160, 120, 100, 80, 60, 40, 30, 20, 16, 13.4]) {
+      const f = anzeige(konfig(refraktorMitVergroesserung(80, v), MOND_EV)).faktorObjekt;
+      expect(f).toBeGreaterThan(vorher);
+      vorher = f;
+    }
+    const ap6 = anzeige(konfig(refraktorMitVergroesserung(80, 80 / 6), MOND_EV)).faktorObjekt;
+    const ap8 = anzeige(konfig(refraktorMitVergroesserung(80, 10), MOND_EV)).faktorObjekt;
+    expect(ap8).toBeCloseTo(ap6, 12);
+  });
+  it("Hintergrund nach Bortle: heller mit der Stufe, immer mindestens 20-mal dunkler als Quellweiss", () => {
+    for (const geraet of [FERNGLAS_10X50, refraktorMitVergroesserung(80, 60), refraktorMitVergroesserung(80, 200)]) {
+      for (const objekt of [MOND_EV, MARS_14]) {
+        let vorher = 0;
+        for (let b = 1; b <= 9; b++) {
+          const h = anzeige(konfig(geraet, objekt, b));
+          expect(h.hintergrundRelativ).toBeGreaterThan(vorher);
+          expect(h.hintergrundRelativ * 20).toBeLessThan(h.faktorObjekt);
+          vorher = h.hintergrundRelativ;
+        }
+      }
+    }
+  });
+  it("Grenzfall Mars 6'', Bortle 9, diesig, 10 Grad: Himmel 10,0 mag unter dem Objekt, Faktor 21,5 (physik.md 12.3)", () => {
+    for (const geraet of [AUGE, FERNGLAS_10X50, refraktorMitVergroesserung(80, 200)]) {
+      const k: Konfiguration = { geraet, objekt: MARS_6, bedingungen: { ...BEDINGUNGEN_A_D9, bortle: 9, transparenz: "diesig", hoeheGrad: 10 } };
+      const h = anzeige(k);
+      expect(h.faktorObjekt / h.hintergrundRelativ).toBeCloseTo(21.45, 1);
+      expect(h.hintergrundRelativ * 20).toBeLessThan(h.faktorObjekt);
+    }
+  });
+  it("Hintergrund Fernglas 10x50: Bortle 1 0,0028 (sRGB 9), Bortle 9 0,0127 (sRGB 30)", () => {
+    expect(anzeige(konfig(FERNGLAS_10X50, MOND_EV, 1)).hintergrundRelativ).toBeCloseTo(0.00282, 4);
+    expect(anzeige(konfig(FERNGLAS_10X50, MOND_EV, 9)).hintergrundRelativ).toBeCloseTo(0.0127, 4);
   });
 });

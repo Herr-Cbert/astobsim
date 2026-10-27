@@ -71,6 +71,19 @@ export const TRANSMISSION: Readonly<Record<Bauart | "fernglas" | "auge", number>
 /** Himmelshelligkeit in mag je Quadratbogensekunde fuer Bortle 1 bis 9, Index = Stufe - 1 (Abschnitt 6.1, Spalte "Vorschlag astobsim"; 8 und 9 geschaetzt). */
 export const BORTLE_MAG_PRO_ARCSEC2: readonly number[] = [21.9, 21.7, 21.4, 21.0, 20.0, 19.0, 18.3, 17.5, 17.0];
 
+/**
+ * Abbildung der Leuchtdichte auf den Bildschirm (Abschnitt 12): Flaechenhelligkeit im Okular in
+ * mag je Quadratbogensekunde, die als Bildschirmweiss erscheint. Vollmond ohne Verluste
+ * (docs/recherche/objekte.md 5.2, daten/objekte.json mond_ev), das hellste Objekt in Version 1.
+ */
+export const ANZEIGE_WEISS_MAG_PRO_ARCSEC2 = 3.35;
+
+/**
+ * Kompressionsexponent der Abbildung auf den Bildschirm (Abschnitt 12): Groessenordnung nach Stevens
+ * 1961 (Helligkeit eines 5-Grad-Felds 0,33, [53]), keine Gleichheit der Empfindung. Offen fuer Phase 6.
+ */
+export const KOMPRESSIONSEXPONENT = 1 / 3;
+
 /** Wortstufen des Seeings (A-B1). */
 export const SEEING_WORTSTUFEN = ["ausgezeichnet", "gut", "mittel", "schlecht"] as const;
 export type Seeingwortstufe = (typeof SEEING_WORTSTUFEN)[number];

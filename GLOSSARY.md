@@ -145,6 +145,10 @@ _Vermeiden_: Fehler (Fehler sind Programmierfehler oder kaputte Daten)
 Das Ergebnisbild: das Objekt im wahren Gesichtsfeld, gefaltet mit der Gesamt-PSF, in Helligkeit und Kontrast angepasst. Zeigt den typischen Langzeit-Anblick, nicht den besten Moment.
 _Vermeiden_: Simulation (ist der Vorgang), Ergebnis, Rendering
 
+**Anzeigehelligkeit**:
+Linearer Wert, mit dem bild ein Pixel zeichnet: 1 = Bildschirmweiss, vor der sRGB-Kodierung. physik bildet die Flaechenhelligkeit im Okular darauf ab (physik.md Abschnitt 12); `Helligkeit.faktorObjekt` ist die Anzeigehelligkeit von Quellweiss, `hintergrundRelativ` die des Himmels.
+_Vermeiden_: Anzeigewert (der Typ `Anzeigewerte` sind die Zahlen neben dem Bild), Tonwert (ist der Arbeitsschritt in bild)
+
 **Zoomansicht**:
 Vergroesserte Ansicht des Objekts im Anblick neben dem unverschlechterten Quellbild zum Vergleich.
 
@@ -153,6 +157,9 @@ Vergroesserte Ansicht des Objekts im Anblick neben dem unverschlechterten Quellb
 **Quellbild**:
 Die echte hochaufgeloeste Aufnahme eines Zustands (Raumsonde, Hubble) oder beim Mond das zugelassene NASA-Rendering, mit bekanntem Pixelmassstab und Nordrichtung.
 _Vermeiden_: Originalbild, Textur, Rohbild (Rohbild ist die unbearbeitete Datei vor der Aufbereitung)
+
+**Quellweiss**:
+Die Flaechenhelligkeit, die der Wert 1,0 (Weiss) im Quellbild eines Zustands bedeutet, in mag/arcsec² (`weissMagProArcsec2`, `daten/objekte.json`). Bezug aller linearen Helligkeiten im Quellbild und der Punktquellen.
 
 **Bildnachweis**:
 Der Datensatz zu jedem Quellbild: Quelle, Mission, Lizenz, Namensnennung, Pixelmassstab, Bearbeitung.
