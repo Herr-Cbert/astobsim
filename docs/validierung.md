@@ -1,0 +1,129 @@
+# Validierung (Phase 6)
+
+Ergebnis von Issue #21: die sechs Beobachtungs-Testfaelle T1 bis T6 (`docs/anforderungen.md` Abschnitt 8, A-Q2) am Bild der Anwendung geprueft, die Kontrastschwelle "erkennbar" daraus abgeleitet und als Tabellen-Test eingefroren (`src/physik/validierung.test.ts`).
+
+**Stand:** Urteile von Claude am 2026-10-27, von Herbert am 2026-10-27 freigegeben.
+
+## 1. Vorgehen
+
+- **Bilder:** `node scripts/validierung-bilder.mjs` nach `npm run build` (Chrome headless, SwiftShader, devicePixelRatio 2). Je Fall die Uebersicht (Gesichtsfeld) und die Zoomansicht (links Anblick, rechts Quellbild) unter `docs/validierung/`. Das Fenster ist 1400 x 1000 CSS-Pixel; der Zoom zeigt dann 270 CSS-Pixel je Bild.
+- **Konfigurationen:** freie Refraktoren ohne Obstruktion, damit Bild und Tabellen-Test dieselbe Optik haben; Bortle 5, klar, Hoehe 90 Grad (das Seeing gilt nur im Zenit ohne Hoehenfaktor X^0,6). Die Brennweite ist frei gewaehlt, sie wirkt nur ueber die Vergroesserung.
+- **Urteil:** erfuellt, teilweise oder nicht, gegen die Erwartung aus A-Q2 und die Zahlen in `docs/recherche/objekte.md` Abschnitt 4. Zusaetzlich zum Augenschein Helligkeitsprofile durch die Screenshots.
+- **Masszahl:** die Delle eines Stufenprofils nach der Faltung mit dem Kern (`profilDelle`, `docs/recherche/physik.md` 8.1; Profile in `objekte.md` 4.6). Abweichung vom Issue-Text, der die MTF bei der Periode 2 x Strukturbreite vorsah: die MTF trennt eine einzelne schmale Linie (Cassini-Teilung) nicht von flaechigem Detail, und die zuerst gewaehlte Balkenantwort mal Objektkontrast kennt die Umgebung der Struktur nicht (begruendet in physik.md 8.1). Entschieden mit Herbert am 2026-10-27.
+- **Was eingefroren wird:** was das Bild zeigt, nicht die Beobachtungserfahrung. Weicht das Bild von der Erwartung ab, steht die Abweichung in Abschnitt 4 und wird ein Issue (A-Q2), keine stille Korrektur.
+
+URL-Basis aller Faelle: `https://herr-cbert.github.io/astobsim/`, dahinter der Suchteil aus der Tabelle (Kurzform `R(D, f, ok)` = `a=fernrohr&ba=refraktor&d=D&f=f&o=0&ok=ok&sg=50`, `B` = `b=5&t=klar&h=90`).
+
+## 2. Testfaelle
+
+| Fall | Suchteil | Gesamt-FWHM | Delle | Bild |
+|---|---|---|---|---|
+| T1 | `?v=1&R(70,700,7)&z=jup_47&s=2&B` | 2,67'' | Baender 0,142 | [Uebersicht](validierung/T1-uebersicht.png), [Zoom](validierung/T1-zoom.png) |
+| T2a | `?v=1&R(100,1200,8)&z=sat_20&s=1.5&B` | 1,94'' | Cassini 0,000 | [Uebersicht](validierung/T2a-uebersicht.png), [Zoom](validierung/T2a-zoom.png) |
+| T2b | `?v=1&R(60,600,6)&z=sat_20&s=1.5&B` | 2,53'' | Cassini 0,000 | [Uebersicht](validierung/T2b-uebersicht.png), [Zoom](validierung/T2b-zoom.png) |
+| T3 | `?v=1&R(80,800,8)&z=mond_ev&s=2&B` | 2,55'' | Krater 0,549, Hadley 0,058 | [Uebersicht](validierung/T3-uebersicht.png), [Zoom](validierung/T3-zoom.png) |
+| T4a | `?v=1&R(300,3000,15)&z=jup_47&s=3&B` | 3,04'' | Detail 1,5'' 0,066 | [Uebersicht](validierung/T4a-uebersicht.png), [Zoom](validierung/T4a-zoom.png) |
+| T4b | `?v=1&R(100,1000,5)&z=jup_47&s=3&B` | 3,23'' | 0,061 | [Uebersicht](validierung/T4b-uebersicht.png), [Zoom](validierung/T4b-zoom.png) |
+| T4c | `?v=1&R(300,3000,15)&z=jup_47&s=1&B` | 1,11'' | 0,139 | [Uebersicht](validierung/T4c-uebersicht.png), [Zoom](validierung/T4c-zoom.png) |
+| T4d | `?v=1&R(100,1000,5)&z=jup_47&s=1&B` | 1,57'' | 0,112 | [Uebersicht](validierung/T4d-uebersicht.png), [Zoom](validierung/T4d-zoom.png) |
+| T5a | `?v=1&R(150,1200,6)&z=mars_14&s=1.5&B` | 1,72'' | Syrtis 0,429 | [Uebersicht](validierung/T5a-uebersicht.png), [Zoom](validierung/T5a-zoom.png) |
+| T5b | `?v=1&R(80,960,8)&z=mars_6&s=1.5&B` | 2,15'' | Syrtis 0,060 | [Uebersicht](validierung/T5b-uebersicht.png), [Zoom](validierung/T5b-zoom.png) |
+| T6a | `?v=1&g=auge&z=mond_ev&s=2&B` | 63,1'' | Mare 0,398 | [Uebersicht](validierung/T6a-uebersicht.png), [Zoom](validierung/T6a-zoom.png) |
+| T6b | `?v=1&g=auge&z=jup_47&s=2&B` | 63,1'' | - | [Uebersicht](validierung/T6b-uebersicht.png), [Zoom](validierung/T6b-zoom.png) |
+| T6c | `?v=1&g=fernglas-10x50&z=jup_47&s=2&B` | 6,74'' | Baender 0,080 | [Uebersicht](validierung/T6c-uebersicht.png), [Zoom](validierung/T6c-zoom.png) |
+
+T5b mit Seeing 1,5'' ist eine Annahme (A-Q2 nennt fuer Mars 6'' kein Seeing); fuer T4 ist die Vergroesserung 200-fach gewaehlt, fuer T5b 120-fach (1,5 D).
+
+### T1: Jupiter 47'', 70 mm, 100-fach, Seeing 2''
+
+Erwartung: zwei dunkle Aequatorbaender erkennbar, Grosser Roter Fleck (GRF) nur als Andeutung.
+
+Bild: das nordliche Band ist klar, das suedliche schwaecher (Profil am Zentralmeridian: Dellen etwa 10 % und 5 % im Anzeigewert). Der GRF ist ein deutlicher roetlicher Fleck, mehr als eine Andeutung. Das Quellbild (Hubble, OPAL) ist kontrastreicher als die visuelle Photometrie: Baender etwa 0,7 der Zonenhelligkeit gegen 0,82 bei Orton (objekte.md 4.6), der GRF kraeftig orange.
+
+**Urteil: teilweise.** Baender erfuellt, GRF zu deutlich. Abweichung 4 (#79).
+
+### T2: Saturn 20'', Seeing 1,5'', 100 mm bei 150-fach gegen 60 mm bei 100-fach
+
+Erwartung: Cassini-Teilung bei 100 mm an den Ringenden erkennbar, bei 60 mm nicht.
+
+Bild: bei beiden Oeffnungen keine Teilung. Im Profil quer durch die Anse steigt die Helligkeit vom A-Ring zum B-Ring stetig an, ohne Minimum; der A-Ring ist schmal (2,4'') und halb so hell wie der aeussere B-Ring, die Delle der 0,76'' breiten Teilung geht in dieser Flanke unter. 60 mm erfuellt die Erwartung, 100 mm nicht.
+
+**Urteil: nicht erfuellt** (100 mm). Abweichung 1 (#76).
+
+### T3: Mond, 80 mm, 100-fach, Seeing 2''
+
+Erwartung: Krater ab etwa 4 km Durchmesser am Terminator erkennbar, Rillen (Hadley-Rille) nicht.
+
+Bild: am Terminator sind viele kleine Krater zu sehen, die kleinsten deutlich erkennbaren bei etwa 8 bis 10 km; keine Rillen. Die Grenze von 4 km (2,15'') ist im Bild nicht pruefbar: der Mond-Zoom zeigt etwa 900'' auf 535 Anzeigepixeln (1,7''/px), groeber als der Arbeitsmassstab (1,0''/px) und als die Gesamt-PSF; auch das Quellbild daneben zeigt bei diesem Massstab keine 4-km-Krater. Die Delle (Kraterschatten 0,549, Hadley 0,058) sagt: erkennbar bzw. nicht.
+
+**Urteil: teilweise** (Rillen erfuellt, Kratergrenze im Bild nicht pruefbar). Abweichung 2 (#77).
+
+### T4: Jupiter, 300 mm gegen 100 mm bei 200-fach, Seeing 3'' und 1''
+
+Erwartung: bei 3'' zeigt der 300 mm kaum mehr Detail als der 100 mm, ist nur heller; bei 1'' ist der Unterschied deutlich.
+
+Bild: bei 3'' sehen beide gleich aus (Baenderprofil: Dellen 7 % und 6 %), der 300 mm ist heller (Leuchtdichte neunfach, Anzeigewert 9^(1/3) = 2,08-fach). Bei 1'' zeigt der 300 mm Festons am Nordrand der EZ, weisse Ovale suedlich des GRF und die Struktur im NEB; der 100 mm zeigt die Baender und den GRF, feines Detail kaum.
+
+**Urteil: erfuellt.**
+
+### T5: Mars 14'', 150 mm, 200-fach, Seeing 1,5''; Mars 6'', 80 mm
+
+Erwartung: bei 14'' Polkappe und Syrtis Major als dunkle Struktur erkennbar; bei 6'' im 80 mm nur ein Scheibchen mit angedeuteter Polkappe.
+
+Bild: bei 14'' sind die dunklen Gebiete als schwache Strukturen zu sehen, bei 6'' nur ein Scheibchen. Eine Polkappe fehlt in beiden Bildern; schon das Quellbild (Hubble 2016-05-12, auch fuer mars_6) zeigt keine abgegrenzte Kappe, nur blaeuliche Randwolken.
+
+**Urteil: teilweise** (dunkle Strukturen und Scheibchen erfuellt, Polkappe nicht pruefbar). Abweichung 3 (#78).
+
+### T6: Mond und Jupiter mit blossem Auge, Jupiter im 10x50
+
+Erwartung: Mond mit Mare als Flecken, keine Krater; Jupiter mit blossem Auge ein Punkt; im 10x50 ein winziges Scheibchen mit zwei bis vier Monden in einer Linie, keine Baender.
+
+Bild: Mond mit klaren Mare-Flecken, keine Krater (T6a). Jupiter mit blossem Auge ein Punkt ohne Monde, die Blendungsregel unterdrueckt alle vier (T6b). Im 10x50 ein Scheibchen von etwa zwei Anzeigepixeln mit vier Monden in einer Linie, im Anzeigewert 49 bis 59 gegen den Himmel 16 (sRGB, linear etwa zehnfach); im Zoom ein schwacher Hauch des NEB (Delle 0,080, unter der Schwelle). Gesichtsfeld beim blossen Auge rechteckig.
+
+**Urteil: erfuellt.**
+
+## 3. Kontrastschwelle "erkennbar"
+
+| Delle | Fall und Struktur | im Bild |
+|---|---|---|
+| 0,549 | T3 Kraterschatten 4 km | erkennbar (aus der Delle, im Bild nicht pruefbar) |
+| 0,429 | T5a Syrtis Major 14'' | erkennbar |
+| 0,398 | T6a Mare, blosses Auge | erkennbar |
+| 0,142 | T1 Baender 70 mm | erkennbar |
+| 0,139 | T4c Detail 1,5'', 300 mm, 1'' | erkennbar |
+| 0,112 | T4d Detail 1,5'', 100 mm, 1'' | nicht (Herbert, 2026-10-27: "kaum" zaehlt als nicht) |
+| 0,080 | T6c Baender 10x50 | nicht |
+| 0,066 / 0,061 | T4a / T4b Detail 1,5'' bei 3'' | nicht |
+| 0,060 | T5b Syrtis Major 6'' | nicht |
+| 0,058 | T3 Hadley-Rille | nicht |
+| 0,000 | T2a / T2b Cassini-Teilung | nicht |
+
+Zulaessig ist jede Schwelle zwischen 0,112 und 0,139. **`SCHWELLE_ERKENNBAR` = 0,125** (geometrisches Mittel, `src/physik/konstanten.ts`). Der Abstand zu beiden Seiten ist etwa 10 %; die Tabellen-Tests werden also bei einer Modellaenderung rot, die eine Delle um mehr als etwa 10 % verschiebt. Gegenprobe: mit 0,25 schlagen T1 und T4c fehl, mit 0,0625 T4a, T4d und T6c.
+
+Die Schwelle ist eine Kalibrierkonstante fuer die Tests, keine Physik: das Bild haengt nicht davon ab. Sie gilt fuer die Delle im linearen Leuchtdichteprofil; die Anzeige komprimiert das Niveau mit dem Exponenten 1/3, nicht den Kontrast innerhalb des Objekts (physik.md 12.3).
+
+## 4. Abweichungen
+
+Als Issues angelegt am 2026-10-27, Milestone M3 (Herbert, 2026-10-27):
+
+1. **#76, T2: Cassini-Teilung bei 100 mm und Seeing 1,5'' nicht sichtbar.** Das Modell faltet mit dem Langzeit-Seeing (Moffat mit voller FWHM); Beobachter sehen die Teilung in Momenten ruhiger Luft. Zu klaeren, ob die Erwartung fuer Langzeit-Seeing zu optimistisch ist oder ob das Seeing-Modell fuer visuelle Beobachtung zu streng ist. Bezug: #29 (Kann: Umschalter ruhiger Moment), physik.md 2.
+2. **#77, T3: Mond-Zoom zu grob fuer die Aufloesungsgrenze.** Der Zoom zeigt beim Mond das halbe Gesichtsfeld (`ZOOM_ANTEIL_GESICHTSFELD_MAX`); bei 80 mm und 100-fach sind das etwa 1,7'' je Anzeigepixel, die Optik loest etwa 1'' je Arbeitspixel auf. Die Grenze von A-Q2 (Krater ab 4 km) ist so nicht zu sehen. Vorschlag: zweite Zoomstufe oder Zoom bis zum Arbeitsmassstab.
+3. **#78, T5: Mars-Quellbild ohne Polkappe.** Hubble 2016-05-12 (mars_14 und mars_6) zeigt keine abgegrenzte Kappe; "Polkappe erkennbar" ist damit nicht pruefbar. Vorschlag: anderes Bild fuer die Aphel-Opposition (Nordfruehling, grosse Nordkappe, objekte.md 4.4).
+4. **#79, T1: Quellbild Jupiter kontrastreicher als visuell.** Baender etwa 0,7 statt 0,82 der Zonenhelligkeit (Orton [56]), GRF kraeftig orange; der GRF erscheint im 70 mm deutlich statt angedeutet. Vorschlag: Kontrast und Farbsaettigung des Quellbilds in `tools/` an die Photometrie angleichen, oder die Erwartung begruenden.
+
+## 5. Pruefpunkte aus Welle 4a
+
+- **Trabantenhelligkeit haengt am Arbeitsmassstab** (physik.md 14.7 Punkt 1, Anzeige proportional s^(-2/3)): im 10x50 sind die vier Monde deutlich sichtbar (49 bis 59 gegen 16), in T1 (70 mm) 58 bis 69 gegen 5. Plausibel; die Monde liegen in keinem der Zoomausschnitte, der Unterschied Zoom gegen Uebersicht ist hier nicht zu sehen. Kein Issue.
+- **Mondmagnitude** (objekte.md 7.16): mond_ev hat -10,2 mag, Krisciunas und Schaefer geben fuer den Phasenwinkel 78,5 Grad -10,54. Der Unterschied ist Leuchtdichte 1,37-fach, im Anzeigewert 1,11-fach. In T3 und T6a wirkt der Mond weder zu hell noch zu dunkel; das Bild entscheidet die 0,34 mag nicht. Kein Issue, die Werte bleiben.
+- **Exponent 1/3 fuer Punktquellen** statt Stevens 0,5 (physik.md 14.7 Punkt 2): die Galileischen Monde sind im 70 mm und im 10x50 leicht zu sehen, wie in der Beobachtungserfahrung; mit 0,5 waeren sie dunkler, aber noch sichtbar. Kein Anlass zu aendern. Kein Issue.
+
+- **Anzeigeweiss und Kompressionsexponent** (physik.md 12.5 Punkte 3 und 5, ADR-0002): der Mond ist mit blossem Auge heller (sRGB etwa 99) als im 80 mm bei 100-fach (etwa 46, Austrittspupille 0,8 mm), wie es A-P4 verlangt; kein Bild ist ausgebrannt oder unlesbar dunkel. Beibehalten, kein Issue.
+- **Schleier des Himmels** (physik.md 12.5 Punkt 4): nicht sichtbar. Die Nachtseite des Mondes ist in T3 so dunkel wie der Himmel (sRGB 6), der Himmel beim blossen Auge ein mittleres Grau (18) wie bei Bortle 5 zu erwarten. Kein Issue.
+
+## 6. Pruefung
+
+| Wer | Wann | Ergebnis |
+|---|---|---|
+| Claude | 2026-10-27 | Urteile wie oben |
+| Herbert | 2026-10-27 | Urteile wie oben |
+

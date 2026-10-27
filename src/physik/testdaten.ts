@@ -83,3 +83,24 @@ export const SATURN_20: Objektzustand = {
     { name: "Rhea", dxArcsec: -60, dyArcsec: 20.7, durchmesserArcsec: 0.25, magnitude: 9.5 }
   ]
 };
+
+/**
+ * Mars 14'' und 6'' ohne Trabanten, Objektwerte aus daten/objekte.json (mars_14, mars_6). Quelle
+ * wie in der Anwendung: Bild mars_hst_20160512 (960 px, Scheibe 900 px) auf die Winkelgroesse
+ * des Zustands skaliert, also 14/900 bzw. 6/900 ''/px.
+ */
+export const MARS_14: Objektzustand = {
+  kennung: "mars_14",
+  durchmesserArcsec: 14,
+  magnitude: -1.4,
+  quelle: { breitePx: 960, hoehePx: 960, massstabArcsecProPx: 14 / 900, weissMagProArcsec2: 2.54 },
+  trabanten: []
+};
+
+export const MARS_6: Objektzustand = {
+  kennung: "mars_6",
+  durchmesserArcsec: 6,
+  magnitude: 1.0,
+  quelle: { breitePx: 960, hoehePx: 960, massstabArcsecProPx: 6 / 900, weissMagProArcsec2: 3.1 },
+  trabanten: []
+};

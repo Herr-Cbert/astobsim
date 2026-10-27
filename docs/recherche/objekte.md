@@ -247,6 +247,22 @@ Albedo/optische Tiefe aus dem Fact Sheet [5]: B-Ring optische Tiefe 0,4 bis 2,5,
 - Jupiter mit blossem Auge: 47" = 0,78' < 1' -> Punkt; Magnitude -2,7 [66]. Die Monde (Ganymed 4,6 mag) stehen 2,3' bis 10,3' vom Planeten, werden aber durch Blendung ueberstrahlt (A-P4 begrenzt Helligkeit, Blendung wird nicht simuliert, A-P9); astobsim muss die Monde beim blossen Auge also entweder unterdruecken oder als nicht sichtbar begruenden (siehe "Unsicher").
 - Jupiter im 10x50: Scheibe 47" * 10 = 7,8' scheinbar -> "winziges Scheibchen". Monde bei 10-fach: Io 1,8' (scheinbar 18'), Europa 2,9', Ganymed 5,5', Kallisto 8,7' vom Planeten; Baender 3,5" * 10 = 35" scheinbar, unter der Augengrenze (1') -> "keine Baender" erfuellt.
 
+### 4.6 Profile fuer die Tabellen-Tests (Issue #21)
+
+Die Tabellen-Tests (`src/physik/validierung.test.ts`) falten je Testfall ein Stufenprofil quer zur Struktur mit dem Kern und messen die Delle (`profilDelle`, `physik.md` 8.1). Geometrie aus 4.1 bis 4.5; Helligkeiten aus der Literatur, wo es sie gibt, sonst aus dem Quellbild (`tools/strukturprofile.py`, linear wie die Anwendung) oder als Annahme gekennzeichnet. Helligkeiten relativ zur Umgebung.
+
+| Fall | Profil | Helligkeiten | Herkunft |
+|---|---|---|---|
+| T1, T6c | Jupiter am Zentralmeridian: NEB 2,3 bis 5,7'' N, SEB 2,7 bis 6,4'' S (47'') | Zonen 1, Baender 0,82 | Orton [56] (0,62/0,76); das Quellbild ist kontrastreicher (Baender etwa 0,7, Hubble-Verarbeitung), der Test bleibt bei der Literatur |
+| T2 | Saturn 20'', radial durch die Anse, Radius 10'': C-Ring 1,236 bis 1,526 R, B innen bis 1,75, B aussen bis 1,950, Cassini bis 2,025, A innen bis 2,10, A aussen bis 2,269 | 0,03 / 0,53 / 1 / 0,06 / 0,50 / 0,21, Himmel 0 | Quellbild sat_20 (beide Ansen, relativ zum aeusseren B-Ring); Zonen nach 4.2 |
+| T3 | Kraterschatten 4 km = 2,15'' | Schatten 0 in 1 | 4.3 (Schattenkontrast nahe 1) |
+| T3 | Hadley-Rille 0,64'' | 0,7 in 1 | Annahme (4.3: "Kontrast viel geringer", nur ein Schattenrand); das Quellbild loest die Rille mit 0,64''/px nicht auf |
+| T4 | Detail 1,5'' auf Jupiter (Festons, Ovale) | 0,82 in 1 | Annahme: Groesse aus dem Quellbild geschaetzt, Kontrast wie die Baender |
+| T5 | Mars-Scheibe 14'' bzw. 6'' mit Syrtis Major 2,1'' bzw. 0,9'' in der Mitte | Scheibe 1, Syrtis 0,41, Himmel 0 | Quellbild mars_14 (Perzentil 10 gegen 70 im inneren Scheibenbereich: 0,141/0,341); Literatur 4.4: etwa 0,45 |
+| T6a | Mare 5' = 300'' | 0,6 in 1 | Annahme aus den Albedos in 2.3 (Mare 0,07 bis 0,10 gegen Hochland 0,11 bis 0,18) |
+
+Die Polkappe (T5) hat kein Profil: das Quellbild (Hubble 2016-05-12) zeigt keine abgegrenzte Kappe, siehe `docs/validierung.md`.
+
 ## 5. Magnituden und Flaechenhelligkeiten
 
 ### 5.1 Magnituden (Mallama und Hilton 2018 [66])

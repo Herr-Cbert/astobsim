@@ -7,7 +7,7 @@ import { airyRadiusArcsec, lambdaDurchDArcsec, mtfPupille } from "./beugung";
 import { PhysikFehler } from "./fehler";
 import type { Bedingungen, Geraet, Objektzustand } from "../naht/konfiguration";
 import { ARCSEC_PRO_GRAD, AUGE_GESICHTSFELD_GRAD, KERN_GROESSE_MAX } from "./konstanten";
-import { baueKern, kernFwhmArcsec, kontrastUebertragung } from "./kern";
+import { baueKern, kernFwhmArcsec, kontrastUebertragung, profilDelle } from "./kern";
 import { optik } from "./optik";
 import { quadratur } from "./profile";
 import { BEDINGUNGEN_A_D9, fenster, JUPITER_QUELLE, MOND_QUELLE, refraktorMitVergroesserung, zenit } from "./testdaten";
@@ -220,6 +220,71 @@ describe("Testhelfer kontrastUebertragung und kernFwhmArcsec", () => {
     expect(() => kontrastUebertragung(kern, 0)).toThrow(PhysikFehler);
     expect(() => kontrastUebertragung(kern, -1)).toThrow(PhysikFehler);
     expect(() => kontrastUebertragung(kern, Number.NaN)).toThrow(PhysikFehler);
+  });
+});
+
+/** Synthetischer Gauss-Kern mit sigma in Pixeln, 1''/px, Radius 4 sigma, auf Summe 1 normiert. */
+function gaussKern(sigmaPx: number): Kern {
+  const radius = Math.ceil(4 * sigmaPx);
+  const groesse = 2 * radius + 1;
+  const daten = new Float32Array(groesse * groesse);
+  let summe = 0;
+  for (let y = 0; y < groesse; y++) {
+    for (let x = 0; x < groesse; x++) {
+      const wert = Math.exp(-((x - radius) ** 2 + (y - radius) ** 2) / (2 * sigmaPx ** 2));
+      daten[y * groesse + x] = wert;
+      summe += wert;
+    }
+  }
+  for (let i = 0; i < daten.length; i++) daten[i]! /= summe;
+  return { schluessel: "gauss", beschreibung: beschreibung(100, 0, 1, 1, 1), groesse, radius, massstabArcsecProPx: 1, daten };
+}
+
+describe("Testhelfer profilDelle (physik.md Abschnitt 8.1)", () => {
+  /** Ein Balken der Breite b um 0 mit Helligkeit h in der Umgebung 1. */
+  const balken = (b: number, h: number) => [{ vonArcsec: -b / 2, bisArcsec: b / 2, helligkeit: h }];
+
+  it("Delta-Kern: die Delle ist der Objektkontrast", () => {
+    const kern = baueKern(SUB_PIXEL);
+    expect(profilDelle(kern, balken(140, 0.4), 1, -100, 100)).toBeCloseTo(0.6, 2);
+  });
+  it("Gauss-Kern: Balken 2 sigma breit mit Kontrast C gibt C erf(1/sqrt(2)) = 0,683 C", () => {
+    const kern = gaussKern(3);
+    expect(profilDelle(kern, balken(6, 0), 1, -5, 5)).toBeCloseTo(0.6827, 2);
+    expect(profilDelle(kern, balken(6, 0.5), 1, -5, 5)).toBeCloseTo(0.3413, 2);
+    expect(profilDelle(kern, balken(12, 0), 1, -5, 5)).toBeCloseTo(0.9545, 2);
+  });
+  it("Treppe ohne lokales Minimum gibt 0, auch wenn die dunkle Stufe schmal ist", () => {
+    const kern = gaussKern(3);
+    const treppe = [
+      { vonArcsec: 0, bisArcsec: 2, helligkeit: 0.3 },
+      { vonArcsec: 2, bisArcsec: 20, helligkeit: 1 }
+    ];
+    expect(profilDelle(kern, treppe, 0, 1, 15)).toBe(0);
+  });
+  it("die Delle misst gegen das kleinere Nachbarmaximum: Linie zwischen hellem und dunklem Streifen", () => {
+    const kern = gaussKern(1);
+    const stufen = [
+      { vonArcsec: -10, bisArcsec: 0, helligkeit: 1 },
+      { vonArcsec: 0, bisArcsec: 2, helligkeit: 0 },
+      { vonArcsec: 2, bisArcsec: 12, helligkeit: 0.5 }
+    ];
+    // Ohne Faltung waere es 1 - 0 / 0,5; mit sigma 1'' bleibt eine deutliche, aber flachere Delle.
+    const delle = profilDelle(kern, stufen, 0, -5, 7);
+    expect(delle).toBeGreaterThan(0.3);
+    expect(delle).toBeLessThan(1);
+  });
+  it("wirft PhysikFehler bei leerem Suchbereich, leerer oder ueberlappender Stufe und nicht endlichen Werten", () => {
+    const kern = gaussKern(1);
+    expect(() => profilDelle(kern, balken(2, 0), 1, 1, 1)).toThrow(PhysikFehler);
+    expect(() => profilDelle(kern, balken(2, 0), Number.NaN, -1, 1)).toThrow(PhysikFehler);
+    expect(() => profilDelle(kern, [{ vonArcsec: 1, bisArcsec: 1, helligkeit: 0 }], 1, -1, 1)).toThrow(PhysikFehler);
+    expect(() => profilDelle(kern, [{ vonArcsec: 0, bisArcsec: 1, helligkeit: Number.NaN }], 1, -1, 1)).toThrow(PhysikFehler);
+    const ueberlappend = [
+      { vonArcsec: 0, bisArcsec: 2, helligkeit: 0 },
+      { vonArcsec: 1, bisArcsec: 3, helligkeit: 0 }
+    ];
+    expect(() => profilDelle(kern, ueberlappend, 1, -1, 4)).toThrow(PhysikFehler);
   });
 });
 

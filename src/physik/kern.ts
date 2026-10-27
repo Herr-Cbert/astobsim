@@ -199,6 +199,82 @@ export function kontrastUebertragung(kern: Kern, periodeArcsec: number): number 
   return Math.min(1, Math.abs(summe));
 }
 
+/** Abschnitt eines eindimensionalen Helligkeitsprofils fuer profilDelle: [von, bis) mit Helligkeit relativ. */
+export interface Profilstufe {
+  vonArcsec: number;
+  bisArcsec: number;
+  helligkeit: number;
+}
+
+/** Abtastung des gefalteten Profils je Arbeitspixel in profilDelle. */
+const PROFIL_ABTASTUNG = 8;
+
+/**
+ * Test-Helfer: tiefste Delle eines eindimensionalen Helligkeitsprofils nach der Faltung mit dem
+ * Kern (physik.md Abschnitt 8.1). Das Profil ist stueckweise konstant, stufen ohne Ueberlappung,
+ * ausserhalb gilt grund. Gefaltet wird mit der Linienbildfunktion (Spaltensummen des Kerns, jeder
+ * Arbeitspixel als Kasten), abgetastet in Achtelpixeln. Die Delle eines lokalen Minimums an x im
+ * Suchbereich ist 1 - Minimum / kleineres der hoechsten Maxima links und rechts davon; ohne
+ * lokales Minimum 0. Ein dunkler Balken der Breite b mit Kontrast C in gleichmaessiger Umgebung
+ * ergibt C mal den Anteil der Linienbildfunktion in |x| <= b/2. Der Suchbereich darf keinen
+ * flachen Grund zwischen hoeheren Flanken enthalten (etwa den Himmel neben einer Scheibe), sonst
+ * zaehlt der als Delle.
+ */
+export function profilDelle(kern: Kern, stufen: readonly Profilstufe[], grund: number, sucheVonArcsec: number, sucheBisArcsec: number): number {
+  if (!(sucheVonArcsec < sucheBisArcsec)) {
+    throw new PhysikFehler("profilDelle.sucheBisArcsec", sucheBisArcsec, `ist nicht groesser als sucheVonArcsec ${sucheVonArcsec}`);
+  }
+  if (!Number.isFinite(grund)) throw new PhysikFehler("profilDelle.grund", grund, "ist nicht endlich");
+  const sortiert = [...stufen].sort((x, y) => x.vonArcsec - y.vonArcsec);
+  sortiert.forEach((st, i) => {
+    if (!(st.vonArcsec < st.bisArcsec) || !Number.isFinite(st.bisArcsec - st.vonArcsec)) {
+      throw new PhysikFehler(`profilDelle.stufen[${i}].bisArcsec`, st.bisArcsec, "ist nicht groesser als vonArcsec");
+    }
+    if (!Number.isFinite(st.helligkeit)) throw new PhysikFehler(`profilDelle.stufen[${i}].helligkeit`, st.helligkeit, "ist nicht endlich");
+    if (i > 0 && st.vonArcsec < sortiert[i - 1]!.bisArcsec) throw new PhysikFehler(`profilDelle.stufen[${i}].vonArcsec`, st.vonArcsec, "ueberlappt die vorige Stufe");
+  });
+
+  const { groesse, radius, massstabArcsecProPx: s, daten } = kern;
+  const lsf = new Float64Array(groesse);
+  for (let x = 0; x < groesse; x++) for (let y = 0; y < groesse; y++) lsf[x]! += daten[y * groesse + x]!;
+  /** Mittel des Profils ueber [a, b]. */
+  const mittel = (a: number, b: number): number => {
+    let integral = grund * (b - a);
+    for (const st of sortiert) integral += (st.helligkeit - grund) * Math.max(0, Math.min(b, st.bisArcsec) - Math.max(a, st.vonArcsec));
+    return integral / (b - a);
+  };
+  const rand = (radius + 1) * s;
+  const von = Math.min(sucheVonArcsec, ...sortiert.map((st) => st.vonArcsec)) - rand;
+  const bis = Math.max(sucheBisArcsec, ...sortiert.map((st) => st.bisArcsec)) + rand;
+  const schritt = s / PROFIL_ABTASTUNG;
+  const anzahl = Math.floor((bis - von) / schritt) + 1;
+  const werte = new Float64Array(anzahl);
+  for (let k = 0; k < anzahl; k++) {
+    const x = von + k * schritt;
+    let summe = 0;
+    for (let i = 0; i < groesse; i++) {
+      const mitte = x - (i - radius) * s;
+      summe += lsf[i]! * mittel(mitte - s / 2, mitte + s / 2);
+    }
+    werte[k] = summe;
+  }
+
+  // Hoechstes Maximum links und rechts jeder Stelle, damit die Delle in einem Durchlauf entsteht.
+  const linksMax = new Float64Array(anzahl);
+  const rechtsMax = new Float64Array(anzahl);
+  for (let k = 1; k < anzahl; k++) linksMax[k] = Math.max(linksMax[k - 1]!, werte[k - 1]!);
+  for (let k = anzahl - 2; k >= 0; k--) rechtsMax[k] = Math.max(rechtsMax[k + 1]!, werte[k + 1]!);
+  let delle = 0;
+  for (let k = 1; k < anzahl - 1; k++) {
+    const x = von + k * schritt;
+    if (x < sucheVonArcsec || x > sucheBisArcsec) continue;
+    if (werte[k]! > werte[k - 1]! || werte[k]! > werte[k + 1]!) continue;
+    const nachbar = Math.min(linksMax[k]!, rechtsMax[k]!);
+    if (nachbar > 0) delle = Math.max(delle, 1 - werte[k]! / nachbar);
+  }
+  return delle;
+}
+
 /**
  * Test-Helfer: Halbwertsbreite des gebauten Kerns in Bogensekunden. Radiales Profil aus allen
  * Pixeln (Mittel je Abstand vom Zentrum), erster Abstand, an dem es unter die halbe Mitte faellt,

@@ -225,7 +225,7 @@ describe("auswerten: Fehlerfaelle sind Programmierfehler", () => {
 
 describe("physik/index.ts", () => {
   it("exportiert Stufe 0 bis 3 und die Testhelfer", () => {
-    for (const name of ["rayleighArcsec", "luftmasse", "optik", "atmosphaere", "aufloesung", "helligkeit", "arbeitsmassstab", "kernbeschreibung", "begrenze", "baueKern", "auswerten", "kontrastUebertragung", "kernFwhmArcsec", "punktquellen"]) {
+    for (const name of ["rayleighArcsec", "luftmasse", "optik", "atmosphaere", "aufloesung", "helligkeit", "arbeitsmassstab", "kernbeschreibung", "begrenze", "baueKern", "auswerten", "kontrastUebertragung", "profilDelle", "kernFwhmArcsec", "punktquellen"]) {
       expect(typeof (physik as Record<string, unknown>)[name], name).toBe("function");
     }
   });

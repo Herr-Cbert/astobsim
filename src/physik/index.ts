@@ -57,5 +57,5 @@ export { anzeigefaktor, bortleMagProArcsec2, helligkeit, leuchtdichteRelativ, ty
 export { arbeitsmassstab, kernSchluessel, kernbeschreibung } from "./arbeitsmassstab";
 export { geblendet, helligkeitRelativ, punktquellen, scheibenFlaechenhelligkeit } from "./punktquellen";
 export { GRENZEN, type Grenze, type Hinweis, aufSchritt, begrenze } from "./begrenze";
-export { baueKern, kernFwhmArcsec, kontrastUebertragung } from "./kern";
+export { baueKern, kernFwhmArcsec, kontrastUebertragung, type Profilstufe, profilDelle } from "./kern";
 export { type Anzeigewerte, type Auswertoptionen, type Auswertung, type Warnung, auswerten } from "./auswerten";

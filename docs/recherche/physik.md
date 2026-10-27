@@ -345,6 +345,22 @@ Alle mit $\lambda$ = 550 nm, 1 rad = 206 264,8''.
 | Anzeige der Leuchtdichte (Issue #55) | $w(\mu) = \min(1, 10^{-0{,}4(\mu - 3{,}35)/3})$ | Tabelle 12.4 (A-D9: 0,3248; Fernglas 10x50: 0,7692; 80 mm bei 200x: 0,1456) |
 | Trabanten (Issue #14) | $\mu = m + 2{,}5\log_{10}(\pi d^2/4)$, relativ $10^{-0{,}4(\mu - \mu_\mathrm{weiss})}$ | Tabelle 13.4 (Io 5,1336 mag/arcsec$^2$, 1,1656; Rhea 6,2274, 1,4094) |
 
+### 8.1 Testhelfer profilDelle (Issue #21)
+
+Die Tabellen-Tests der Validierung (`src/physik/validierung.test.ts`, `docs/validierung.md`) fragen, ob eine Struktur nach der Faltung noch als Delle im Helligkeitsverlauf steht. Ein Stufenprofil $p(x)$ quer zur Struktur (stueckweise konstant, aussen ein Grundwert) wird mit der Linienbildfunktion des Kerns gefaltet; das Bild einer in $y$ ausgedehnten Struktur ist die eindimensionale Faltung mit der LSF [61]:
+
+$$\mathrm{LSF}(x) = \int \mathrm{PSF}(x, y)\,dy, \qquad g(x) = (p * \mathrm{LSF})(x).$$
+
+Im diskreten Kern ist die LSF die Spaltensumme; jeder Arbeitspixel zaehlt als Kasten seiner Breite, $g$ wird in Achtelpixeln abgetastet. Die Delle eines lokalen Minimums an $x_0$ ist
+
+$$\delta = 1 - \frac{g(x_0)}{\min(\max_{x<x_0} g,\ \max_{x>x_0} g)},$$
+
+gesucht nur in einem vom Aufrufer genannten Bereich (der flache Himmel neben einer Scheibe waere sonst eine Delle). Ohne lokales Minimum ist $\delta = 0$. Sonderfall: ein dunkler Balken der Breite $b$ mit Objektkontrast $C$ in gleichmaessiger Umgebung gibt $\delta = C \int_{-b/2}^{b/2} \mathrm{LSF}\,dx$; bei Gauss-PSF mit $\sigma$ ist das $C\,\mathrm{erf}(b/(2\sqrt{2}\,\sigma))$.
+
+Warum nicht die MTF bei der Periode $2b$ (`kontrastUebertragung`, so im Issue-Text vorgesehen): eine einzelne schmale Linie ist keine Periode. Die Cassini-Teilung (0,76'') haette am 100 mm bei Seeing 1,5'' eine MTF um 0,007, die Baender in T1 0,43, eine gemeinsame Schwelle gaebe es nicht. Unterhalb von zwei Arbeitspixeln Periode misst die MTF ausserdem Aliasing (Hadley-Rille 0,27 gegen Krater 0,18). Auch die Balkenantwort allein reicht nicht: sie kennt die Umgebung nicht, die Cassini-Teilung liegt aber zwischen dem hellen B-Ring und dem halb so hellen, schmalen A-Ring, Syrtis Major bei 6'' auf einer Scheibe, die kaum breiter ist als die PSF. Das Profil traegt diese Umgebung mit.
+
+Testwerte (Kern-Tests in `kern.test.ts`): Delta-Kern, Balken mit Helligkeit 0,4: $\delta$ = 0,6; Gauss-Kern $\sigma$ = 3 px bei 1''/px, Balken 6'' schwarz: 0,683, mit Helligkeit 0,5: 0,341, 12'' schwarz: 0,954 (Toleranz 0,005); Treppe ohne Minimum: 0.
+
 ---
 
 ## 9. Empfehlung fuer astobsim (Formelsammlung fuer Phase 3)
@@ -467,6 +483,7 @@ Beide Wege sind physikalisch gleichwertig (Langzeit-Kolmogorov); der Frequenzrau
 58. Reinhard, E., Stark, M., Shirley, P., Ferwerda, J.: "Photographic Tone Reproduction for Digital Images", ACM Trans. Graphics 21(3), 267 (2002); Technischer Bericht UUCS-02-001, University of Utah, https://users.cs.utah.edu/docs/techreports/2002/pdf/UUCS-02-001.pdf (Gl. 1: logarithmischer Mittelwert der Leuchtdichte als "Key"; Gl. 2: $L = a\,L_w/\bar L_w$ mit $a$ = 0,18; Gl. 3: $L_d = L/(1+L)$; Gl. 4 mit $L_\mathrm{white}$).
 59. IEC 61966-2-1:1999, Multimedia systems and equipment, Colour measurement and management, Part 2-1: Default RGB colour space, sRGB (Referenzanzeige 80 cd/m$^2$, Kennlinie wie in `src/ui/zeichne.ts`).
 60. Wikipedia: "Surface brightness", https://en.wikipedia.org/wiki/Surface_brightness (Flaechenhelligkeit $S = m + 2{,}5\log_{10} A$ mit $A$ der Flaeche in Quadratbogensekunden, folgt direkt aus der Definition der Magnitude; dieselbe Rechnung wie fuer die Quellweiss-Werte in `docs/recherche/objekte.md` 5.2).
+61. Linienbildfunktion (line spread function) als Integral der PSF ueber eine Richtung und Bild einer Linie als eindimensionale Faltung: Standardbegriff der linearen, verschiebungsinvarianten Abbildung, dargestellt z. B. in Boreman, G. D.: Modulation Transfer Function in Optical and Electro-Optical Systems, SPIE Press (2001), Kap. 1 (nicht am Buch geprueft).
 
 ---
 
@@ -558,9 +575,9 @@ Mond A-D9 und Mars 14'' bei 120x sind mit `rendere` nachgemessen (`faktorObjekt`
 
 1. **Stevens & Stevens [54]:** Bibliographie nur aus [56], Band und Jahr widersprechen sich; fuer die Entscheidung nicht noetig, weil kein Adaptionsniveau eingeht.
 2. **Exponent fuer Planetenscheibchen:** Mars mit 14'' erscheint bei 120x unter etwa 0,5 Grad, kleiner als Stevens' 5-Grad-Feld; fuer kleine Felder naehert sich der Exponent dem Punktquellenwert 0,5 [53]. Fuer die Anzeige bleibt ein Exponent fuer alle Objekte, damit Verhaeltnisse zwischen Objekten erhalten bleiben.
-3. **Wahl von $\mu_\mathrm{weiss}$:** Bildschirm, Umgebungslicht und Helligkeitseinstellung des Nutzers sind unbekannt; die Wahl ist am Bild in Phase 6 zu pruefen. Eine Konstante in `src/physik/konstanten.ts` aendert alle Anzeigewerte gemeinsam.
-4. **Schleier des Himmels:** Weil Objekt und Himmel getrennt komprimiert werden, hebt die Abbildung den Himmel relativ zum Objekt um den Faktor $(L_\mathrm{obj}/L_\mathrm{Himmel})^{2/3}$ an. Ueber dunklen Bildteilen wirkt er wie ein Schleier (fuer Trabanten seit #72 durch die Punktebene aufgehoben, Abschnitt 14): in A-D9 zeigt ein Pixel mit $q$ = 0,01 (relativ zu Quellweiss) 0,0032, der Himmel 0,0021. Physikalisch waere der Himmel dort um Groessenordnungen dunkler. Am Bild in Phase 6 pruefen (Abhilfe waere etwa, den Himmel mit der Anzeigehelligkeit des Objekts linear mitzufuehren).
-5. **Exponent:** 1/3 ist eine Groessenordnung nach Stevens, keine Herleitung; wie $\mu_\mathrm{weiss}$ in Phase 6 am Bild zu pruefen.
+3. **Wahl von $\mu_\mathrm{weiss}$:** Bildschirm, Umgebungslicht und Helligkeitseinstellung des Nutzers sind unbekannt; die Wahl ist am Bild in Phase 6 zu pruefen (**geprueft, beibehalten:** `docs/validierung.md` 5). Eine Konstante in `src/physik/konstanten.ts` aendert alle Anzeigewerte gemeinsam.
+4. **Schleier des Himmels:** Weil Objekt und Himmel getrennt komprimiert werden, hebt die Abbildung den Himmel relativ zum Objekt um den Faktor $(L_\mathrm{obj}/L_\mathrm{Himmel})^{2/3}$ an. Ueber dunklen Bildteilen wirkt er wie ein Schleier (fuer Trabanten seit #72 durch die Punktebene aufgehoben, Abschnitt 14): in A-D9 zeigt ein Pixel mit $q$ = 0,01 (relativ zu Quellweiss) 0,0032, der Himmel 0,0021. Physikalisch waere der Himmel dort um Groessenordnungen dunkler. Am Bild in Phase 6 pruefen (Abhilfe waere etwa, den Himmel mit der Anzeigehelligkeit des Objekts linear mitzufuehren). **Geprueft in Phase 6 (`docs/validierung.md` 5):** kein sichtbarer Schleier, die Nachtseite des Mondes in T3 ist so dunkel wie der Himmel.
+5. **Exponent:** 1/3 ist eine Groessenordnung nach Stevens, keine Herleitung; wie $\mu_\mathrm{weiss}$ in Phase 6 am Bild zu pruefen (**geprueft, beibehalten:** `docs/validierung.md` 5).
 6. **Begrenzung bei Mars (seit Issue #71):** Quellweiss von Mars 25'' (1,68) und 14'' (2,54) ist heller als $\mu_\mathrm{weiss}$ = 3,35. `anzeigefaktor` begrenzt das Niveau auf 1, sobald $\mu_\mathrm{obj} < 3{,}35$: am 80-mm-Refraktor (45 Grad, klar, eigene Rechnung aus `faktorObjekt` bei 60x) fuer Mars 25'' ab etwa 3,3 mm Austrittspupille, fuer Mars 14'' ab etwa 5,0 mm; Mars 6'' (3,10) erreicht die Grenze nicht. Darueber ist die Anzeige konstant, A-P4 (heller mit groesserer Austrittspupille) gilt dort fuer Mars nicht mehr. Kein Pixel wird abgeschnitten, das Scheibenmittel liegt bei 0,14 bis 0,24 (`objekte.md` 5.3). Abhilfe waere, statt des Niveaus erst das Pixel $q \cdot w$ zu begrenzen (Anzeigehelligkeit von Quellweiss darf 1 uebersteigen, `Anblick` erlaubt Werte ueber 1), oder $\mu_\mathrm{weiss}$ heller zu waehlen; offen fuer Herbert, nicht in #71 (`src/` bleibt). **Erledigt mit Issue #72 (Herbert, 2026-10-27):** erste Abhilfe umgesetzt, Begrenzung erst je Pixel beim Zeichnen (14.4).
 
 ## 13. Trabanten als Punktquellen (Issue #14)
@@ -690,6 +707,6 @@ Beim Mars aendert sich nur die Anzeige ab der frueheren Grenze (14.4): Scheibenm
 
 ### 14.7 Unsicher
 
-1. **Abhaengigkeit vom Arbeitsmassstab:** Solange die Gesamt-PSF kleiner als ein Arbeitspixel ist, ist $p \propto$ Fluss / Pixelflaeche, die Anzeige also $\propto s^{-2/3}$ ($s$ Arbeitsmassstab). Ein Trabant erscheint im Zoom (feineres Raster) heller als im ganzen Gesichtsfeld (Saturn 80 mm: Titan 47 gegen 43); ist das Pixel feiner als die PSF, haengt die Spitze nicht mehr am Raster. Im 10x50 bleibt Ursache (b): gegenueber einer Abtastung an der Augenaufloesung (6'') sind die Monde um $(22{,}85/6)^{2/3}$ = 2,4 dunkler. T6 ist trotzdem erfuellt (vier Monde sRGB 62 bis 72 gegen den Himmel 16, linear etwa zehnmal heller). Am Bild in Phase 6 pruefen.
-2. **Exponent fuer Punktquellen:** Stevens' Wert fuer Punktquellen ist 0,5 [53]; mit 1/3 werden schwache Trabanten staerker angehoben. Bewusst ein Exponent fuer alle Ebenen (14.2); wie 12.5 Punkt 5 in Phase 6 am Bild pruefen.
+1. **Abhaengigkeit vom Arbeitsmassstab:** Solange die Gesamt-PSF kleiner als ein Arbeitspixel ist, ist $p \propto$ Fluss / Pixelflaeche, die Anzeige also $\propto s^{-2/3}$ ($s$ Arbeitsmassstab). Ein Trabant erscheint im Zoom (feineres Raster) heller als im ganzen Gesichtsfeld (Saturn 80 mm: Titan 47 gegen 43); ist das Pixel feiner als die PSF, haengt die Spitze nicht mehr am Raster. Im 10x50 bleibt Ursache (b): gegenueber einer Abtastung an der Augenaufloesung (6'') sind die Monde um $(22{,}85/6)^{2/3}$ = 2,4 dunkler. T6 ist trotzdem erfuellt (vier Monde sRGB 62 bis 72 gegen den Himmel 16, linear etwa zehnmal heller). Am Bild in Phase 6 pruefen. **Geprueft in Phase 6 (`docs/validierung.md` 5):** plausibel, kein Issue.
+2. **Exponent fuer Punktquellen:** Stevens' Wert fuer Punktquellen ist 0,5 [53]; mit 1/3 werden schwache Trabanten staerker angehoben. Bewusst ein Exponent fuer alle Ebenen (14.2); wie 12.5 Punkt 5 in Phase 6 am Bild pruefen. **Geprueft in Phase 6 (`docs/validierung.md` 5):** die Monde sind im 70 mm und im 10x50 sichtbar wie in der Erfahrung, kein Anlass zu aendern.
 3. **Grosse Trabantenscheibchen:** Ab $d/s > 1$ zeigt die Punktebene die Scheibe des Trabanten mit $h_\mathrm{rel}$; ihr Inneres wird dann mit $(a\,h_\mathrm{rel})^{1/3}$ abgebildet, nicht linear wie die Planetenscheibe. In Version 1 sind alle Trabanten (hoechstens 1,73'') kleiner als die Gesamt-FWHM, ohne sichtbare Folge.
