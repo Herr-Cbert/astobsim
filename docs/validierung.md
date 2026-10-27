@@ -127,3 +127,21 @@ Als Issues angelegt am 2026-10-27, Milestone M3 (Herbert, 2026-10-27):
 | Claude | 2026-10-27 | Urteile wie oben |
 | Herbert | 2026-10-27 | Urteile wie oben |
 
+## 7. Sicherheit (Issue #22)
+
+Stand 2026-10-27, Branch `issue-22-sicherheit` auf `main` nach PR #80.
+
+| Pruefpunkt | Ergebnis | Beleg |
+|---|---|---|
+| Keine Laufzeitabhaengigkeiten (ADR-0001) | erfuellt | `package.json` ohne `dependencies`, nur `typescript`, `vite`, `vitest` als Dev-Abhaengigkeiten |
+| `npm audit` | 0 Befunde | `npm audit` am 2026-10-27 |
+| Keine Cookies, kein Browserspeicher, kein Tracking (A-T4) | erfuellt | Suche ueber `src/` und `index.html`: kein `document.cookie`, `localStorage`, `sessionStorage`, `indexedDB`, `sendBeacon`; Konfiguration nur in der URL (A-D8) |
+| Keine externen Ressourcen (A-T1, A-T4) | erfuellt | keine fremden URLs in `src/` und `index.html`; `fetch` nur unter `import.meta.env.BASE_URL + "daten/"` (`src/daten/pruefe.ts`, `src/daten/kachellader.ts`); Bildpfade kommen aus `daten/bilder.json`, nie aus der URL |
+| URL-Parameter begrenzt und nie in HTML | erfuellt | gelesen nur in `ausUrl` (`src/zustand/url.ts`): Zahlen per `Number`, unbekannte Werte fallen auf die Voreinstellung, danach `begrenze` (A-F8); Zustands-ids nur als Schluessel im Katalog. Geschrieben per `history.replaceState`. Texte gelangen nur ueber `textContent` ins DOM, auch Fehlermeldungen (`src/ui/starte.ts`) |
+| Keine Code-Ausfuehrung aus Daten | erfuellt | kein `innerHTML`, `outerHTML`, `insertAdjacentHTML`, `document.write`, `eval`, `new Function` in `src/` |
+| Content-Security-Policy | neu | im Bau als meta-Tag: `default-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'` (Plugin in `vite.config.ts`). GitHub Pages erlaubt keine eigenen Header; `frame-ancestors` (Einbetten in fremde Seiten) wirkt im meta-Tag nicht und bleibt offen, ohne Folgen fuer eine Seite ohne Konten und Eingaben an einen Server. Im Dev-Server keine CSP (Vite fuegt CSS als `<style>` ein). Geprueft: alle 13 Faelle von `scripts/validierung-bilder.mjs` ohne Konsolenfehler, Screenshots byte-gleich, `npm run test:browser` bestanden; Gegenprobe mit `connect-src 'none'`: das Skript meldet die Verstoesse und endet mit Exit 1 |
+
+**Review der Aenderungen:** Der Skill `security-review` bricht auf `sam` ab, weil `git diff` ueber `diff.external` vimdiff startet; die Aenderungen des Branches (CSP-Plugin, Skript) sind deshalb von Hand nach derselben Methode geprueft. Befund: die lokalen Testserver in `scripts/browser-test.mjs` und `scripts/validierung-bilder.mjs` prueften den Pfad mit `startsWith(bau)` ohne Trennzeichen, `../dist-x/...` haette Dateien aus Nachbarordnern ausgeliefert, die mit `dist` beginnen. Beide Server lauschen nur auf 127.0.0.1; trotzdem behoben (`startsWith(bau + sep)`).
+
+**Massnahmen:** CSP im Bau; `scripts/validierung-bilder.mjs` meldet Konsolenfehler und CSP-Verstoesse (Exit 1, das favicon an der Wurzel ausgenommen, das Chrome von sich aus anfragt); Pfadpruefung der Testserver gehaertet. Keine offenen Befunde.
+

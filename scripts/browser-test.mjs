@@ -10,7 +10,7 @@ import { spawn } from "node:child_process";
 import { existsSync, mkdtempSync, readFileSync, rmSync } from "node:fs";
 import { createServer } from "node:http";
 import { tmpdir } from "node:os";
-import { extname, join, normalize } from "node:path";
+import { extname, join, normalize, sep } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const wurzel = fileURLToPath(new URL("..", import.meta.url));
@@ -29,7 +29,8 @@ const typen = { ".html": "text/html; charset=utf-8", ".js": "text/javascript; ch
 const server = createServer((anfrage, antwort) => {
   const pfad = normalize(decodeURIComponent(new URL(anfrage.url ?? "/", "http://x").pathname)).replace(/^([/\\])+/, "");
   const datei = join(bau, pfad === "" ? "index.html" : pfad);
-  if (!datei.startsWith(bau) || !existsSync(datei)) {
+  // Mit Trennzeichen, sonst kaeme "../dist-x/..." an einem Nachbarordner vorbei (Issue #22).
+  if (!datei.startsWith(bau + sep) || !existsSync(datei)) {
     antwort.writeHead(404).end();
     return;
   }
