@@ -17,6 +17,7 @@
         "weiss_mag_arcsec2": 3.35,
         "entfernung_au": 0.00257,
         "bild": "mond_svs5587_6285",
+        "hinweis_hilfe": "Ab etwa 200 mm Objektivdurchmesser begrenzt die Bildvorlage (0,64 Bogensekunden pro Pixel) die Detailtiefe, nicht mehr das Fernrohr.",
         "kommentar": "Winkelgroesse ist der Jahrbuch-Mittelwert (objekte.md 6.1). Das Quellbild zeigt 1774,4 Bogensekunden (bilder.json, winkelgroesse_arcsec); die Anwendung skaliert die Scheibe von objekt_durchmesser_px auf die Winkelgroesse des Zustands. weiss_mag_arcsec2 ist die Vollmond-Flaechenhelligkeit (objekte.md 5.2), weil das Bild die Tagseite unveraendert in voller Helligkeit zeigt."
       }
     ]

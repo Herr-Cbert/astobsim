@@ -174,6 +174,8 @@ Saturn 16" (skaliert mit 16/20):
 
 Die Magnituden bei Saturn 20" sind gegenueber der mittleren Opposition um 0,1 mag heller (Entfernung 8,31 statt 8,54 AE), bei 16" um 0,4 mag schwaecher (ber.).
 
+Nachtrag 2026-10-27 (Issue #13, PR #61, Entscheidung Herbert): Das Quellbild heic2113c hat B = 19 Grad (Horizons 19,2 Grad, gemessen 19,15 Grad), deshalb gilt in `objekte.json` `ringneigung_grad: 19` statt der Empfehlung 15 Grad aus 1.3 (A-X3 hat Vorrang, siehe 7 Punkt 3). Die dy-Werte sind mit derselben Formel dy = sqrt(1 - (dx/E)^2) * E * sin B fuer B = 19 Grad neu gerechnet: Saturn 20" Titan +150/-44,4, Rhea -60/+20,7; Saturn 16" Titan +120/-35,5, Rhea -48/+16,6 (ber., im Review von PR #61 nachgerechnet). dx, Durchmesser und Mondmagnituden bleiben.
+
 ## 4. Zahlen fuer die Testfaelle
 
 ### 4.1 T1: Jupiter 47", 70 mm, 100-fach, Seeing 2"
@@ -266,6 +268,8 @@ Werte fuer die Zustaende (ber. mit den Formeln oben):
 | Jupiter 35" | 5,20 / 5,63 | 10 | -2,0 | |
 | Saturn 20", B = 15 | 9,3 / 8,31 | 0,5 | +0,0 | nur Kugel: +0,5; B = 7,5: +0,3; B = 27: -0,3 |
 | Saturn 16", B = 15 | 9,4 / 10,39 | 6 | +0,7 | nur Kugel: +1,2 |
+| Saturn 20", B = 19 | 9,3 / 8,31 | 0,5 | -0,1 | Nachtrag 2026-10-27 (#13): in objekte.json verwendet |
+| Saturn 16", B = 19 | 9,4 / 10,39 | 6 | +0,6 | Nachtrag 2026-10-27 (#13): in objekte.json verwendet |
 | Mond voll | - | 0 | -12,74 | Fact Sheet [1] |
 | Mond erstes Viertel | - | 78 bis 84 | ca. -10,0 bis -10,4 | nicht primaer belegt, siehe "Unsicher" |
 
@@ -302,7 +306,7 @@ Die Flaechenhelligkeit der Planeten ist nahezu entfernungsunabhaengig (nur Phase
 
 Zusatzfelder, die Phase 3 fuer die Bildzuordnung braucht: Bildmassstab in km pro Pixel bzw. " pro Pixel (aus A-X4), Nordrichtung im Bild, bei Saturn der aeussere Ringrand in Pixeln (dient als Massstab 2,269 R_S), bei Jupiter die Lage des GRF (Laenge System III) nur informativ.
 
-Feste Mondstellungen: siehe Tabellen in 3.3 (Jupiter: Io -110/+2,9; Europa +175/-4,7; Ganymed +330/+4,3; Kallisto -520/-11,7 bei 47"; Saturn: Titan +150/-35, Rhea -60/+17 bei 20"; kleine Zustaende linear skaliert).
+Feste Mondstellungen: siehe Tabellen in 3.3 (Jupiter: Io -110/+2,9; Europa +175/-4,7; Ganymed +330/+4,3; Kallisto -520/-11,7 bei 47"; Saturn: Titan +150/-35, Rhea -60/+17 bei 20"; kleine Zustaende linear skaliert). Nachtrag 2026-10-27: Saturn mit B = 19 Grad nach dem Quellbild, Titan +150/-44,4, Rhea -60/+20,7, Magnituden Saturn -0,1 (20") und +0,6 (16"), siehe 3.3 und 5.1.
 
 ### 6.2 Datenformat-Vorschlag (JSON, eine Datei `objekte.json`)
 
@@ -343,7 +347,7 @@ Beispiel Jupiter 47" mit vier Monden:
 }
 ```
 
-Fuer Saturn kommen `ringneigung_grad: 15` und `ring_aussen_arcsec: 45.4` hinzu; die Monde Titan (+150, -35, 0.85, 8.3) und Rhea (-60, +17, 0.25, 9.5) wie in 3.3. Fuer den Mond entfaellt `monde`, dafuer `kolongitude_grad: 11` als Dokumentation des Bildzustands.
+Fuer Saturn kommen `ringneigung_grad: 15` (umgesetzt: 19, Nachtrag in 3.3) und `ring_aussen_arcsec: 45.4` hinzu; die Monde Titan (+150, -35, 0.85, 8.3) und Rhea (-60, +17, 0.25, 9.5) wie in 3.3. Fuer den Mond entfaellt `monde`, dafuer `kolongitude_grad: 11` als Dokumentation des Bildzustands.
 
 ## 7. Unsicher oder zu pruefen (fuer Herbert)
 
