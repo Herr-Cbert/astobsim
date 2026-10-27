@@ -3,7 +3,7 @@ import type { Auge, Fernglas, Konfiguration, Objektzustand } from "../naht/konfi
 import type { Atmosphaere } from "./atmosphaere";
 import { auswerten } from "./auswerten";
 import { PhysikFehler } from "./fehler";
-import { anzeigefaktor, bortleMagProArcsec2, helligkeit, okularhelligkeit } from "./helligkeit";
+import { anzeigefaktor, bortleMagProArcsec2, helligkeit, leuchtdichteRelativ, okularhelligkeit } from "./helligkeit";
 import type { Optik } from "./optik";
 import { BEDINGUNGEN_A_D9, KONFIGURATION_A_D9, MOND_Q1 as MOND, refraktorMitVergroesserung } from "./testdaten";
 
@@ -80,8 +80,8 @@ describe("anzeigefaktor: Stevens-Potenz 1/3 relativ zu 3,35 mag/arcsec2", () => 
     expect(anzeigefaktor(5.85)).toBeCloseTo(0.4642, 4);
     expect(anzeigefaktor(10.85)).toBeCloseTo(0.1, 12);
   });
-  it("heller als 3,35 bleibt 1 (keine Blendung, A-P9)", () => {
-    expect(anzeigefaktor(1.5)).toBe(1);
+  it("heller als 3,35 ueber 1, nicht mehr begrenzt (Issue #72, physik.md 14.4): 1,5 gibt 10^(0,74/3) = 1,7647", () => {
+    expect(anzeigefaktor(1.5)).toBeCloseTo(1.7647, 4);
   });
   it("streng monoton fallend und verhaeltnistreu: Faktor 2 in der Leuchtdichte ist Faktor 2^(1/3) in der Anzeige", () => {
     let vorher = Infinity;
@@ -188,5 +188,66 @@ describe("helligkeit: Akzeptanz Issue #55 (Tabelle 12.4)", () => {
   it("Hintergrund Fernglas 10x50: Bortle 1 0,0028 (sRGB 9), Bortle 9 0,0127 (sRGB 30)", () => {
     expect(anzeige(konfig(FERNGLAS_10X50, MOND_EV, 1)).hintergrundRelativ).toBeCloseTo(0.00282, 4);
     expect(anzeige(konfig(FERNGLAS_10X50, MOND_EV, 9)).hintergrundRelativ).toBeCloseTo(0.0127, 4);
+  });
+});
+
+/** Mars mit Quellweiss nach Issue #71 (daten/objekte.json mars_14 2,54, mars_25 1,68). */
+const MARS_14_GEEICHT: Objektzustand = { ...MARS_14, quelle: { ...MARS_14.quelle, weissMagProArcsec2: 2.54 } };
+const MARS_25_GEEICHT: Objektzustand = { ...MARS_14, kennung: "mars-25", durchmesserArcsec: 25, magnitude: -3, quelle: { ...MARS_14.quelle, weissMagProArcsec2: 1.68 } };
+/** Jupiter 47'' mit Quellweiss nach Issue #71 (daten/objekte.json jup_47 4,29). */
+const JUPITER_47: Objektzustand = { kennung: "jup-47", durchmesserArcsec: 47, magnitude: -2.7, quelle: { breitePx: 1000, hoehePx: 1000, massstabArcsecProPx: 0.05, weissMagProArcsec2: 4.29 }, trabanten: [] };
+
+// Punktebene, docs/recherche/physik.md Abschnitt 14 (Tabelle 14.3).
+describe("helligkeit: Punktebene (Issue #72)", () => {
+  it("leuchtdichteRelativ: 3,35 ist 1, 2,5 mag dunkler 0,1, ohne Begrenzung nach oben", () => {
+    expect(leuchtdichteRelativ(3.35)).toBeCloseTo(1, 12);
+    expect(leuchtdichteRelativ(5.85)).toBeCloseTo(0.1, 12);
+    expect(leuchtdichteRelativ(0.85)).toBeCloseTo(10, 10);
+    expect(() => leuchtdichteRelativ(Number.NaN)).toThrow(PhysikFehler);
+  });
+  it("Quellweiss 3,4, AP 0,8 mm ohne Verluste: punktFaktor 10^(-0,4 * 4,425) = 0,01698, faktorObjekt = punktFaktor^(1/3)", () => {
+    const h = helligkeit(optikMit({}), KLAR, 5, MOND);
+    expect(h.punktFaktor).toBeCloseTo(0.01698, 5);
+    expect(h.punktExponent).toBe(1 / 3);
+    expect(h.faktorObjekt).toBeCloseTo(Math.pow(h.punktFaktor, h.punktExponent), 12);
+  });
+  it("Schluessel enthaelt punktFaktor: andere Austrittspupille, anderer Schluessel", () => {
+    expect(helligkeit(optikMit({ austrittspupilleMm: 1 }), KLAR, 5, MOND).schluessel).not.toBe(helligkeit(optikMit({}), KLAR, 5, MOND).schluessel);
+  });
+  it("Jupiter 47'' im 10x50: punktFaktor 0,1915; Io auf einem Arbeitspixel 22,85'' (p = 0,000996) zeigt 0,0576 (sRGB 68) statt linear 0,00057", () => {
+    const h = anzeige(konfig(FERNGLAS_10X50, JUPITER_47));
+    expect(h.punktFaktor).toBeCloseTo(0.1915, 3);
+    expect(h.faktorObjekt).toBeCloseTo(0.5764, 3);
+    // Io (m = 5,0): Fluss 10^(-0,4 (5,0 - 4,29)) = 0,5200 Quadratbogensekunden Quellweiss auf 22,85^2.
+    const p = Math.pow(10, -0.4 * (5.0 - 4.29)) / 22.85 ** 2;
+    expect(p).toBeCloseTo(0.000996, 5);
+    const w = Math.min(1, Math.pow(h.punktFaktor * p, h.punktExponent));
+    expect(w).toBeCloseTo(0.0576, 3);
+    expect(srgb8(w)).toBe(68);
+    expect(srgb8(h.faktorObjekt * p)).toBeLessThan(10);
+  });
+});
+
+// Mars-Grenze (Issue #72, physik.md 14.4): faktorObjekt wird nicht mehr auf 1 begrenzt.
+describe("helligkeit: Mars nach Issue #71 bleibt monoton in der Austrittspupille", () => {
+  for (const objekt of [MARS_14_GEEICHT, MARS_25_GEEICHT]) {
+    it(`${objekt.kennung}: Anzeige steigt streng mit der Austrittspupille bis 6 mm und bleibt dann`, () => {
+      let vorher = 0;
+      for (const v of [400, 300, 200, 160, 120, 100, 80, 60, 40, 30, 24, 20, 16, 13.4]) {
+        const f = anzeige(konfig(refraktorMitVergroesserung(80, v), objekt)).faktorObjekt;
+        expect(f).toBeGreaterThan(vorher);
+        vorher = f;
+      }
+      const ap6 = anzeige(konfig(refraktorMitVergroesserung(80, 80 / 6), objekt)).faktorObjekt;
+      const ap8 = anzeige(konfig(refraktorMitVergroesserung(80, 10), objekt)).faktorObjekt;
+      expect(ap8).toBeCloseTo(ap6, 12);
+    });
+  }
+  it("bei AP 6 mm am 80-mm-Refraktor ueber 1: Mars 14'' 1,135, Mars 25'' 1,478; der Himmel bleibt unter 1", () => {
+    const m14 = anzeige(konfig(refraktorMitVergroesserung(80, 80 / 6), MARS_14_GEEICHT));
+    const m25 = anzeige(konfig(refraktorMitVergroesserung(80, 80 / 6), MARS_25_GEEICHT));
+    expect(m14.faktorObjekt).toBeCloseTo(1.135, 3);
+    expect(m25.faktorObjekt).toBeCloseTo(1.478, 3);
+    expect(m25.hintergrundRelativ).toBeLessThan(0.02);
   });
 });

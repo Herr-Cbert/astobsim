@@ -4,7 +4,8 @@ import { FalterJs, type Falter } from "./falter";
 import { BildFehler } from "./fehler";
 import { QuelleAusRaster } from "./quelle";
 import { neuesRaster, pixelIndex, summe, type Raster } from "./raster";
-import { rendere, type Zwischenspeicher } from "./rendere";
+import { mittele, skaliere } from "./mittele";
+import { maskiere, rendere, type Zwischenspeicher } from "./rendere";
 import { deltaKern, kastenKern } from "./testkerne";
 
 const N = 16;
@@ -30,7 +31,7 @@ function parameter(teil: Partial<Simulationsparameter> = {}): Simulationsparamet
   return {
     quellbild: { schluessel: "q|0|0", objekt: "test", massstabArcsecProPx: 1, rasterPx: N, mitteXArcsec: 0, mitteYArcsec: 0, punktquellen: [] },
     kern: deltaKern(5),
-    helligkeit: { schluessel: "h1", faktorObjekt: 1, hintergrundRelativ: 0, hintergrundMagProArcsec2: 20 },
+    helligkeit: { schluessel: "h1", faktorObjekt: 1, hintergrundRelativ: 0, hintergrundMagProArcsec2: 20, punktFaktor: 1, punktExponent: 1 },
     gesichtsfeld: { form: "kreis", breiteArcsec: 100, hoeheArcsec: 100 },
     fenster: { breiteArcsec: N, mitteXArcsec: 0, mitteYArcsec: 0, px: N },
     ...teil
@@ -50,7 +51,7 @@ describe("rendere", () => {
   });
 
   it("Tonwert: Objektfaktor multipliziert, Hintergrundgrau addiert", () => {
-    const p = parameter({ helligkeit: { schluessel: "h2", faktorObjekt: 0.5, hintergrundRelativ: 0.1, hintergrundMagProArcsec2: 20 } });
+    const p = parameter({ helligkeit: { schluessel: "h2", faktorObjekt: 0.5, hintergrundRelativ: 0.1, hintergrundMagProArcsec2: 20, punktFaktor: 1, punktExponent: 1 } });
     const anblick = rendere(p, quelle(), falter);
     expect(anblick.raster.daten[pixelIndex(anblick.raster, 0, 0)]).toBeCloseTo(0.6, 6);
     expect(anblick.raster.daten[pixelIndex(anblick.raster, 13, 2)]).toBeCloseTo(2.6, 6);
@@ -189,11 +190,49 @@ describe("rendere", () => {
     expect(summe(mit) - summe(ohne)).toBeCloseTo(Math.PI / 4, 4);
   });
 
+  it("flaechige Objekte bitgleich (Issue #72): ohne sichtbare Punktquelle ist der Anblick der lineare Tonwert wie vorher", () => {
+    // Referenz ist die Pipeline vor #72: maskiere(skaliere(f * falte(mittele(quelle)) + h)).
+    const kern = kastenKern(3);
+    const h = { schluessel: "h4", faktorObjekt: 1.7, hintergrundRelativ: 0.0123, hintergrundMagProArcsec2: 20, punktFaktor: 4.9, punktExponent: 1 / 3 };
+    const geblendet: Punktquelle = { name: "Io", xArcsec: -5.5, yArcsec: 0.5, durchmesserArcsec: 1, helligkeitRelativ: 1, sichtbar: false, grund: "blendung" };
+    const gesichtsfeld = { form: "kreis" as const, breiteArcsec: 14, hoeheArcsec: 14 };
+    const fenster = { breiteArcsec: N, mitteXArcsec: 0, mitteYArcsec: 0, px: 37 };
+    for (const punktquellen of [[], [geblendet]]) {
+      const p = parameter({ kern, helligkeit: h, gesichtsfeld, fenster, quellbild: { ...parameter().quellbild, punktquellen } });
+      const q = quelle();
+      const ausschnitt = q.ausschnitt({ xArcsec: 0, yArcsec: 0 }, N, 1);
+      const gefaltet = falter.falte(mittele(ausschnitt, p.quellbild), kern);
+      const alt = { ...gefaltet, daten: Float32Array.from(gefaltet.daten, (v) => 1.7 * v + 0.0123) };
+      const erwartet = maskiere(skaliere(alt, fenster.px), gesichtsfeld, fenster);
+      expect(rendere(p, quelle(), falter).raster.daten).toEqual(erwartet.daten);
+    }
+  });
+
+  it("Punktebene: Trabant mit punktFaktor und punktExponent komprimiert, Objekt unberuehrt, Ebene im Zwischenspeicher", () => {
+    // Trabant 0,1'' mit h = 1: Fluss pi/400 = 0,00785 auf ein Pixel (Deltakern). Linear 0,00785, mit
+    // punktFaktor 1 und Exponent 1/3 dagegen 0,199.
+    const trabant: Punktquelle = { name: "Io", xArcsec: -5.5, yArcsec: 0.5, durchmesserArcsec: 0.1, helligkeitRelativ: 1, sichtbar: true };
+    const p = parameter({ quellbild: { ...parameter().quellbild, schluessel: "q|io", punktquellen: [trabant] } });
+    const zwischen: Zwischenspeicher = {};
+    const f = new FalterZaehlend();
+    const linear = rendere(p, quelle(), f, zwischen).raster;
+    expect(linear.daten[pixelIndex(linear, 2, 7)]).toBeCloseTo(1 + Math.PI / 400, 6);
+    const ebene = zwischen.stufe2?.punktebene;
+    expect(ebene).toBeDefined();
+    const komprimiert = rendere({ ...p, helligkeit: { ...p.helligkeit, schluessel: "h5", punktExponent: 1 / 3 } }, quelle(), f, zwischen).raster;
+    expect(komprimiert.daten[pixelIndex(komprimiert, 2, 7)]).toBeCloseTo(1 + Math.cbrt(Math.PI / 400), 6);
+    expect(komprimiert.daten[pixelIndex(komprimiert, 3, 7)]).toBe(1);
+    expect(f.aufrufe).toBe(1);
+    expect(zwischen.stufe2?.punktebene).toBe(ebene);
+  });
+
   it("wirft BildFehler bei verletzten Invarianten der Naht", () => {
     const p = parameter();
     expect(() => rendere(parameter({ quellbild: { ...p.quellbild, rasterPx: 15 } }), quelle(), falter)).toThrow(BildFehler);
     expect(() => rendere(parameter({ kern: deltaKern(5, 2) }), quelle(), falter)).toThrow(BildFehler);
     expect(() => rendere(parameter({ fenster: { ...p.fenster, mitteXArcsec: 1 } }), quelle(), falter)).toThrow(BildFehler);
     expect(() => rendere(parameter({ fenster: { ...p.fenster, px: 0 } }), quelle(), falter)).toThrow(BildFehler);
+    expect(() => rendere(parameter({ helligkeit: { ...p.helligkeit, punktExponent: 0 } }), quelle(), falter)).toThrow(BildFehler);
+    expect(() => rendere(parameter({ helligkeit: { ...p.helligkeit, punktFaktor: -1 } }), quelle(), falter)).toThrow(BildFehler);
   });
 });

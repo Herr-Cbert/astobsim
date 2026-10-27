@@ -45,7 +45,7 @@ Wir nehmen die vier Stufen mit Schluesseln, `optik()`, `Fenster` und die Testhel
 // src/naht/simulationsparameter.ts: nur Typen, strukturiert klonbar
 export interface Fenster { breiteArcsec: number; mitteXArcsec: number; mitteYArcsec: number; px: number }
 
-export interface Quellbild {      // Stufe 1: Ausschnitt mitteln, Trabanten malen
+export interface Quellbild {      // Stufe 1: Ausschnitt mitteln, Trabanten in die Punktebene malen
   schluessel: string; objekt: string; massstabArcsecProPx: number; rasterPx: number;
   mitteXArcsec: number; mitteYArcsec: number; punktquellen: Punktquelle[];
 }
@@ -58,7 +58,8 @@ export interface Kern {           // Stufe 2: Faltung
 export interface Kernbeschreibung { oeffnungMm: number; obstruktion: number; seeingFwhmArcsec: number;
   augeFwhmArcsec: number; massstabArcsecProPx: number }   // auf 4 Stellen gerundet
 export interface Helligkeit {     // Stufe 3: Tonwert
-  schluessel: string; faktorObjekt: number; hintergrundRelativ: number; hintergrundMagProArcsec2: number }
+  schluessel: string; faktorObjekt: number; hintergrundRelativ: number; hintergrundMagProArcsec2: number;
+  punktFaktor: number; punktExponent: number }          // Punktebene, Issue #72
 export interface Gesichtsfeld { form: "kreis" | "rechteck"; breiteArcsec: number; hoeheArcsec: number }
 export interface Simulationsparameter { quellbild: Quellbild; kern: Kern; helligkeit: Helligkeit;
   gesichtsfeld: Gesichtsfeld; fenster: Fenster }        // Stufe 4: Anzeige
@@ -74,7 +75,7 @@ export interface Auswertung { parameter: Simulationsparameter; anzeige: Anzeigew
 // kernFwhmArcsec sind ebenfalls exportiert; siehe Variante 3, Abschnitt 1.3.
 ```
 
-Vertrag fuer bild: Anblick = tonwert(falte(male(mittele(quelle, quellbild)), kern), helligkeit), maskiert mit `gesichtsfeld` (zentriert auf die Fenstermitte: die Feldblende bleibt in der Mitte, beim Verschieben nach A-D2 wandert das Objekt; Entscheidung 2026-10-26, Issue #6), gezeichnet in `fenster`. Gleicher Schluessel einer Stufe heisst gleiches Ergebnis; bild darf Zwischenergebnisse behalten. Koordinaten: Objektmitte 0/0, +x rechts, +y Norden (A-D11), Bogensekunden. Helligkeiten relativ zu Quellweiss (1,0 = Flaechenhelligkeit, die Weiss im Quellbild bedeutet), linear. Ausnahme Stufe 3: `Helligkeit.faktorObjekt` und `hintergrundRelativ` sind Anzeigehelligkeiten (GLOSSARY: linear, 1 = Bildschirmweiss), physik bildet die Flaechenhelligkeit im Okular darauf ab (Issue #55, ADR-0002 Nachtrag 2026-10-27, physik.md Abschnitt 12).
+Vertrag fuer bild: Anblick = tonwert(falte(mittele(quelle, quellbild), kern), faltePunkte(punktquellen, kern), helligkeit), maskiert mit `gesichtsfeld` (zentriert auf die Fenstermitte: die Feldblende bleibt in der Mitte, beim Verschieben nach A-D2 wandert das Objekt; Entscheidung 2026-10-26, Issue #6), gezeichnet in `fenster`. Gleicher Schluessel einer Stufe heisst gleiches Ergebnis; bild darf Zwischenergebnisse behalten. Koordinaten: Objektmitte 0/0, +x rechts, +y Norden (A-D11), Bogensekunden. Helligkeiten relativ zu Quellweiss (1,0 = Flaechenhelligkeit, die Weiss im Quellbild bedeutet), linear. Ausnahme Stufe 3: `Helligkeit.faktorObjekt` und `hintergrundRelativ` sind Anzeigehelligkeiten (GLOSSARY: linear, 1 = Bildschirmweiss), physik bildet die Flaechenhelligkeit im Okular darauf ab (Issue #55, ADR-0002 Nachtrag 2026-10-27, physik.md Abschnitt 12); `faktorObjekt` darf 1 uebersteigen, begrenzt wird erst das Pixel beim Zeichnen (Issue #72). Punktquellen werden nicht ins Objektraster gemalt, sondern in eine eigene Punktebene, die bild lokal mit dem Kern faltet und je Arbeitspixel mit `Helligkeit.punktFaktor` (Leuchtdichte von Quellweiss im Okular relativ zu Anzeigeweiss) und `punktExponent` abbildet: Pixel = faktorObjekt * objekt + hintergrundRelativ + min(1, (punktFaktor * punkt)^punktExponent) (Issue #72, ADR-0002 Nachtrag, physik.md Abschnitt 14). Die Punktebene liegt im Zwischenspeicher unter demselben Schluessel wie Stufe 2.
 
 Invarianten, die Tests absichern: Kern Summe 1 (Toleranz 1e-6), ungerade Groesse 5 bis 81, Symmetrie; `rasterPx * massstab = fenster.breiteArcsec`; Arbeitsmassstab >= Gesamt-FWHM / 2,5; Schluessel gleich genau dann, wenn gerundete Felder gleich; `begrenze` wirft nie, `auswerten` wirft `PhysikFehler` nur bei Programmierfehlern (NaN, unbegrenzte Eingaben).
 

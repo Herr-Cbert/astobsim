@@ -72,6 +72,9 @@ _Vermeiden_: Mond, Satellit, Begleiter
 Ein Objekt, dessen Winkeldurchmesser unter der Aufloesungsgrenze liegt und das durch Magnitude statt Flaechenhelligkeit beschrieben wird. In Version 1 nur Trabanten.
 _Vermeiden_: Stern
 
+**Punktebene**:
+Eigene Ebene im Arbeitsraster, in die bild die Punktquellen malt und lokal mit dem Kern faltet, getrennt vom Objektraster (Issue #72). Ihre Pixel werden je Pixel mit `Helligkeit.punktFaktor` und `punktExponent` auf die Anzeigehelligkeit abgebildet (physik.md Abschnitt 14).
+
 **Winkelgroesse**:
 Scheinbarer Durchmesser eines Objekts oder Zustands in Bogensekunden, bei Planeten aequatorial.
 

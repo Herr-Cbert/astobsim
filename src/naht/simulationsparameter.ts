@@ -6,9 +6,11 @@
 // Helligkeiten relativ zu Quellweiss (1,0 = Flaechenhelligkeit, die Weiss im Quellbild
 // bedeutet), linear. Massstaebe in Bogensekunden je Pixel.
 //
-// Vertrag fuer bild: Anblick = tonwert(falte(male(mittele(quelle, quellbild)), kern), helligkeit),
-// maskiert mit gesichtsfeld, gezeichnet in fenster. Jede Stufe traegt einen Schluessel aus den
-// gerundeten Eingangsgroessen: gleicher Schluessel heisst gleiches Ergebnis, bild darf das
+// Vertrag fuer bild: Anblick = tonwert(falte(mittele(quelle, quellbild), kern),
+// faltePunkte(punktquellen, kern), helligkeit), maskiert mit gesichtsfeld, gezeichnet in fenster.
+// Punktquellen liegen in einer eigenen Ebene (Issue #72), nicht im Objektraster, weil tonwert sie
+// je Pixel abbildet (docs/recherche/physik.md Abschnitt 14). Jede Stufe traegt einen Schluessel aus
+// den gerundeten Eingangsgroessen: gleicher Schluessel heisst gleiches Ergebnis, bild darf das
 // Zwischenergebnis der Stufe behalten.
 
 /**
@@ -37,14 +39,14 @@ export interface Quellbild {
   /** Mitte des Ausschnitts in Objektkoordinaten, gleich Fenster.mitte. */
   mitteXArcsec: number;
   mitteYArcsec: number;
-  /** Vor der Faltung als Scheibchen ins Arbeitsraster malen. */
+  /** Vor der Faltung als Scheibchen in die Punktebene malen (nicht ins Objektraster, Issue #72). */
   punktquellen: Punktquelle[];
 }
 
 /**
  * Trabant als Punktquelle: Position und Durchmesser in Bogensekunden in Objektkoordinaten.
  * helligkeitRelativ ist die Flaechenhelligkeit relativ zu Quellweiss ohne den gemeinsamen
- * Faktor aus Helligkeit.faktorObjekt. Die Blendungsregel (A-P6) ist bereits entschieden:
+ * Faktor aus Helligkeit (punktFaktor, punktExponent). Die Blendungsregel (A-P6) ist bereits entschieden:
  * sichtbar false mit grund "blendung" heisst unterdrueckt, ui kann das erklaeren.
  */
 export interface Punktquelle {
@@ -96,12 +98,18 @@ export interface Kernbeschreibung {
 }
 
 /**
- * Stufe 3: Tonwert, nur Multiplikation und Addition. Beide Faktoren sind Anzeigehelligkeiten
+ * Stufe 3: Tonwert je Arbeitspixel. faktorObjekt und hintergrundRelativ sind Anzeigehelligkeiten
  * (GLOSSARY: linear, 1 = Bildschirmweiss vor der sRGB-Kodierung), nicht die physikalische Daempfung
- * (Issue #55, docs/recherche/physik.md Abschnitt 12): faktorObjekt in (0, 1] ist die
- * Anzeigehelligkeit von Quellweiss aus der Flaechenhelligkeit im Okular (Transmission, Abschattung,
- * Extinktion, Austrittspupille), hintergrundRelativ die des Himmels im Okular (Grauton des
+ * (Issue #55, docs/recherche/physik.md Abschnitt 12): faktorObjekt > 0 ist die Anzeigehelligkeit von
+ * Quellweiss aus der Flaechenhelligkeit im Okular (Transmission, Abschattung, Extinktion,
+ * Austrittspupille); sie darf 1 uebersteigen (Mars, physik.md 14.4), begrenzt wird erst das Pixel
+ * beim Zeichnen. hintergrundRelativ in (0, 1] ist die des Himmels im Okular (Grauton des
  * Gesichtsfelds). Das Quellbild bleibt linear: Pixel mal faktorObjekt plus hintergrundRelativ.
+ *
+ * Punktebene (Issue #72, physik.md Abschnitt 14): jedes Pixel p (relativ zu Quellweiss) wird wie eine
+ * eigene Flaeche abgebildet und addiert: min(1, (punktFaktor * p)^punktExponent). punktFaktor ist die
+ * Leuchtdichte von Quellweiss im Okular relativ zu Anzeigeweiss (linear, nicht komprimiert),
+ * punktExponent der Kompressionsexponent; es gilt faktorObjekt = punktFaktor^punktExponent.
  * hintergrundMagProArcsec2 ist physikalisch und dient nur Anzeige und Hilfetext.
  */
 export interface Helligkeit {
@@ -109,6 +117,8 @@ export interface Helligkeit {
   faktorObjekt: number;
   hintergrundRelativ: number;
   hintergrundMagProArcsec2: number;
+  punktFaktor: number;
+  punktExponent: number;
 }
 
 /**
