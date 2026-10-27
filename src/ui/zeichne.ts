@@ -1,5 +1,5 @@
-// Zeichnen des Anblicks auf ein Canvas. Der Anblick aus rendere ist linear relativ zu Quellweiss
-// (QuelleKacheln linearisiert die sRGB-Kacheln); fuer die Anzeige wird auf 0..1 begrenzt und mit
+// Zeichnen des Anblicks auf ein Canvas. Der Anblick aus rendere ist lineare Anzeigehelligkeit
+// (1 = Bildschirmweiss, GLOSSARY; Abbildung in physik, #55); fuer die Anzeige wird auf 0..1 begrenzt und mit
 // der sRGB-Kennlinie (IEC 61966-2-1) kodiert, sonst wirkt das Bild zu dunkel. Zeile 0 des
 // Rasters ist Norden und landet oben im Canvas (A-D11). Die Maske des Gesichtsfelds hat bild
 // schon angewandt; das Canvas bekommt fuer einen sauberen Rand zusaetzlich die Form per CSS.

@@ -36,15 +36,16 @@ export function infozeilen(anzeige: Anzeigewerte): Infozeile[] {
   const a = anzeige.aufloesung;
   const gf = anzeige.wahresGesichtsfeldGrad;
   const I = TEXTE.info;
+  const H = TEXTE.hilfe.anzeige;
   return [
-    { beschriftung: I.vergroesserung, wert: `${zahl(anzeige.vergroesserung, 0)}${E.fach}` },
-    { beschriftung: I.wahresGesichtsfeld, wert: `${zahl(gf, 2)}${E.grad} (${zahl(gf * 60, 0)}${E.bogenminute})` },
-    { beschriftung: I.austrittspupille, wert: `${austrittspupille(anzeige.austrittspupilleMm)} ${E.mm}` },
-    { beschriftung: I.rayleigh, wert: bogensekunden(a.rayleighArcsec) },
-    { beschriftung: I.dawes, wert: bogensekunden(a.dawesArcsec) },
-    { beschriftung: I.seeing, wert: bogensekunden(a.seeingFwhmArcsec) },
-    { beschriftung: I.auge, wert: bogensekunden(a.augeFwhmArcsec) },
-    { beschriftung: I.dominant, wert: TEXTE.grenzen[a.dominant] }
+    { beschriftung: I.vergroesserung, wert: `${zahl(anzeige.vergroesserung, 0)}${E.fach}`, hilfe: H.vergroesserung },
+    { beschriftung: I.wahresGesichtsfeld, wert: `${zahl(gf, 2)}${E.grad} (${zahl(gf * 60, 0)}${E.bogenminute})`, hilfe: H.wahresGesichtsfeld },
+    { beschriftung: I.austrittspupille, wert: `${austrittspupille(anzeige.austrittspupilleMm)} ${E.mm}`, hilfe: H.austrittspupille },
+    { beschriftung: I.rayleigh, wert: bogensekunden(a.rayleighArcsec), hilfe: H.rayleigh },
+    { beschriftung: I.dawes, wert: bogensekunden(a.dawesArcsec), hilfe: H.dawes },
+    { beschriftung: I.seeing, wert: bogensekunden(a.seeingFwhmArcsec), hilfe: H.seeing },
+    { beschriftung: I.auge, wert: bogensekunden(a.augeFwhmArcsec), hilfe: H.auge },
+    { beschriftung: I.dominant, wert: TEXTE.grenzen[a.dominant], hilfe: H.dominant }
   ];
 }
 

@@ -207,7 +207,7 @@ body {
 
 /* Formular Geraet (#17) */
 
-.formular-geraet .formular-ueberschrift {
+.formular-ueberschrift {
   margin: 0 0 8px;
   font-size: 1.1rem;
 }
@@ -313,4 +313,10 @@ body {
 
 .warnung .hilfe-text {
   color: var(--text);
+}
+
+/* Zusammenfuehrung Welle 3: Tooltips im Infopanel rechts oeffnen nach links, sonst ragen sie ueber den Rand. */
+.info .hilfe-text {
+  left: auto;
+  right: 0;
 }

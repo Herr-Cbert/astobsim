@@ -9,14 +9,15 @@ import { voreinstellung } from "../zustand";
 import { austrittspupille, infozeilen } from "./infopanel";
 
 describe("infozeilen", () => {
-  it("zeigt alle Werte nach A-D4 in fester Reihenfolge, ohne Hilfetext (kommt aus #18)", () => {
+  it("zeigt alle Werte nach A-D4 in fester Reihenfolge, je mit Hilfetext (A-D6)", () => {
     const kataloge = { geraete: pruefeGeraete(geraeteJson), objekte: pruefeObjekte(objekteJson), nachweise: pruefeBildnachweise(bilderJson) };
     const zeilen = infozeilen(auswerten(voreinstellung(kataloge), { anzeigePx: 64 }).anzeige);
     const I = TEXTE.info;
     expect(zeilen.map((z) => z.beschriftung)).toEqual([I.vergroesserung, I.wahresGesichtsfeld, I.austrittspupille, I.rayleigh, I.dawes, I.seeing, I.auge, I.dominant]);
     expect(zeilen[0]?.wert).toBe("60×");
     expect(zeilen[2]?.wert).toBe("1,3 mm");
-    expect(zeilen.every((z) => z.hilfe === undefined)).toBe(true);
+    const H = TEXTE.hilfe.anzeige;
+    expect(zeilen.map((z) => z.hilfe)).toEqual([H.vergroesserung, H.wahresGesichtsfeld, H.austrittspupille, H.rayleigh, H.dawes, H.seeing, H.auge, H.dominant]);
   });
 });
 
