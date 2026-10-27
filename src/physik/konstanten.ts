@@ -80,7 +80,8 @@ export const ANZEIGE_WEISS_MAG_PRO_ARCSEC2 = 3.35;
 
 /**
  * Kompressionsexponent der Abbildung auf den Bildschirm (Abschnitt 12): Groessenordnung nach Stevens
- * 1961 (Helligkeit eines 5-Grad-Felds 0,33, [53]), keine Gleichheit der Empfindung. Offen fuer Phase 6.
+ * 1961 (Helligkeit eines 5-Grad-Felds 0,33, [53]), keine Gleichheit der Empfindung. In Phase 6 am Bild
+ * geprueft und beibehalten (docs/validierung.md 5).
  */
 export const KOMPRESSIONSEXPONENT = 1 / 3;
 
@@ -138,3 +139,12 @@ export const SIGNIFIKANTE_STELLEN = 4;
  */
 export const BLENDUNG_ABSTAND_SCHEINBAR_ARCSEC = 600;
 export const BLENDUNG_DELTA_MAG = 6;
+
+/**
+ * Kontrastschwelle "erkennbar" der Tabellen-Tests (A-Q2, docs/validierung.md): eine Struktur gilt
+ * als erkennbar, wenn ihre Delle nach der Faltung (profilDelle, physik.md 8.1) darueber liegt.
+ * Kalibrierkonstante, keine Physik: am Bild der Testfaelle T1 bis T6 festgelegt, als geometrisches
+ * Mittel des Intervalls zwischen der tiefsten nicht erkennbaren (T4d) und der flachsten
+ * erkennbaren Delle (T4c). Nur die Tests verwenden sie; das Bild haengt nicht davon ab.
+ */
+export const SCHWELLE_ERKENNBAR = 0.125;

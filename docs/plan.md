@@ -77,7 +77,7 @@ Umgesetzt ab 2026-10-27: Vorbereitungs-PR `vorbereitung-welle-3` (Steuerung mit 
 
 **Welle 4a (M2, Folge-Issues aus Welle 3b):** #71 (Quellweiss eichen) und #51 (Kachelstufen linear) parallel, danach #72 (Trabanten als eigene Punktebene, Ansatz 2026-10-27 im Plan-Modus mit Herbert geklaert; loest auch die Begrenzung von Mars am Anzeigeweiss). Umgesetzt 2026-10-27, PRs #73 bis #75.
 
-**Welle 4 (M3):** #21, #22, #23 sequentiell; #21 braucht Herberts Urteil zu den Testfaellen.
+**Welle 4 (M3):** #21, #22, #23 sequentiell; #21 braucht Herberts Urteil zu den Testfaellen. #21 am 2026-10-27 im Plan-Modus geklaert (Masszahl Profildelle statt MTF, Screenshots per Skript), Ergebnis `docs/validierung.md`.
 
 Merge-Konflikte in Stufe B zeigen, wo der Modulschnitt nicht sauber war; sie werden in der Retrospektive (#23) festgehalten.
 
@@ -100,5 +100,5 @@ Die 14 Kann-Anforderungen (A-Z8, A-Z9, A-Z10, A-F9, A-B5, A-B6, A-P8, A-D12 bis 
 - Bildformat WebP gegen JPEG: Entscheidung in #7, Nachtrag in ADR-0003.
 - Kerngroesse 81 px bei grosser Anzeige mit blossem Auge: Test in #4 (architektur.md Abschnitt 4).
 - Worker fuer die JavaScript-Faltung: Version 1 ohne Worker (architektur.md Abschnitt 4); wird nur noetig, wenn #19 die 0,5 s im Fallback verfehlt.
-- Kontrastschwelle "erkennbar": wird in #21 am Bild festgelegt und eingefroren.
+- Kontrastschwelle "erkennbar": in #21 am Bild festgelegt (0,125, Delle eines gefalteten Stufenprofils) und in `src/physik/validierung.test.ts` eingefroren, siehe `docs/validierung.md`.
 - Hubble-Lizenzlesart: beide Angaben im Bildnachweis (#12), siehe `docs/recherche/bilder.md` 6.3.
