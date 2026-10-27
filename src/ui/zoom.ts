@@ -90,7 +90,8 @@ const VERGLEICH = "vergleich";
  * Parameter des Vergleichsbilds zum Zoom-Anblick (Entscheidung Herbert 2026-10-27): dasselbe
  * Fenster, Gesichtsfeld und dieselben Punktquellen, aber ein 1x1-Delta-Kern (keine Faltung) und
  * neutrale Helligkeit (faktorObjekt 1, hintergrundRelativ 0, also Quellweiss = Bildschirmweiss,
- * ohne die Leuchtdichte-Abbildung aus #55). So rechnet rendere ohne Aenderung an bild.
+ * ohne die Leuchtdichte-Abbildung aus #55; Punktebene linear mit punktFaktor 1 und punktExponent 1,
+ * also wie vor Issue #72 nur auf 1 begrenzt). So rechnet rendere ohne Aenderung an bild.
  *
  * Abweichung: das Arbeitsraster ist nicht das des Anblicks (Gesamt-FWHM / 2,5), sondern so fein
  * wie Quelle und Anzeige es hergeben, max(Quellmassstab, fenster.breite / fenster.px). Mit dem
@@ -121,6 +122,6 @@ export function vergleichsparameter(anblick: Simulationsparameter, quellmassstab
       rasterPx
     },
     kern: delta,
-    helligkeit: { ...helligkeit, schluessel: VERGLEICH, faktorObjekt: 1, hintergrundRelativ: 0 }
+    helligkeit: { ...helligkeit, schluessel: VERGLEICH, faktorObjekt: 1, hintergrundRelativ: 0, punktFaktor: 1, punktExponent: 1 }
   };
 }

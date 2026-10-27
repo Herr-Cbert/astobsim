@@ -27,7 +27,7 @@ describe("Naht-Typen sind strukturiert klonbar", () => {
         massstabArcsecProPx: 1.2,
         daten: new Float32Array(25).fill(1 / 25),
       },
-      helligkeit: { schluessel: "0.7|0.02", faktorObjekt: 0.7, hintergrundRelativ: 0.02, hintergrundMagProArcsec2: 20.5 },
+      helligkeit: { schluessel: "0.7|0.02", faktorObjekt: 0.7, hintergrundRelativ: 0.02, hintergrundMagProArcsec2: 20.5, punktFaktor: 0.343, punktExponent: 1 / 3 },
       gesichtsfeld: { form: "kreis", breiteArcsec: 1024, hoeheArcsec: 1024 },
       fenster: { breiteArcsec: 1024, mitteXArcsec: 0, mitteYArcsec: 0, px: 1024 },
     };

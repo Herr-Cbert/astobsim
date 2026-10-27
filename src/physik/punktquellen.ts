@@ -1,6 +1,6 @@
 // Punktquellen (Stufe 1): Trabanten eines Objektzustands als Punktquellen der Naht, mit Helligkeit
 // relativ zu Quellweiss und Blendungsregel (A-P6, A-X2). Quelle: docs/recherche/physik.md,
-// Abschnitte 7, 9 und 13 (Herleitung 13.1, Blendungsregel 13.3). Bild malt sie vor der Faltung als Scheibchen (ADR-0002).
+// Abschnitte 7, 9 und 13 (Herleitung 13.1, Blendungsregel 13.3). Bild malt sie vor der Faltung als Scheibchen in die Punktebene (ADR-0002, Abschnitt 14).
 
 import type { Objektzustand, Trabant } from "../naht/konfiguration";
 import type { Punktquelle } from "../naht/simulationsparameter";
@@ -23,7 +23,7 @@ export function scheibenFlaechenhelligkeit(magnitude: number, durchmesserArcsec:
  * 10^(-0,4 (mu_Trabant - mu_Quellweiss)) (Abschnitt 13.1). Herleitung: Fluss am Auge
  * ~ 10^(-0,4 m) a tau (1 - eps^2) min(D, p V)^2 (Abschnitt 7, 9), Bildflaeche ~ V^2, also
  * Flaechenhelligkeit ~ a tau (1 - eps^2) min(AP, p)^2 wie beim Objekt (Abschnitt 5.1). Atmosphaere,
- * Transmission, Abschattung und Austrittspupille stecken daher fuer beide in Helligkeit.faktorObjekt;
+ * Transmission, Abschattung und Austrittspupille stecken daher fuer beide in Helligkeit (faktorObjekt, fuer die Punktebene punktFaktor);
  * die Oeffnung wirkt ueber die PSF, die den Fluss bei der Faltung verteilt.
  */
 export function helligkeitRelativ(magnitude: number, durchmesserArcsec: number, weissMagProArcsec2: number): number {
@@ -54,7 +54,7 @@ export function geblendet(t: Trabant, blender: readonly Blender[], vergroesserun
 /**
  * Die Trabanten des Objektzustands als Punktquellen: Position (+x rechts, +y Norden) und
  * Durchmesser in Bogensekunden, Flaechenhelligkeit relativ zu Quellweiss ohne den gemeinsamen
- * Faktor aus Helligkeit.faktorObjekt, sichtbar false mit grund "blendung" nach der Blendungsregel.
+ * Faktor aus Helligkeit (punktFaktor), sichtbar false mit grund "blendung" nach der Blendungsregel.
  * Blender sind das Objekt selbst (Mitte 0/0) und die anderen Trabanten. Wirft PhysikFehler bei
  * Durchmesser <= 0, nicht endlicher Magnitude oder Position (Programmierfehler, daten prueft das).
  */

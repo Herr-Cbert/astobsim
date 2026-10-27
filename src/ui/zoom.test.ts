@@ -85,7 +85,7 @@ describe("vergleichsparameter", () => {
   it("1x1-Delta-Kern im Massstab des Vergleichsrasters, neutrale Helligkeit", () => {
     expect(v.kern).toMatchObject({ groesse: 1, radius: 0, massstabArcsecProPx: v.quellbild.massstabArcsecProPx });
     expect(Array.from(v.kern.daten)).toEqual([1]);
-    expect(v.helligkeit).toMatchObject({ faktorObjekt: 1, hintergrundRelativ: 0 });
+    expect(v.helligkeit).toMatchObject({ faktorObjekt: 1, hintergrundRelativ: 0, punktFaktor: 1, punktExponent: 1 });
     expect(v.kern.schluessel).not.toBe(anblick.kern.schluessel);
     expect(v.helligkeit.schluessel).not.toBe(anblick.helligkeit.schluessel);
   });
