@@ -11,7 +11,7 @@ import { findeZustand, type Objekt, objektzustand, type ZustandEintrag } from ".
 import type { Konfiguration } from "../physik";
 import { TEXTE } from "../texte";
 import type { Kataloge } from "../zustand";
-import { auswahl, type AuswahlOption } from "./feld";
+import { auswahl, type AuswahlOption, optionselemente } from "./feld";
 import type { Steuerung } from "./steuerung";
 
 const T = TEXTE.objekt;
@@ -48,15 +48,7 @@ export function gewaehlt(kataloge: Kataloge, k: Konfiguration): { objekt: Objekt
 
 /** Ersetzt die Optionen eines select. */
 function setzeOptionen(s: HTMLSelectElement, optionen: readonly AuswahlOption[]): void {
-  const d = s.ownerDocument;
-  s.replaceChildren(
-    ...optionen.map((o) => {
-      const e = d.createElement("option");
-      e.value = o.wert;
-      e.textContent = o.text;
-      return e;
-    })
-  );
+  s.replaceChildren(...optionselemente(s.ownerDocument, optionen));
 }
 
 export function baueFormularObjekt(platz: HTMLElement, steuerung: Steuerung): void {

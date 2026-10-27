@@ -4,7 +4,7 @@
 // Kacheln geholt wurden (Cache-Tests).
 
 import type { Kanaele, Raster } from "../naht/raster";
-import { QuelleKacheln, type Kacheladresse } from "./kacheln";
+import { kachelSchluessel, QuelleKacheln } from "./kacheln";
 
 /** Halbiert ein Raster durch 2x2-Flaechenmittel; ungerade Raender zaehlen die vorhandenen Pixel. */
 export function halbiere(raster: Raster): Raster {
@@ -90,6 +90,5 @@ export function quelleRaster(
   return { quelle: new QuelleKacheln(geometrie, lader, optionen.maxKacheln), geladen };
 }
 
-export function adresseText(a: Kacheladresse): string {
-  return `${a.stufe}/${a.x}_${a.y}`;
-}
+/** Name einer Kachel in geladen und fehlschlagen: derselbe Schluessel wie im Cache. */
+export const adresseText = kachelSchluessel;

@@ -11,16 +11,24 @@ export interface Ort {
   eintrag: string;
 }
 
-/** Laedt daten/<datei> relativ zu BASE_URL (Dev "/", Build "/astobsim/") und parst das JSON. */
-export async function ladeJson(datei: string): Promise<unknown> {
-  const url = import.meta.env.BASE_URL + "daten/" + datei;
+/**
+ * Holt daten/<pfad> relativ zu BASE_URL (Dev "/", Build "/astobsim/"). Wirft DatenFehler mit
+ * datei und eintrag, wenn der Server nicht erreichbar ist oder keinen Status 2xx liefert.
+ */
+export async function holeDaten(pfad: string, datei: string, eintrag: string): Promise<Response> {
   let antwort: Response;
   try {
-    antwort = await fetch(url);
+    antwort = await fetch(import.meta.env.BASE_URL + "daten/" + pfad);
   } catch (e) {
-    throw new DatenFehler(datei, "-", "-", `nicht erreichbar (${String(e)})`);
+    throw new DatenFehler(datei, eintrag, "-", `nicht erreichbar (${String(e)})`);
   }
-  if (!antwort.ok) throw new DatenFehler(datei, "-", "-", `HTTP ${antwort.status}`);
+  if (!antwort.ok) throw new DatenFehler(datei, eintrag, "-", `HTTP ${antwort.status}`);
+  return antwort;
+}
+
+/** Laedt daten/<datei> und parst das JSON. */
+export async function ladeJson(datei: string): Promise<unknown> {
+  const antwort = await holeDaten(datei, datei, "-");
   try {
     return await antwort.json();
   } catch (e) {

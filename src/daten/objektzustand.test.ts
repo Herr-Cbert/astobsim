@@ -4,7 +4,7 @@ import objekteJson from "../../daten/objekte.json";
 import { pruefeBildnachweise } from "./bildnachweise";
 import { DatenFehler } from "./fehler";
 import { pruefeObjekte } from "./objekte";
-import { findeZustand, objektzustand } from "./objektzustand";
+import { findeZustand, nachweisZu, objektzustand } from "./objektzustand";
 
 const nachweise = pruefeBildnachweise(bilderJson);
 const objekte = pruefeObjekte(objekteJson);
@@ -36,5 +36,12 @@ describe("objektzustand", () => {
 
   it("wirft DatenFehler, wenn der Bildnachweis fehlt", () => {
     expect(() => objektzustand(objekte, [], "mond_ev")).toThrow(DatenFehler);
+  });
+});
+
+describe("nachweisZu", () => {
+  it("liefert den Bildnachweis des Zustands, undefined bei unbekannter id", () => {
+    for (const o of objekte) for (const z of o.zustaende) expect(nachweisZu(objekte, nachweise, z.id)?.id).toBe(z.bild);
+    expect(nachweisZu(objekte, nachweise, "gibt-es-nicht")).toBeUndefined();
   });
 });

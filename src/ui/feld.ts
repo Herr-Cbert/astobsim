@@ -210,6 +210,16 @@ export function regler(d: Document, o: ZahlOptionen): Regler {
   return { ...feld, regler: r };
 }
 
+/** option-Elemente zu den Eintraegen, fuer select oder optgroup. */
+export function optionselemente(d: Document, optionen: readonly AuswahlOption[]): HTMLOptionElement[] {
+  return optionen.map((o) => {
+    const e = d.createElement("option");
+    e.value = o.wert;
+    e.textContent = o.text;
+    return e;
+  });
+}
+
 /** Auswahlliste mit optionalen Gruppen (z. B. Auge, Fernglaeser, Fernrohre, A-F2). */
 export function auswahl(d: Document, o: AuswahlOptionen): Auswahl {
   const { element, zeile } = feldrahmen(d, o);
@@ -223,12 +233,7 @@ export function auswahl(d: Document, o: AuswahlOptionen): Auswahl {
       ziel.label = g.beschriftung;
       s.append(ziel);
     }
-    for (const opt of g.optionen) {
-      const e = d.createElement("option");
-      e.value = opt.wert;
-      e.textContent = opt.text;
-      ziel.append(e);
-    }
+    ziel.append(...optionselemente(d, g.optionen));
   }
   zeile.append(s);
   const setzeWert = (wert: string): void => {

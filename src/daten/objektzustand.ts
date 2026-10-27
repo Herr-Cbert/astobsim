@@ -44,3 +44,9 @@ export function objektzustand(objekte: readonly Objekt[], nachweise: readonly Bi
     trabanten: zustand.trabanten.map((t) => ({ ...t }))
   };
 }
+
+/** Bildnachweis zum Zustand mit der id kennung (fuer Namensnennung und Bildquelle); undefined, wenn es keinen gibt. */
+export function nachweisZu(objekte: readonly Objekt[], nachweise: readonly Bildnachweis[], kennung: string): Bildnachweis | undefined {
+  const bild = findeZustand(objekte, kennung)?.zustand.bild;
+  return bild === undefined ? undefined : nachweise.find((n) => n.id === bild);
+}
