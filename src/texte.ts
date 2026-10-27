@@ -17,6 +17,21 @@ export const TEXTE = {
   gesichtsfeld: "Anblick im wahren Gesichtsfeld",
   /** Titel und Zusatz zur Beschriftung des Gesichtsfelds, wenn es sich verschieben laesst (A-D2, #19). */
   gesichtsfeldVerschieben: "Ziehen mit der Maus oder Pfeiltasten verschieben den Ausschnitt, Pos1 zentriert.",
+  /** Titel und Zusatz zur Beschriftung des Gesichtsfelds: es oeffnet die Zoomansicht (A-D3, #20). */
+  gesichtsfeldZoom: "Klick oder Eingabetaste zeigt das Objekt vergrößert neben dem Quellbild.",
+
+  /** Zoomansicht (A-D3, src/ui/zoomansicht.ts); Hilfetexte unter hilfe.anblick und hilfe.quellbild. */
+  zoom: {
+    ueberschrift: "Zoomansicht",
+    anblick: "Anblick",
+    quellbild: "Quellbild",
+    anblickBild: "Anblick vergrößert",
+    quellbildBild: "Quellbild im selben Maßstab und Ausschnitt",
+    zurueck: "Zurück zur Übersicht",
+    /** Titel der beiden Bilder, je nachdem ob sich der Ausschnitt verschieben laesst. */
+    bedienung: "Klick, Eingabetaste oder Escape führt zurück zur Übersicht.",
+    bedienungVerschieben: "Ziehen mit der Maus oder Pfeiltasten verschieben beide Bilder gemeinsam, Pos1 zentriert. Klick, Eingabetaste oder Escape führt zurück zur Übersicht."
+  },
 
   status: {
     ladeDaten: "Lade Geräte- und Objektdaten …",
@@ -78,6 +93,14 @@ export const TEXTE = {
       "Wie hoch das Objekt über dem Horizont steht, in Grad (90° ist der Zenit, senkrecht über dem Beobachter). " +
       "Je tiefer es steht, desto länger ist der Weg des Lichts durch die Luft: Das Seeing wird schlechter und das Objekt dunkler. " +
       "Die Luftmasse gibt diesen Weg an, 1 im Zenit, bei 30° etwa 2, bei 10° etwa 5,6.",
+
+    /** Beschriftungen der Zoomansicht (#20). */
+    anblick:
+      "So erscheint das Objekt im Okular: verschmiert durch Beugung, Seeing und die Grenze des Auges und in der Helligkeit, die das Auge im Okular sieht. " +
+      "Gezeigt wird der Anblick über längere Zeit, nicht der beste ruhige Moment. Hier vergrößert, damit sich die Einzelheiten mit dem Quellbild vergleichen lassen.",
+    quellbild:
+      "Die Aufnahme, aus der der Anblick entsteht (Raumsonde, Hubble oder beim Mond ein NASA-Rendering), im selben Maßstab und Ausschnitt, aber ohne Verschmierung und ohne Anpassung der Helligkeit: Weiß im Quellbild ist Weiß auf dem Bildschirm. " +
+      "Was hier zu sehen ist und im Anblick fehlt, bleibt unter den eingestellten Bedingungen unsichtbar.",
 
     /** Hilfetexte zu den Zahlen des Infopanels (A-D6), Schluessel wie in TEXTE.info. */
     anzeige: {

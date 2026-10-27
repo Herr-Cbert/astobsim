@@ -6,18 +6,23 @@
 // das Netz (Bildquelle, Kacheln) und wird dabei ueberholt, wird sie verworfen; ohne Netz laeuft
 // sie in einem Zug durch, damit auch Dauerziehen am Regler Bilder liefert. Das alte Bild bleibt
 // bis zum neuen im Stand (kein Flackern). verschiebe aendert nur die Fenstermitte (A-D2).
+// zoome wechselt zwischen Uebersicht und Zoomansicht (A-D3, Issue #20): der Zoom ist nur ein
+// anderes Fenster (zoom.ts) mit derselben Fenstermitte, dazu das Vergleichsbild aus derselben
+// Quelle; er schreibt keine URL.
 //
 // Alles, was den Browser braucht (Frame, URL, Bildquelle, Anzeigegroesse), kommt ueber die
 // Umgebung herein; so prueft Vitest die Schleife in Node. Die Steuerung wirft nie: Fehler landen
 // im Stand und die UI zeigt sie an.
 
-import { type Anblick, type Falter, rendere, type Zwischenspeicher } from "../bild";
+import { type Anblick, type Falter, FalterJs, rendere, type Zwischenspeicher } from "../bild";
 import type { Objektzustand } from "../naht/konfiguration";
 import type { Quelle } from "../naht/quelle";
 import type { Simulationsparameter } from "../naht/simulationsparameter";
 import { type Auswertung, auswerten, begrenze, type Hinweis, type Konfiguration, optik } from "../physik";
 import { inUrl, type Kataloge } from "../zustand";
 import { type Ausschnittsanfrage, ausschnittsanfrage } from "./fenster";
+import { sollMitte } from "./verschieben";
+import { vergleichsparameter, verschiebelage, zoomfenster } from "./zoom";
 
 /** Quelle eines Objektzustands mit dem asynchronen Vorladen, das rendere voraussetzt. */
 export interface Bildquelle {
@@ -38,8 +43,8 @@ export interface Umgebung {
   warte(): Promise<void>;
   /** Schreibt den Suchteil der URL (Browser: history.replaceState). */
   schreibeUrl(suche: string): void;
-  /** Anzeigepixel des Gesichtsfelds fuer die naechste Rechnung. */
-  anzeigePx(): number;
+  /** Anzeigepixel fuer die naechste Rechnung: Gesichtsfeld, im Zoom ein Bild der Zoomansicht. */
+  anzeigePx(zoom: boolean): number;
   /** Zeit in ms (Browser: performance.now). */
   uhr(): number;
 }
@@ -69,8 +74,12 @@ export interface Stand {
   auswertung?: Auswertung;
   /** Fenstermitte in Objektkoordinaten (Bogensekunden, +y Norden); 0/0 zeigt das Objekt zentriert. */
   mitte: { xArcsec: number; yArcsec: number };
-  /** Letzter fertiger Anblick; bleibt stehen, bis der naechste fertig ist, auch bei einem Fehler. */
+  /** Gewuenschte Ansicht: false Uebersicht (Gesichtsfeld), true Zoomansicht (A-D3). */
+  zoom: boolean;
+  /** Letzter fertiger Anblick der Uebersicht; bleibt stehen, bis der naechste fertig ist, auch bei einem Fehler. */
   anblick?: Anblick;
+  /** Letzte fertige Zoomansicht: Anblick und Vergleichsbild im selben Fenster; bleibt stehen wie anblick. */
+  zoombilder?: Zoombilder;
   /** Zaehlt die fertigen Anblicke; ein Beobachter zeichnet nur, wenn sich die Nummer aendert. */
   nummer: number;
   /** Dauer von rendere fuer den letzten Anblick in ms. */
@@ -79,13 +88,23 @@ export interface Stand {
   fehler?: { art: "bild" | "rechnen"; ursache: unknown };
 }
 
+/** Die beiden Bilder der Zoomansicht, aus einer Rechnung. */
+export interface Zoombilder {
+  anblick: Anblick;
+  /** Quellbild ohne Faltung und ohne Helligkeitsanpassung, Quellweiss = Bildschirmweiss (zoom.ts). */
+  vergleich: Anblick;
+}
+
 export type Beobachter = (stand: Readonly<Stand>) => void;
 
-/** Aktuelle Bildquelle; gehoert zu genau einem Objektzustand, ebenso ihr Zwischenspeicher. */
+/**
+ * Aktuelle Bildquelle; gehoert zu genau einem Objektzustand, ebenso ihre Zwischenspeicher. Einer je
+ * Bild, damit sich Uebersicht, Zoom und Vergleichsbild die Stufen nicht gegenseitig verdraengen.
+ */
 interface AktuelleQuelle {
   kennung: string;
   bildquelle: Promise<Bildquelle>;
-  zwischen: Zwischenspeicher;
+  zwischen: { uebersicht: Zwischenspeicher; zoom: Zwischenspeicher; vergleich: Zwischenspeicher };
 }
 
 export class Steuerung {
@@ -102,13 +121,15 @@ export class Steuerung {
   private urlGeschrieben = false;
   private vorher: Simulationsparameter | undefined;
   private aktuell: AktuelleQuelle | undefined;
+  /** Faltet das Vergleichsbild: der 1x1-Delta-Kern braucht keine GPU und kein Kontextrisiko. */
+  private readonly vergleichsfalter = new FalterJs();
 
   /** Startet mit start (z. B. aus ausUrl) und plant URL und erste Rechnung. */
   constructor(
     private readonly umgebung: Umgebung,
     start: Konfiguration
   ) {
-    this.zustand = { konfiguration: begrenze(start).konfiguration, phase: "laedt", nummer: 0, mitte: { xArcsec: 0, yArcsec: 0 } };
+    this.zustand = { konfiguration: begrenze(start).konfiguration, phase: "laedt", zoom: false, nummer: 0, mitte: { xArcsec: 0, yArcsec: 0 } };
     this.url = this.urlZu(this.zustand.konfiguration);
     this.plane();
   }
@@ -151,6 +172,21 @@ export class Steuerung {
     if (m.xArcsec === xArcsec && m.yArcsec === yArcsec) return;
     this.ueberhole();
     this.setze({ mitte: { xArcsec, yArcsec } });
+    this.plane();
+  }
+
+  /**
+   * Wechselt zwischen Uebersicht (false) und Zoomansicht (true); schreibt keine URL (der Zoom ist
+   * kein Parameter der Konfiguration). Die Fenstermitte bleibt, soweit die neue Ansicht sie
+   * erlaubt (sonst begrenzt oder 0/0, verschieben.ts); Anblick und Zoombilder bleiben im Stand,
+   * bis die neue Rechnung fertig ist.
+   */
+  zoome(zoom: boolean): void {
+    if (this.zustand.zoom === zoom) return;
+    const lage = verschiebelage(this.zustand.konfiguration, zoom);
+    const mitte = sollMitte(this.zustand.mitte, lage?.durchmesser, lage?.erlaubt ?? false);
+    this.ueberhole();
+    this.setze({ zoom, mitte });
     this.plane();
   }
 
@@ -242,7 +278,7 @@ export class Steuerung {
 
   private quelleFuer(objekt: Objektzustand): AktuelleQuelle {
     if (this.aktuell?.kennung !== objekt.kennung) {
-      this.aktuell = { kennung: objekt.kennung, bildquelle: this.umgebung.bildquelle(objekt), zwischen: {} };
+      this.aktuell = { kennung: objekt.kennung, bildquelle: this.umgebung.bildquelle(objekt), zwischen: { uebersicht: {}, zoom: {}, vergleich: {} } };
     }
     return this.aktuell;
   }
@@ -256,12 +292,17 @@ export class Steuerung {
     await this.umgebung.warte();
     const version = this.version;
     const ueberholt = this.ueberholt.promise;
-    const { konfiguration: k, mitte } = this.zustand;
+    const { konfiguration: k, mitte, zoom } = this.zustand;
 
     let auswertung: Auswertung;
+    let vergleich: Simulationsparameter | undefined;
     try {
-      const fenster = { breiteArcsec: optik(k.geraet).gesichtsfeld.breiteArcsec, mitteXArcsec: mitte.xArcsec, mitteYArcsec: mitte.yArcsec, px: this.umgebung.anzeigePx() };
+      const px = this.umgebung.anzeigePx(zoom);
+      const fenster = zoom
+        ? zoomfenster(k, mitte, px)
+        : { breiteArcsec: optik(k.geraet).gesichtsfeld.breiteArcsec, mitteXArcsec: mitte.xArcsec, mitteYArcsec: mitte.yArcsec, px };
       auswertung = auswerten(k, { fenster, vorher: this.vorher });
+      if (zoom) vergleich = vergleichsparameter(auswertung.parameter, k.objekt.quelle.massstabArcsecProPx);
     } catch (e) {
       this.setze({ phase: "fehler", fehler: { art: "rechnen", ursache: e } });
       return;
@@ -274,6 +315,8 @@ export class Steuerung {
     const laden = (async (): Promise<Bildquelle> => {
       const bildquelle = await aktuell.bildquelle;
       await bildquelle.lade(ausschnittsanfrage(auswertung.parameter.quellbild));
+      // Das Vergleichsbild fragt feiner an (andere Kachelstufe), deshalb eigens laden.
+      if (vergleich !== undefined) await bildquelle.lade(ausschnittsanfrage(vergleich.quellbild));
       return bildquelle;
     })();
     let bildquelle: Bildquelle | undefined;
@@ -296,9 +339,13 @@ export class Steuerung {
     if (neueQuelle) this.setze({ phase: "rechnet" });
     try {
       const t0 = this.umgebung.uhr();
-      const anblick = rendere(auswertung.parameter, bildquelle.quelle, this.umgebung.falter, aktuell.zwischen);
+      const anblick = rendere(auswertung.parameter, bildquelle.quelle, this.umgebung.falter, zoom ? aktuell.zwischen.zoom : aktuell.zwischen.uebersicht);
+      const bilder: Partial<Stand> =
+        vergleich === undefined
+          ? { anblick }
+          : { zoombilder: { anblick, vergleich: rendere(vergleich, bildquelle.quelle, this.vergleichsfalter, aktuell.zwischen.vergleich) } };
       const ms = Math.round(this.umgebung.uhr() - t0);
-      this.setze({ phase: "fertig", anblick, ms, nummer: this.zustand.nummer + 1 });
+      this.setze({ phase: "fertig", ...bilder, ms, nummer: this.zustand.nummer + 1 });
     } catch (e) {
       this.setze({ phase: "fehler", fehler: { art: "rechnen", ursache: e } });
     }
