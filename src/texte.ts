@@ -41,7 +41,7 @@ export const TEXTE = {
   /** Infosymbol (src/ui/hilfe.ts); die Hilfetexte selbst stehen im Abschnitt hilfe und bei den Formularen. */
   hilfe: {
     symbol: "i",
-    beschriftung: "Hilfe"
+    beschriftung: (thema: string): string => `Hilfe zu ${thema}`
     // Issue #18: Hilfetexte zu Parametern und Anzeigezahlen (A-D6), Hinweise A-X5, A-X1, A-B2.
   },
 

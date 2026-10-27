@@ -114,11 +114,15 @@ body {
   position: absolute;
   z-index: 10;
   left: 0;
-  top: 1.8em;
+  top: 100%;
   width: 18em;
+  /* Abstand zum Knopf als Rand ohne Luecke: die Maus kann auf den Text wechseln (WCAG 1.4.13). */
+  border-top: 6px solid transparent;
+  background-clip: padding-box;
   padding: 8px;
-  border: 1px solid var(--rand);
-  background: var(--hintergrund);
+  outline: 1px solid var(--rand);
+  outline-offset: -1px;
+  background-color: var(--hintergrund);
   color: var(--text);
   font-size: 0.85rem;
 }

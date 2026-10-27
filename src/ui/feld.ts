@@ -87,7 +87,7 @@ function feldrahmen(d: Document, o: Feldbasis): { element: HTMLElement; zeile: H
   label.htmlFor = o.id;
   label.textContent = o.beschriftung;
   kopf.append(label);
-  if (o.hilfe !== undefined) kopf.append(hilfesymbol(d, `${o.id}-hilfe`, o.hilfe));
+  if (o.hilfe !== undefined) kopf.append(hilfesymbol(d, `${o.id}-hilfe`, o.hilfe, o.beschriftung));
   const zeile = d.createElement("div");
   zeile.className = "feld-zeile";
   element.append(kopf, zeile);
@@ -117,24 +117,29 @@ function zahlteil(d: Document, o: ZahlOptionen, zeile: HTMLElement, element: HTM
   element.append(hinweis);
 
   let aktuell = o.wert;
-  const setzeWert = (wert: number): void => {
-    aktuell = wert;
-    eingabe.value = zahl(wert, o.stellen);
-    beiWert?.(wert);
-  };
   const zeigeHinweis = (h: Hinweis | undefined): void => {
     hinweis.hidden = h === undefined;
     hinweis.textContent = h === undefined ? "" : TEXTE.feld.geschnitten(zahl(h.eingabe, o.stellen), zahl(h.wert, o.stellen));
     if (h === undefined) eingabe.removeAttribute("aria-describedby");
     else eingabe.setAttribute("aria-describedby", hinweis.id);
   };
+  const zeigeWert = (wert: number): void => {
+    aktuell = wert;
+    eingabe.value = zahl(wert, o.stellen);
+    beiWert?.(wert);
+  };
+  // Ein Wert von aussen (anderes Feld, Beobachter) macht einen alten Hinweis ungueltig.
+  const setzeWert = (wert: number): void => {
+    zeigeHinweis(undefined);
+    zeigeWert(wert);
+  };
   const uebernimm = (wert: number): void => {
     const h = hinweisFuer(o.beiAenderung(wert), o.feld);
     zeigeHinweis(h);
-    setzeWert(h === undefined ? wert : h.wert);
+    zeigeWert(h === undefined ? wert : h.wert);
   };
 
-  setzeWert(o.wert);
+  zeigeWert(o.wert);
   eingabe.addEventListener("change", () => {
     const wert = leseDezimal(eingabe.value);
     // Unlesbares wird verworfen; der alte Wert erscheint wieder.
@@ -167,15 +172,12 @@ export function regler(d: Document, o: ZahlOptionen): Regler {
   const feld = zahlteil(d, o, zeile, element, (wert) => {
     r.value = String(wert);
   });
+  // Der Regler bleibt in den Grenzen; Hinweise gibt es nur aus dem Zahlenfeld. Eine Aenderung
+  // mit gleichem Wert (change nach input) verwirft die Steuerung, deshalb genuegt input.
   r.addEventListener("input", () => {
     const wert = Number(r.value);
+    feld.setzeWert(wert);
     o.beiAenderung(wert);
-    feld.eingabe.value = zahl(wert, o.stellen);
-  });
-  // Nach dem Ziehen den Wert wie eine Eingabe im Zahlenfeld uebernehmen (Hinweis, Anzeige).
-  r.addEventListener("change", () => {
-    feld.eingabe.value = r.value;
-    feld.eingabe.dispatchEvent(new Event("change"));
   });
   return { ...feld, regler: r };
 }

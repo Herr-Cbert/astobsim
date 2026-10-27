@@ -4,6 +4,9 @@
 // steuerung.konfiguration, haengt sich mit steuerung.beobachte an Aenderungen von aussen und
 // meldet jede Eingabe ueber steuerung.aendere (begrenzt, schreibt die URL, rechnet neu).
 // Felder ueber feld.ts, Hilfetexte ueber hilfe.ts, alle Texte aus src/texte.ts.
+// Vergroesserung als Eingabe (A-F7): begrenze meldet den Hinweis auf geraet.okular.brennweiteMm;
+// beiAenderung des Vergroesserungsfelds rechnet ihn in Vergroesserung um und gibt ihn mit dem
+// eigenen Feldpfad zurueck (zahlenfeld erwartet hinweis.wert im Mass des Felds).
 
 import type { Steuerung } from "./steuerung";
 

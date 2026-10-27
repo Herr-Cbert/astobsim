@@ -1,9 +1,11 @@
-// Steuerung der UI: haelt die Konfiguration und den Rechenstand und verbindet Formulare,
-// Gesichtsfeld und Infopanel (docs/architektur.md Abschnitt 1, Modul ui). Jede Aenderung laeuft
-// ueber aendere: begrenze (physik) -> URL schreiben (zustand, A-D8) -> Rechnung planen. Gerechnet
-// wird hoechstens einmal pro Frame (A-D7); mehrere Aenderungen im selben Frame werden zu einer
-// Rechnung, eine Rechnung zu einer inzwischen ueberholten Konfiguration wird vor dem Falten
-// verworfen. Das alte Bild bleibt bis zum neuen im Stand (kein Flackern).
+// Steuerung der UI: haelt die Konfiguration, die Fenstermitte und den Rechenstand und verbindet
+// Formulare, Gesichtsfeld und Infopanel (docs/architektur.md Abschnitt 1, Modul ui). Jede
+// Aenderung laeuft ueber aendere: begrenze (physik) -> Rechnung planen; im geplanten Frame wird
+// die URL geschrieben (zustand, A-D8) und gerechnet. Gerechnet wird hoechstens einmal pro Frame
+// (A-D7); mehrere Aenderungen im selben Frame werden zu einer Rechnung. Wartet eine Rechnung auf
+// das Netz (Bildquelle, Kacheln) und wird dabei ueberholt, wird sie verworfen; ohne Netz laeuft
+// sie in einem Zug durch, damit auch Dauerziehen am Regler Bilder liefert. Das alte Bild bleibt
+// bis zum neuen im Stand (kein Flackern). verschiebe aendert nur die Fenstermitte (A-D2).
 //
 // Alles, was den Browser braucht (Frame, URL, Bildquelle, Anzeigegroesse), kommt ueber die
 // Umgebung herein; so prueft Vitest die Schleife in Node. Die Steuerung wirft nie: Fehler landen
@@ -13,7 +15,7 @@ import { type Anblick, type Falter, rendere, type Zwischenspeicher } from "../bi
 import type { Objektzustand } from "../naht/konfiguration";
 import type { Quelle } from "../naht/quelle";
 import type { Simulationsparameter } from "../naht/simulationsparameter";
-import { type Auswertung, auswerten, begrenze, type Hinweis, type Konfiguration } from "../physik";
+import { type Auswertung, auswerten, begrenze, type Hinweis, type Konfiguration, optik } from "../physik";
 import { inUrl, type Kataloge } from "../zustand";
 import { type Ausschnittsanfrage, ausschnittsanfrage } from "./fenster";
 
@@ -45,13 +47,29 @@ export interface Umgebung {
 /** laedt: Bildquelle oder Kacheln werden geholt; rechnet: rendere laeuft gleich; fertig, fehler. */
 export type Phase = "laedt" | "rechnet" | "fertig" | "fehler";
 
+/** Wird erfuellt, sobald die laufende Rechnung ueberholt ist (naechstes aendere oder verschiebe). */
+interface Signal {
+  promise: Promise<void>;
+  loese(): void;
+}
+
+function neuesSignal(): Signal {
+  let loese = (): void => {};
+  const promise = new Promise<void>((weiter) => {
+    loese = weiter;
+  });
+  return { promise, loese };
+}
+
 export interface Stand {
   /** Die aktuelle, begrenzte Konfiguration. */
   konfiguration: Konfiguration;
   phase: Phase;
   /** Auswertung der zuletzt begonnenen Rechnung (Infopanel, Warnungen); fehlt vor der ersten. */
   auswertung?: Auswertung;
-  /** Letzter fertiger Anblick; bleibt stehen, bis der naechste fertig ist oder ein Fehler kommt. */
+  /** Fenstermitte in Objektkoordinaten (Bogensekunden, +y Norden); 0/0 zeigt das Objekt zentriert. */
+  mitte: { xArcsec: number; yArcsec: number };
+  /** Letzter fertiger Anblick; bleibt stehen, bis der naechste fertig ist, auch bei einem Fehler. */
   anblick?: Anblick;
   /** Zaehlt die fertigen Anblicke; ein Beobachter zeichnet nur, wenn sich die Nummer aendert. */
   nummer: number;
@@ -73,21 +91,25 @@ interface AktuelleQuelle {
 export class Steuerung {
   private zustand: Stand;
   private readonly beobachter = new Set<Beobachter>();
-  /** Zaehlt die Aenderungen; eine Rechnung prueft vor dem Falten, ob sie noch aktuell ist. */
+  /** Zaehlt die Aenderungen; eine Rechnung prueft nach dem Warten aufs Netz, ob sie noch aktuell ist. */
   private version = 0;
+  private ueberholt = neuesSignal();
   private geplant = false;
   private laeuft = false;
   private nochmal = false;
+  /** Suchteil der URL, der zuletzt geschrieben wurde oder werden soll. */
+  private url = "";
+  private urlGeschrieben = false;
   private vorher: Simulationsparameter | undefined;
   private aktuell: AktuelleQuelle | undefined;
 
-  /** Startet mit start (z. B. aus ausUrl), schreibt die URL und plant die erste Rechnung. */
+  /** Startet mit start (z. B. aus ausUrl) und plant URL und erste Rechnung. */
   constructor(
     private readonly umgebung: Umgebung,
     start: Konfiguration
   ) {
-    this.zustand = { konfiguration: begrenze(start).konfiguration, phase: "laedt", nummer: 0 };
-    this.schreibeUrl();
+    this.zustand = { konfiguration: begrenze(start).konfiguration, phase: "laedt", nummer: 0, mitte: { xArcsec: 0, yArcsec: 0 } };
+    this.url = this.urlZu(this.zustand.konfiguration);
     this.plane();
   }
 
@@ -104,16 +126,38 @@ export class Steuerung {
   }
 
   /**
-   * Uebernimmt eine neue Konfiguration: begrenzt sie (A-F8), schreibt die URL und plant die
-   * Rechnung. Liefert die Hinweise von begrenze, damit das Formular sie am Feld zeigt.
+   * Uebernimmt eine neue Konfiguration: begrenzt sie (A-F8) und plant URL und Rechnung; eine
+   * Konfiguration, die der aktuellen gleicht, aendert nichts. Wechselt Objekt oder Geraet,
+   * springt die Fenstermitte auf 0/0. Liefert die Hinweise von begrenze fuer das Feld.
    */
   aendere(neu: Konfiguration): Hinweis[] {
     const { konfiguration, hinweise } = begrenze(neu);
-    this.version++;
-    this.setze({ konfiguration });
-    this.schreibeUrl();
+    const url = this.urlZu(konfiguration);
+    if (url !== "" && url === this.url) return hinweise;
+    const alt = this.zustand.konfiguration;
+    const zurueck = konfiguration.objekt.kennung !== alt.objekt.kennung || JSON.stringify(konfiguration.geraet) !== JSON.stringify(alt.geraet);
+    this.url = url;
+    this.urlGeschrieben = false;
+    this.ueberhole();
+    this.setze(zurueck ? { konfiguration, mitte: { xArcsec: 0, yArcsec: 0 } } : { konfiguration });
     this.plane();
     return hinweise;
+  }
+
+  /** Setzt die Fenstermitte (Verschieben, A-D2); schreibt keine URL, baut keinen neuen Kern. */
+  verschiebe(xArcsec: number, yArcsec: number): void {
+    if (!Number.isFinite(xArcsec) || !Number.isFinite(yArcsec)) return;
+    const m = this.zustand.mitte;
+    if (m.xArcsec === xArcsec && m.yArcsec === yArcsec) return;
+    this.ueberhole();
+    this.setze({ mitte: { xArcsec, yArcsec } });
+    this.plane();
+  }
+
+  /** Plant eine Rechnung ohne Aenderung, z. B. nach neuer Anzeigegroesse oder Falterwechsel. */
+  rechneNeu(): void {
+    this.ueberhole();
+    this.plane();
   }
 
   /** Meldet jeden neuen Stand an f, sofort auch den aktuellen. Liefert die Abmeldung. */
@@ -121,6 +165,12 @@ export class Steuerung {
     this.beobachter.add(f);
     this.melde(f);
     return () => this.beobachter.delete(f);
+  }
+
+  private ueberhole(): void {
+    this.version++;
+    this.ueberholt.loese();
+    this.ueberholt = neuesSignal();
   }
 
   private setze(teil: Partial<Stand>): void {
@@ -137,9 +187,21 @@ export class Steuerung {
     }
   }
 
-  private schreibeUrl(): void {
+  private urlZu(k: Konfiguration): string {
     try {
-      this.umgebung.schreibeUrl(inUrl(this.zustand.konfiguration, this.umgebung.kataloge));
+      return inUrl(k, this.umgebung.kataloge);
+    } catch (e) {
+      console.error(e);
+      return "";
+    }
+  }
+
+  /** Hoechstens einmal pro Frame: Browser drosseln haeufiges history.replaceState. */
+  private schreibeUrl(): void {
+    if (this.urlGeschrieben || this.url === "") return;
+    this.urlGeschrieben = true;
+    try {
+      this.umgebung.schreibeUrl(this.url);
     } catch (e) {
       // Die URL ist Komfort (A-D8); ohne sie geht die Anzeige weiter.
       console.error(e);
@@ -151,6 +213,7 @@ export class Steuerung {
     this.geplant = true;
     this.umgebung.plane(() => {
       this.geplant = false;
+      this.schreibeUrl();
       void this.lauf();
     });
   }
@@ -165,7 +228,12 @@ export class Steuerung {
     try {
       do {
         this.nochmal = false;
-        await this.rechne();
+        try {
+          await this.rechne();
+        } catch (e) {
+          // Letztes Netz fuer Fehler der Umgebung (warte, bildquelle): die Steuerung wirft nie.
+          this.setze({ phase: "fehler", fehler: { art: "rechnen", ursache: e } });
+        }
       } while (this.nochmal);
     } finally {
       this.laeuft = false;
@@ -179,42 +247,58 @@ export class Steuerung {
     return this.aktuell;
   }
 
+  /**
+   * Erst warten (der Browser zeichnet den Status), dann den aktuellen Stand lesen und ohne
+   * weiteren Frame durchrechnen. Nur das Warten aufs Netz kann ueberholt werden.
+   */
   private async rechne(): Promise<void> {
+    this.setze({ phase: "rechnet", fehler: undefined });
+    await this.umgebung.warte();
     const version = this.version;
-    const k = this.zustand.konfiguration;
+    const ueberholt = this.ueberholt.promise;
+    const { konfiguration: k, mitte } = this.zustand;
 
     let auswertung: Auswertung;
     try {
-      auswertung = auswerten(k, { anzeigePx: this.umgebung.anzeigePx(), vorher: this.vorher });
+      const fenster = { breiteArcsec: optik(k.geraet).gesichtsfeld.breiteArcsec, mitteXArcsec: mitte.xArcsec, mitteYArcsec: mitte.yArcsec, px: this.umgebung.anzeigePx() };
+      auswertung = auswerten(k, { fenster, vorher: this.vorher });
     } catch (e) {
       this.setze({ phase: "fehler", fehler: { art: "rechnen", ursache: e } });
       return;
     }
     this.vorher = auswertung.parameter;
-    this.setze({ auswertung, phase: "laedt" });
 
+    const neueQuelle = this.aktuell?.kennung !== k.objekt.kennung;
     const aktuell = this.quelleFuer(k.objekt);
-    let bildquelle: Bildquelle;
-    try {
-      bildquelle = await aktuell.bildquelle;
+    this.setze(neueQuelle ? { auswertung, phase: "laedt" } : { auswertung });
+    const laden = (async (): Promise<Bildquelle> => {
+      const bildquelle = await aktuell.bildquelle;
       await bildquelle.lade(ausschnittsanfrage(auswertung.parameter.quellbild));
+      return bildquelle;
+    })();
+    let bildquelle: Bildquelle | undefined;
+    try {
+      bildquelle = await Promise.race([laden, ueberholt.then(() => undefined)]);
     } catch (e) {
       // Naechster Versuch baut die Bildquelle neu auf (z. B. nach einem Netzfehler).
       if (this.aktuell === aktuell) this.aktuell = undefined;
       if (version === this.version) this.setze({ phase: "fehler", fehler: { art: "bild", ursache: e } });
       return;
     }
-    if (version !== this.version) return;
+    if (bildquelle === undefined || version !== this.version) {
+      // Ueberholt: das Laden darf im Hintergrund weiterlaufen (fuellt den Kachel-Cache).
+      laden.catch(() => {
+        if (this.aktuell === aktuell) this.aktuell = undefined;
+      });
+      return;
+    }
 
-    this.setze({ phase: "rechnet" });
-    await this.umgebung.warte();
-    if (version !== this.version) return;
-
+    if (neueQuelle) this.setze({ phase: "rechnet" });
     try {
       const t0 = this.umgebung.uhr();
       const anblick = rendere(auswertung.parameter, bildquelle.quelle, this.umgebung.falter, aktuell.zwischen);
       const ms = Math.round(this.umgebung.uhr() - t0);
-      this.setze({ phase: "fertig", anblick, ms, nummer: this.zustand.nummer + 1, fehler: undefined });
+      this.setze({ phase: "fertig", anblick, ms, nummer: this.zustand.nummer + 1 });
     } catch (e) {
       this.setze({ phase: "fehler", fehler: { art: "rechnen", ursache: e } });
     }
