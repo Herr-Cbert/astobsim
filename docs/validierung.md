@@ -153,3 +153,64 @@ Stand 2026-10-27, Branch `issue-22-sicherheit` auf `main` nach PR #80.
 
 **Massnahmen:** CSP im Bau; `scripts/validierung-bilder.mjs` meldet Konsolenfehler und CSP-Verstoesse (Exit 1, das favicon an der Wurzel ausgenommen, das Chrome von sich aus anfragt); Pfadpruefung der Testserver gehaertet. Keine offenen Befunde.
 
+
+## 8. Nachweis der Anforderungen (Issue #23, A-Q3)
+
+Stand 2026-10-28. Je Muss-Anforderung aus `docs/anforderungen.md` das Issue mit PR und der Beleg im Repo (Test, Datei oder Abschnitt hier). Erhoben von einem Explore-Agenten aus Anforderungen, `docs/plan.md`, Git-Log und GitHub, die Belegdateien von Claude auf Existenz geprueft. "erfuellt" setzt bei A-X1, A-X3 und A-Q2 die Merges von PR #90 (#77) und #91 (#78) voraus.
+
+| ID | Kurzform | Issue / PR | Beleg | Status |
+|---|---|---|---|---|
+| A-Z1 | Anblick am Okular fuer Geraet und Bedingungen | #9 / PR #54, #19 / PR #62 | Abschnitt 2, T1 bis T6 | erfuellt |
+| A-Z2 | Einsteiger: Voreinstellungen und Hilfetexte | #16 / PR #53, #18 / PR #59 | `src/zustand/voreinstellung.ts`, `src/texte.ts` | erfuellt (qualitativ) |
+| A-Z3 | Experten geben jede Zahl direkt ein | #17 / PR #58, #18 / PR #59 | `src/ui/feld.ts`, `src/ui/geraetewahl.test.ts` | erfuellt |
+| A-Z4 | Mond, Jupiter, Saturn, Mars | #7 / PR #43, #12 / PR #56, #13 / PR #61 | `daten/objekte.json`, `src/daten/objekte.test.ts` | erfuellt |
+| A-Z5 | Nur visueller Anblick | ADR-0002 | `docs/adr/0002-simulationsmodell.md` | erfuellt (Entwurf) |
+| A-F1 | Oeffnung, Brennweite, Obstruktion, Bauart | #1 / PR #39, #11 / PR #47, #17 / PR #58 | `src/daten/geraete.test.ts`, `src/ui/geraetewahl.ts` | erfuellt |
+| A-F2 | Liste oder freie Eingabe, 22 Fernrohre | #11 / PR #47, #17 / PR #58 | `daten/geraete.json` (26 Eintraege: 22 Fernrohre, Auge, 3 Fernglaeser) | erfuellt |
+| A-F3 | Blosses Auge | #3 / PR #41, #11 / PR #47 | `src/physik/optik.test.ts`, T6a und T6b | erfuellt |
+| A-F4 | Drei Ferngläser | #11 / PR #47 | `src/daten/geraete.test.ts`, T6c | erfuellt |
+| A-F5 | Geraeteliste als Datendatei | #11 / PR #47 | `daten/geraete.json`, `src/daten/geraete.ts` | erfuellt |
+| A-F6 | Okular mit Brennweite, Gesichtsfeld, Presets | #3 / PR #41, #17 / PR #58 | `src/physik/optik.test.ts`, `src/ui/formular_geraet.ts` | erfuellt |
+| A-F7 | Vergroesserung direkt editierbar | #17 / PR #58, #63 / PR #82 | `src/ui/geraetewahl.test.ts` | erfuellt |
+| A-F8 | Eingaben begrenzen mit Hinweis | #3 / PR #41, #64 / PR #67, #65 / PR #68 | `src/physik/begrenze.test.ts`, `src/zustand/url.test.ts` | erfuellt |
+| A-B1 | Seeing 0,5 bis 5'' mit Wortstufe | #3 / PR #41, #18 / PR #59 | `src/ui/formular_bedingungen.test.ts` | erfuellt |
+| A-B2 | Bortle 1 bis 9 | #3 / PR #41, #18 / PR #59, #55 / PR #60 | `src/physik/helligkeit.test.ts` | erfuellt |
+| A-B3 | Transparenz dreistufig | #3 / PR #41, #18 / PR #59 | `src/physik/atmosphaere.test.ts` | erfuellt |
+| A-B4 | Hoehe 10 bis 90 Grad | #3 / PR #41, #18 / PR #59 | `src/physik/atmosphaere.test.ts`, `src/physik/begrenze.test.ts` | erfuellt |
+| A-P1 | Jede Formel mit Quelle | #2 bis #5 | `docs/recherche/physik.md`, Spielregel in `docs/plan.md` | erfuellt (Doku) |
+| A-P2 | Drei Grenzen: Beugung, Seeing, Auge | #3 / PR #41, #4 / PR #44 | `src/physik/aufloesung.test.ts`, `src/physik/kern.test.ts` | erfuellt |
+| A-P3 | Obstruktion senkt den Kontrast | #4 / PR #44 | `src/physik/beugung.test.ts`, `src/physik/kern.test.ts` | erfuellt |
+| A-P4 | Helligkeit ueber Austrittspupille und Extinktion | #3 / PR #41, #55 / PR #60, #71 / PR #74 | `src/physik/helligkeit.test.ts`, Abschnitt 5 | erfuellt |
+| A-P5 | Langzeitmittel statt bester Moment | ADR-0002, #76 / PR #87 | T2, `docs/recherche/physik.md` 15 | erfuellt |
+| A-P6 | Punktquellen mit Blendungsregel | #14 / PR #69, #72 / PR #75 | `src/physik/punktquellen.test.ts`, `src/bild/punktebene.test.ts` | erfuellt |
+| A-P7 | Reine, testbare Funktionen | #2 bis #5 | `src/physik/*.test.ts` | erfuellt |
+| A-D1 | Gesichtsfeld rund, Auge rechteckig | #9 / PR #54, #19 / PR #62 | `src/ui/gesichtsfeld.ts`, T6 | erfuellt |
+| A-D2 | Ausschnitt verschieben | #19 / PR #62 | `src/ui/verschieben.test.ts` | erfuellt |
+| A-D3 | Zoomansicht mit Quellbild daneben | #20 / PR #70, #77 / PR #90 | `src/ui/zoom.test.ts`, T3 Detail | erfuellt |
+| A-D4 | Infopanel mit Kennzahlen | #5 / PR #48, #19 / PR #62 | `src/ui/infopanel.test.ts` | erfuellt |
+| A-D5 | Warnungen Austrittspupille und Vergroesserung | #5 / PR #48, #19 / PR #62 | `src/physik/auswerten.test.ts`, `src/ui/warnungen.test.ts` | erfuellt |
+| A-D6 | Hilfetext fuer jeden Parameter und jede Zahl | #17, #18, #19 | `src/ui/infopanel.test.ts`, `src/texte.ts` | erfuellt (Test nur Infopanel) |
+| A-D7 | Rechnung unter 0,5 s | #15 / PR #50, #19 / PR #62, #66 / PR #89 | `src/physik/auswerten.laufzeit.test.ts` | erfuellt |
+| A-D8 | Alle Parameter in der URL | #16 / PR #53 | `src/zustand/url.test.ts` | erfuellt |
+| A-D9 | Startkonfiguration | #16 / PR #53 | `src/zustand/voreinstellung.test.ts` | erfuellt |
+| A-D10 | Deutsch, Texte in einer Datei | #9 / PR #54, PR #57 | `src/texte.ts`, `src/texte.test.ts` | erfuellt |
+| A-D11 | Aufrecht, Norden oben | #8 / PR #49, #9 / PR #54 | `norden_oben` in `src/daten/bildnachweise.ts`, `src/ui/zeichne.ts` | erfuellt |
+| A-X1 | Feste Zustaende, Mars-6-Hinweis | #7, #12, #13, #78 / PR #91 | `daten/objekte.json`, `src/daten/objektzustand.test.ts` | erfuellt |
+| A-X2 | Galileische Monde, Titan, Rhea | #13 / PR #61, #14 / PR #69 | `src/daten/objekte.test.ts`, `src/physik/punktquellen.test.ts` | erfuellt |
+| A-X3 | Nur echte Aufnahmen mit freier Lizenz | #7, #12, #13, #79 / PR #88, #78 / PR #91 | `daten/bilder.json`, `src/daten/bilddateien.test.ts`, `tools/bildnachweis_pruefen.py` | erfuellt |
+| A-X4 | Bildnachweis in einer Datendatei | #8 / PR #49, #23 | `src/daten/bildnachweise.test.ts`, Seitenfuss `src/ui/bildnachweise.ts` | erfuellt |
+| A-X5 | Quellaufloesung fein genug, Mond gekachelt | #7 / PR #43, #8 / PR #49, #12 / PR #56 | `bogensekunden_pro_pixel` in `daten/bilder.json`, ADR-0003 | erfuellt (Daten, kein Test) |
+| A-X6 | Erstladen unter 5 MB, je Objekt unter 20 MB | #7, #8, #10 / PR #42 | `scripts/build-abschluss.mjs`, `src/daten/bilddateien.test.ts` | erfuellt |
+| A-T1 | Nur Browser, kein Backend | ADR-0001, #10 / PR #42, #22 / PR #81 | Abschnitt 7 | erfuellt |
+| A-T2 | GitHub Pages | #10 / PR #42 | `.github/workflows/pages.yml`, https://herr-cbert.github.io/astobsim/ | erfuellt |
+| A-T3 | Chrome und Firefox (Desktop) | #15 / PR #50, #23 | Chrome: `scripts/browser-test.mjs`, `scripts/validierung-bilder.mjs`; Firefox: siehe unten | **offen bis Pruefung Herbert** |
+| A-T4 | Keine Konten, Cookies, Tracking | #16 / PR #53, #22 / PR #81 | Abschnitt 7 | erfuellt |
+| A-T5 | MIT-Lizenz, Bilder mit eigener Lizenz | #23 | `LICENSE`, `package.json`, Seitenfuss | erfuellt |
+| A-T6 | Stackwahl in Phase 3 | ADR-0001 | `docs/adr/0001-stack.md` | erfuellt |
+| A-Q1 | Unit-Tests der Physik gegen bekannte Werte | #2 / PR #40, #3 / PR #41, #4 / PR #44 | `src/physik/aufloesung.test.ts`, `src/physik/atmosphaere.test.ts` | erfuellt |
+| A-Q2 | T1 bis T6 geprueft, Abweichungen als Issues | #21 / PR #80, #76 bis #79 | Abschnitte 2 bis 4, `src/physik/validierung.test.ts` | erfuellt |
+| A-Q3 | Version 1 fertig | #23 | dieser Abschnitt, Seite online | erfuellt mit A-T3 |
+
+**Firefox (A-T3):** Firefox 158 auf `sam` startet headless und zeigt Layout und Ladestatus (Screenshot beim Laden); `--screenshot` wartet nicht auf die Rechnung, ein voller Durchlauf ist so nicht pruefbar. Pruefpunkt von Hand (Herbert): https://herr-cbert.github.io/astobsim/ in Firefox oeffnen, Objekt und Geraet wechseln, Seeing-Regler ziehen, Zoom, beim Mond Detail und Verschieben, Bildnachweise aufklappen; Konsole ohne Fehler. Ergebnis in Abschnitt 6 eintragen.
+
+**Kann-Punkte:** alle als Issues im Milestone "Nach Version 1": A-Z8 #24, A-Z9 #25, A-Z10 #26, A-F9 #27, A-B5 #28, A-B6 #29, A-P8 #30, A-D12 #31, A-D13 #32, A-D14 #33, A-D15 #34, A-D16 #35, A-X7 #36, A-X8 #37, eigenes Mond-Rendering (ADR-0002) #38.

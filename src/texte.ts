@@ -13,6 +13,19 @@ export const TEXTE = {
   /** Namensnennung des Quellbilds unter dem Gesichtsfeld (aus bilder.json); Punkt ergaenzt, falls sie keinen hat. */
   bildnachweis: (namensnennung: string, lizenz: string): string =>
     `Bild: ${namensnennung}${/[.!?]$/.test(namensnennung) ? "" : "."} Lizenz: ${lizenz}.`,
+  /** Seitenfuss (A-T5, A-X4, Issue #23, src/ui/bildnachweise.ts); Credit-Zeilen kommen woertlich aus bilder.json. */
+  fuss: {
+    codeVor: "astobsim ist freie Software unter der ",
+    codeLizenz: "MIT-Lizenz",
+    codeMitte: ", Quelltext auf ",
+    codeQuelle: "GitHub",
+    bildnachweise: (anzahl: number): string => `Bildnachweise (${anzahl} Bilder, jedes unter seiner eigenen Lizenz)`,
+    aufnahme: "Aufnahme",
+    credit: "Namensnennung",
+    lizenz: "Lizenz",
+    quelle: "Quelle",
+    bearbeitung: "Bearbeitung"
+  },
   /** Platzhalter fuer einen nicht endlichen Zahlenwert. */
   fehlwert: "–",
   gesichtsfeld: "Anblick im wahren Gesichtsfeld",
