@@ -5,22 +5,20 @@
 // ist ein Anzeigebild; tools/mond_kacheln.py aendert keine Farben, tools/bild_aufbereiten.py rechnet
 // eingebettete Profile wie Adobe RGB nach sRGB um). Die Naht verlangt lineare
 // Helligkeiten relativ zu Quellweiss (src/naht/raster.ts); deshalb wird mit der sRGB-Kennlinie
-// (IEC 61966-2-1) linearisiert, 255 = Quellweiss = 1,0. rgbaZuRaster ist rein und in Node getestet.
+// (IEC 61966-2-1) linearisiert, 255 = Quellweiss = 1,0. Einzelbilder werden beim Laden linearisiert
+// (rgbaZuRaster), Kacheln bleiben 8-Bit-sRGB (rgbaZuSrgb) und werden erst in QuelleKacheln.ausschnitt
+// linearisiert (Issue #66: ein Viertel des Speichers). Beide Funktionen sind rein und in Node getestet.
 
 import type { Raster } from "../naht/raster";
 import type { Bildnachweis } from "./bildnachweise";
 import { DatenFehler } from "./fehler";
-import { kachelPfad, pyramidengeometrie, QuelleKacheln, type KachelLader } from "./kacheln";
+import { kachelPfad, type KachelLader, type KachelSrgb, pyramidengeometrie, QuelleKacheln } from "./kacheln";
 import { holeDaten } from "./pruefe";
 import { quelleEinzelbild, type QuelleEinzelbild } from "./quelle_einzelbild";
 
-/** sRGB-Kodewert 0..1 in lineare Helligkeit 0..1 (IEC 61966-2-1). */
-export function srgbZuLinear(wert: number): number {
-  return wert <= 0.04045 ? wert / 12.92 : ((wert + 0.055) / 1.055) ** 2.4;
-}
+import { LINEAR_8BIT } from "./srgb";
 
-/** Nachschlagetabelle fuer 8-Bit-Kodewerte. */
-const LINEAR_8BIT = Float32Array.from({ length: 256 }, (_, i) => srgbZuLinear(i / 255));
+export { srgbZuLinear } from "./srgb";
 
 /**
  * RGBA-Bytes (ImageData, zeilenweise, Zeile 0 oben = Norden) in ein lineares Raster mit drei
@@ -39,8 +37,31 @@ export function rgbaZuRaster(rgba: Uint8ClampedArray | Uint8Array, breite: numbe
   return { breite, hoehe, kanaele: 3, daten };
 }
 
+/**
+ * RGBA-Bytes in 8-Bit-sRGB mit drei Kanaelen fuer den Kachel-Cache (Issue #66): Alpha faellt weg,
+ * die Kodewerte bleiben unveraendert; linearisiert wird erst in QuelleKacheln.ausschnitt.
+ */
+export function rgbaZuSrgb(rgba: Uint8ClampedArray | Uint8Array, breite: number, hoehe: number): KachelSrgb {
+  if (rgba.length !== breite * hoehe * 4) {
+    throw new DatenFehler("Kachel", "-", "Pixel", `${breite * hoehe * 4} Bytes RGBA erwartet, ${rgba.length} geliefert`);
+  }
+  const srgb = new Uint8Array(breite * hoehe * 3);
+  for (let i = 0, j = 0; i < rgba.length; i += 4, j += 3) {
+    srgb[j] = rgba[i]!;
+    srgb[j + 1] = rgba[i + 1]!;
+    srgb[j + 2] = rgba[i + 2]!;
+  }
+  return { breite, hoehe, srgb };
+}
+
 /** Laedt daten/bilder/<pfad> (nur im Browser) und liefert es als lineares Raster mit drei Kanaelen. */
 async function ladeRasterBrowser(pfad: string, nachweisId: string): Promise<Raster> {
+  const { rgba, breite, hoehe } = await ladeRgbaBrowser(pfad, nachweisId);
+  return rgbaZuRaster(rgba, breite, hoehe);
+}
+
+/** Laedt und dekodiert daten/bilder/<pfad> (nur im Browser) zu RGBA-Bytes. */
+async function ladeRgbaBrowser(pfad: string, nachweisId: string): Promise<{ rgba: Uint8ClampedArray; breite: number; hoehe: number }> {
   const antwort = await holeDaten("bilder/" + pfad, pfad, nachweisId);
   let bitmap: ImageBitmap;
   try {
@@ -53,7 +74,7 @@ async function ladeRasterBrowser(pfad: string, nachweisId: string): Promise<Rast
     const { width: breite, height: hoehe } = bitmap;
     const kontext = zeichenflaeche(breite, hoehe);
     kontext.drawImage(bitmap, 0, 0);
-    return rgbaZuRaster(kontext.getImageData(0, 0, breite, hoehe).data, breite, hoehe);
+    return { rgba: kontext.getImageData(0, 0, breite, hoehe).data, breite, hoehe };
   } finally {
     bitmap.close();
   }
@@ -62,7 +83,10 @@ async function ladeRasterBrowser(pfad: string, nachweisId: string): Promise<Rast
 /** Lader fuer die Kachelpyramide eines Bildnachweises (nur im Browser). */
 function kachelLaderBrowser(nachweis: Bildnachweis): KachelLader {
   // async, damit auch ein Fehler in kachelPfad als abgelehntes Promise ankommt (Vertrag KachelLader).
-  return async (stufe, x, y) => ladeRasterBrowser(kachelPfad(nachweis, { stufe, x, y }), nachweis.id);
+  return async (stufe, x, y) => {
+    const { rgba, breite, hoehe } = await ladeRgbaBrowser(kachelPfad(nachweis, { stufe, x, y }), nachweis.id);
+    return rgbaZuSrgb(rgba, breite, hoehe);
+  };
 }
 
 /** QuelleKacheln fuer einen Zustand im Browser: Geometrie skaliert auf winkelgroesseArcsec. */
