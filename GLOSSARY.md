@@ -157,10 +157,14 @@ Die Grundansicht: der Anblick im ganzen wahren Gesichtsfeld (Standardfenster, ve
 _Vermeiden_: Normalansicht, Hauptansicht
 
 **Zoomansicht**:
-Vergroesserte Ansicht des Objekts im Anblick neben dem unverschlechterten Quellbild zum Vergleich (A-D3). Kein URL-Parameter.
+Vergroesserte Ansicht des Objekts im Anblick neben dem unverschlechterten Quellbild zum Vergleich (A-D3). Zeigt das Zoomfenster oder auf Wunsch das Detailfenster. Kein URL-Parameter.
 
 **Zoomfenster**:
 Das Fenster der Zoomansicht: das Objekt (Ausdehnung inklusive Ringe, aus dem Quellbild) mit 5 % Rand je Seite, hoechstens ein halbes Gesichtsfeld breit, mindestens 16 Arbeitspixel; Mitte wie in der Uebersicht (`src/ui/zoom.ts`).
+
+**Detailfenster**:
+Das schmalere Fenster der Zoomansicht (Schaltflaeche "Detail", Issue #77): 120 Arbeitspixel breit, damit die Aufloesungsgrenze sichtbar wird; nur angeboten, wo es hoechstens drei Viertel des Zoomfensters zeigt (praktisch nur beim Mond). Mitte wie im Zoom, `Stand.detail` in der Steuerung (`src/ui/zoom.ts`).
+_Vermeiden_: Zoomstufe (ist eine Stufe der Kachelpyramide), Detailzoom
 
 **Vergleichsbild**:
 Das Quellbild rechts in der Zoomansicht: dasselbe Zoomfenster, dieselbe Maske und dieselben Punktquellen wie der Anblick, aber ohne Faltung (1x1-Delta-Kern) und ohne Helligkeitsanpassung (Quellweiss = Bildschirmweiss), auf einem Raster so fein wie Quelle und Anzeige es hergeben. Technisch ein `Anblick` aus `rendere`, inhaltlich kein Anblick.

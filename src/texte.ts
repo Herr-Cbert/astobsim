@@ -29,6 +29,9 @@ export const TEXTE = {
     anblickBild: "Anblick vergrößert",
     quellbildBild: "Quellbild im selben Maßstab und Ausschnitt",
     zurueck: "Zurück zur Übersicht",
+    /** Schaltflaeche fuer das Detailfenster (#77), nur wo es angeboten wird; aria-pressed zeigt den Zustand. */
+    detail: "Detail",
+    detailTitel: "Zeigt einen kleineren Ausschnitt so fein, dass die Auflösungsgrenze von Fernrohr, Luft und Auge zu sehen ist.",
     /** Titel der beiden Bilder, je nachdem ob sich der Ausschnitt verschieben laesst. */
     bedienung: "Klick, Eingabetaste oder Escape führt zurück zur Übersicht.",
     bedienungVerschieben: "Ziehen mit der Maus oder Pfeiltasten verschieben beide Bilder gemeinsam, Pos1 zentriert. Klick, Eingabetaste oder Escape führt zurück zur Übersicht."

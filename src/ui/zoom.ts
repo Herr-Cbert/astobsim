@@ -24,6 +24,15 @@ const ZOOM_ANTEIL_GESICHTSFELD_MAX = 0.5;
  * ein Arbeitspixel (sonst PhysikFehler in auswerten).
  */
 export const ZOOM_ARBEITSPIXEL_MIN = 16;
+/**
+ * Breite des Detailfensters in Arbeitspixeln (Issue #77): die Bilder der Zoomansicht sind hoechstens
+ * etwa 350 CSS-Pixel breit (stil.css), dann fallen knapp 3 CSS-Pixel auf ein Arbeitspixel und die
+ * Aufloesungsgrenze (FWHM = 2,5 Arbeitspixel) wird sichtbar. Fest in Arbeitspixeln statt aus der
+ * Anzeige, damit Verschieben und Groessenaenderung das Fenster nicht aendern.
+ */
+export const DETAIL_ARBEITSPIXEL = 120;
+/** Das Detail wird nur angeboten, wenn es hoechstens diesen Anteil des Zoomfensters zeigt. */
+const DETAIL_ANTEIL_ZOOM_MAX = 0.75;
 
 /**
  * Ausdehnung des Objekts in Bogensekunden: der groessere Wert aus Durchmesser und Quellbild
@@ -40,17 +49,35 @@ export function objektausdehnungArcsec(k: Konfiguration): number {
  * mindestens ZOOM_ARBEITSPIXEL_MIN Arbeitspixel. Wirft wie optik bei unlesbarem Geraet.
  */
 export function zoombreiteArcsec(k: Konfiguration): number {
+  return breiten(k).zoom;
+}
+
+/**
+ * Breite des Detailfensters (Issue #77): DETAIL_ARBEITSPIXEL Arbeitspixel; undefined, wenn es
+ * nicht deutlich schmaler als das Zoomfenster waere (Planeten). Wirft wie optik.
+ */
+export function detailbreiteArcsec(k: Konfiguration): number | undefined {
+  const { zoom, detail } = breiten(k);
+  return detail <= zoom * DETAIL_ANTEIL_ZOOM_MAX ? detail : undefined;
+}
+
+function breiten(k: Konfiguration): { zoom: number; detail: number } {
   const o = optik(k.geraet);
   const feld = Math.min(o.gesichtsfeld.breiteArcsec, o.gesichtsfeld.hoeheArcsec);
   const aufl = aufloesung(o, atmosphaere(k.bedingungen));
   const arbeitspixel = arbeitsmassstabOhneFenster(aufl, k.objekt.quelle);
   const breite = Math.min(objektausdehnungArcsec(k) * (1 + 2 * ZOOM_RAND), feld * ZOOM_ANTEIL_GESICHTSFELD_MAX);
-  return Math.max(breite, arbeitspixel * ZOOM_ARBEITSPIXEL_MIN);
+  return { zoom: Math.max(breite, arbeitspixel * ZOOM_ARBEITSPIXEL_MIN), detail: arbeitspixel * DETAIL_ARBEITSPIXEL };
 }
 
-/** Fenster des Zooms: Zoombreite um die Fenstermitte der Steuerung, px Anzeigepixel. */
-export function zoomfenster(k: Konfiguration, mitte: Mitte, px: number): Simulationsparameter["fenster"] {
-  return { breiteArcsec: zoombreiteArcsec(k), mitteXArcsec: mitte.xArcsec, mitteYArcsec: mitte.yArcsec, px };
+/** Breite des gezeigten Fensters: Detailfenster, wenn gewuenscht und angeboten, sonst Zoomfenster. */
+function fensterbreiteArcsec(k: Konfiguration, detail: boolean): number {
+  return (detail ? detailbreiteArcsec(k) : undefined) ?? zoombreiteArcsec(k);
+}
+
+/** Fenster des Zooms: Zoom- oder Detailbreite um die Fenstermitte der Steuerung, px Anzeigepixel. */
+export function zoomfenster(k: Konfiguration, mitte: Mitte, px: number, detail = false): Simulationsparameter["fenster"] {
+  return { breiteArcsec: fensterbreiteArcsec(k, detail), mitteXArcsec: mitte.xArcsec, mitteYArcsec: mitte.yArcsec, px };
 }
 
 /** Lage fuer das Verschieben in der gerade gezeigten Ansicht. */
@@ -64,14 +91,14 @@ export interface Verschiebelage {
 
 /**
  * Uebersicht: Gesichtsfeld; erlaubt, wenn das Objekt groesser als das Gesichtsfeld ist (A-D2).
- * Zoom: Zoomfenster; erlaubt, wenn das Objekt breiter als das Zoomfenster ist (Mond). undefined
- * bei unlesbarem Geraet.
+ * Zoom: Zoom- oder Detailfenster (zoomfenster); erlaubt, wenn das Objekt breiter als das Fenster
+ * ist (Mond). undefined bei unlesbarem Geraet.
  */
-export function verschiebelage(k: Konfiguration, zoom: boolean): Verschiebelage | undefined {
+export function verschiebelage(k: Konfiguration, zoom: boolean, detail = false): Verschiebelage | undefined {
   try {
     const durchmesser = k.objekt.durchmesserArcsec;
     if (zoom) {
-      const breite = zoombreiteArcsec(k);
+      const breite = fensterbreiteArcsec(k, detail);
       return { durchmesser, breite, erlaubt: durchmesser > breite };
     }
     const gesichtsfeld = optik(k.geraet).gesichtsfeld;
