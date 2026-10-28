@@ -66,7 +66,9 @@ Ein Orbiter in polarer Bahn fotografiert jeden Streifen bei etwa gleicher Ortsze
 
 ## 3. Mars 6", 14", 25"
 
-Ephemeride fuer die Aufnahmedaten (JPL Horizons, geozentrisch) [Q22]: 2003-08-26: 25,12", subterrestrische Breite -19,0 Grad (Suedpolkappe zugewandt). 2016-05-12: 17,51", +8,6 Grad.
+Ephemeride fuer die Aufnahmedaten (JPL Horizons, geozentrisch) [Q22]: 2003-08-26: 25,12", subterrestrische Breite -19,0 Grad (Suedpolkappe zugewandt). 2016-05-12: 17,51", +8,6 Grad. 1995-02-25 (Nachtrag #78): 13,46" bis 13,40" ueber den Tag, +17,6 Grad, Positionswinkel der Nordpolachse 2,6 Grad, Phasenwinkel 11,3 Grad.
+
+Nachtrag 2026-10-28 (Issue #78): mars_14 und mars_6 nutzen seit #78 Hubble WFPC2 vom 25.02.1995 ("Mars at Opposition 1995 (Syrtis Major Region)", NASA https://science.nasa.gov/asset/hubble/mars-2/, ESA opo9516d, pixelgleich, 800 x 800 px, Scheibe 618 px, etwa 295 px native). Grund: heic1609a (2016, Ls etwa 151) zeigt keine abgegrenzte Nordkappe, T5 verlangt eine; 1995 liegt bei Ls etwa 64 (Aphel-Opposition, Nordfruehling) mit grosser Nordkappe und Syrtis Major in der Mitte. Credit "Philip James (University of Toledo), Steven Lee (University of Colorado), NASA" (ESA: "... NASA / ESA"). Verworfen bei der Suche: 1999 PIA01592 (Sommer-Restkappe, schaerfer), 1997 opo9715c und opo9709b (Montagen mit Text, JPEG), 2024 heic2505b (Kappe unter Polhaube, UV-Anteil), 2007 und 2001 (Polhaube bzw. Staubsturm).
 
 | Kandidat | Datum, Instrument | Groesse, Aufloesung | Sichtbar | Lizenz, Credit | Bewertung |
 |---|---|---|---|---|---|
@@ -312,7 +314,7 @@ Was ein eigenes Rendering fuer den Mond braeuchte (nur falls A-X9 fuer den Mond 
 |---|---|---|---|---|---|
 | Mond, kurz nach erstem Viertel | **Keine Empfehlung ohne Entscheidung von Herbert.** Option A: Commons-Mosaik 2026 (echtes Foto, CC BY-SA 4.0). Option B: NASA SVS 5587, Einzelframe fuer den Zeitpunkt etwa 1 Tag nach dem ersten Viertel (Rendering, gemeinfrei). Option C: CC0-Bild Niittee 2024 als Zwischenloesung. | A: https://commons.wikimedia.org/wiki/File:20260423_-_First_Quarter_Moon_Mosaic.png ; B: https://svs.gsfc.nasa.gov/5587 ; C: https://commons.wikimedia.org/wiki/File:Moon_in_T%C3%B5rva.png | A: CC BY-SA 4.0; B: Public Domain; C: CC0 | A: 13 454 px nominal, echte Aufloesung unbekannt; B: etwa 3000 px (unter 4000); C: etwa 3000 px Scheibe | A: hoch (Urheber kontaktieren, Qualitaet pruefen, drehen, Kacheln); B: mittel (Frame waehlen, Kacheln), aber A-X9-Konflikt; C: gering |
 | Mars 25" | Hubble WFPC2, 26.08.2003 | https://science.nasa.gov/asset/hubble/hubbles-close-encounter-with-mars-august-26-2003 (ESA-Kopie: https://esahubble.org/images/opo0322a/) | Public Domain (NASA) bzw. CC BY 4.0 (ESA/Hubble), zu klaeren | 800 x 800 px Datei, etwa 550 px native, 27 km | gering: Hintergrund schwaerzen, Norden pruefen |
-| Mars 14" | Hubble WFC3 heic1609a, 12.05.2016 (17,5") | https://esahubble.org/images/heic1609a/ | wie oben | 2000 x 2000 px Datei, etwa 440 px native, 30 km | gering; fuer T5 alternativ PIA01592 (Syrtis Major zentral) oder das 2003-Bild verkleinert |
+| Mars 14" | Hubble WFC3 heic1609a, 12.05.2016 (17,5"); seit #78 Hubble WFPC2 25.02.1995 (Abschnitt 3, Nachtrag) | https://esahubble.org/images/heic1609a/ ; seit #78 https://science.nasa.gov/asset/hubble/mars-2/ | wie oben | 2000 x 2000 px Datei, etwa 440 px native, 30 km; 1995: 800 x 800 px, etwa 295 px native | gering; fuer T5 alternativ PIA01592 (Syrtis Major zentral) oder das 2003-Bild verkleinert |
 | Mars 6" | dasselbe Bild wie 14", in der Anwendung auf 24 px skaliert | wie oben | wie oben | weit ueber Messlatte | keiner |
 | Jupiter 47" | Hubble WFC3 heic1914a, 27.06.2019 (45,7") | https://esahubble.org/images/heic1914a/ | wie oben | 3050 x 3050 px, etwa 1140 px native, 240 km | gering; Alternative ohne CC-Frage: Cassini PIA04866 (gemeinfrei, 60 km) |
 | Jupiter 35" | dasselbe Bild, skaliert | wie oben | wie oben | - | keiner |

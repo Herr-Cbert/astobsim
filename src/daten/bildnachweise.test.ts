@@ -122,8 +122,8 @@ describe("pruefeBildnachweise", () => {
 });
 
 describe("pruefeBildnachweise mit Einzelbildern", () => {
-  /** Index des Einzelbilds Mars 2016 in der Kopie. */
-  const MARS_14 = (bilderJson as { id: string }[]).findIndex((e) => e.id === "mars_hst_20160512");
+  /** Index des Einzelbilds Mars 1995 in der Kopie. */
+  const MARS_14 = (bilderJson as { id: string }[]).findIndex((e) => e.id === "mars_hst_19950225");
 
   it("akzeptiert die Mars-Einzelbilder mit datei_bytes und ohne kacheln", () => {
     const nachweise = pruefeBildnachweise(bilderJson);
@@ -149,7 +149,7 @@ describe("pruefeBildnachweise mit Einzelbildern", () => {
   it("verlangt datei_bytes bei Einzelbildern und eine Datei statt eines Verzeichnisses", () => {
     const roh = kopie();
     delete roh[MARS_14]!["datei_bytes"];
-    expect([fehlerVon(roh).eintrag, fehlerVon(roh).feld]).toEqual(["mars_hst_20160512", "datei_bytes"]);
+    expect([fehlerVon(roh).eintrag, fehlerVon(roh).feld]).toEqual(["mars_hst_19950225", "datei_bytes"]);
     const roh2 = kopie();
     roh2[MARS_14]!["datei"] = "mars/";
     expect(fehlerVon(roh2).feld).toBe("datei");
@@ -163,6 +163,6 @@ describe("pruefeBildnachweise mit Einzelbildern", () => {
     const roh = kopie();
     roh[MARS_14]!["datei_bytes"] = 19_990_000;
     const f = fehlerVon(roh);
-    expect([f.eintrag, f.feld]).toEqual(["mars_hst_20160512", "datei_bytes"]);
+    expect([f.eintrag, f.feld]).toEqual(["mars_hst_19950225", "datei_bytes"]);
   });
 });
