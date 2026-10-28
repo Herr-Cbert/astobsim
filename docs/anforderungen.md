@@ -122,7 +122,7 @@ Kennungen: A-Z Zweck, A-F Fernrohr und Geraete, A-B Bedingungen, A-P Physik und 
 | Nr | Konfiguration | Erwartung |
 |---|---|---|
 | T1 | Jupiter 47", 70 mm Refraktor, 100-fach, Seeing 2" | Zwei dunkle Aequatorbaender erkennbar, Grosser Roter Fleck nur als Andeutung. |
-| T2 | Saturn 20", Seeing 1,5", 100 mm bei 150-fach gegen 60 mm | Cassini-Teilung bei 100 mm an den Ringenden erkennbar, bei 60 mm nicht. |
+| T2 | Saturn 20", Seeing 1,5", 100 mm bei 150-fach gegen 60 mm | Cassini-Teilung im Langzeitmittel bei beiden Oeffnungen nicht erkennbar; bei 100 mm nur in ruhigen Momenten (A-B6), bei 60 mm auch dann nicht. Angepasst nach Issue #76 (Herbert, 2026-10-27, Begruendung `docs/recherche/physik.md` 15); vorher: bei 100 mm an den Ringenden erkennbar. |
 | T3 | Mond, 80 mm, 100-fach, Seeing 2" | Krater ab etwa 4 km Durchmesser am Terminator erkennbar, Rillen (z. B. Hadley-Rille) nicht. |
 | T4 | Jupiter, 300 mm gegen 100 mm, Seeing 3" und Seeing 1" | Bei 3" zeigt der 300 mm kaum mehr Detail als der 100 mm, ist nur heller. Bei 1" ist der Unterschied deutlich. |
 | T5 | Mars 14", 150 mm, 200-fach, Seeing 1,5"; Mars 6", 80 mm | Bei 14" Polkappe und Syrtis Major als dunkle Struktur erkennbar. Bei 6" im 80 mm nur Scheibchen mit angedeuteter Polkappe. |

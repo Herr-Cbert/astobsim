@@ -136,7 +136,7 @@ Fried 1966 [14]: Kurzzeit-Aufloesung kann deutlich besser sein als Langzeit, wei
 
 $$\sigma_\alpha^2 = 0{,}182\,\lambda^2\,D^{-1/3}\,r_0^{-5/3} = 0{,}182\,(D/r_0)^{5/3}\,(\lambda/D)^2$$
 
-Zahlen bei 550 nm, 2'' Seeing ($r_0$ = 5,6 cm), eigene Rechnung: 60 mm: $\sigma$ = 0,94'' (mit 2,355 $\sigma$ = 2,2'' praktisch die ganze Langzeit-FWHM); 100 mm: 0,86''; 200 mm: 0,77''; 300 mm: 0,72''. Bei $D/r_0 \lesssim 1$ besteht die Langzeit-PSF also fast nur aus Bewegung des weitgehend intakten Beugungsbilds; Sacek: Speckle-Struktur ab $D/r_0 \approx 3$, deutlich ab 4; Tilt "nicht schaedlich" unterhalb von etwa 100 mm Oeffnung [20]. Umgekehrt heisst das: der *Langzeit*-Anblick (A-P5) eines 80-mm-Refraktors bei 2'' Seeing ist eine verschmierte Scheibe mit FWHM $\approx$ 2,5'' (Abschnitt 2.5), der *Momentan*-Anblick ist ein zitterndes, aber scharfes Bild. Beides ist richtig, astobsim zeigt per A-P5 den Langzeitfall. Fuer den Kann-Punkt A-B6 ("ruhiger Moment") bietet sich an, die Bewegungsvarianz quadratisch abzuziehen: $\mathrm{FWHM}_\mathrm{kurz}^2 \approx \mathrm{FWHM}_\mathrm{lang}^2 - (2{,}355\,\sigma_\alpha)^2$, begrenzt nach unten durch die Beugung. Das ist eine Heuristik (Tokovinin benutzt dieselbe Idee fuer die aeussere Skala [16]), keine Theorie.
+Zahlen bei 550 nm, 2'' Seeing ($r_0$ = 5,6 cm), eigene Rechnung: 60 mm: $\sigma$ = 0,94'' (mit 2,355 $\sigma$ = 2,2'' praktisch die ganze Langzeit-FWHM); 100 mm: 0,86''; 200 mm: 0,77''; 300 mm: 0,72''. Bei $D/r_0 \lesssim 1$ besteht die Langzeit-PSF also fast nur aus Bewegung des weitgehend intakten Beugungsbilds; Sacek: Speckle-Struktur ab $D/r_0 \approx 3$, deutlich ab 4; Tilt "nicht schaedlich" unterhalb von etwa 100 mm Oeffnung [20]. Umgekehrt heisst das: der *Langzeit*-Anblick (A-P5) eines 80-mm-Refraktors bei 2'' Seeing ist eine verschmierte Scheibe mit FWHM $\approx$ 2,5'' (Abschnitt 2.5), der *Momentan*-Anblick ist ein zitterndes, aber scharfes Bild. Beides ist richtig, astobsim zeigt per A-P5 den Langzeitfall. Fuer den Kann-Punkt A-B6 ("ruhiger Moment") bietet sich an, die Bewegungsvarianz quadratisch abzuziehen: $\mathrm{FWHM}_\mathrm{kurz}^2 \approx \mathrm{FWHM}_\mathrm{lang}^2 - (2{,}355\,\sigma_\alpha)^2$, begrenzt nach unten durch die Beugung. Das ist eine Heuristik (Tokovinin benutzt dieselbe Idee fuer die aeussere Skala [16]), keine Theorie. Zahlen dazu fuer Validierung T2 (Cassini-Teilung) in Abschnitt 15.
 
 Fuer $D/r_0 \gg 1$ ist auch die Kurzzeit-PSF ein Speckle-Haufen mit Huelle $\approx \lambda/r_0$; Fried [14] gibt fuer die Kurzzeit-OTF $\exp[-3{,}44(\lambda f/r_0)^{5/3}(1-(\lambda f/D)^{1/3})]$ an (zitiert nach [24]). Testfall T4 (300 mm gegen 100 mm bei 3'' und 1'') ist mit dem Langzeitmodell abgedeckt: bei 3'' ($r_0$ = 3,7 cm) liegt die Gesamt-FWHM fuer beide bei etwa 3,1 bis 3,2'', bei 1'' ($r_0$ = 11 cm) bei 1,07'' gegen 1,54''.
 
@@ -710,3 +710,41 @@ Beim Mars aendert sich nur die Anzeige ab der frueheren Grenze (14.4): Scheibenm
 1. **Abhaengigkeit vom Arbeitsmassstab:** Solange die Gesamt-PSF kleiner als ein Arbeitspixel ist, ist $p \propto$ Fluss / Pixelflaeche, die Anzeige also $\propto s^{-2/3}$ ($s$ Arbeitsmassstab). Ein Trabant erscheint im Zoom (feineres Raster) heller als im ganzen Gesichtsfeld (Saturn 80 mm: Titan 47 gegen 43); ist das Pixel feiner als die PSF, haengt die Spitze nicht mehr am Raster. Im 10x50 bleibt Ursache (b): gegenueber einer Abtastung an der Augenaufloesung (6'') sind die Monde um $(22{,}85/6)^{2/3}$ = 2,4 dunkler. T6 ist trotzdem erfuellt (vier Monde sRGB 62 bis 72 gegen den Himmel 16, linear etwa zehnmal heller). Am Bild in Phase 6 pruefen. **Geprueft in Phase 6 (`docs/validierung.md` 5):** plausibel, kein Issue.
 2. **Exponent fuer Punktquellen:** Stevens' Wert fuer Punktquellen ist 0,5 [53]; mit 1/3 werden schwache Trabanten staerker angehoben. Bewusst ein Exponent fuer alle Ebenen (14.2); wie 12.5 Punkt 5 in Phase 6 am Bild pruefen. **Geprueft in Phase 6 (`docs/validierung.md` 5):** die Monde sind im 70 mm und im 10x50 sichtbar wie in der Erfahrung, kein Anlass zu aendern.
 3. **Grosse Trabantenscheibchen:** Ab $d/s > 1$ zeigt die Punktebene die Scheibe des Trabanten mit $h_\mathrm{rel}$; ihr Inneres wird dann mit $(a\,h_\mathrm{rel})^{1/3}$ abgebildet, nicht linear wie die Planetenscheibe. In Version 1 sind alle Trabanten (hoechstens 1,73'') kleiner als die Gesamt-FWHM, ohne sichtbare Folge.
+
+## 15. Cassini-Teilung unter Langzeit-Seeing (Issue #76)
+
+Anlass: Validierung T2 (`docs/validierung.md`, Abweichung 1). Bei Saturn 20'', 100 mm, 150-fach und Seeing 1,5'' zeigt das Bild keine Cassini-Teilung (Delle 0,000, 8.1), A-Q2 erwartete sie. Zu entscheiden war, ob die Erwartung fuer das Langzeitmittel (A-P5) zu optimistisch ist oder das Seeing-Modell fuer visuelle Beobachtung zu streng.
+
+### 15.1 Bildbewegung als Anteil der Langzeit-FWHM
+
+Mit der Tilt-Varianz aus 2.3 [14, 21] und $r_0 = 0{,}98\,\lambda/\mathrm{FWHM}$ (2.1) ergibt sich bei 1,5'' ($r_0$ = 7,4 cm, $D/r_0$ = 1,35 am 100 mm) eine Bildbewegung von $2{,}355\,\sigma_\alpha$ = 1,46'' am 100 mm und 1,59'' am 60 mm (eigene Rechnung). Die Langzeit-FWHM besteht hier fast nur aus Bewegung; die Heuristik aus 2.3 ergibt als Kurzzeit-FWHM 0,33'' (100 mm) und 0,10'' (60 mm, praktisch beugungsbegrenzt). Das passt zu Sacek: unterhalb $D/r_0 \approx 3$ bleibt das Beugungsbild weitgehend intakt [20].
+
+### 15.2 Delle mit und ohne Bildbewegung
+
+Eigene Rechnung mit `baueKern` und `profilDelle` (8.1), Arbeitsmassstab Gesamt-FWHM/2,5, Profile wie in `src/physik/validierung.test.ts`. Abgezogen wird der Anteil $f$ der Tilt-Varianz: $\mathrm{FWHM}^2 = \mathrm{FWHM}_\mathrm{lang}^2 - f\,(2{,}355\,\sigma_\alpha)^2$. Schwelle "erkennbar" 0,125 (`docs/validierung.md` 3).
+
+| Fall | $f$ = 0 (Langzeit) | $f$ = 0,5 | $f$ = 1 (Kurzzeit) |
+|---|---|---|---|
+| T2a 100 mm, Quellprofil (A-Ring innen 0,50, aussen 0,21) | 0,000 | 0,000 | 0,029 |
+| T2a 100 mm, A-Ring 0,7 / 0,6 (angenommen) | 0,000 | 0,059 | 0,224 |
+| T2b 60 mm, A-Ring 0,7 / 0,6 | 0,000 | 0,007 | 0,043 |
+| T4d Detail 1,5'', 100 mm, 1'' (Urteil: nicht) | 0,112 | 0,128 | 0,147 |
+| T5b Syrtis Major, Mars 6'', 80 mm (Urteil: nicht) | 0,060 | 0,129 | 0,231 |
+| T1, T3, T4a bis T4c, T5a, T6c | Urteile in allen Spalten unveraendert |
+
+Zum Vergleich mit Langzeit-Seeing allein (100 mm, A-Ring 0,7 / 0,6): die Delle uebersteigt die Schwelle erst unterhalb von etwa 0,8''.
+
+### 15.3 Entscheidung
+
+**Die Erwartung war fuer das Langzeitmittel zu optimistisch; das Modell bleibt** (Herbert, 2026-10-27). Begruendung:
+
+1. Unter Langzeit-Seeing 1,5'' entsteht am 100 mm auch mit hellerem A-Ring keine Delle. Sichtbar wird die Teilung erst, wenn die Bildbewegung herausfaellt, also in ruhigen Momenten. Die Beobachtungserfahrung beschreibt den Momentan-Anblick (2.3), A-P5 verlangt das Langzeitmittel; den ruhigen Moment deckt A-B6 ab (#29).
+2. Ein fuer visuelle Beobachtung entschaerftes Seeing (Tilt-Abzug ueber die Integrationszeit des Auges) hebt schon bei halbem Abzug T4d und T5b ueber die Schwelle, gegen die freigegebenen Urteile. Es waere eine Aenderung von A-P5 und ADR-0002 mit neuer Schwellenableitung, nicht eine Korrektur.
+3. 60 mm zeigt die Teilung in keiner Variante; T2b bleibt erfuellt.
+
+A-Q2 T2 ist entsprechend angepasst (`docs/anforderungen.md`).
+
+### 15.4 Folgen fuer andere Issues
+
+- **Quellbild sat_20 (#79):** Der A-Ring ist im Hubble-Bild 0,50 (innen) und 0,21 (aussen) des aeusseren B-Rings hell (`tools/strukturprofile.py`). Damit zeigt selbst der ruhige Moment die Teilung kaum (0,029). Visuell wirkt der A-Ring heller; vermutlich ist das Pressebild nichtlinear gestreckt wie das Jupiterbild in #79. Photometrische Werte fuer das Verhaeltnis A zu B mit Quelle stehen noch aus.
+- **Ruhiger Moment (#29):** Der Tilt-Abzug aus 2.3 veraendert nicht nur Cassini, sondern auch T4d und T5b (15.2). Eine Umsetzung braucht eigene Erwartungen fuer den ruhigen Moment und darf die Schwelle nicht aus den Langzeit-Urteilen uebernehmen.

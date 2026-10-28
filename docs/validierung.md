@@ -44,11 +44,13 @@ Bild: das nordliche Band ist klar, das suedliche schwaecher (Profil am Zentralme
 
 ### T2: Saturn 20'', Seeing 1,5'', 100 mm bei 150-fach gegen 60 mm bei 100-fach
 
-Erwartung: Cassini-Teilung bei 100 mm an den Ringenden erkennbar, bei 60 mm nicht.
+Erwartung: Cassini-Teilung bei 100 mm an den Ringenden erkennbar, bei 60 mm nicht. Seit Issue #76: im Langzeitmittel bei beiden Oeffnungen nicht erkennbar, bei 100 mm nur in ruhigen Momenten (A-Q2 angepasst).
 
 Bild: bei beiden Oeffnungen keine Teilung. Im Profil quer durch die Anse steigt die Helligkeit vom A-Ring zum B-Ring stetig an, ohne Minimum; der A-Ring ist schmal (2,4'') und halb so hell wie der aeussere B-Ring, die Delle der 0,76'' breiten Teilung geht in dieser Flanke unter. 60 mm erfuellt die Erwartung, 100 mm nicht.
 
 **Urteil: nicht erfuellt** (100 mm). Abweichung 1 (#76).
+
+**Nach #76 (2026-10-27): erfuellt** gegen die angepasste Erwartung. Bei 1,5'' besteht die Langzeit-FWHM am 100 mm fast nur aus Bildbewegung (1,46''); erst ohne sie entsteht eine Delle, und auch dann nur mit hellerem A-Ring als im Quellbild (physik.md 15). Bild und Tabellen-Test bleiben unveraendert.
 
 ### T3: Mond, 80 mm, 100-fach, Seeing 2''
 
@@ -106,10 +108,10 @@ Die Schwelle ist eine Kalibrierkonstante fuer die Tests, keine Physik: das Bild 
 
 Als Issues angelegt am 2026-10-27, Milestone M3 (Herbert, 2026-10-27):
 
-1. **#76, T2: Cassini-Teilung bei 100 mm und Seeing 1,5'' nicht sichtbar.** Das Modell faltet mit dem Langzeit-Seeing (Moffat mit voller FWHM); Beobachter sehen die Teilung in Momenten ruhiger Luft. Zu klaeren, ob die Erwartung fuer Langzeit-Seeing zu optimistisch ist oder ob das Seeing-Modell fuer visuelle Beobachtung zu streng ist. Bezug: #29 (Kann: Umschalter ruhiger Moment), physik.md 2.
+1. **#76, T2: Cassini-Teilung bei 100 mm und Seeing 1,5'' nicht sichtbar.** Das Modell faltet mit dem Langzeit-Seeing (Moffat mit voller FWHM); Beobachter sehen die Teilung in Momenten ruhiger Luft. Zu klaeren, ob die Erwartung fuer Langzeit-Seeing zu optimistisch ist oder ob das Seeing-Modell fuer visuelle Beobachtung zu streng ist. Bezug: #29 (Kann: Umschalter ruhiger Moment), physik.md 2. **Erledigt 2026-10-27:** Erwartung zu optimistisch, Modell bleibt, A-Q2 T2 angepasst. Ein Tilt-Abzug haette T4d und T5b ueber die Schwelle gehoben (physik.md 15).
 2. **#77, T3: Mond-Zoom zu grob fuer die Aufloesungsgrenze.** Der Zoom zeigt beim Mond das halbe Gesichtsfeld (`ZOOM_ANTEIL_GESICHTSFELD_MAX`); bei 80 mm und 100-fach sind das etwa 1,7'' je Anzeigepixel, die Optik loest etwa 1'' je Arbeitspixel auf. Die Grenze von A-Q2 (Krater ab 4 km) ist so nicht zu sehen. Vorschlag: zweite Zoomstufe oder Zoom bis zum Arbeitsmassstab.
 3. **#78, T5: Mars-Quellbild ohne Polkappe.** Hubble 2016-05-12 (mars_14 und mars_6) zeigt keine abgegrenzte Kappe; "Polkappe erkennbar" ist damit nicht pruefbar. Vorschlag: anderes Bild fuer die Aphel-Opposition (Nordfruehling, grosse Nordkappe, objekte.md 4.4).
-4. **#79, T1: Quellbild Jupiter kontrastreicher als visuell.** Baender etwa 0,7 statt 0,82 der Zonenhelligkeit (Orton [56]), GRF kraeftig orange; der GRF erscheint im 70 mm deutlich statt angedeutet. Vorschlag: Kontrast und Farbsaettigung des Quellbilds in `tools/` an die Photometrie angleichen, oder die Erwartung begruenden.
+4. **#79, T1: Quellbild Jupiter kontrastreicher als visuell.** Baender etwa 0,7 statt 0,82 der Zonenhelligkeit (Orton [56]), GRF kraeftig orange; der GRF erscheint im 70 mm deutlich statt angedeutet. Vorschlag: Kontrast und Farbsaettigung des Quellbilds in `tools/` an die Photometrie angleichen, oder die Erwartung begruenden. Aus #76 dazu: Saturn-A-Ring im Quellbild 0,50 (innen) und 0,21 (aussen) des aeusseren B-Rings, vermutlich ebenfalls zu dunkel; selbst im ruhigen Moment zeigt er die Cassini-Teilung kaum (physik.md 15.4).
 
 ## 5. Pruefpunkte aus Welle 4a
 
@@ -126,6 +128,7 @@ Als Issues angelegt am 2026-10-27, Milestone M3 (Herbert, 2026-10-27):
 |---|---|---|
 | Claude | 2026-10-27 | Urteile wie oben |
 | Herbert | 2026-10-27 | Urteile wie oben |
+| Herbert | 2026-10-27 | #76: T2-Erwartung an das Langzeitmittel angepasst, T2 erfuellt |
 
 ## 7. Sicherheit (Issue #22)
 
