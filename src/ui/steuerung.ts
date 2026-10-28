@@ -8,7 +8,8 @@
 // bis zum neuen im Stand (kein Flackern). verschiebe aendert nur die Fenstermitte (A-D2).
 // zoome wechselt zwischen Uebersicht und Zoomansicht (A-D3, Issue #20): der Zoom ist nur ein
 // anderes Fenster (zoom.ts) mit derselben Fenstermitte, dazu das Vergleichsbild aus derselben
-// Quelle; er schreibt keine URL.
+// Quelle; er schreibt keine URL. zeigeDetail schaltet im Zoom auf das schmalere Detailfenster
+// (Issue #77), wo zoom.ts es anbietet.
 //
 // Alles, was den Browser braucht (Frame, URL, Bildquelle, Anzeigegroesse), kommt ueber die
 // Umgebung herein; so prueft Vitest die Schleife in Node. Die Steuerung wirft nie: Fehler landen
@@ -76,6 +77,8 @@ export interface Stand {
   mitte: { xArcsec: number; yArcsec: number };
   /** Gewuenschte Ansicht: false Uebersicht (Gesichtsfeld), true Zoomansicht (A-D3). */
   zoom: boolean;
+  /** Im Zoom das Detailfenster statt des Zoomfensters (zoom.ts); wirkt nur, wo es angeboten wird. */
+  detail: boolean;
   /** Letzter fertiger Anblick der Uebersicht; bleibt stehen, bis der naechste fertig ist, auch bei einem Fehler. */
   anblick?: Anblick;
   /**
@@ -108,12 +111,12 @@ export type Beobachter = (stand: Readonly<Stand>) => void;
 
 /**
  * Aktuelle Bildquelle; gehoert zu genau einem Objektzustand, ebenso ihre Zwischenspeicher. Einer je
- * Bild, damit sich Uebersicht, Zoom und Vergleichsbild die Stufen nicht gegenseitig verdraengen.
+ * Bild, damit sich Uebersicht, Zoom, Detail und Vergleichsbild die Stufen nicht gegenseitig verdraengen.
  */
 interface AktuelleQuelle {
   kennung: string;
   bildquelle: Promise<Bildquelle>;
-  zwischen: { uebersicht: Zwischenspeicher; zoom: Zwischenspeicher; vergleich: Zwischenspeicher };
+  zwischen: { uebersicht: Zwischenspeicher; zoom: Zwischenspeicher; detail: Zwischenspeicher; vergleich: Zwischenspeicher };
 }
 
 export class Steuerung {
@@ -137,7 +140,7 @@ export class Steuerung {
     private readonly umgebung: Umgebung,
     start: Konfiguration
   ) {
-    this.zustand = { konfiguration: begrenze(start).konfiguration, phase: "laedt", zoom: false, nummer: 0, mitte: { xArcsec: 0, yArcsec: 0 } };
+    this.zustand = { konfiguration: begrenze(start).konfiguration, phase: "laedt", zoom: false, detail: false, nummer: 0, mitte: { xArcsec: 0, yArcsec: 0 } };
     this.url = this.urlZu(this.zustand.konfiguration);
     this.plane();
   }
@@ -189,14 +192,27 @@ export class Steuerung {
    * Wechselt zwischen Uebersicht (false) und Zoomansicht (true); schreibt keine URL (der Zoom ist
    * kein Parameter der Konfiguration). Die Fenstermitte bleibt, soweit die neue Ansicht sie
    * erlaubt (sonst begrenzt oder 0/0, verschieben.ts); Anblick und Zoombilder bleiben im Stand,
-   * bis die neue Rechnung fertig ist.
+   * bis die neue Rechnung fertig ist. Der Zoom oeffnet immer ohne Detail.
    */
   zoome(zoom: boolean): void {
     if (this.zustand.zoom === zoom) return;
-    const lage = verschiebelage(this.zustand.konfiguration, zoom);
+    this.wechsleAnsicht(zoom, false);
+  }
+
+  /**
+   * Schaltet im Zoom zwischen Zoomfenster (false) und Detailfenster (true, Issue #77); ausserhalb
+   * des Zooms wirkungslos. Die Fenstermitte bleibt wie bei zoome, soweit erlaubt.
+   */
+  zeigeDetail(detail: boolean): void {
+    if (!this.zustand.zoom || this.zustand.detail === detail) return;
+    this.wechsleAnsicht(true, detail);
+  }
+
+  private wechsleAnsicht(zoom: boolean, detail: boolean): void {
+    const lage = verschiebelage(this.zustand.konfiguration, zoom, detail);
     const mitte = sollMitte(this.zustand.mitte, lage?.durchmesser, lage?.erlaubt ?? false);
     this.ueberhole();
-    this.setze({ zoom, mitte });
+    this.setze({ zoom, detail, mitte });
     this.plane();
   }
 
@@ -288,7 +304,7 @@ export class Steuerung {
 
   private quelleFuer(objekt: Objektzustand): AktuelleQuelle {
     if (this.aktuell?.kennung !== objekt.kennung) {
-      this.aktuell = { kennung: objekt.kennung, bildquelle: this.umgebung.bildquelle(objekt), zwischen: { uebersicht: {}, zoom: {}, vergleich: {} } };
+      this.aktuell = { kennung: objekt.kennung, bildquelle: this.umgebung.bildquelle(objekt), zwischen: { uebersicht: {}, zoom: {}, detail: {}, vergleich: {} } };
     }
     return this.aktuell;
   }
@@ -302,14 +318,14 @@ export class Steuerung {
     await this.umgebung.warte();
     const version = this.version;
     const ueberholt = this.ueberholt.promise;
-    const { konfiguration: k, mitte, zoom } = this.zustand;
+    const { konfiguration: k, mitte, zoom, detail } = this.zustand;
 
     let auswertung: Auswertung;
     let vergleich: Simulationsparameter | undefined;
     try {
       const px = this.umgebung.anzeigePx(zoom);
       const fenster = zoom
-        ? zoomfenster(k, mitte, px)
+        ? zoomfenster(k, mitte, px, detail)
         : { breiteArcsec: optik(k.geraet).gesichtsfeld.breiteArcsec, mitteXArcsec: mitte.xArcsec, mitteYArcsec: mitte.yArcsec, px };
       // Der Kern der letzten Auswertung wird bei gleichem Schluessel wiederverwendet (auswerten, vorher).
       auswertung = auswerten(k, { fenster, vorher: this.zustand.auswertung?.parameter });
@@ -348,7 +364,7 @@ export class Steuerung {
     if (neueQuelle) this.setze({ phase: "rechnet" });
     try {
       const t0 = this.umgebung.uhr();
-      const anblick = rendere(auswertung.parameter, bildquelle.quelle, this.umgebung.falter, zoom ? aktuell.zwischen.zoom : aktuell.zwischen.uebersicht);
+      const anblick = rendere(auswertung.parameter, bildquelle.quelle, this.umgebung.falter, zwischenspeicherFuer(aktuell, zoom, detail));
       const bilder: Partial<Stand> =
         vergleich === undefined
           ? { anblick }
@@ -359,4 +375,10 @@ export class Steuerung {
       this.setze({ phase: "fehler", fehler: { art: "rechnen", ursache: e } });
     }
   }
+}
+
+/** Zwischenspeicher des Anblicks in der gezeigten Ansicht. */
+function zwischenspeicherFuer(aktuell: AktuelleQuelle, zoom: boolean, detail: boolean): Zwischenspeicher {
+  if (!zoom) return aktuell.zwischen.uebersicht;
+  return detail ? aktuell.zwischen.detail : aktuell.zwischen.zoom;
 }

@@ -9,7 +9,7 @@ import { GRENZEN } from "../physik";
 import { PARAMETER, voreinstellung, type Kataloge } from "../zustand";
 import type { Ausschnittsanfrage } from "./fenster";
 import { type Bildquelle, type Stand, Steuerung, type Umgebung } from "./steuerung";
-import { zoombreiteArcsec } from "./zoom";
+import { detailbreiteArcsec, zoombreiteArcsec } from "./zoom";
 
 const nachweise = pruefeBildnachweise(bilderJson);
 const objekte = pruefeObjekte(objekteJson);
@@ -413,6 +413,36 @@ describe("Steuerung, Zoomansicht (A-D3)", () => {
     if (k.geraet.art !== "fernrohr") throw new Error("Voreinstellung ist kein Fernrohr");
     s.aendere({ ...k, geraet: { ...k.geraet, okular: { ...k.geraet.okular, brennweiteMm: 6 } } });
     expect(s.stand.zoombilder).toBeUndefined();
+  });
+
+  it("zeigt im Zoom auf Wunsch das Detailfenster mit derselben Mitte und oeffnet den Zoom danach ohne Detail (#77)", async () => {
+    const { u, s } = neu();
+    await u.frame();
+    s.zeigeDetail(true);
+    expect(s.stand.detail).toBe(false);
+    expect(u.geplanteFrames).toBe(0);
+    s.zoome(true);
+    s.verschiebe(300, 100);
+    await u.frame();
+    s.zeigeDetail(true);
+    expect(s.stand.detail).toBe(true);
+    expect(s.stand.mitte).toEqual({ xArcsec: 300, yArcsec: 100 });
+    await u.frame();
+    const breite = detailbreiteArcsec(s.konfiguration);
+    expect(breite).toBeDefined();
+    expect(s.stand.zoombilder?.anblick.fenster).toMatchObject({ breiteArcsec: breite, mitteXArcsec: 300, mitteYArcsec: 100 });
+    expect(s.stand.zoombilder?.vergleich.fenster).toEqual(s.stand.zoombilder?.anblick.fenster);
+    expect(u.urls).toHaveLength(1);
+
+    s.zeigeDetail(false);
+    await u.frame();
+    expect(s.stand.zoombilder?.anblick.fenster.breiteArcsec).toBeCloseTo(zoombreiteArcsec(s.konfiguration), 9);
+    s.zeigeDetail(true);
+    s.zoome(false);
+    expect(s.stand.detail).toBe(false);
+    s.zoome(true);
+    await u.frame();
+    expect(s.stand.zoombilder?.anblick.fenster.breiteArcsec).toBeCloseTo(zoombreiteArcsec(s.konfiguration), 9);
   });
 
   it("bleibt beim Objektwechsel im Zoom und zeigt das neue Objekt", async () => {
