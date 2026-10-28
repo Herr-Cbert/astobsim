@@ -614,7 +614,7 @@ Blosses Auge ($V$ = 1): alle Trabanten unterdrueckt. 10x50: alle vier Jupitertra
 
 ### 13.4 Testwerte (A-Q1)
 
-Spalte "vor #71": Quellweiss jup_47 5,3 und sat_20 6,6, Stand vor #71; das sind die festen Eingaben der Unit-Tests (`src/physik/punktquellen.test.ts`) und bleiben so. Spalte "nach #71": Quellweiss 4,29 bzw. 5,34 (`objekte.md` 5.3).
+Spalte "vor #71": Quellweiss jup_47 5,3 und sat_20 6,6, Stand vor #71; das sind die festen Eingaben der Unit-Tests (`src/physik/punktquellen.test.ts`) und bleiben so. Spalte "nach #71": Quellweiss 4,29 bzw. 5,34 (`objekte.md` 5.3). Seit Issue #79 sind es 4,83 (Jupiter) und 5,85 (Saturn), weil die Quellbilder im Kontrast angeglichen sind; die Rechnungen in 13.4 und 14 bleiben als Beispiele mit 4,29 stehen.
 
 | Trabant (Zustand) | $m$ | $d$ | $\mu_\mathrm{T}$ | $h_\mathrm{rel}$ vor #71 | $h_\mathrm{rel}$ nach #71 |
 |---|---|---|---|---|---|
@@ -746,5 +746,5 @@ A-Q2 T2 ist entsprechend angepasst (`docs/anforderungen.md`).
 
 ### 15.4 Folgen fuer andere Issues
 
-- **Quellbild sat_20 (#79):** Der A-Ring ist im Hubble-Bild 0,50 (innen) und 0,21 (aussen) des aeusseren B-Rings hell (`tools/strukturprofile.py`). Damit zeigt selbst der ruhige Moment die Teilung kaum (0,029). Visuell wirkt der A-Ring heller; vermutlich ist das Pressebild nichtlinear gestreckt wie das Jupiterbild in #79. Photometrische Werte fuer das Verhaeltnis A zu B mit Quelle stehen noch aus.
+- **Quellbild sat_20 (#79):** Der A-Ring ist im Hubble-Bild 0,50 (innen) und 0,21 (aussen) des aeusseren B-Rings hell (`tools/strukturprofile.py`). Damit zeigt selbst der ruhige Moment die Teilung kaum (0,029). Visuell wirkt der A-Ring heller; vermutlich ist das Pressebild nichtlinear gestreckt wie das Jupiterbild in #79. Photometrische Werte fuer das Verhaeltnis A zu B mit Quelle stehen noch aus. **Nachtrag #79 (2026-10-28):** Werte nach Salo und French 2010 (`objekte.md` 4.2): A innen 0,83, A aussen 0,56, Cassini-Zone 0,15. Das Bild ist mit einer Tonkurve angeglichen (eine Potenzkurve, die die A-Ringe trifft, haette die Teilung drei- bis viermal zu hell gemacht). Mit den neuen Stufen (A 0,82 / 0,54, Cassini 0,17) bleibt die Delle im Langzeitmittel 0,000; im ruhigen Moment ergibt sich am 100 mm 0,131 (Anhalt, Arbeitsmassstab des Langzeitkerns), am 60 mm 0,017.
 - **Ruhiger Moment (#29):** Der Tilt-Abzug aus 2.3 veraendert nicht nur Cassini, sondern auch T4d und T5b (15.2). Eine Umsetzung braucht eigene Erwartungen fuer den ruhigen Moment und darf die Schwelle nicht aus den Langzeit-Urteilen uebernehmen.

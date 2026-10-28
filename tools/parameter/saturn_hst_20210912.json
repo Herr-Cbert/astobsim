@@ -21,6 +21,25 @@
   "ziel_durchmesser_px": 600,
   "leinwand_px": 1400,
   "leinwand_hoehe_px": 620,
+  "kontrast_kurve": [
+    [
+      0.0354,
+      0.092
+    ],
+    [
+      0.1272,
+      0.3877
+    ],
+    [
+      0.3069,
+      0.5647
+    ],
+    [
+      0.6152,
+      0.6152
+    ]
+  ],
+  "kontrast_begruendung": "Pressebild nichtlinear bearbeitet: an der Anse A-Ring innen 0,50, aussen 0,21, Cassini-Teilung 0,06 des aeusseren B-Rings; Ziele 0,83, 0,56 und 0,15 nach Salo und French 2010 (HST F555W, Ringoeffnung um 19 Grad, docs/recherche/objekte.md 4.2); eine Potenzkurve trifft nicht alle zugleich, daher Tonkurve mit Stuetzstellen aus tools/strukturprofile.py --kurve; der C-Ring hat keine Stuetzstelle (etwa 0,08 statt 0,11), Issue #79",
   "qualitaet": 95,
   "native_bogensekunden_pro_pixel": 0.04,
   "native_instrument": "WFC3/UVIS",
@@ -32,7 +51,7 @@
   "lizenz": "CC-BY-4.0 (ESA/Hubble) / Public Domain (NASA)",
   "lizenz_url": "https://esahubble.org/copyright/",
   "namensnennung": "NASA, ESA, A. Simon (Goddard Space Flight Center), and M.H. Wong (University of California, Berkeley) and the OPAL team",
-  "aenderungsvermerk": "gedreht, zugeschnitten, skaliert, Trabanten entfernt, nach sRGB umgerechnet",
+  "aenderungsvermerk": "gedreht, zugeschnitten, skaliert, Trabanten entfernt, nach sRGB umgerechnet, Kontrast angepasst",
   "winkelgroesse_arcsec": 18.11,
   "sub_erde_breite_grad": 19.2,
   "phase": 0.999,

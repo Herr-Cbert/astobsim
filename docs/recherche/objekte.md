@@ -225,6 +225,17 @@ Auf der Vorder- und Rueckseite des Rings ist die Teilung um sin B verkuerzt (bei
 
 Albedo/optische Tiefe aus dem Fact Sheet [5]: B-Ring optische Tiefe 0,4 bis 2,5, Albedo 0,4 bis 0,6; A-Ring 0,4 bis 1,0; Cassini-Teilung 0 bis 0,1, Albedo 0,2 bis 0,4; C-Ring 0,05 bis 0,35, Albedo 0,12 bis 0,30 (im Bild halbtransparent, "Krepp-Ring").
 
+Ringhelligkeit an der Anse (Issue #79), HST WFPC2 F555W (etwa 540 nm), korrigierte I/F nach Salo und French 2010 [69]: Tabellen 1 bis 3 (Bereiche C 78 000 bis 83 000 km, B 100 000 bis 107 000 km, A 127 000 bis 129 000 km) und radiale Profile in Abb. 2 (Ringoeffnung 23,5 Grad). Verhaeltnisse eigene Rechnung, Werte aus Abb. 2 eigene Ablesung (an den Tabellenbereichen auf 0,002 geprueft):
+
+| Groesse (relativ zum aeusseren B-Ring, 110 000 bis 117 000 km) | B = 23,5 Grad, Phase 2 bis 6 Grad | fuer sat_20 (B = 19 Grad, Phase etwa 4 Grad) |
+|---|---|---|
+| A-Ring innen (122 500 bis 124 500 km) | 0,81 | 0,83 +- 0,05 |
+| A-Ring aussen (134 000 bis 136 300 km) | 0,54 bis 0,55 | 0,56 +- 0,05 |
+| Cassini-Teilung, Median 118 000 bis 121 500 km (Minimum) | 0,16 (0,10) | 0,15, durch die HST-PSF eher Obergrenze |
+| C-Ring (78 000 bis 83 000 km) | etwa 0,09 | etwa 0,11 |
+
+Umrechnung auf B = 19 Grad ueber den Kippeffekt (A/B steigt laut Tabellen von 0,64 bei 23,6 Grad auf 0,67 bis 0,68 bei 20,1 und 0,71 bei 15,4 Grad; Abb. 16), Faktor 1,04 bis 1,07, eigene Abschaetzung. Der Phasenwinkel aendert die Verhaeltnisse zwischen 0,6 und 6 Grad kaum. Fuer die Leuchtdichte passt F555W am besten (F439W gibt A/B 0,67, F675W 0,62 bei B = 23,6 Grad und Phase 6 Grad). Ein belastbarer Wert fuer Ring gegen Scheibe fand sich nicht (Schmid et al. 2011 [70] gibt nur eine abgeleitete Reflektivitaet der Scheibenmitte, 0,68 bei 600 nm).
+
 ### 4.3 T3: Mond, 80 mm, 100-fach, Seeing 2"
 
 - Bei 384 400 km: 1 km = 0,537" (ber.). 4 km = 2,15", 10 km = 5,4".
@@ -253,8 +264,8 @@ Die Tabellen-Tests (`src/physik/validierung.test.ts`) falten je Testfall ein Stu
 
 | Fall | Profil | Helligkeiten | Herkunft |
 |---|---|---|---|
-| T1, T6c | Jupiter am Zentralmeridian: NEB 2,3 bis 5,7'' N, SEB 2,7 bis 6,4'' S (47'') | Zonen 1, Baender 0,82 | Orton [56] (0,62/0,76); das Quellbild ist kontrastreicher (Baender etwa 0,7, Hubble-Verarbeitung), der Test bleibt bei der Literatur |
-| T2 | Saturn 20'', radial durch die Anse, Radius 10'': C-Ring 1,236 bis 1,526 R, B innen bis 1,75, B aussen bis 1,950, Cassini bis 2,025, A innen bis 2,10, A aussen bis 2,269 | 0,03 / 0,53 / 1 / 0,06 / 0,50 / 0,21, Himmel 0 | Quellbild sat_20 (beide Ansen, relativ zum aeusseren B-Ring); Zonen nach 4.2 |
+| T1, T6c | Jupiter am Zentralmeridian: NEB 2,3 bis 5,7'' N, SEB 2,7 bis 6,4'' S (47'') | Zonen 1, Baender 0,82 | Orton [56] (0,62/0,76); seit #79 ist das Quellbild darauf angeglichen (NEB/NTrZ vorher 0,65, jetzt 0,82, Exponent 0,427), Test und Bild stimmen ueberein |
+| T2 | Saturn 20'', radial durch die Anse, Radius 10'': C-Ring 1,236 bis 1,526 R, B innen bis 1,75, B aussen bis 1,950, Cassini bis 2,025, A innen bis 2,10, A aussen bis 2,269 | 0,07 / 0,78 / 1 / 0,17 / 0,82 / 0,54, Himmel 0 | Quellbild sat_20 (beide Ansen, relativ zum aeusseren B-Ring), seit #79 mit einer Tonkurve an Salo und French 2010 angeglichen (4.2; vorher 0,03 / 0,53 / 1 / 0,06 / 0,50 / 0,21); Zonen nach 4.2 |
 | T3 | Kraterschatten 4 km = 2,15'' | Schatten 0 in 1 | 4.3 (Schattenkontrast nahe 1) |
 | T3 | Hadley-Rille 0,64'' | 0,7 in 1 | Annahme (4.3: "Kontrast viel geringer", nur ein Schattenrand); das Quellbild loest die Rille mit 0,64''/px nicht auf |
 | T4 | Detail 1,5'' auf Jupiter (Festons, Ovale) | 0,82 in 1 | Annahme: Groesse aus dem Quellbild geschaetzt, Kontrast wie die Baender |
@@ -329,6 +340,8 @@ Nachtrag 2026-10-27 (Issue #71): Die Werte dieser Tabelle sind mittlere Flaechen
 | sat_16 | saturn_hst_20210912 | 0,026667 | 96,25 | +0,6 | 6,6 | 5,56 | -1,04 |
 | sat_20 | saturn_hst_20210912 | 0,033333 | 150,4 | -0,1 | 6,6 | 5,34 | -1,26 |
 
+Nachtrag Issue #79 (2026-10-28): Das Jupiterbild ist seit #79 im Kontrast an Orton angeglichen (jeder Kanal in linearem Licht hoch 0,427, 4.6), dadurch heller. Neu geeicht: jup_35 Fluss 568,8, Quellweiss 4,89; jup_47 Fluss 1025,7, Quellweiss 4,83 (je +0,54 mag gegen die Tabelle). Das Saturnbild ist mit einer Tonkurve an Salo und French 2010 angeglichen (4.2, 4.6): sat_16 Fluss 153,0, Quellweiss 6,06; sat_20 Fluss 239,0, Quellweiss 5,85 (je +0,50 mag). Probe mit `tools/quellweiss_eichen.py` auf 0,005 mag.
+
 Lesart: Das Scheibenmittel im Quellbild ist $10^{-0{,}4\,(S - \mu_\mathrm{weiss})}$ mit $S$ aus 5.2: Mars 25" etwa 0,14, Mars 14" 0,24, Jupiter 47" 0,39. Die Planetenbilder sind also deutlich dunkler als Weiss, Mars 2003 am staerksten. Bei Mars, Jupiter und Saturn wird Quellweiss um 1,0 bis 2,1 mag heller, die Planetenflaeche im Arbeitsraster entsprechend heller; beim Mond wird er 0,56 mag dunkler.
 
 Anmerkungen:
@@ -363,7 +376,7 @@ Feste Mondstellungen: siehe Tabellen in 3.3 (Jupiter: Io -110/+2,9; Europa +175/
 Felder je Objekt: `id`, `name`, `typ` ("mond" | "planet"), `quelle_physik` (Verweis auf diese Datei), `zustaende[]`.
 Felder je Zustand: `id`, `name`, `winkelgroesse_arcsec` (aequatorial), `polar_arcsec`, `phase` (beleuchteter Anteil 0 bis 1), `phasenwinkel_grad`, `ringneigung_grad` (nur Saturn, sonst weglassen), `ring_aussen_arcsec` (nur Saturn), `magnitude`, `entfernung_au`, `bild` (Verweis auf Bildnachweis in der Bilddatendatei nach A-X4), `monde[]`.
 Felder je Mond: `name`, `dx_arcsec`, `dy_arcsec`, `durchmesser_arcsec`, `magnitude`.
-Nachtrag 2026-10-26 (Welle 2): Pflichtfeld `weiss_mag_arcsec2` je Zustand, die Flaechenhelligkeit in mag/"^2, die Weiss im Quellbild bedeutet (Werte aus 5.2: Mond 3,35 als Vollmond, weil die Tagseite im Bild volle Helligkeit hat; Mars 3,8 / 4,1 / 4,5; Jupiter 5,3 / 5,4; Saturn 6,6). Nachtrag 2026-10-27 (Issue #71): seit #71 auf den Pixelwert 1,0 des Quellbilds geeicht (5.3): Mond 3,91; Mars 3,10 / 2,54 / 1,68; Jupiter 4,35 / 4,29; Saturn 5,56 / 5,34.
+Nachtrag 2026-10-26 (Welle 2): Pflichtfeld `weiss_mag_arcsec2` je Zustand, die Flaechenhelligkeit in mag/"^2, die Weiss im Quellbild bedeutet (Werte aus 5.2: Mond 3,35 als Vollmond, weil die Tagseite im Bild volle Helligkeit hat; Mars 3,8 / 4,1 / 4,5; Jupiter 5,3 / 5,4; Saturn 6,6). Nachtrag 2026-10-27 (Issue #71): seit #71 auf den Pixelwert 1,0 des Quellbilds geeicht (5.3): Mond 3,91; Mars 3,10 / 2,54 / 1,68; Jupiter 4,35 / 4,29; Saturn 5,56 / 5,34. Nachtrag Issue #79: Jupiter 4,89 / 4,83 und Saturn 6,06 / 5,85 nach der Kontrastangleichung der Bilder.
 Nachtrag 2026-10-26 (Issue #12): optionales Feld `hinweis_hilfe` je Zustand, ein Satz fuer den Hilfetext dieses Zustands (A-Z2), den ui anzeigt; `kommentar` bleibt reine Dokumentation der Datei. Erster Fall: `mars_6` ("real gibbos, etwa 90 Prozent beleuchtet, als Vollscheibe gezeigt", A-X1). `phase` und `phasenwinkel_grad` beschreiben auch bei `mars_6` den realen Zustand (0,90 und 37 Grad aus 1.2), nicht das Bild.
 Nachtrag 2026-10-26 (Issue #12), geteilte Bilder: Zwei Zustaende eines Objekts duerfen ueber `bild` denselben Bildnachweis nutzen (`mars_6` und `mars_14` nutzen `mars_hst_20160512`). Der Nachweis nennt in `zustand` genau einen Zustand, den, fuer den das Bild ausgewaehlt wurde (`mars_14`); die Pruefung (`pruefeVerweise`) verlangt nur, dass dieser Zustand zum selben Objekt gehoert. Die Datei liegt einmal im Repo, der Massstab folgt je Zustand aus dessen Winkelgroesse und `objekt_durchmesser_px`.
 Einheiten stehen im Feldnamen; Zahlen als Dezimalzahlen mit Punkt; keine berechenbaren Groessen doppelt speichern (Polar-Durchmesser wird trotzdem gespeichert, weil Bild und Modell ihn direkt brauchen).
@@ -488,3 +501,5 @@ Fuer Saturn kommen `ringneigung_grad: 15` (umgesetzt: 19, Nachtrag in 3.3) und `
 66. = [9] (Mallama und Hilton 2018), hier fuer Jupiter-Magnitude -2,70 bei mittlerer Opposition.
 67. Universe Today / EarthSky zur Ringkantenstellung 2025-03-23 und zum 29,5-Jahre-Zyklus (nur Einstieg; Zahlen aus [14]).
 68. Krisciunas, K., Schaefer, B. E. (1991): A Model of the Brightness of Moonlight. PASP 103, 1033-1039, doi:10.1086/132921; Gl. 9 (V-Magnitude des Mondes ueber den Phasenwinkel). Formel geprueft an der Umsetzung in specsim (`krisciunas_schaefer`, Kommentar "eqn. 9"), https://github.com/desihub/specsim/blob/main/specsim/atmosphere.py (abgerufen 2026-10-27); das Original habe ich nicht gelesen.
+69. Salo, H., French, R. G. (2010): The opposition and tilt effects of Saturn's rings from HST observations. Icarus 210, 785-816; arXiv:1007.0349, https://arxiv.org/abs/1007.0349 . Verwendet: Tabellen 1 bis 3 (S. 62 bis 67 im arXiv-PDF), Abb. 2 (S. 40), Abb. 16 (S. 54). Daten aus Cuzzi et al. 2002 und French et al. 2007 (nur ueber dieses Zitat bekannt). Gelesen 2026-10-28 (Recherche-Agent, Werte aus Abb. 2 digitalisiert und an den Tabellen geprueft).
+70. Schmid, H. M., Joos, F., Buenzli, E., Gisler, D. (2011): Long slit spectropolarimetry of Jupiter and Saturn. Icarus; arXiv:1101.5000, Tabelle 3 (abgeleitete Reflektivitaet, nicht als Ziel verwendet).
