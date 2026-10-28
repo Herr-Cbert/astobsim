@@ -144,6 +144,7 @@ Als Issues angelegt am 2026-10-27, Milestone M3 (Herbert, 2026-10-27):
 | Claude | 2026-10-28 | #79: Quellbilder Jupiter und Saturn angeglichen, T1 erfuellt, T2 weiter erfuellt, T4 und T6 unveraendert im Urteil |
 | Claude | 2026-10-28 | #77: Detail in der Zoomansicht, T3 erfuellt |
 | Claude | 2026-10-28 | #78: Quellbild Mars 1995 mit Nordkappe, T5 erfuellt |
+| Herbert | 2026-10-28 | A-T3: Firefox funktioniert |
 
 ## 7. Sicherheit (Issue #22)
 
@@ -213,14 +214,14 @@ Stand 2026-10-28. Je Muss-Anforderung aus `docs/anforderungen.md` das Issue mit 
 | A-X6 | Erstladen unter 5 MB, je Objekt unter 20 MB | #7, #8, #10 / PR #42 | `scripts/build-abschluss.mjs`, `src/daten/bilddateien.test.ts` | erfuellt |
 | A-T1 | Nur Browser, kein Backend | ADR-0001, #10 / PR #42, #22 / PR #81 | Abschnitt 7 | erfuellt |
 | A-T2 | GitHub Pages | #10 / PR #42 | `.github/workflows/pages.yml`, https://herr-cbert.github.io/astobsim/ | erfuellt |
-| A-T3 | Chrome und Firefox (Desktop) | #15 / PR #50, #23 | Chrome: `scripts/browser-test.mjs`, `scripts/validierung-bilder.mjs`; Firefox: siehe unten | **offen bis Pruefung Herbert** |
+| A-T3 | Chrome und Firefox (Desktop) | #15 / PR #50, #23 | Chrome: `scripts/browser-test.mjs`, `scripts/validierung-bilder.mjs`; Firefox: von Hand, Abschnitt 6 | erfuellt |
 | A-T4 | Keine Konten, Cookies, Tracking | #16 / PR #53, #22 / PR #81 | Abschnitt 7 | erfuellt |
 | A-T5 | MIT-Lizenz, Bilder mit eigener Lizenz | #23 | `LICENSE`, `package.json`, Seitenfuss | erfuellt |
 | A-T6 | Stackwahl in Phase 3 | ADR-0001 | `docs/adr/0001-stack.md` | erfuellt |
 | A-Q1 | Unit-Tests der Physik gegen bekannte Werte | #2 / PR #40, #3 / PR #41, #4 / PR #44 | `src/physik/aufloesung.test.ts`, `src/physik/atmosphaere.test.ts` | erfuellt |
 | A-Q2 | T1 bis T6 geprueft, Abweichungen als Issues | #21 / PR #80, #76 bis #79 | Abschnitte 2 bis 4, `src/physik/validierung.test.ts` | erfuellt |
-| A-Q3 | Version 1 fertig | #23 | dieser Abschnitt, Seite online | erfuellt mit A-T3 |
+| A-Q3 | Version 1 fertig | #23 | dieser Abschnitt, Seite online | erfuellt |
 
-**Firefox (A-T3):** Firefox 158 auf `sam` startet headless und zeigt Layout und Ladestatus (Screenshot beim Laden); `--screenshot` wartet nicht auf die Rechnung, ein voller Durchlauf ist so nicht pruefbar. Pruefpunkt von Hand (Herbert): https://herr-cbert.github.io/astobsim/ in Firefox oeffnen, Objekt und Geraet wechseln, Seeing-Regler ziehen, Zoom, beim Mond Detail und Verschieben, Bildnachweise aufklappen; Konsole ohne Fehler. Ergebnis in Abschnitt 6 eintragen.
+**Firefox (A-T3):** Firefox 158 auf `sam` startet headless und zeigt Layout und Ladestatus (Screenshot beim Laden); `--screenshot` wartet nicht auf die Rechnung, ein voller Durchlauf ist so nicht pruefbar. Pruefpunkt von Hand (Herbert): https://herr-cbert.github.io/astobsim/ in Firefox oeffnen, Objekt und Geraet wechseln, Seeing-Regler ziehen, Zoom, beim Mond Detail und Verschieben, Bildnachweise aufklappen; Konsole ohne Fehler. Ergebnis in Abschnitt 6 eintragen. **Erledigt 2026-10-28:** Herbert, Firefox funktioniert.
 
 **Kann-Punkte:** alle als Issues im Milestone "Nach Version 1": A-Z8 #24, A-Z9 #25, A-Z10 #26, A-F9 #27, A-B5 #28, A-B6 #29, A-P8 #30, A-D12 #31, A-D13 #32, A-D14 #33, A-D15 #34, A-D16 #35, A-X7 #36, A-X8 #37, eigenes Mond-Rendering (ADR-0002) #38.
