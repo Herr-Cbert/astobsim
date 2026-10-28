@@ -84,7 +84,7 @@
         "phase": 0.99,
         "phasenwinkel_grad": 10,
         "magnitude": -2.0,
-        "weiss_mag_arcsec2": 4.35,
+        "weiss_mag_arcsec2": 4.89,
         "entfernung_au": 5.63,
         "bild": "jupiter_hst_20190627",
         "trabanten": [
@@ -128,7 +128,7 @@
         "phase": 1.0,
         "phasenwinkel_grad": 0.5,
         "magnitude": -2.7,
-        "weiss_mag_arcsec2": 4.29,
+        "weiss_mag_arcsec2": 4.83,
         "entfernung_au": 4.195,
         "bild": "jupiter_hst_20190627",
         "trabanten": [
@@ -181,7 +181,7 @@
         "ringneigung_grad": 19,
         "ring_aussen_arcsec": 36.3,
         "magnitude": 0.6,
-        "weiss_mag_arcsec2": 5.56,
+        "weiss_mag_arcsec2": 6.06,
         "entfernung_au": 10.39,
         "bild": "saturn_hst_20210912",
         "trabanten": [
@@ -213,7 +213,7 @@
         "ringneigung_grad": 19,
         "ring_aussen_arcsec": 45.4,
         "magnitude": -0.1,
-        "weiss_mag_arcsec2": 5.34,
+        "weiss_mag_arcsec2": 5.85,
         "entfernung_au": 8.31,
         "bild": "saturn_hst_20210912",
         "trabanten": [

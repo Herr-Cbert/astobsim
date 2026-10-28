@@ -28,15 +28,16 @@ const JUPITER_BAENDER: Profilstufe[] = [stufe(-6.4, -2.7, 0.82), stufe(2.3, 5.7,
 
 /**
  * Saturn 20'', radial durch die Anse (Saturnradius 10''): Ringzonen nach objekte.md 4.2,
- * Helligkeiten relativ zum aeusseren B-Ring aus dem Quellbild (tools/strukturprofile.py), Himmel 0.
+ * Helligkeiten relativ zum aeusseren B-Ring aus dem Quellbild (tools/strukturprofile.py; seit #79 an Salo und
+ * French 2010 angeglichen, objekte.md 4.6), Himmel 0.
  */
 const SATURN_ANSE: Profilstufe[] = [
-  stufe(12.36, 15.26, 0.03),
-  stufe(15.26, 17.5, 0.53),
+  stufe(12.36, 15.26, 0.07),
+  stufe(15.26, 17.5, 0.78),
   stufe(17.5, 19.5, 1),
-  stufe(19.5, 20.25, 0.06),
-  stufe(20.25, 21.0, 0.5),
-  stufe(21.0, 22.69, 0.21)
+  stufe(19.5, 20.25, 0.17),
+  stufe(20.25, 21.0, 0.82),
+  stufe(21.0, 22.69, 0.54)
 ];
 
 /** Mars-Scheibe mit Radius r und Syrtis Major der Breite b in der Mitte, dunkel/hell 0,41 (Quellbild), Himmel 0. */

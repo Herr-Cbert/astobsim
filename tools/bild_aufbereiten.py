@@ -13,6 +13,18 @@ Parameterdatei nennt leinwand_hoehe_px):
       bikubisch in linearem Licht; ohne diese Felder wird nichts gedreht,
     - Scheibenmitte auf die Leinwandmitte (Randkoordinate leinwand_px / 2,
       wie QuelleEinzelbild und QuelleKacheln sie annehmen),
+    - optional kontrast_exponent g (0 < g <= 1, Issue #79): jeder Kanal in
+      linearem Licht hoch g, vor dem Skalieren. Pressebilder sind oft
+      nichtlinear gestreckt; g < 1 senkt Kontrast und Saettigung gemeinsam,
+      Schwarz bleibt Schwarz. Pflicht dazu ist kontrast_begruendung (Ziel und
+      Quelle der Photometrie, geht ins Feld bearbeitung; bilder.md Abschnitt 9,
+      Punkt 6). g bestimmt tools/strukturprofile.py --exponent,
+    - optional statt dessen kontrast_kurve (Issue #79, Saturn): Stuetzstellen
+      [[x, y], ...] einer streng steigenden, stueckweise linearen Tonkurve f
+      auf die Leuchtdichte Y in linearem Licht, dazu (0, 0) und (1, 1); die
+      Kanaele werden mit f(Y)/Y skaliert (Farbton bleibt). Fuer Bilder, die
+      sich nicht mit einem Exponenten angleichen lassen; Stuetzstellen aus
+      tools/strukturprofile.py --kurve, Pflicht ebenfalls kontrast_begruendung,
     - Skalierung auf ziel_durchmesser_px (600 bis 1200 px, bilder.md
       Abschnitt 9, Schritt 7), gerechnet in linearem Licht mit Lanczos,
     - ausserhalb der Scheibe plus rand_px Rand schwarz; mit roh_ring_aussen_px
@@ -126,6 +138,21 @@ def lade_parameter(pfad):
         raise SystemExit(f"{pfad}: spiegeln muss true oder false sein")
     if "CC" in p["lizenz"] and not p.get("aenderungsvermerk"):
         raise SystemExit(f"{pfad}: CC-Lizenz verlangt aenderungsvermerk (bilder.md Abschnitt 9, Schritt 8)")
+    if "kontrast_exponent" in p and "kontrast_kurve" in p:
+        raise SystemExit(f"{pfad}: kontrast_exponent und kontrast_kurve schliessen sich aus")
+    if "kontrast_kurve" in p:
+        xs = [0.0] + [pt[0] for pt in p["kontrast_kurve"]] + [1.0]
+        ys = [0.0] + [pt[1] for pt in p["kontrast_kurve"]] + [1.0]
+        if any(b <= a for a, b in zip(xs, xs[1:])) or any(b <= a for a, b in zip(ys, ys[1:])):
+            raise SystemExit(f"{pfad}: kontrast_kurve muss in x und y streng steigen und in (0, 1) liegen")
+        if not p.get("kontrast_begruendung"):
+            raise SystemExit(f"{pfad}: kontrast_kurve verlangt kontrast_begruendung (bilder.md Abschnitt 9, Punkt 6)")
+    if "kontrast_exponent" in p:
+        g = p["kontrast_exponent"]
+        if not (isinstance(g, (int, float)) and 0 < g <= 1):
+            raise SystemExit(f"{pfad}: kontrast_exponent {g} liegt nicht in (0, 1]")
+        if not p.get("kontrast_begruendung"):
+            raise SystemExit(f"{pfad}: kontrast_exponent verlangt kontrast_begruendung (bilder.md Abschnitt 9, Punkt 6)")
     if not p["datei"].endswith(".webp") or p["datei"].startswith("/") or ".." in p["datei"]:
         raise SystemExit(f"{pfad}: datei muss ein relativer Pfad unter daten/bilder/ auf .webp sein")
     return p
@@ -184,6 +211,15 @@ def ausrichten(p, rgb):
         linear = np.dstack([np.asarray(k) for k in kanaele])
     w = np.clip(linear, 0.0, 1.0)
     return (np.where(w <= 0.0031308, w * 12.92, 1.055 * w ** (1 / 2.4) - 0.055) * 255.0).astype(np.float32)
+
+
+def tonkurve(linear, punkte):
+    """Stueckweise lineare Tonkurve auf die Leuchtdichte Y (IEC 61966-2-1), Kanaele mit f(Y)/Y skaliert."""
+    xs = [0.0] + [pt[0] for pt in punkte] + [1.0]
+    ys = [0.0] + [pt[1] for pt in punkte] + [1.0]
+    y = 0.2126 * linear[..., 0] + 0.7152 * linear[..., 1] + 0.0722 * linear[..., 2]
+    faktor = np.where(y > 0, np.interp(y, xs, ys) / np.where(y > 0, y, 1.0), 1.0)
+    return (linear * faktor[..., None]).astype(np.float32)
 
 
 def srgb_zu_linear(kodewert):
@@ -300,6 +336,10 @@ def leinwand(p, rgb):
     faktor = p["ziel_durchmesser_px"] / p["roh_durchmesser_px"]
     mx, my = p["roh_mitte_px"]
     linear = srgb_zu_linear(rgb)
+    if "kontrast_exponent" in p:
+        linear = (linear ** np.float32(p["kontrast_exponent"])).astype(np.float32)
+    elif "kontrast_kurve" in p:
+        linear = tonkurve(linear, p["kontrast_kurve"])
     # Pillow-Boxkoordinaten sind Randkoordinaten: Pixelzentrum i liegt bei i + 0,5.
     halb, halb_h = n / 2 / faktor, h / 2 / faktor
     bx, by = mx + 0.5, my + 0.5
@@ -352,9 +392,20 @@ def bildnachweis(p, farbraum, faktor, datei_bytes):
     hoch_roh = p["roh_durchmesser_px"] / nativ_px
     hoch_ziel = d / nativ_px
     qualitaet = p.get("qualitaet", QUALITAET_STANDARD)
-    farbe = (f"Farbraum {farbraum} farbmetrisch nach sRGB umgerechnet (relativ farbmetrisch), sonst keine Farb- "
-             f"oder Kontrastaenderung" if "srgb" not in farbraum.lower()
-             else "keine Farb- oder Kontrastaenderung (Rohbild sRGB)")
+    if "kontrast_exponent" in p or "kontrast_kurve" in p:
+        if "kontrast_exponent" in p:
+            kontrast = (f"Kontrast und Saettigung angeglichen: jeder Kanal in linearem Licht hoch "
+                        f"{p['kontrast_exponent']} ({p['kontrast_begruendung']})")
+        else:
+            stuetz = ", ".join(f"{x}->{y}" for x, y in p["kontrast_kurve"])
+            kontrast = (f"Kontrast angeglichen: Tonkurve auf die Leuchtdichte in linearem Licht durch {stuetz}, "
+                        f"Kanaele im Verhaeltnis skaliert ({p['kontrast_begruendung']})")
+        farbe = (f"Farbraum {farbraum} farbmetrisch nach sRGB umgerechnet (relativ farbmetrisch); {kontrast}"
+                 if "srgb" not in farbraum.lower() else f"Rohbild sRGB; {kontrast}")
+    else:
+        farbe = (f"Farbraum {farbraum} farbmetrisch nach sRGB umgerechnet (relativ farbmetrisch), sonst keine Farb- "
+                 f"oder Kontrastaenderung" if "srgb" not in farbraum.lower()
+                 else "keine Farb- oder Kontrastaenderung (Rohbild sRGB)")
     skalierung = ("nicht skaliert" if abs(faktor - 1) < 1e-9
                   else f"in linearem Licht mit Lanczos um den Faktor {faktor:.4f} skaliert")
     rand = p.get("rand_px", RAND_PX_STANDARD)
