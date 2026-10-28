@@ -10,6 +10,7 @@ import { ladeBildnachweise, ladeGeraete, ladeObjekte, nachweisZu, quelleEinzelbi
 import type { Objektzustand } from "../naht/konfiguration";
 import { TEXTE } from "../texte";
 import { ausUrl, type Kataloge } from "../zustand";
+import { baueFuss } from "./bildnachweise";
 import { waehleAnzeigePx } from "./fenster";
 import { baueFormularBedingungen } from "./formular_bedingungen";
 import { baueFormularGeraet } from "./formular_geraet";
@@ -36,6 +37,8 @@ interface Seite extends GesichtsfeldPlaetze {
   bild: HTMLElement;
   /** Platz der Zoomansicht (A-D3), ersetzt im Zoom das Gesichtsfeld. */
   zoom: HTMLElement;
+  /** Seitenfuss mit Lizenz und Bildnachweisen (A-T5, A-X4), gefuellt nach dem Laden der Kataloge. */
+  fuss: HTMLElement;
 }
 
 /** Baut das Grundgeruest der Seite in wurzel auf (ersetzt den bisherigen Inhalt). */
@@ -83,8 +86,10 @@ function baueSeite(wurzel: HTMLElement): Seite {
   status.setAttribute("role", "status");
   status.setAttribute("aria-live", "polite");
 
-  wurzel.replaceChildren(kopf, ansicht, status);
-  return { canvas, info, nachweis, warnungen, geraet, objekt, bedingungen, status, bild, zoom };
+  const fuss = element("footer", "fuss");
+
+  wurzel.replaceChildren(kopf, ansicht, status, fuss);
+  return { canvas, info, nachweis, warnungen, geraet, objekt, bedingungen, status, bild, zoom, fuss };
 }
 
 function zeigeStatus(seite: Seite, text: string): void {
@@ -193,6 +198,7 @@ export async function starte(wurzel: HTMLElement): Promise<void> {
     zeigeFehler(seite, TEXTE.fehler.daten, e);
     return;
   }
+  baueFuss(seite.fuss, kataloge);
 
   // Der Falter meldet den Wechsel auf JavaScript (Kontextverlust, WebGL2-Fehler): dann gilt die
   // Anzeigegrenze, und die Steuerung rechnet mit der kleineren Anzeige neu.
