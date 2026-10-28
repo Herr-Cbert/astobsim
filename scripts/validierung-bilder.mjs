@@ -3,7 +3,8 @@
 // mit SwiftShader und steuert es ueber das Chrome DevTools Protocol (eingebauter WebSocket von
 // Node 22). Je Fall: URL laden, warten bis das Gesichtsfeld fertig gerendert ist, Uebersicht
 // speichern (Gesichtsfeld), Zoom per Eingabetaste oeffnen, Zoom speichern (Anblick und Quellbild),
-// beides in der Aufloesung der Canvas (devicePixelRatio 2). Ablage docs/validierung/<fall>-uebersicht.png und -zoom.png.
+// beides in der Aufloesung der Canvas (devicePixelRatio 2); bietet der Zoom ein Detail an (Mond,
+// Issue #77), auch das Detail. Ablage docs/validierung/<fall>-uebersicht.png, -zoom.png und -detail.png.
 // Meldet Chrome einen Verstoss gegen die Content-Security-Policy des Baus (Issue #22) oder einen
 // Fehler auf der Konsole, endet das Skript mit Exit-Code 1.
 //
@@ -33,12 +34,16 @@ const B = "b=5&t=klar&h=90";
 /** Freier Refraktor ohne Obstruktion, Okular 50 Grad. */
 const refraktor = (d, f, ok) => `a=fernrohr&ba=refraktor&d=${d}&f=${f}&o=0&ok=${ok}&sg=50`;
 
-/** Die Faelle aus docs/validierung.md: Name, Suchteil der URL. */
+/**
+ * Die Faelle aus docs/validierung.md: Name, Suchteil der URL, optional die Pfeiltaste und Anzahl
+ * der Schritte mit Umschalt (je 25 % der Detailbreite), die das Detail an die gepruefte Stelle
+ * schieben (T3: knapp rechts vom Terminator, Issue #77).
+ */
 export const FAELLE = [
   ["T1", `${refraktor(70, 700, 7)}&z=jup_47&s=2`],
   ["T2a", `${refraktor(100, 1200, 8)}&z=sat_20&s=1.5`],
   ["T2b", `${refraktor(60, 600, 6)}&z=sat_20&s=1.5`],
-  ["T3", `${refraktor(80, 800, 8)}&z=mond_ev&s=2`],
+  ["T3", `${refraktor(80, 800, 8)}&z=mond_ev&s=2`, { taste: "ArrowLeft", anzahl: 2 }],
   ["T4a", `${refraktor(300, 3000, 15)}&z=jup_47&s=3`],
   ["T4b", `${refraktor(100, 1000, 5)}&z=jup_47&s=3`],
   ["T4c", `${refraktor(300, 3000, 15)}&z=jup_47&s=1`],
@@ -48,7 +53,7 @@ export const FAELLE = [
   ["T6a", `g=auge&z=mond_ev&s=2`],
   ["T6b", `g=auge&z=jup_47&s=2`],
   ["T6c", `g=fernglas-10x50&z=jup_47&s=2`]
-].map(([name, such]) => ({ name, such: `?v=1&${such}&${B}` }));
+].map(([name, such, detail]) => ({ name, such: `?v=1&${such}&${B}`, detail }));
 
 if (!existsSync(join(bau, "index.html"))) {
   console.error("validierung-bilder: dist/index.html fehlt, vorher npm run build");
@@ -191,8 +196,8 @@ try {
     await s("Page.navigate", { url: ursprung + fall.such });
 
     const wert = async (ausdruck) => (await s("Runtime.evaluate", { expression: ausdruck, returnByValue: true })).result.value;
-    /** Wartet, bis data-nummer des Canvas gesetzt ist und RUHE_MS lang gleich bleibt. */
-    const fertig = async (selektor) => {
+    /** Wartet, bis data-nummer des Canvas gesetzt, ungleich vorher ist und RUHE_MS lang gleich bleibt. */
+    const fertig = async (selektor, vorher = null) => {
       const ende = Date.now() + ZEITLIMIT_FALL_MS;
       let letzte = null;
       let seit = Date.now();
@@ -201,7 +206,7 @@ try {
         if (nummer !== letzte) {
           letzte = nummer;
           seit = Date.now();
-        } else if (nummer !== null && Date.now() - seit >= RUHE_MS) return nummer;
+        } else if (nummer !== null && nummer !== vorher && Date.now() - seit >= RUHE_MS) return nummer;
         await warte(200);
       }
       const konsole = konsolenfehler.length > 0 ? `; Konsole:\n  ${konsolenfehler.join("\n  ")}` : "";
@@ -222,9 +227,19 @@ try {
     for (const type of ["keyDown", "keyUp"]) {
       await s("Input.dispatchKeyEvent", { type, key: "Enter", code: "Enter", windowsVirtualKeyCode: 13, nativeVirtualKeyCode: 13 });
     }
-    await fertig(".zoom canvas.zoom-canvas");
+    const nummerZoom = await fertig(".zoom canvas.zoom-canvas");
     const zoom = await speichere("zoom", ".zoom-bilder");
-    console.log(`${fall.name}: ${uebersicht.slice(wurzel.length)}, ${zoom.slice(wurzel.length)}  ${ursprung}${fall.such}`);
+    let detail = "";
+    if (await wert(`document.querySelector(".zoom-detail")?.hidden === false`)) {
+      await wert(`document.querySelector(".zoom-detail").click()`);
+      // Der Fokus liegt seit der Eingabetaste auf dem Anblick im Zoom; Umschalt (8) fuer grosse Schritte.
+      for (let i = 0; i < (fall.detail?.anzahl ?? 0); i++) {
+        for (const type of ["keyDown", "keyUp"]) await s("Input.dispatchKeyEvent", { type, key: fall.detail.taste, code: fall.detail.taste, modifiers: 8 });
+      }
+      await fertig(".zoom canvas.zoom-canvas", nummerZoom);
+      detail = `, ${(await speichere("detail", ".zoom-bilder")).slice(wurzel.length)}`;
+    }
+    console.log(`${fall.name}: ${uebersicht.slice(wurzel.length)}, ${zoom.slice(wurzel.length)}${detail}  ${ursprung}${fall.such}`);
     await senden("Target.closeTarget", { targetId });
     if (konsolenfehler.length > 0) throw new Error(`${fall.name}: Fehler auf der Konsole:\n  ${konsolenfehler.join("\n  ")}`);
   }

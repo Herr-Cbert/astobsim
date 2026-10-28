@@ -40,10 +40,10 @@ const SATURN_ANSE: Profilstufe[] = [
   stufe(21.0, 22.69, 0.54)
 ];
 
-/** Mars-Scheibe mit Radius r und Syrtis Major der Breite b in der Mitte, dunkel/hell 0,41 (Quellbild), Himmel 0. */
+/** Mars-Scheibe mit Radius r und Syrtis Major der Breite b in der Mitte, dunkel/hell 0,47 (Quellbild seit #78), Himmel 0. */
 const mars = (radiusArcsec: number, syrtisArcsec: number): Profilstufe[] => [
   stufe(-radiusArcsec, -syrtisArcsec / 2, 1),
-  stufe(-syrtisArcsec / 2, syrtisArcsec / 2, 0.41),
+  stufe(-syrtisArcsec / 2, syrtisArcsec / 2, 0.47),
   stufe(syrtisArcsec / 2, radiusArcsec, 1)
 ];
 

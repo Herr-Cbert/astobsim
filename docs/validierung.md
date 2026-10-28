@@ -6,7 +6,7 @@ Ergebnis von Issue #21: die sechs Beobachtungs-Testfaelle T1 bis T6 (`docs/anfor
 
 ## 1. Vorgehen
 
-- **Bilder:** `node scripts/validierung-bilder.mjs` nach `npm run build` (Chrome headless, SwiftShader, devicePixelRatio 2). Je Fall die Uebersicht (Gesichtsfeld) und die Zoomansicht (links Anblick, rechts Quellbild) unter `docs/validierung/`. Das Fenster ist 1400 x 1000 CSS-Pixel; der Zoom zeigt dann 270 CSS-Pixel je Bild.
+- **Bilder:** `node scripts/validierung-bilder.mjs` nach `npm run build` (Chrome headless, SwiftShader, devicePixelRatio 2). Je Fall die Uebersicht (Gesichtsfeld) und die Zoomansicht (links Anblick, rechts Quellbild) unter `docs/validierung/`. Das Fenster ist 1400 x 1000 CSS-Pixel; der Zoom zeigt dann 270 CSS-Pixel je Bild. Bietet der Zoom ein Detail an (Mond, #77), dazu das Detail (120 Arbeitspixel breit, `DETAIL_ARBEITSPIXEL` in `src/ui/zoom.ts`), bei T3 mit Pfeiltasten an die gepruefte Stelle geschoben.
 - **Konfigurationen:** freie Refraktoren ohne Obstruktion, damit Bild und Tabellen-Test dieselbe Optik haben; Bortle 5, klar, Hoehe 90 Grad (das Seeing gilt nur im Zenit ohne Hoehenfaktor X^0,6). Die Brennweite ist frei gewaehlt, sie wirkt nur ueber die Vergroesserung.
 - **Urteil:** erfuellt, teilweise oder nicht, gegen die Erwartung aus A-Q2 und die Zahlen in `docs/recherche/objekte.md` Abschnitt 4. Zusaetzlich zum Augenschein Helligkeitsprofile durch die Screenshots.
 - **Masszahl:** die Delle eines Stufenprofils nach der Faltung mit dem Kern (`profilDelle`, `docs/recherche/physik.md` 8.1; Profile in `objekte.md` 4.6). Abweichung vom Issue-Text, der die MTF bei der Periode 2 x Strukturbreite vorsah: die MTF trennt eine einzelne schmale Linie (Cassini-Teilung) nicht von flaechigem Detail, und die zuerst gewaehlte Balkenantwort mal Objektkontrast kennt die Umgebung der Struktur nicht (begruendet in physik.md 8.1). Entschieden mit Herbert am 2026-10-27.
@@ -21,13 +21,13 @@ URL-Basis aller Faelle: `https://herr-cbert.github.io/astobsim/`, dahinter der S
 | T1 | `?v=1&R(70,700,7)&z=jup_47&s=2&B` | 2,67'' | Baender 0,142 | [Uebersicht](validierung/T1-uebersicht.png), [Zoom](validierung/T1-zoom.png) |
 | T2a | `?v=1&R(100,1200,8)&z=sat_20&s=1.5&B` | 1,94'' | Cassini 0,000 | [Uebersicht](validierung/T2a-uebersicht.png), [Zoom](validierung/T2a-zoom.png) |
 | T2b | `?v=1&R(60,600,6)&z=sat_20&s=1.5&B` | 2,53'' | Cassini 0,000 | [Uebersicht](validierung/T2b-uebersicht.png), [Zoom](validierung/T2b-zoom.png) |
-| T3 | `?v=1&R(80,800,8)&z=mond_ev&s=2&B` | 2,55'' | Krater 0,549, Hadley 0,058 | [Uebersicht](validierung/T3-uebersicht.png), [Zoom](validierung/T3-zoom.png) |
+| T3 | `?v=1&R(80,800,8)&z=mond_ev&s=2&B` | 2,55'' | Krater 0,549, Hadley 0,058 | [Uebersicht](validierung/T3-uebersicht.png), [Zoom](validierung/T3-zoom.png), [Detail](validierung/T3-detail.png) |
 | T4a | `?v=1&R(300,3000,15)&z=jup_47&s=3&B` | 3,04'' | Detail 1,5'' 0,066 | [Uebersicht](validierung/T4a-uebersicht.png), [Zoom](validierung/T4a-zoom.png) |
 | T4b | `?v=1&R(100,1000,5)&z=jup_47&s=3&B` | 3,23'' | 0,061 | [Uebersicht](validierung/T4b-uebersicht.png), [Zoom](validierung/T4b-zoom.png) |
 | T4c | `?v=1&R(300,3000,15)&z=jup_47&s=1&B` | 1,11'' | 0,139 | [Uebersicht](validierung/T4c-uebersicht.png), [Zoom](validierung/T4c-zoom.png) |
 | T4d | `?v=1&R(100,1000,5)&z=jup_47&s=1&B` | 1,57'' | 0,112 | [Uebersicht](validierung/T4d-uebersicht.png), [Zoom](validierung/T4d-zoom.png) |
-| T5a | `?v=1&R(150,1200,6)&z=mars_14&s=1.5&B` | 1,72'' | Syrtis 0,429 | [Uebersicht](validierung/T5a-uebersicht.png), [Zoom](validierung/T5a-zoom.png) |
-| T5b | `?v=1&R(80,960,8)&z=mars_6&s=1.5&B` | 2,15'' | Syrtis 0,060 | [Uebersicht](validierung/T5b-uebersicht.png), [Zoom](validierung/T5b-zoom.png) |
+| T5a | `?v=1&R(150,1200,6)&z=mars_14&s=1.5&B` | 1,72'' | Syrtis 0,384 | [Uebersicht](validierung/T5a-uebersicht.png), [Zoom](validierung/T5a-zoom.png) |
+| T5b | `?v=1&R(80,960,8)&z=mars_6&s=1.5&B` | 2,15'' | Syrtis 0,046 | [Uebersicht](validierung/T5b-uebersicht.png), [Zoom](validierung/T5b-zoom.png) |
 | T6a | `?v=1&g=auge&z=mond_ev&s=2&B` | 63,1'' | Mare 0,398 | [Uebersicht](validierung/T6a-uebersicht.png), [Zoom](validierung/T6a-zoom.png) |
 | T6b | `?v=1&g=auge&z=jup_47&s=2&B` | 63,1'' | - | [Uebersicht](validierung/T6b-uebersicht.png), [Zoom](validierung/T6b-zoom.png) |
 | T6c | `?v=1&g=fernglas-10x50&z=jup_47&s=2&B` | 6,74'' | Baender 0,080 | [Uebersicht](validierung/T6c-uebersicht.png), [Zoom](validierung/T6c-zoom.png) |
@@ -64,6 +64,10 @@ Bild: am Terminator sind viele kleine Krater zu sehen, die kleinsten deutlich er
 
 **Urteil: teilweise** (Rillen erfuellt, Kratergrenze im Bild nicht pruefbar). Abweichung 2 (#77).
 
+Nachtrag #77 (2026-10-28): das Detail zeigt 122'' auf 270 CSS-Pixeln (0,45''/CSS-Pixel, gut 2 CSS-Pixel je Arbeitspixel), Mitte 61'' westlich der Scheibenmitte, knapp oestlich des Terminators. Krater ab etwa 7 km (3,8'') sind deutlich, Krater um 4 bis 5 km als Hell-Dunkel-Paar angedeutet, zum Terminator hin geht alles im Dunkel unter (sRGB-Wert im linken Rand etwa 15, rechts etwa 37). Kleinere Krater (unter etwa 1,5'') fehlen im Anblick, im Quellbild daneben sind sie zu sehen. Die Grenze liegt damit wie erwartet bei etwa 4 km; dass sie nur angedeutet ist, liegt an der dunklen Anzeige bei 0,8 mm Austrittspupille, nicht an der Aufloesung.
+
+**Urteil nach #77: erfuellt** (Kratergrenze im Detail pruefbar, etwa 4 km angedeutet, ab etwa 7 km deutlich; keine Rillen).
+
 ### T4: Jupiter, 300 mm gegen 100 mm bei 200-fach, Seeing 3'' und 1''
 
 Erwartung: bei 3'' zeigt der 300 mm kaum mehr Detail als der 100 mm, ist nur heller; bei 1'' ist der Unterschied deutlich.
@@ -80,6 +84,10 @@ Bild: bei 14'' sind die dunklen Gebiete als schwache Strukturen zu sehen, bei 6'
 
 **Urteil: teilweise** (dunkle Strukturen und Scheibchen erfuellt, Polkappe nicht pruefbar). Abweichung 3 (#78).
 
+Nachtrag #78 (2026-10-28): neues Quellbild Hubble 25.02.1995 (mars_hst_19950225, Aphel-Opposition, Ls etwa 64, grosse Nordkappe 0,28 Scheibendurchmesser, Syrtis Major in der Mitte), Screenshots neu. Bei 14'' ist die Nordkappe als helle Flaeche am Nordrand deutlich (Leuchtdichte im Nord-Sued-Schnitt 0,122 in der Kappe gegen 0,074 suedlich davon, eigenes Maximum), Syrtis Major als dunkler Keil links der Mitte schwach (Delle 0,384). Bei 6'' im 80 mm ein Scheibchen ohne eigenes Maximum der Kappe, aber mit hellerem Nordrand (sRGB 33 gegen 24 und 46 gegen 34 im gleichen Abstand von der Mitte nach Norden und Sueden), also angedeutet; Syrtis nicht (0,046).
+
+**Urteil nach #78: erfuellt** (Polkappe und Syrtis bei 14'' erkennbar, bei 6'' Scheibchen mit angedeuteter Kappe).
+
 ### T6: Mond und Jupiter mit blossem Auge, Jupiter im 10x50
 
 Erwartung: Mond mit Mare als Flecken, keine Krater; Jupiter mit blossem Auge ein Punkt; im 10x50 ein winziges Scheibchen mit zwei bis vier Monden in einer Linie, keine Baender.
@@ -93,14 +101,14 @@ Bild: Mond mit klaren Mare-Flecken, keine Krater (T6a). Jupiter mit blossem Auge
 | Delle | Fall und Struktur | im Bild |
 |---|---|---|
 | 0,549 | T3 Kraterschatten 4 km | erkennbar (aus der Delle, im Bild nicht pruefbar) |
-| 0,429 | T5a Syrtis Major 14'' | erkennbar |
+| 0,384 | T5a Syrtis Major 14'' (seit #78, vorher 0,429) | erkennbar |
 | 0,398 | T6a Mare, blosses Auge | erkennbar |
 | 0,142 | T1 Baender 70 mm | erkennbar |
 | 0,139 | T4c Detail 1,5'', 300 mm, 1'' | erkennbar |
 | 0,112 | T4d Detail 1,5'', 100 mm, 1'' | nicht (Herbert, 2026-10-27: "kaum" zaehlt als nicht) |
 | 0,080 | T6c Baender 10x50 | nicht |
 | 0,066 / 0,061 | T4a / T4b Detail 1,5'' bei 3'' | nicht |
-| 0,060 | T5b Syrtis Major 6'' | nicht |
+| 0,046 | T5b Syrtis Major 6'' (seit #78, vorher 0,060) | nicht |
 | 0,058 | T3 Hadley-Rille | nicht |
 | 0,000 | T2a / T2b Cassini-Teilung | nicht |
 
@@ -113,8 +121,8 @@ Die Schwelle ist eine Kalibrierkonstante fuer die Tests, keine Physik: das Bild 
 Als Issues angelegt am 2026-10-27, Milestone M3 (Herbert, 2026-10-27):
 
 1. **#76, T2: Cassini-Teilung bei 100 mm und Seeing 1,5'' nicht sichtbar.** Das Modell faltet mit dem Langzeit-Seeing (Moffat mit voller FWHM); Beobachter sehen die Teilung in Momenten ruhiger Luft. Zu klaeren, ob die Erwartung fuer Langzeit-Seeing zu optimistisch ist oder ob das Seeing-Modell fuer visuelle Beobachtung zu streng ist. Bezug: #29 (Kann: Umschalter ruhiger Moment), physik.md 2. **Erledigt 2026-10-27:** Erwartung zu optimistisch, Modell bleibt, A-Q2 T2 angepasst. Ein Tilt-Abzug haette T4d und T5b ueber die Schwelle gehoben (physik.md 15).
-2. **#77, T3: Mond-Zoom zu grob fuer die Aufloesungsgrenze.** Der Zoom zeigt beim Mond das halbe Gesichtsfeld (`ZOOM_ANTEIL_GESICHTSFELD_MAX`); bei 80 mm und 100-fach sind das etwa 1,7'' je Anzeigepixel, die Optik loest etwa 1'' je Arbeitspixel auf. Die Grenze von A-Q2 (Krater ab 4 km) ist so nicht zu sehen. Vorschlag: zweite Zoomstufe oder Zoom bis zum Arbeitsmassstab.
-3. **#78, T5: Mars-Quellbild ohne Polkappe.** Hubble 2016-05-12 (mars_14 und mars_6) zeigt keine abgegrenzte Kappe; "Polkappe erkennbar" ist damit nicht pruefbar. Vorschlag: anderes Bild fuer die Aphel-Opposition (Nordfruehling, grosse Nordkappe, objekte.md 4.4).
+2. **#77, T3: Mond-Zoom zu grob fuer die Aufloesungsgrenze.** Der Zoom zeigt beim Mond das halbe Gesichtsfeld (`ZOOM_ANTEIL_GESICHTSFELD_MAX`); bei 80 mm und 100-fach sind das etwa 1,7'' je Anzeigepixel, die Optik loest etwa 1'' je Arbeitspixel auf. Die Grenze von A-Q2 (Krater ab 4 km) ist so nicht zu sehen. Vorschlag: zweite Zoomstufe oder Zoom bis zum Arbeitsmassstab. **Erledigt 2026-10-28:** zweite Ansicht "Detail" in der Zoomansicht (Herbert, 2026-10-28), 120 Arbeitspixel breit, nur angeboten, wo sie hoechstens drei Viertel des Zoomfensters zeigt (praktisch nur beim Mond); T3 erfuellt.
+3. **#78, T5: Mars-Quellbild ohne Polkappe.** Hubble 2016-05-12 (mars_14 und mars_6) zeigt keine abgegrenzte Kappe; "Polkappe erkennbar" ist damit nicht pruefbar. Vorschlag: anderes Bild fuer die Aphel-Opposition (Nordfruehling, grosse Nordkappe, objekte.md 4.4). **Erledigt 2026-10-28:** Hubble WFPC2 vom 25.02.1995 (Ls etwa 64, 13,43'', Syrtis Major in der Mitte) fuer mars_14 und mars_6, Quellweiss neu geeicht (objekte.md 5.3), Syrtis-Verhaeltnis 0,47 statt 0,41 (objekte.md 4.6); T5 erfuellt.
 4. **#79, T1: Quellbild Jupiter kontrastreicher als visuell.** Baender etwa 0,7 statt 0,82 der Zonenhelligkeit (Orton [56]), GRF kraeftig orange; der GRF erscheint im 70 mm deutlich statt angedeutet. Vorschlag: Kontrast und Farbsaettigung des Quellbilds in `tools/` an die Photometrie angleichen, oder die Erwartung begruenden. Aus #76 dazu: Saturn-A-Ring im Quellbild 0,50 (innen) und 0,21 (aussen) des aeusseren B-Rings, vermutlich ebenfalls zu dunkel; selbst im ruhigen Moment zeigt er die Cassini-Teilung kaum (physik.md 15.4). **Erledigt 2026-10-28:** Jupiter mit Exponent 0,427 an Orton angeglichen (NEB/NTrZ 0,82), Saturn mit einer Tonkurve an Salo und French 2010 (eine Potenzkurve passt dort nicht); Quellweiss neu geeicht, T1 erfuellt, T2 weiter erfuellt.
 
 ## 5. Pruefpunkte aus Welle 4a
@@ -134,6 +142,8 @@ Als Issues angelegt am 2026-10-27, Milestone M3 (Herbert, 2026-10-27):
 | Herbert | 2026-10-27 | Urteile wie oben |
 | Herbert | 2026-10-27 | #76: T2-Erwartung an das Langzeitmittel angepasst, T2 erfuellt |
 | Claude | 2026-10-28 | #79: Quellbilder Jupiter und Saturn angeglichen, T1 erfuellt, T2 weiter erfuellt, T4 und T6 unveraendert im Urteil |
+| Claude | 2026-10-28 | #77: Detail in der Zoomansicht, T3 erfuellt |
+| Claude | 2026-10-28 | #78: Quellbild Mars 1995 mit Nordkappe, T5 erfuellt |
 
 ## 7. Sicherheit (Issue #22)
 
