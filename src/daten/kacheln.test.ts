@@ -3,7 +3,8 @@ import bilderJson from "../../daten/bilder.json";
 import type { Raster } from "../naht/raster";
 import { pruefeBildnachweise } from "./bildnachweise";
 import { DatenFehler } from "./fehler";
-import { kachelPfad, pyramidengeometrie, QuelleKacheln } from "./kacheln";
+import { kachelPfad, type KachelSrgb, pyramidengeometrie, QuelleKacheln } from "./kacheln";
+import { rgbaZuRaster, rgbaZuSrgb } from "./kachellader";
 import { adresseText, pyramideAusRaster, quelleRaster, schneideKachel } from "./testkacheln";
 
 const MITTE = { xArcsec: 0, yArcsec: 0 };
@@ -172,6 +173,65 @@ describe("QuelleKacheln Cache", () => {
     // Kachel 1_0 muss 2x4 sein (Randkachel).
     await expect(quelle.lade(MITTE, 10, 1)).rejects.toThrow(DatenFehler);
     expect(quelle.kachelnImCache).toBe(1);
+  });
+});
+
+describe("QuelleKacheln mit 8-Bit-sRGB-Kacheln (Issue #66)", () => {
+  // Zwei Stufen 37x23 und 19x12 mit drei Kanaelen und Kacheln 8 px (Randkacheln kleiner), Bytes
+  // aus einem festen Pseudozufall; dieselben Bytes einmal als sRGB-Kachel, einmal ueber rgbaZuRaster.
+  const stufen = [
+    { breitePx: 37, hoehePx: 23, massstabArcsecProPx: 1 },
+    { breitePx: 19, hoehePx: 12, massstabArcsecProPx: 37 / 19 }
+  ];
+  const geometrie = { kachelPx: 8, kanaele: 3 as const, stufen };
+  function rgba(stufe: number, x: number, y: number): { rgba: Uint8Array; breite: number; hoehe: number } {
+    const breite = Math.min(8, stufen[stufe]!.breitePx - x * 8);
+    const hoehe = Math.min(8, stufen[stufe]!.hoehePx - y * 8);
+    const bytes = new Uint8Array(breite * hoehe * 4);
+    let z = 1 + stufe * 7919 + x * 104729 + y * 1299709;
+    for (let i = 0; i < bytes.length; i++) {
+      z = (z * 1103515245 + 12345) % 2147483648;
+      bytes[i] = z % 256;
+    }
+    return { rgba: bytes, breite, hoehe };
+  }
+  const alsSrgb = new QuelleKacheln(geometrie, async (s, x, y) => {
+    const r = rgba(s, x, y);
+    return rgbaZuSrgb(r.rgba, r.breite, r.hoehe);
+  });
+  const alsFloat = new QuelleKacheln(geometrie, async (s, x, y) => {
+    const r = rgba(s, x, y);
+    return rgbaZuRaster(r.rgba, r.breite, r.hoehe);
+  });
+
+  it("der Ausschnitt ist bitgleich zum Pfad ueber lineare Float-Kacheln", async () => {
+    const faelle: [number, number, number, number][] = [
+      [0, 0, 40, 1],
+      [3.3, -2.1, 13, 1],
+      [-15, 9, 9, 1],
+      [0, 0, 60, 37 / 19],
+      [10, 5, 21, 37 / 19]
+    ];
+    for (const [x, y, breite, massstab] of faelle) {
+      const mitte = { xArcsec: x, yArcsec: y };
+      await alsSrgb.lade(mitte, breite, massstab);
+      await alsFloat.lade(mitte, breite, massstab);
+      const a = alsSrgb.ausschnitt(mitte, breite, massstab);
+      const b = alsFloat.ausschnitt(mitte, breite, massstab);
+      expect(a.raster.breite).toBe(b.raster.breite);
+      expect(a.raster.hoehe).toBe(b.raster.hoehe);
+      expect(a.linksXArcsec).toBe(b.linksXArcsec);
+      expect(a.obenYArcsec).toBe(b.obenYArcsec);
+      expect(Array.from(a.raster.daten)).toEqual(Array.from(b.raster.daten));
+    }
+  });
+
+  it("weist sRGB-Kacheln mit falschen Massen oder bei einem Kanal zurueck", async () => {
+    const falsch = new QuelleKacheln(geometrie, async (): Promise<KachelSrgb> => ({ breite: 8, hoehe: 8, srgb: new Uint8Array(8 * 8 * 3) }));
+    // Kachel 4_0 der Stufe 0 muss 5x8 sein (Randkachel).
+    await expect(falsch.lade({ xArcsec: 16, yArcsec: 0 }, 4, 1)).rejects.toThrow(DatenFehler);
+    const einKanal = new QuelleKacheln({ ...geometrie, kanaele: 1 }, async (): Promise<KachelSrgb> => ({ breite: 8, hoehe: 8, srgb: new Uint8Array(8 * 8 * 3) }));
+    await expect(einKanal.lade(MITTE, 4, 1)).rejects.toThrow(DatenFehler);
   });
 });
 

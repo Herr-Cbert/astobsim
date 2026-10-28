@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { DatenFehler } from "./fehler";
-import { rgbaZuRaster, srgbZuLinear } from "./kachellader";
+import { rgbaZuRaster, rgbaZuSrgb, srgbZuLinear } from "./kachellader";
 
 describe("srgbZuLinear", () => {
   it("bildet die sRGB-Kennlinie ab (IEC 61966-2-1)", () => {
@@ -26,5 +26,15 @@ describe("rgbaZuRaster", () => {
 
   it("weist falsche Laengen ab", () => {
     expect(() => rgbaZuRaster(new Uint8ClampedArray(7), 1, 2)).toThrow(DatenFehler);
+  });
+});
+
+describe("rgbaZuSrgb (Issue #66)", () => {
+  it("laesst Alpha weg und behaelt die Kodewerte", () => {
+    const k = rgbaZuSrgb(new Uint8ClampedArray([255, 128, 1, 7, 0, 64, 200, 255]), 2, 1);
+    expect(k).toEqual({ breite: 2, hoehe: 1, srgb: new Uint8Array([255, 128, 1, 0, 64, 200]) });
+  });
+  it("wirft DatenFehler bei falscher Laenge", () => {
+    expect(() => rgbaZuSrgb(new Uint8ClampedArray(7), 1, 2)).toThrow(DatenFehler);
   });
 });

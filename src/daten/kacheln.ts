@@ -11,7 +11,10 @@
 // (Zentrum 1536,5); der Versatz von 0,5 px auf Stufe 0 (0,34'') ist vernachlaessigbar.
 // Alle Stufen decken dieselbe Flaeche am Himmel ab; Stufe n hat das 2^n-fache Pixelmass.
 //
-// Cache: LRU mit maxKacheln. Nie verdraengt werden die Kacheln laufender lade-Aufrufe, der
+// Cache: LRU mit maxKacheln. Kacheln aus dem Browser liegen als 8-Bit-sRGB im Cache (KachelSrgb,
+// Issue #66: 3 statt 12 Bytes je Pixel, die Mond-Pyramide etwa 37 statt 149 MB) und werden erst
+// in ausschnitt ueber dieselbe Tabelle wie rgbaZuRaster linearisiert, das Ergebnis ist bitgleich.
+// Lader in Tests liefern weiter lineare Raster (Float32). Nie verdraengt werden die Kacheln laufender lade-Aufrufe, der
 // zuletzt abgeschlossenen Anfrage und der zuletzt gestarteten abgeschlossenen Anfrage. So gilt
 // "lade, dann ausschnitt" auch, wenn ein aelterer lade-Aufruf erst nach einem neueren fertig wird.
 
@@ -20,6 +23,7 @@ import type { Kanaele, Raster } from "../naht/raster";
 import { BILDER_DATEI, type Bildnachweis } from "./bildnachweise";
 import { DatenFehler } from "./fehler";
 import { massstabFuerZustand, type Pixelbereich, pixelbereich, schwarz } from "./pixelbereich";
+import { LINEAR_8BIT } from "./srgb";
 
 /** Eine Stufe der Pyramide in Anzeige-Bogensekunden (schon auf den Zustand skaliert). */
 interface Stufengeometrie {
@@ -35,8 +39,18 @@ export interface Pyramidengeometrie {
   stufen: Stufengeometrie[];
 }
 
+/** Kachel als 8-Bit-sRGB-Kodewerte, drei Kanaele zeilenweise, Zeile 0 Norden (Issue #66). */
+export interface KachelSrgb {
+  breite: number;
+  hoehe: number;
+  srgb: Uint8Array;
+}
+
+/** Kachel im Cache: lineares Raster oder 8-Bit-sRGB (linearisiert erst im Ausschnitt). */
+export type Kachel = Raster | KachelSrgb;
+
 /** Liefert die Kachel (x, y) der Stufe; Randkacheln sind kleiner als kachelPx. */
-export type KachelLader = (stufe: number, x: number, y: number) => Promise<Raster>;
+export type KachelLader = (stufe: number, x: number, y: number) => Promise<Kachel>;
 
 /** Adresse einer Kachel. */
 export interface Kacheladresse {
@@ -46,7 +60,7 @@ export interface Kacheladresse {
 }
 
 
-/** Standardgroesse des Caches: 64 volle Kacheln 512 px mit 3 Kanaelen sind rund 200 MB Float32. */
+/** Standardgroesse des Caches: 64 volle Kacheln 512 px mit 3 Kanaelen sind rund 50 MB als sRGB (200 MB Float32). */
 const MAX_KACHELN_STANDARD = 64;
 
 /** Relative Toleranz der Stufenwahl gegen Rundung (gewuenschter Massstab gleich Stufenmassstab). */
@@ -54,9 +68,9 @@ const TOLERANZ_STUFE = 1e-9;
 
 export class QuelleKacheln implements Quelle {
   /** Geladene Kacheln; Einfuegereihenfolge = zuletzt benutzt zuletzt (LRU). */
-  private readonly cache = new Map<string, Raster>();
+  private readonly cache = new Map<string, Kachel>();
   /** Laufende Ladevorgaenge, damit gleichzeitige lade-Aufrufe eine Kachel nur einmal holen. */
-  private readonly laufend = new Map<string, Promise<Raster>>();
+  private readonly laufend = new Map<string, Promise<Kachel>>();
   /** Kacheln je laufendem lade-Aufruf, nach fortlaufender Nummer des Aufrufs. */
   private readonly anfragenLaufend = new Map<number, ReadonlySet<string>>();
   private anfragenGestartet = 0;
@@ -130,7 +144,7 @@ export class QuelleKacheln implements Quelle {
     const schluessel = new Set(benoetigt.map(kachelSchluessel));
     const nummer = ++this.anfragenGestartet;
     this.anfragenLaufend.set(nummer, schluessel);
-    let ergebnisse: PromiseSettledResult<Raster>[];
+    let ergebnisse: PromiseSettledResult<Kachel>[];
     try {
       ergebnisse = await Promise.allSettled(benoetigt.map((a) => this.ladeKachel(a)));
     } finally {
@@ -165,9 +179,12 @@ export class QuelleKacheln implements Quelle {
       const sx0 = Math.max(x0, kx0);
       const sx1 = Math.min(x1, kx0 + kachel.breite);
       const zeilenLaenge = (sx1 - sx0) * kanaele;
+      const srgb = "srgb" in kachel ? kachel.srgb : undefined;
       for (let y = Math.max(y0, ky0); y < Math.min(y1, ky0 + kachel.hoehe); y++) {
         const von = ((y - ky0) * kachel.breite + (sx0 - kx0)) * kanaele;
-        raster.daten.set(kachel.daten.subarray(von, von + zeilenLaenge), ((y - y0) * raster.breite + (sx0 - x0)) * kanaele);
+        const nach = ((y - y0) * raster.breite + (sx0 - x0)) * kanaele;
+        if (srgb === undefined) raster.daten.set((kachel as Raster).daten.subarray(von, von + zeilenLaenge), nach);
+        else linearisiere(srgb, von, raster.daten, nach, zeilenLaenge);
       }
     }
     return { raster, massstabArcsecProPx: ms, linksXArcsec: links + x0 * ms, obenYArcsec: oben - y0 * ms };
@@ -179,7 +196,7 @@ export class QuelleKacheln implements Quelle {
     return pixelbereich(mitte, breiteArcsec, geo.breitePx, geo.hoehePx, geo.massstabArcsecProPx);
   }
 
-  private async ladeKachel(adresse: Kacheladresse): Promise<Raster> {
+  private async ladeKachel(adresse: Kacheladresse): Promise<Kachel> {
     const schluessel = kachelSchluessel(adresse);
     const vorhanden = this.cache.get(schluessel);
     if (vorhanden !== undefined) return vorhanden;
@@ -198,18 +215,20 @@ export class QuelleKacheln implements Quelle {
   }
 
   /** Masse und Kanaele der Kachel muessen zur Geometrie passen, sonst stimmt der Ausschnitt nicht. */
-  private pruefeKachel(adresse: Kacheladresse, kachel: Raster): void {
+  private pruefeKachel(adresse: Kacheladresse, kachel: Kachel): void {
     const geo = this.geometrie.stufen[adresse.stufe]!;
     const k = this.geometrie.kachelPx;
     const breite = Math.min(k, geo.breitePx - adresse.x * k);
     const hoehe = Math.min(k, geo.hoehePx - adresse.y * k);
     const kanaele = this.geometrie.kanaele;
-    if (kachel.breite !== breite || kachel.hoehe !== hoehe || kachel.kanaele !== kanaele || kachel.daten.length !== breite * hoehe * kanaele) {
+    // Eine sRGB-Kachel hat immer drei Kanaele.
+    const [kKanaele, laenge] = "srgb" in kachel ? [3, kachel.srgb.length] : [kachel.kanaele, kachel.daten.length];
+    if (kachel.breite !== breite || kachel.hoehe !== hoehe || kKanaele !== kanaele || laenge !== breite * hoehe * kanaele) {
       throw new DatenFehler(
         "Kachel",
         kachelSchluessel(adresse),
         "Masse",
-        `${breite}x${hoehe}x${kanaele} erwartet, ${kachel.breite}x${kachel.hoehe}x${kachel.kanaele} geliefert`
+        `${breite}x${hoehe}x${kanaele} erwartet, ${kachel.breite}x${kachel.hoehe}x${kKanaele} geliefert`
       );
     }
   }
@@ -260,6 +279,12 @@ export function kachelPfad(nachweis: Bildnachweis, adresse: Kacheladresse): stri
     nachweis.datei +
     nachweis.kacheln.muster.replace("{stufe}", String(adresse.stufe)).replace("{x}", String(adresse.x)).replace("{y}", String(adresse.y))
   );
+}
+
+/** n sRGB-Kodewerte ab von in lineare Werte ab nach; eigene Funktion, damit die Schleife monomorph bleibt. */
+function linearisiere(srgb: Uint8Array, von: number, ziel: Float32Array, nach: number, n: number): void {
+  const tabelle = LINEAR_8BIT;
+  for (let i = 0; i < n; i++) ziel[nach + i] = tabelle[srgb[von + i]!]!;
 }
 
 /** Schluessel einer Kachel im Cache und in Meldungen: "stufe/x_y". */
