@@ -71,7 +71,7 @@ function kern(f: Fall): Kern {
 
 const FAELLE: Fall[] = [
   { fall: "T1", struktur: "Baender, 70 mm, 100-fach, Seeing 2''", geraet: refraktorMitVergroesserung(70, 100), objekt: JUPITER_47, bedingungen: zenit(2), stufen: JUPITER_BAENDER, grund: 1, suche: [-8, 8], erkennbar: true },
-  // T2a: Erfahrung sagt erkennbar, das Bild zeigt die Teilung nicht (docs/validierung.md, Abweichung 1, Issue #76).
+  // T2a: im Langzeitmittel nicht erkennbar, erst im ruhigen Moment (Erwartung nach Issue #76 angepasst, physik.md 15).
   { fall: "T2a", struktur: "Cassini-Teilung, 100 mm, 150-fach, Seeing 1,5''", geraet: refraktorMitVergroesserung(100, 150), objekt: SATURN_20, bedingungen: zenit(1.5), stufen: SATURN_ANSE, grund: 0, suche: [19, 21], erkennbar: false },
   { fall: "T2b", struktur: "Cassini-Teilung, 60 mm, 100-fach, Seeing 1,5''", geraet: refraktorMitVergroesserung(60, 100), objekt: SATURN_20, bedingungen: zenit(1.5), stufen: SATURN_ANSE, grund: 0, suche: [19, 21], erkennbar: false },
   { fall: "T3", struktur: "Kraterschatten 4 km, 80 mm, 100-fach, Seeing 2''", geraet: refraktorMitVergroesserung(80, 100), objekt: MOND_Q1, bedingungen: zenit(2), stufen: balken(2.15, 0), grund: 1, suche: [-2, 2], erkennbar: true },
