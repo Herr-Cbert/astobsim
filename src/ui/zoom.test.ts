@@ -8,7 +8,18 @@ import { objektzustand, pruefeBildnachweise, pruefeGeraete, pruefeObjekte, pruef
 import type { Konfiguration } from "../naht/konfiguration";
 import { atmosphaere, aufloesung, auswerten, optik } from "../physik";
 import { type Kataloge, voreinstellung } from "../zustand";
-import { objektausdehnungArcsec, vergleichsparameter, verschiebelage, ZOOM_ARBEITSPIXEL_MIN, ZOOM_RAND, zoombreiteArcsec, zoomfenster } from "./zoom";
+import { arbeitsmassstabOhneFenster } from "../physik";
+import {
+  DETAIL_ARBEITSPIXEL,
+  detailbreiteArcsec,
+  objektausdehnungArcsec,
+  vergleichsparameter,
+  verschiebelage,
+  ZOOM_ARBEITSPIXEL_MIN,
+  ZOOM_RAND,
+  zoombreiteArcsec,
+  zoomfenster
+} from "./zoom";
 
 const nachweise = pruefeBildnachweise(bilderJson);
 const objekte = pruefeObjekte(objekteJson);
@@ -58,11 +69,38 @@ describe("zoombreiteArcsec", () => {
   });
 });
 
+describe("detailbreiteArcsec (Issue #77)", () => {
+  it("Mond T3 (80/800, Okular 8 mm, Seeing 2): DETAIL_ARBEITSPIXEL Arbeitspixel, deutlich schmaler als der Zoom", () => {
+    const k0 = mit("mond_ev");
+    if (k0.geraet.art !== "fernrohr") throw new Error("Voreinstellung ist kein Fernrohr");
+    const k: Konfiguration = {
+      ...k0,
+      geraet: { ...k0.geraet, brennweiteMm: 800, okular: { ...k0.geraet.okular, brennweiteMm: 8 } },
+      bedingungen: { ...k0.bedingungen, seeingFwhmArcsec: 2 }
+    };
+    const arbeitspixel = arbeitsmassstabOhneFenster(aufloesung(optik(k.geraet), atmosphaere(k.bedingungen)), k.objekt.quelle);
+    const breite = detailbreiteArcsec(k);
+    expect(breite).toBeCloseTo(arbeitspixel * DETAIL_ARBEITSPIXEL, 9);
+    // Etwa 1" je Arbeitspixel: ein Krater von 4 km (2,15") ueberdeckt rund zwei Arbeitspixel.
+    expect(arbeitspixel).toBeGreaterThan(0.8);
+    expect(arbeitspixel).toBeLessThan(1.3);
+    expect(breite).toBeLessThan(zoombreiteArcsec(k) / 4);
+  });
+
+  it("wird bei den Planeten nicht angeboten, auch nicht im 300 mm bei 1\"", () => {
+    for (const id of ["jup_47", "sat_16", "mars_14", "mars_6"]) expect(detailbreiteArcsec(mit(id))).toBeUndefined();
+    const k0 = mit("jup_47");
+    const k = { ...k0, bedingungen: { ...k0.bedingungen, seeingFwhmArcsec: 1 } };
+    expect(detailbreiteArcsec(k)).toBeUndefined();
+  });
+});
+
 describe("verschiebelage", () => {
   it("Mond: Uebersicht fest (Mond im Feld), Zoom verschiebbar mit der Zoombreite", () => {
     const k = mit("mond_ev");
     expect(verschiebelage(k, false)).toEqual({ durchmesser: 1865, breite: optik(k.geraet).gesichtsfeld.breiteArcsec, erlaubt: false });
     expect(verschiebelage(k, true)).toEqual({ durchmesser: 1865, breite: zoombreiteArcsec(k), erlaubt: true });
+    expect(verschiebelage(k, true, true)).toEqual({ durchmesser: 1865, breite: detailbreiteArcsec(k), erlaubt: true });
   });
 
   it("Jupiter: auch im Zoom nicht verschiebbar", () => {
@@ -74,6 +112,12 @@ describe("zoomfenster", () => {
   it("nimmt Mitte und Anzeigepixel unveraendert", () => {
     const k = mit("mond_ev");
     expect(zoomfenster(k, { xArcsec: 120, yArcsec: -40 }, 500)).toEqual({ breiteArcsec: zoombreiteArcsec(k), mitteXArcsec: 120, mitteYArcsec: -40, px: 500 });
+    expect(zoomfenster(k, { xArcsec: 120, yArcsec: -40 }, 500, true)).toEqual({ breiteArcsec: detailbreiteArcsec(k), mitteXArcsec: 120, mitteYArcsec: -40, px: 500 });
+  });
+
+  it("faellt ohne angebotenes Detail auf das Zoomfenster zurueck", () => {
+    const k = mit("jup_47");
+    expect(zoomfenster(k, { xArcsec: 0, yArcsec: 0 }, 500, true).breiteArcsec).toBe(zoombreiteArcsec(k));
   });
 });
 

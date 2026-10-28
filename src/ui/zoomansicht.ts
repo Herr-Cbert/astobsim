@@ -3,7 +3,8 @@
 // Gesichtsfeld; Fenster und Vergleichsbild rechnet die Steuerung (zoom.ts). Die Zoomansicht
 // ersetzt das Gesichtsfeld auf der Seite, solange stand.zoom gilt. Zurueck per Klick auf ein
 // Bild, Eingabetaste, Escape oder Schaltflaeche; Verschieben (Mond) bewegt beide Bilder gemeinsam,
-// weil beide aus derselben Fenstermitte entstehen.
+// weil beide aus derselben Fenstermitte entstehen. Die Schaltflaeche Detail (Issue #77) schaltet
+// auf das schmalere Detailfenster, wo zoom.ts es anbietet (Mond), sonst ist sie verborgen.
 
 import { TEXTE } from "../texte";
 import { nachweistext } from "./gesichtsfeld";
@@ -11,7 +12,7 @@ import { hilfesymbol } from "./hilfe";
 import type { Steuerung, Zoombilder } from "./steuerung";
 import { zeichneAnblick } from "./zeichne";
 import { verbindeBild } from "./ziehen";
-import { verschiebelage } from "./zoom";
+import { detailbreiteArcsec, verschiebelage } from "./zoom";
 
 /** Die Plaetze, die die Zoomansicht braucht: ihr eigenes Element und das Gesichtsfeld, das sie ersetzt. */
 export interface ZoomPlaetze {
@@ -61,10 +62,18 @@ export function baueZoomansicht(plaetze: ZoomPlaetze, steuerung: Steuerung): Zoo
   zurueck.type = "button";
   zurueck.className = "zoom-zurueck";
   zurueck.textContent = TEXTE.zoom.zurueck;
+  const detail = d.createElement("button");
+  detail.type = "button";
+  detail.className = "zoom-detail";
+  detail.textContent = TEXTE.zoom.detail;
+  detail.title = TEXTE.zoom.detailTitel;
+  detail.setAttribute("aria-pressed", "false");
+  detail.hidden = true;
+  detail.addEventListener("click", () => steuerung.zeigeDetail(!steuerung.stand.detail));
   const norden = d.createElement("span");
   norden.className = "norden";
   norden.textContent = TEXTE.nordenOben;
-  kopf.append(zurueck, norden);
+  kopf.append(zurueck, detail, norden);
 
   const a = baueBild(d, TEXTE.zoom.anblick, TEXTE.hilfe.anblick, "hilfe-zoom-anblick", TEXTE.zoom.anblickBild);
   const v = baueBild(d, TEXTE.zoom.quellbild, TEXTE.hilfe.quellbild, "hilfe-zoom-quellbild", TEXTE.zoom.quellbildBild);
@@ -91,7 +100,7 @@ export function baueZoomansicht(plaetze: ZoomPlaetze, steuerung: Steuerung): Zoo
   for (const canvas of [a.canvas, v.canvas]) {
     verbindeBild(canvas, {
       steuerung,
-      lage: () => verschiebelage(steuerung.konfiguration, true),
+      lage: () => verschiebelage(steuerung.konfiguration, true, steuerung.stand.detail),
       breitePx: () => canvas.getBoundingClientRect().width,
       wechsle: schliesse
     });
@@ -127,7 +136,15 @@ export function baueZoomansicht(plaetze: ZoomPlaetze, steuerung: Steuerung): Zoo
       kennung = stand.konfiguration.objekt.kennung;
       nachweis.textContent = nachweistext(steuerung.kataloge, kennung);
     }
-    const jetzt = verschiebelage(stand.konfiguration, true)?.erlaubt ?? false;
+    let angeboten = false;
+    try {
+      angeboten = detailbreiteArcsec(stand.konfiguration) !== undefined;
+    } catch {
+      // Unlesbares Geraet: kein Detail; den Fehler zeigt die Rechnung.
+    }
+    detail.hidden = !angeboten;
+    detail.setAttribute("aria-pressed", String(angeboten && stand.detail));
+    const jetzt = verschiebelage(stand.konfiguration, true, stand.detail)?.erlaubt ?? false;
     if (jetzt !== erlaubt) {
       erlaubt = jetzt;
       const hinweis = jetzt ? TEXTE.zoom.bedienungVerschieben : TEXTE.zoom.bedienung;
