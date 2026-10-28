@@ -26,7 +26,7 @@ const MITTE = { xArcsec: 0, yArcsec: 0 };
 
 /** Nachweis eines Einzelbilds 8x6 px mit 4 px Scheibe, aufgenommen bei 2 Bogensekunden. */
 function nachweisTest(): Bildnachweis {
-  const echt = pruefeBildnachweise(bilderJson).find((n) => n.id === "mars_hst_20160512")!;
+  const echt = pruefeBildnachweise(bilderJson).find((n) => n.id === "mars_hst_19950225")!;
   return { ...echt, pixelBreite: 8, pixelHoehe: 6, objektDurchmesserPx: 4, winkelgroesseArcsec: 2, bogensekundenProPixel: 0.5 };
 }
 
@@ -89,8 +89,8 @@ describe("QuelleEinzelbild mit Mars aus daten/", () => {
       const nachweis = nachweise.find((n) => n.id === objekte.find((o) => o.id === "mars")!.zustaende.find((z) => z.id === id)!.bild)!;
       expect(einzelbildMassstab(nachweis, zustand.durchmesserArcsec)).toBeCloseTo(zustand.quelle.massstabArcsecProPx, 12);
     }
-    // mars_6 und mars_14 teilen das Bild von 2016 mit 900 px Scheibe.
-    expect(objektzustand(objekte, nachweise, "mars_6")!.quelle.massstabArcsecProPx).toBeCloseTo(6 / 900, 12);
-    expect(objektzustand(objekte, nachweise, "mars_14")!.quelle.breitePx).toBe(960);
+    // mars_6 und mars_14 teilen das Bild von 1995 mit 620 px Scheibe.
+    expect(objektzustand(objekte, nachweise, "mars_6")!.quelle.massstabArcsecProPx).toBeCloseTo(6 / 620, 12);
+    expect(objektzustand(objekte, nachweise, "mars_14")!.quelle.breitePx).toBe(664);
   });
 });

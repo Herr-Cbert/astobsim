@@ -269,10 +269,10 @@ Die Tabellen-Tests (`src/physik/validierung.test.ts`) falten je Testfall ein Stu
 | T3 | Kraterschatten 4 km = 2,15'' | Schatten 0 in 1 | 4.3 (Schattenkontrast nahe 1) |
 | T3 | Hadley-Rille 0,64'' | 0,7 in 1 | Annahme (4.3: "Kontrast viel geringer", nur ein Schattenrand); das Quellbild loest die Rille mit 0,64''/px nicht auf |
 | T4 | Detail 1,5'' auf Jupiter (Festons, Ovale) | 0,82 in 1 | Annahme: Groesse aus dem Quellbild geschaetzt, Kontrast wie die Baender |
-| T5 | Mars-Scheibe 14'' bzw. 6'' mit Syrtis Major 2,1'' bzw. 0,9'' in der Mitte | Scheibe 1, Syrtis 0,41, Himmel 0 | Quellbild mars_14 (Perzentil 10 gegen 70 im inneren Scheibenbereich: 0,141/0,341); Literatur 4.4: etwa 0,45 |
+| T5 | Mars-Scheibe 14'' bzw. 6'' mit Syrtis Major 2,1'' bzw. 0,9'' in der Mitte | Scheibe 1, Syrtis 0,47, Himmel 0 | Quellbild mars_14 seit #78 (Hubble 1995; Perzentil 10 gegen 70 im inneren Scheibenbereich: 0,172/0,366; bis #78 Hubble 2016: 0,141/0,341 = 0,41); Literatur 4.4: etwa 0,45 |
 | T6a | Mare 5' = 300'' | 0,6 in 1 | Annahme aus den Albedos in 2.3 (Mare 0,07 bis 0,10 gegen Hochland 0,11 bis 0,18) |
 
-Die Polkappe (T5) hat kein Profil: das Quellbild (Hubble 2016-05-12) zeigt keine abgegrenzte Kappe, siehe `docs/validierung.md`.
+Die Polkappe (T5) hat kein Profil im Tabellen-Test: profilDelle misst Dellen, die Kappe ist eine helle Struktur am Rand, und die Schwelle ist nur an Dellen geeicht; sie wird am Bild beurteilt (`docs/validierung.md` T5). Gemessen mit `tools/strukturprofile.py` seit #78 (Hubble 1995): Breite an der Halbwertskante 0,284 Scheibendurchmesser (3,8'' bei 13,43'', also 4,0'' bei 14''), knapp unter der Schaetzung 4,3'' bis 6,2'' aus 4.4; Kern 2,5-fach so hell wie die hellen Gebiete. Bis #78 (Hubble 2016-05-12) zeigte das Quellbild keine abgegrenzte Kappe.
 
 ## 5. Magnituden und Flaechenhelligkeiten
 
@@ -341,6 +341,8 @@ Nachtrag 2026-10-27 (Issue #71): Die Werte dieser Tabelle sind mittlere Flaechen
 | sat_20 | saturn_hst_20210912 | 0,033333 | 150,4 | -0,1 | 6,6 | 5,34 | -1,26 |
 
 Nachtrag Issue #79 (2026-10-28): Das Jupiterbild ist seit #79 im Kontrast an Orton angeglichen (jeder Kanal in linearem Licht hoch 0,427, 4.6), dadurch heller. Neu geeicht: jup_35 Fluss 568,8, Quellweiss 4,89; jup_47 Fluss 1025,7, Quellweiss 4,83 (je +0,54 mag gegen die Tabelle). Das Saturnbild ist mit einer Tonkurve an Salo und French 2010 angeglichen (4.2, 4.6): sat_16 Fluss 153,0, Quellweiss 6,06; sat_20 Fluss 239,0, Quellweiss 5,85 (je +0,50 mag). Probe mit `tools/quellweiss_eichen.py` auf 0,005 mag.
+
+Nachtrag Issue #78 (2026-10-28): mars_6 und mars_14 nutzen statt mars_hst_20160512 das Bild mars_hst_19950225 (Hubble 25.02.1995, 620 px Scheibe, mit grosser Nordpolkappe). Neu geeicht: mars_6 Massstab 0,009677, Fluss 8,37, Quellweiss 3,31; mars_14 Massstab 0,022581, Fluss 45,57, Quellweiss 2,75 (je +0,21 mag gegen die Tabelle: das Bild ist im Mittel heller, Fluss je Scheibenflaeche 1,21-fach). Probe auf 0,005 mag.
 
 Lesart: Das Scheibenmittel im Quellbild ist $10^{-0{,}4\,(S - \mu_\mathrm{weiss})}$ mit $S$ aus 5.2: Mars 25" etwa 0,14, Mars 14" 0,24, Jupiter 47" 0,39. Die Planetenbilder sind also deutlich dunkler als Weiss, Mars 2003 am staerksten. Bei Mars, Jupiter und Saturn wird Quellweiss um 1,0 bis 2,1 mag heller, die Planetenflaeche im Arbeitsraster entsprechend heller; beim Mond wird er 0,56 mag dunkler.
 

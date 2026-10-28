@@ -22,7 +22,11 @@ Y = 0,2126 R + 0,7152 G + 0,0722 B, wie tools/quellweiss_eichen.py), und gibt au
       ohne Flanken.
     - Mars (mars_14): Perzentile 10 und 70 der Leuchtdichte im inneren
       Scheibenbereich (Radius unter 0,7) als dunkle und helle Gebiete, und ihr
-      Verhaeltnis.
+      Verhaeltnis. Dazu die Nordpolkappe (Issue #78): in der hellsten Zeile
+      der Nordkappe (oberhalb 0,6 Radien) die Breite an der Halbwertskante
+      zwischen Kappenkern (Perzentil 95 der Zeile) und hellen Gebieten
+      (Perzentil 70 innen), in Bogensekunden und Scheibendurchmessern, und
+      der Kern relativ zu den hellen Gebieten.
     - Jupiter (jup_47, Issue #79): Streifen am Zentralmeridian (96 px breit),
       Kern des NEB gegen die NTrZ, Fenster in Bogensekunden vom Aequator im
       Bild (Massstab des Nachweises), gewaehlt nach dem Profil des Bilds von
@@ -165,6 +169,17 @@ def mars() -> None:
     innen = y[np.hypot(xx - breite / 2, yy - hoehe / 2) < 0.7 * radius_px]
     p10, p70 = np.percentile(innen, 10), np.percentile(innen, 70)
     print(f"Mars {n['datei']}: Perzentil 10 {p10:.3f}, 70 {p70:.3f}, Verhaeltnis dunkel/hell {p10 / p70:.3f}")
+    # Nordpolkappe: hellste Zeile oberhalb 0,6 Radien, nur innerhalb der Scheibe
+    in_scheibe = np.hypot(xx - breite / 2, yy - hoehe / 2) < 0.98 * radius_px
+    oben = np.where(in_scheibe & (yy < hoehe / 2 - 0.6 * radius_px), y, 0.0)
+    zeile = int(np.argmax(oben.mean(axis=1)))
+    profil = oben[zeile - 2 : zeile + 3].mean(axis=0)
+    kern_y = np.percentile(profil[profil > 0], 95)
+    ueber = np.where(profil > (kern_y + p70) / 2)[0]
+    breite_px = ueber.max() - ueber.min() + 1
+    massstab = n["bogensekunden_pro_pixel"]
+    print(f"  Nordpolkappe (Zeile {zeile}, {(hoehe / 2 - zeile) / radius_px:.2f} R ueber der Mitte): Breite {breite_px} px = "
+          f"{breite_px * massstab:.2f}\" = {breite_px / n['objekt_durchmesser_px']:.3f} D, Kern {kern_y:.3f}, relativ zu hell {kern_y / p70:.2f}")
 
 
 

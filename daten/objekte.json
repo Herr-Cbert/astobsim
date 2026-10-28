@@ -36,11 +36,11 @@
         "phase": 0.9,
         "phasenwinkel_grad": 37,
         "magnitude": 1.0,
-        "weiss_mag_arcsec2": 3.1,
+        "weiss_mag_arcsec2": 3.31,
         "entfernung_au": 1.56,
-        "bild": "mars_hst_20160512",
+        "bild": "mars_hst_19950225",
         "hinweis_hilfe": "Mars ist bei 6 Bogensekunden in Wirklichkeit nicht voll beleuchtet, sondern zu etwa 90 Prozent (gibbos, Phasenwinkel rund 37 Grad); astobsim zeigt ihn vereinfacht als volle Scheibe.",
-        "kommentar": "Werte aus objekte.md 6.1, Phasenwinkel aus 1.2 (36 bis 39 Grad). Kein eigenes Bild: nutzt das Bild von mars_14 (Hubble 2016, Vollscheibe, A-X1); phase und phasenwinkel_grad beschreiben den realen Zustand, nicht das Bild. weiss_mag_arcsec2 auf den Pixelwert 1,0 geeicht (objekte.md 5.3): der Gesamtfluss der vollen Bildscheibe bei 6\" ergibt die Magnitude 1,0 (bis #71: 4,5 aus 5.2)."
+        "kommentar": "Werte aus objekte.md 6.1, Phasenwinkel aus 1.2 (36 bis 39 Grad). Kein eigenes Bild: nutzt das Bild von mars_14 (Hubble 1995, Vollscheibe, A-X1); phase und phasenwinkel_grad beschreiben den realen Zustand, nicht das Bild. weiss_mag_arcsec2 auf den Pixelwert 1,0 geeicht (objekte.md 5.3): der Gesamtfluss der vollen Bildscheibe bei 6\" ergibt die Magnitude 1,0 (bis #71: 4,5 aus 5.2; bis #78: 3,10 mit Hubble 2016)."
       },
       {
         "id": "mars_14",
@@ -50,10 +50,10 @@
         "phase": 1.0,
         "phasenwinkel_grad": 0,
         "magnitude": -1.4,
-        "weiss_mag_arcsec2": 2.54,
+        "weiss_mag_arcsec2": 2.75,
         "entfernung_au": 0.669,
-        "bild": "mars_hst_20160512",
-        "kommentar": "Werte aus objekte.md 6.1, Phasenwinkel 0 wie in 5.1. Quellbild Hubble 12.05.2016 bei 17,51\" (bilder.json); die Anwendung skaliert die Scheibe auf 14\". weiss_mag_arcsec2 auf den Pixelwert 1,0 geeicht (objekte.md 5.3, bis #71: 4,1)."
+        "bild": "mars_hst_19950225",
+        "kommentar": "Werte aus objekte.md 6.1, Phasenwinkel 0 wie in 5.1. Quellbild Hubble 25.02.1995 bei 13,43\" mit grosser Nordpolkappe (bilder.json, bis #78 Hubble 12.05.2016 ohne abgegrenzte Kappe); die Anwendung skaliert die Scheibe auf 14\". weiss_mag_arcsec2 auf den Pixelwert 1,0 geeicht (objekte.md 5.3, bis #71: 4,1; bis #78: 2,54 mit Hubble 2016)."
       },
       {
         "id": "mars_25",
