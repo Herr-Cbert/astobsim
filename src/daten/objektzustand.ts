@@ -34,7 +34,7 @@ export function objektzustand(objekte: readonly Objekt[], nachweise: readonly Bi
   const ergebnis: Objektzustand = {
     kennung: zustand.id,
     klasse: objekt.klasse,
-    durchmesserArcsec: objekt.klasse === "doppelstern" ? groessterAbstand(sterne) : zustand.winkelgroesseArcsec!,
+    durchmesserArcsec: objekt.klasse === "doppelstern" ? groessterAbstand(sterne) : pflicht(zustand.winkelgroesseArcsec, zustand.id, "winkelgroesse_arcsec"),
     magnitude: zustand.magnitude,
     trabanten: zustand.trabanten.map((t) => ({ ...t })),
     sterne
@@ -44,15 +44,23 @@ export function objektzustand(objekte: readonly Objekt[], nachweise: readonly Bi
     if (nachweis === undefined) {
       throw new DatenFehler(OBJEKTE_DATEI, zustand.id, "bild", `kein Bildnachweis "${zustand.bild}" in ${BILDER_DATEI}`);
     }
+    // Quellweiss: bei log-Kennlinie (Deep-Sky) mag_hell, sonst weiss_mag_arcsec2 des Zustands.
+    const weiss = nachweis.kennlinie?.magHell ?? pflicht(zustand.weissMagProArcsec2, zustand.id, "weiss_mag_arcsec2");
     ergebnis.quelle = {
       breitePx: nachweis.pixelBreite,
       hoehePx: nachweis.pixelHoehe,
-      massstabArcsecProPx: zustand.winkelgroesseArcsec! / nachweis.objektDurchmesserPx,
-      weissMagProArcsec2: zustand.weissMagProArcsec2!
+      massstabArcsecProPx: pflicht(zustand.winkelgroesseArcsec, zustand.id, "winkelgroesse_arcsec") / nachweis.objektDurchmesserPx,
+      weissMagProArcsec2: weiss
     };
     if (zustand.isophoten !== undefined) ergebnis.isophoten = zustand.isophoten.map((i) => ({ ...i }));
   }
   return ergebnis;
+}
+
+/** Wert, den pruefeObjekte fuer die Klasse schon verlangt; fehlt er doch, DatenFehler statt undefined. */
+function pflicht(wert: number | undefined, zustandId: string, feld: string): number {
+  if (wert === undefined) throw new DatenFehler(OBJEKTE_DATEI, zustandId, feld, "fehlt");
+  return wert;
 }
 
 /** Groesster Abstand zweier Sterne in Bogensekunden; 0 bei weniger als zwei Sternen. */

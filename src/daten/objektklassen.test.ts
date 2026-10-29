@@ -30,7 +30,7 @@ function paar(): Roh {
         name: "Testpaar (3'', 4 und 6 mag)",
         magnitude: 3.84,
         katalog: [
-          { wds: "00001+0001", komponenten: "TST 1 AB", trennung_arcsec: 3.0, positionswinkel_grad: 90, epoche: 2027.0, quelle: "erfunden" }
+          { wds: "00001+0001", komponenten: "TST 1 AB", sterne: ["A", "B"], trennung_arcsec: 3.0, positionswinkel_grad: 90, epoche: 2027.0, quelle: "erfunden" }
         ],
         sterne: [
           { name: "A", dx_arcsec: -1.5, dy_arcsec: 0, magnitude: 4.0, b_v: 1.1, quelle_farbe: "erfunden" },
@@ -54,7 +54,6 @@ function nebel(): Roh {
         polar_arcsec: 300,
         positionswinkel_grad: 35,
         magnitude: 6.5,
-        weiss_mag_arcsec2: 16,
         bild: "nebel_test_bild",
         profil: { art: "king", mu0_mag_arcsec2: 16.5, rc_arcsec: 30, rt_arcsec: 900, quelle: "erfunden" },
         isophoten: [
@@ -84,6 +83,37 @@ function haufen(): Roh {
         sterne: [
           { name: "S1", dx_arcsec: -4500, dy_arcsec: 1200, magnitude: 3.0, b_v: -0.1 },
           { name: "S2", dx_arcsec: 300, dy_arcsec: -200, magnitude: 5.5, b_v: 0.5 }
+        ]
+      }
+    ]
+  };
+}
+
+/** Erfundenes Vierfachsystem wie Epsilon Lyrae: zwei Paare, ein Nachweis zwischen den Systemmitten. */
+function vierling(): Roh {
+  const nachweis = (komponenten: string, sterne: unknown, trennung: number): Roh => ({
+    wds: "00002-0002", komponenten, sterne, trennung_arcsec: trennung, positionswinkel_grad: 0, epoche: 2027.0, quelle: "erfunden"
+  });
+  return {
+    id: "vierling_test",
+    name: "Testvierling",
+    typ: "doppelstern",
+    zustaende: [
+      {
+        id: "vierling_test_1",
+        name: "Testvierling",
+        magnitude: 4,
+        // Mitten (-104, 0) und (104,5, 1): Abstand hypot(208,5, 1) = 208,5024 (ber.)
+        sterne: [
+          { name: "Eins A", dx_arcsec: -105, dy_arcsec: 0, magnitude: 5, b_v: 0.1 },
+          { name: "Eins B", dx_arcsec: -103, dy_arcsec: 0, magnitude: 6, b_v: 0.3 },
+          { name: "Zwei C", dx_arcsec: 103, dy_arcsec: 1, magnitude: 5.2, b_v: 0.2 },
+          { name: "Zwei D", dx_arcsec: 106, dy_arcsec: 1, magnitude: 5.4, b_v: 0.2 }
+        ],
+        katalog: [
+          nachweis("TST 2 AB", ["Eins A", "Eins B"], 2),
+          nachweis("TST 3 CD", ["Zwei C", "Zwei D"], 3),
+          nachweis("TST 4 AB,CD", [["Eins A", "Eins B"], ["Zwei C", "Zwei D"]], 208.502)
         ]
       }
     ]
@@ -132,7 +162,7 @@ describe("pruefeObjekte Doppelstern", () => {
     expect(z.sterne[0]).toEqual({ name: "A", dxArcsec: -1.5, dyArcsec: 0, magnitude: 4, bv: 1.1, quelleFarbe: "erfunden" });
     expect(z.sterne[1]).toEqual({ name: "B", dxArcsec: 1.5, dyArcsec: 0, magnitude: 6, bv: -0.1 });
     expect(z.katalog).toEqual([
-      { wds: "00001+0001", komponenten: "TST 1 AB", trennungArcsec: 3, positionswinkelGrad: 90, epoche: 2027, quelle: "erfunden" }
+      { wds: "00001+0001", komponenten: "TST 1 AB", sterne: [["A"], ["B"]], trennungArcsec: 3, positionswinkelGrad: 90, epoche: 2027, quelle: "erfunden" }
     ]);
   });
 
@@ -157,8 +187,7 @@ describe("pruefeObjekte Doppelstern", () => {
     sterne[0]!["dx_arcsec"] = -1.6;
     sterne[1]!["dx_arcsec"] = 1.6;
     const f = fehlerVon(() => katalog(roh));
-    expect(f.feld).toBe("sterne");
-    expect(f.message).toContain("trennung_arcsec");
+    expect([f.eintrag, f.feld]).toEqual(["testpaar_1, katalog[0]", "trennung_arcsec"]);
     // Rundung der Lagen auf 0,001'' wird toleriert.
     const gerundet = paar();
     const s = zustandVon(gerundet)["sterne"] as Roh[];
@@ -227,21 +256,42 @@ describe("pruefeObjekte Doppelstern", () => {
     expect(() => katalog(nebel360)).not.toThrow();
   });
 
-  it("noch nicht geprueft: Lage und Trennung bei mehr als zwei Sternen (Epsilon Lyrae, Entscheidung offen)", () => {
-    // Vier Sterne mit drei Paarnachweisen; die Trennungen passen absichtlich zu keinem Sternabstand.
-    // Wird die Paarpruefung fuer Mehrfachsterne eingefuehrt, muss dieser Test einen DatenFehler erwarten.
-    const roh = paar();
-    const z = zustandVon(roh);
-    z["sterne"] = [
-      { name: "A", dx_arcsec: -105, dy_arcsec: 0, magnitude: 5, b_v: 0.1 },
-      { name: "B", dx_arcsec: -103, dy_arcsec: 1, magnitude: 6, b_v: 0.3 },
-      { name: "C", dx_arcsec: 103, dy_arcsec: 0, magnitude: 5.2, b_v: 0.2 },
-      { name: "D", dx_arcsec: 106, dy_arcsec: 0, magnitude: 5.4, b_v: 0.2 }
+  it("prueft bei einem Vierfachsystem jeden Nachweis, Gruppen am geometrischen Mittelpunkt", () => {
+    const [o] = katalog(vierling());
+    const k = o!.zustaende[0]!.katalog!;
+    expect(k.map((p) => p.sterne)).toEqual([[["Eins A"], ["Eins B"]], [["Zwei C"], ["Zwei D"]], [["Eins A", "Eins B"], ["Zwei C", "Zwei D"]]]);
+  });
+
+  it("meldet beim Vierfachsystem falsche Trennungen, unbekannte Namen und falsche Komponenten", () => {
+    // Trennung der Systemmitten passt nicht (208,502'' gerechnet, 209,4'' eingetragen).
+    const weit = vierling();
+    (zustandVon(weit)["katalog"] as Roh[])[2]!["trennung_arcsec"] = 209.4;
+    const f = fehlerVon(() => katalog(weit));
+    expect([f.eintrag, f.feld]).toEqual(["vierling_test_1, katalog[2]", "trennung_arcsec"]);
+    // Unterpaar passt nicht.
+    const eng = vierling();
+    (zustandVon(eng)["katalog"] as Roh[])[1]!["trennung_arcsec"] = 3.1;
+    expect(fehlerVon(() => katalog(eng)).eintrag).toBe("vierling_test_1, katalog[1]");
+    const faelle: unknown[] = [
+      ["Eins A", "Drei E"],
+      ["Eins A"],
+      ["Eins A", "Eins A"],
+      [["Eins A", "Eins B"], ["Eins B", "Zwei C"]],
+      [["Eins A"], "Eins B"],
+      ["Eins A", 3]
     ];
-    const p = (z["katalog"] as Roh[])[0]!;
-    z["katalog"] = [p, { ...p, trennung_arcsec: 7 }, { ...p, trennung_arcsec: 500 }];
-    z["magnitude"] = 4;
-    expect(() => katalog(roh)).not.toThrow();
+    for (const sterne of faelle) {
+      const roh = vierling();
+      (zustandVon(roh)["katalog"] as Roh[])[0]!["sterne"] = sterne;
+      const g = fehlerVon(() => katalog(roh));
+      expect([g.eintrag, g.feld]).toEqual(["vierling_test_1, katalog[0]", "sterne"]);
+    }
+    const ohne = vierling();
+    delete (zustandVon(ohne)["katalog"] as Roh[])[0]!["sterne"];
+    expect(fehlerVon(() => katalog(ohne)).feld).toBe("sterne");
+    const doppelt = vierling();
+    (zustandVon(doppelt)["sterne"] as Roh[])[3]!["name"] = "Zwei C";
+    expect(fehlerVon(() => katalog(doppelt)).message).toContain("doppelt");
   });
 
   it("reserviert die Kennung frei fuer das freie Paar", () => {
@@ -256,7 +306,7 @@ describe("pruefeObjekte Deep-Sky", () => {
     const [o] = katalog(nebel());
     expect(o!.klasse).toBe("deep_sky");
     const z = o!.zustaende[0]!;
-    expect([z.winkelgroesseArcsec, z.polarArcsec, z.positionswinkelGrad, z.weissMagProArcsec2, z.bild]).toEqual([600, 300, 35, 16, "nebel_test_bild"]);
+    expect([z.winkelgroesseArcsec, z.polarArcsec, z.positionswinkelGrad, z.weissMagProArcsec2, z.bild]).toEqual([600, 300, 35, undefined, "nebel_test_bild"]);
     expect(z.profil).toEqual({ art: "king", werte: { mu0_mag_arcsec2: 16.5, rc_arcsec: 30, rt_arcsec: 900 }, quelle: "erfunden" });
     expect(z.isophoten).toEqual([
       { magProArcsec2: 18, flaecheArcsec2: 100 },
@@ -275,11 +325,18 @@ describe("pruefeObjekte Deep-Sky", () => {
     expect(fehlerVon(() => katalog(roh)).feld).toBe("winkelgroesse_arcsec");
   });
 
-  it("verlangt mit Bild isophoten und weiss_mag_arcsec2", () => {
-    for (const feld of ["isophoten", "weiss_mag_arcsec2"]) {
-      const roh = nebel();
-      delete zustandVon(roh)[feld];
-      expect(fehlerVon(() => katalog(roh)).feld).toBe(feld);
+  it("verlangt mit Bild isophoten", () => {
+    const roh = nebel();
+    delete zustandVon(roh)["isophoten"];
+    expect(fehlerVon(() => katalog(roh)).feld).toBe("isophoten");
+  });
+
+  it("verbietet weiss_mag_arcsec2 mit Hinweis auf kennlinie.mag_hell, mit und ohne Bild", () => {
+    for (const roh of [nebel(), haufen()]) {
+      zustandVon(roh)["weiss_mag_arcsec2"] = 16;
+      const f = fehlerVon(() => katalog(roh));
+      expect(f.feld).toBe("weiss_mag_arcsec2");
+      expect(f.message).toContain("kennlinie.mag_hell");
     }
   });
 
@@ -299,15 +356,13 @@ describe("pruefeObjekte Deep-Sky", () => {
     expect(fehlerVon(() => katalog(kurz)).feld).toBe("isophoten");
   });
 
-  it("ohne Bild: keine isophoten, kein Quellweiss, aber Sterne", () => {
+  it("ohne Bild: keine isophoten, aber Sterne", () => {
     const [o] = katalog(haufen());
     expect(o!.zustaende[0]!.bild).toBeUndefined();
     expect(o!.zustaende[0]!.isophoten).toBeUndefined();
-    for (const [feld, wert] of [["isophoten", [{ mag_arcsec2: 18, flaeche_arcsec2: 1 }]], ["weiss_mag_arcsec2", 16]] as const) {
-      const roh = haufen();
-      zustandVon(roh)[feld] = wert;
-      expect(fehlerVon(() => katalog(roh)).feld).toBe(feld);
-    }
+    const mitIsophoten = haufen();
+    zustandVon(mitIsophoten)["isophoten"] = [{ mag_arcsec2: 18, flaeche_arcsec2: 1 }];
+    expect(fehlerVon(() => katalog(mitIsophoten)).feld).toBe("isophoten");
     const leer = haufen();
     zustandVon(leer)["sterne"] = [];
     expect(fehlerVon(() => katalog(leer)).feld).toBe("sterne");
@@ -378,7 +433,7 @@ describe("pruefeObjekte Magnitude je Klasse", () => {
 });
 
 describe("pruefeVerweise mit Kennlinie", () => {
-  it("akzeptiert ein Deep-Sky-Bild mit log-Kennlinie und mag_hell = Quellweiss", () => {
+  it("akzeptiert ein Deep-Sky-Bild mit log-Kennlinie", () => {
     expect(() => pruefeVerweise(katalog(nebel(), haufen(), paar()), [nebelBild()])).not.toThrow();
   });
 
@@ -386,13 +441,6 @@ describe("pruefeVerweise mit Kennlinie", () => {
     const ohne = { ...nebelBild(), kennlinie: undefined };
     const f = fehlerVon(() => pruefeVerweise(katalog(nebel()), [ohne]));
     expect([f.datei, f.feld]).toEqual(["bilder.json", "kennlinie"]);
-  });
-
-  it("verlangt weiss_mag_arcsec2 gleich mag_hell", () => {
-    const roh = nebel();
-    zustandVon(roh)["weiss_mag_arcsec2"] = 16.1;
-    const f = fehlerVon(() => pruefeVerweise(katalog(roh), [nebelBild()]));
-    expect([f.datei, f.eintrag, f.feld]).toEqual(["objekte.json", "nebel_test_1", "weiss_mag_arcsec2"]);
   });
 
   it("verlangt Isophoten im Umfang der Kennlinie", () => {
@@ -444,7 +492,10 @@ describe("objektzustand je Klasse", () => {
     const z = objektzustand(objekte, nachweise, "nebel_test_1")!;
     expect(z.klasse).toBe("deep_sky");
     expect(z.durchmesserArcsec).toBe(600);
+    // Quellweiss ist mag_hell der Kennlinie (16), der Zustand hat kein weiss_mag_arcsec2.
     expect(z.quelle).toEqual({ breitePx: 400, hoehePx: 200, massstabArcsecProPx: 2, weissMagProArcsec2: 16 });
+    const anderesHell = objektzustand(objekte, [{ ...nachweise[0]!, kennlinie: { art: "log", magHell: 15.5, magDunkel: 26 } }], "nebel_test_1")!;
+    expect(anderesHell.quelle!.weissMagProArcsec2).toBe(15.5);
     expect(z.isophoten).toEqual([
       { magProArcsec2: 18, flaecheArcsec2: 100 },
       { magProArcsec2: 18.1, flaecheArcsec2: 150 },

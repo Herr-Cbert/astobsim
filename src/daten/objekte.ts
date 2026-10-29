@@ -8,9 +8,11 @@
 // Die Objektklasse (A-D18) folgt aus typ: mond und planet sind sonnensystem, doppelstern und
 // deep_sky heissen wie die Klasse. Die Felder eines Zustands haengen an der Klasse:
 // - sonnensystem: wie Version 1 (Winkelgroesse, Phase, Bild, Trabanten);
-// - doppelstern: sterne und katalog (Nachweis je Paar), kein bild, keine winkelgroesse_arcsec;
+// - doppelstern: sterne und katalog (Nachweis je Paar mit den beiden Komponenten in sterne),
+//   kein bild, keine winkelgroesse_arcsec;
 // - deep_sky: grosse und kleine Achse, positionswinkel_grad, profil (nur fuer tools/), bild
-//   optional (fehlt bei M45), mit Bild Pflicht isophoten und weiss_mag_arcsec2; sterne inline
+//   optional (fehlt bei M45), mit Bild Pflicht isophoten; kein weiss_mag_arcsec2, Quellweiss ist
+//   kennlinie.mag_hell des Bildnachweises (Entscheidung Herbert 2026-10-29); sterne inline
 //   oder als sterne_datei.
 
 import { BILDER_DATEI, type Bildnachweis } from "./bildnachweise";
@@ -60,13 +62,13 @@ const FELDER_ZUSTAND: Record<Objektklasse, readonly string[]> = {
   ],
   doppelstern: ["id", "name", "magnitude", "katalog", "sterne", "hinweis_hilfe", "kommentar"],
   deep_sky: [
-    "id", "name", "winkelgroesse_arcsec", "polar_arcsec", "positionswinkel_grad", "magnitude", "weiss_mag_arcsec2", "bild", "profil",
+    "id", "name", "winkelgroesse_arcsec", "polar_arcsec", "positionswinkel_grad", "magnitude", "bild", "profil",
     "isophoten", "sterne", "sterne_datei", "hinweis_hilfe", "kommentar"
   ]
 };
 const FELDER_TRABANT = ["name", "dx_arcsec", "dy_arcsec", "durchmesser_arcsec", "magnitude"] as const;
 const FELDER_STERN = ["name", "dx_arcsec", "dy_arcsec", "magnitude", "b_v", "katalog", "quelle_farbe"] as const;
-const FELDER_PAAR = ["wds", "komponenten", "trennung_arcsec", "positionswinkel_grad", "epoche", "quelle"] as const;
+const FELDER_PAAR = ["wds", "komponenten", "sterne", "trennung_arcsec", "positionswinkel_grad", "epoche", "quelle"] as const;
 const FELDER_ISOPHOTE = ["mag_arcsec2", "flaeche_arcsec2"] as const;
 const FELDER_STERNLISTE = ["objekt", "quelle", "lizenz", "kommentar", "sterne"] as const;
 /** Profile je art mit ihren Zahlenfeldern (deep-sky.md 7.3); nur tools/ rechnet damit. */
@@ -93,10 +95,16 @@ export interface SternEintrag {
   quelleFarbe?: string;
 }
 
-/** Nachweis eines Paars aus dem Katalog (WDS, ORB6); trennungArcsec ist der Massstab fuer dx. */
+/**
+ * Nachweis eines Paars aus dem Katalog (WDS, ORB6); trennungArcsec ist der Massstab fuer dx.
+ * sterne nennt die beiden Komponenten, jede als Liste von Sternnamen: ein Name ist ein Stern, mehrere
+ * sind eine Gruppe, gemessen an ihrem geometrischen Mittelpunkt (Epsilon Lyrae AB gegen CD). In der
+ * Datei steht ein einzelner Stern als Name ("A"), eine Gruppe als Liste (["A", "B"]).
+ */
 export interface Paarnachweis {
   wds: string;
   komponenten: string;
+  sterne: [string[], string[]];
   trennungArcsec: number;
   positionswinkelGrad: number;
   epoche: number;
@@ -133,7 +141,8 @@ export interface ZustandEintrag {
   magnitude: number;
   /**
    * Flaechenhelligkeit in mag je Quadratbogensekunde, die Weiss (1,0) im Quellbild bedeutet
-   * (Objektzustand.quelle.weissMagProArcsec2); Werte aus docs/recherche/objekte.md 5.2. Nur mit bild.
+   * (Objektzustand.quelle.weissMagProArcsec2); Werte aus docs/recherche/objekte.md 5.2. Nur
+   * Sonnensystem; bei Deep-Sky gilt kennlinie.mag_hell des Bildnachweises.
    */
   weissMagProArcsec2?: number;
   /** Nur Sonnensystem. */
@@ -219,6 +228,9 @@ function pruefeZustand(wert: unknown, typ: Objekttyp, klasse: Objektklasse, ortI
       if (obj[feld] !== undefined) throw new DatenFehler(OBJEKTE_DATEI, id, feld, "Doppelsterne haben kein bild und keine winkelgroesse_arcsec");
     }
   }
+  if (klasse === "deep_sky" && obj["weiss_mag_arcsec2"] !== undefined) {
+    throw new DatenFehler(OBJEKTE_DATEI, id, "weiss_mag_arcsec2", "nicht bei Deep-Sky: Quellweiss ist kennlinie.mag_hell in bilder.json");
+  }
   nurBekannteFelder(obj, ort, FELDER_ZUSTAND[klasse]);
   const zustand: ZustandEintrag = {
     id,
@@ -274,37 +286,69 @@ function pruefeSonnensystem(obj: Record<string, unknown>, typ: Objekttyp, zustan
 }
 
 /**
- * Doppelstern: mindestens zwei Sterne und ein Paarnachweis. Bei genau zwei Sternen gilt die Lage
- * aus A-Z9 (Mitte im Ursprung, Ost-West, dy = 0) und abs(dx_B - dx_A) = Trennung des einen
- * Paarnachweises; dx wiederholt die Trennung bewusst (Nachweis gegen Modell, ADR-0003 Nachtrag V2).
+ * Doppelstern: mindestens zwei Sterne mit eindeutigen Namen und ein Paarnachweis je Paar. Jeder
+ * Nachweis nennt in sterne seine beiden Komponenten; deren Abstand muss trennung_arcsec sein (dx
+ * wiederholt die Trennung bewusst, Nachweis gegen Modell, ADR-0003 Nachtrag V2). Eine Gruppe zaehlt
+ * mit dem geometrischen Mittelpunkt ihrer Sterne; das ist eine Naeherung, der WDS misst zwischen den
+ * Photozentren. Bei genau zwei Sternen gilt zusaetzlich die Lage aus A-Z9 (Mitte im Ursprung,
+ * Ost-West, dy = 0) und genau ein Nachweis.
  */
 function pruefeDoppelstern(obj: Record<string, unknown>, zustand: ZustandEintrag, ort: Ort): void {
   const id = zustand.id;
   zustand.sterne = pruefeSterne(alsListe(obj["sterne"], ort, "sterne"), ort);
   if (zustand.sterne.length < 2) throw new DatenFehler(OBJEKTE_DATEI, id, "sterne", "mindestens zwei Sterne erwartet");
+  const nachName = new Map<string, SternEintrag>();
+  for (const stern of zustand.sterne) {
+    if (nachName.has(stern.name)) throw new DatenFehler(OBJEKTE_DATEI, id, "sterne", `Name "${stern.name}" doppelt vergeben`);
+    nachName.set(stern.name, stern);
+  }
+  if (zustand.sterne.length === 2) {
+    // Lage aus A-Z9 nur fuer Zweisternobjekte; Mehrfachsterne stehen in echter Lage.
+    const [a, b] = zustand.sterne as [SternEintrag, SternEintrag];
+    if (a.dyArcsec !== 0 || b.dyArcsec !== 0) throw new DatenFehler(OBJEKTE_DATEI, id, "sterne", "Paar liegt Ost-West, dy_arcsec = 0 (A-Z9)");
+    if (Math.abs(a.dxArcsec + b.dxArcsec) > TOLERANZ_TRENNUNG_ARCSEC) {
+      throw new DatenFehler(OBJEKTE_DATEI, id, "sterne", "Mitte des Paars liegt nicht im Ursprung (A bei -rho/2, B bei +rho/2)");
+    }
+  }
   const rohKatalog = alsListe(obj["katalog"], ort, "katalog");
   if (rohKatalog.length === 0) throw new DatenFehler(OBJEKTE_DATEI, id, "katalog", "mindestens ein Paarnachweis erwartet");
-  zustand.katalog = rohKatalog.map((p, n) => pruefePaarnachweis(p, { datei: OBJEKTE_DATEI, eintrag: `${id}, katalog[${n}]` }));
+  zustand.katalog = rohKatalog.map((p, n) => {
+    const ortP: Ort = { datei: OBJEKTE_DATEI, eintrag: `${id}, katalog[${n}]` };
+    const nachweis = pruefePaarnachweis(p, ortP);
+    pruefeTrennung(nachweis, nachName, ortP);
+    return nachweis;
+  });
   // Die Gesamthelligkeit ist heller als jeder einzelne Stern (kleinere Magnitude).
   const hellster = Math.min(...zustand.sterne.map((s) => s.magnitude));
   if (zustand.magnitude > hellster) {
     throw new DatenFehler(OBJEKTE_DATEI, id, "magnitude", `${zustand.magnitude} schwaecher als der hellste Stern (${hellster})`);
   }
-  // Bei mehr als zwei Sternen (Epsilon Lyrae: vier Sterne, drei Paarnachweise, einer davon zwischen
-  // den Systemmitten) ist aus den Daten nicht ablesbar, welcher Nachweis zu welchen Sternen gehoert;
-  // Lage und Trennung bleiben dort vorerst ungeprueft (Entscheidung Herbert offen, PR #122).
-  if (zustand.sterne.length === 2) {
-    const [a, b] = zustand.sterne as [SternEintrag, SternEintrag];
-    if (zustand.katalog.length !== 1) throw new DatenFehler(OBJEKTE_DATEI, id, "katalog", "genau ein Paarnachweis fuer zwei Sterne erwartet");
-    const trennung = zustand.katalog[0]!.trennungArcsec;
-    if (a.dyArcsec !== 0 || b.dyArcsec !== 0) throw new DatenFehler(OBJEKTE_DATEI, id, "sterne", "Paar liegt Ost-West, dy_arcsec = 0 (A-Z9)");
-    if (Math.abs(a.dxArcsec + b.dxArcsec) > TOLERANZ_TRENNUNG_ARCSEC) {
-      throw new DatenFehler(OBJEKTE_DATEI, id, "sterne", "Mitte des Paars liegt nicht im Ursprung (A bei -rho/2, B bei +rho/2)");
+  if (zustand.sterne.length === 2 && zustand.katalog.length !== 1) {
+    throw new DatenFehler(OBJEKTE_DATEI, id, "katalog", "genau ein Paarnachweis fuer zwei Sterne erwartet");
+  }
+}
+
+/** Abstand der beiden Komponenten eines Paarnachweises gegen trennung_arcsec; unbekannte Namen sind Fehler. */
+function pruefeTrennung(nachweis: Paarnachweis, nachName: ReadonlyMap<string, SternEintrag>, ort: Ort): void {
+  const [p, q] = nachweis.sterne.map((namen) => {
+    let x = 0;
+    let y = 0;
+    for (const name of namen) {
+      const stern = nachName.get(name);
+      if (stern === undefined) throw new DatenFehler(ort.datei, ort.eintrag, "sterne", `kein Stern "${name}" in sterne des Zustands`);
+      x += stern.dxArcsec;
+      y += stern.dyArcsec;
     }
-    const abstand = Math.abs(b.dxArcsec - a.dxArcsec);
-    if (Math.abs(abstand - trennung) > TOLERANZ_TRENNUNG_ARCSEC) {
-      throw new DatenFehler(OBJEKTE_DATEI, id, "sterne", `abs(dx_B - dx_A) = ${abstand} passt nicht zu trennung_arcsec ${trennung} im katalog`);
-    }
+    return { x: x / namen.length, y: y / namen.length };
+  }) as [{ x: number; y: number }, { x: number; y: number }];
+  const abstand = Math.hypot(q.x - p.x, q.y - p.y);
+  if (Math.abs(abstand - nachweis.trennungArcsec) > TOLERANZ_TRENNUNG_ARCSEC) {
+    throw new DatenFehler(
+      ort.datei,
+      ort.eintrag,
+      "trennung_arcsec",
+      `${nachweis.trennungArcsec} passt nicht zum Abstand ${abstand.toFixed(4)} der Komponenten in sterne`
+    );
   }
 }
 
@@ -322,13 +366,10 @@ function pruefeDeepSky(obj: Record<string, unknown>, zustand: ZustandEintrag, or
   const bild = optional(obj, "bild", (o, f) => text(o, f, ort));
   if (bild !== undefined) {
     zustand.bild = bild;
-    zustand.weissMagProArcsec2 = zahl(obj, "weiss_mag_arcsec2", ort, -5, 30);
     zustand.isophoten = pruefeIsophoten(alsListe(obj["isophoten"], ort, "isophoten"), ort);
   } else {
-    // Ohne Bild gibt es weder Quellweiss noch eine Flaechentabelle (M45, ADR-0003 Nachtrag V2).
-    for (const feld of ["weiss_mag_arcsec2", "isophoten"]) {
-      if (obj[feld] !== undefined) throw new DatenFehler(OBJEKTE_DATEI, id, feld, "nur mit bild");
-    }
+    // Ohne Bild gibt es keine Flaechentabelle (M45, ADR-0003 Nachtrag V2).
+    if (obj["isophoten"] !== undefined) throw new DatenFehler(OBJEKTE_DATEI, id, "isophoten", "nur mit bild");
   }
 
   const sterneDatei = optional(obj, "sterne_datei", (o, f) => text(o, f, ort));
@@ -344,6 +385,23 @@ function pruefeDeepSky(obj: Record<string, unknown>, zustand: ZustandEintrag, or
       throw new DatenFehler(OBJEKTE_DATEI, id, "sterne", "ohne bild mindestens ein Stern oder sterne_datei erwartet");
     }
   }
+}
+
+/**
+ * Feld sterne eines Paarnachweises: genau zwei Komponenten, jede ein Sternname oder eine Liste von
+ * mindestens zwei Namen (Gruppe); kein Stern in beiden Komponenten.
+ */
+function pruefeKomponenten(obj: Record<string, unknown>, ort: Ort): [string[], string[]] {
+  const liste = alsListe(obj["sterne"], ort, "sterne");
+  if (liste.length !== 2) throw new DatenFehler(ort.datei, ort.eintrag, "sterne", "genau zwei Komponenten erwartet");
+  const komponenten = liste.map((k): string[] => {
+    if (typeof k === "string" && k.trim() !== "") return [k];
+    if (Array.isArray(k) && k.length >= 2 && k.every((n) => typeof n === "string" && n.trim() !== "")) return k as string[];
+    throw new DatenFehler(ort.datei, ort.eintrag, "sterne", "Komponente ist ein Sternname oder eine Liste von mindestens zwei Namen");
+  }) as [string[], string[]];
+  const alle = komponenten.flat();
+  if (new Set(alle).size !== alle.length) throw new DatenFehler(ort.datei, ort.eintrag, "sterne", "ein Stern steht mehrfach in den Komponenten");
+  return komponenten;
 }
 
 /** Positionswinkel in Grad, halboffen [0, 360): 360 ist 0 und soll so eingetragen werden. */
@@ -384,6 +442,7 @@ function pruefePaarnachweis(wert: unknown, ort: Ort): Paarnachweis {
   return {
     wds,
     komponenten: text(obj, "komponenten", ort),
+    sterne: pruefeKomponenten(obj, ort),
     trennungArcsec: zahl(obj, "trennung_arcsec", ort, 0.001, 2 * LAGE_MAX_ARCSEC),
     positionswinkelGrad: positionswinkel(obj, ort),
     epoche: zahl(obj, "epoche", ort, 1700, 2200),
@@ -453,9 +512,9 @@ export function pruefeSternliste(roh: unknown, datei: string, objektId: string):
  * Zustand verwendet, ist ebenfalls ein Fehler (Bild im Repo, das niemand nutzt).
  *
  * Kennlinie je Klasse (ADR-0003 Nachtrag V2): Bilder von Deep-Sky-Objekten tragen die log-Kennlinie,
- * Mond und Planeten nicht (sRGB). Bei der log-Kennlinie ist Quellweiss mag_hell (kennlinie.ts):
- * weiss_mag_arcsec2 des Zustands muss gleich mag_hell sein, und die Isophoten muessen im Umfang der
- * Kennlinie liegen, weil tools/ sie am dekodierten Bild misst.
+ * Mond und Planeten nicht (sRGB). Bei der log-Kennlinie ist Quellweiss mag_hell (kennlinie.ts,
+ * objektzustand), und die Isophoten muessen im Umfang der Kennlinie liegen, weil tools/ sie am
+ * dekodierten Bild misst.
  */
 export function pruefeVerweise(objekte: readonly Objekt[], nachweise: readonly Bildnachweis[]): void {
   const nachId = new Map(nachweise.map((n) => [n.id, n]));
@@ -483,9 +542,6 @@ export function pruefeVerweise(objekte: readonly Objekt[], nachweise: readonly B
   }
 }
 
-/** Toleranz zwischen weiss_mag_arcsec2 und mag_hell in mag. */
-const TOLERANZ_WEISS_MAG = 0.005;
-
 function pruefeKennlinieZuKlasse(objekt: Objekt, zustand: ZustandEintrag, nachweis: Bildnachweis): void {
   const kennlinie = nachweis.kennlinie;
   if (objekt.klasse !== "deep_sky") {
@@ -493,10 +549,6 @@ function pruefeKennlinieZuKlasse(objekt: Objekt, zustand: ZustandEintrag, nachwe
     return;
   }
   if (kennlinie === undefined) throw new DatenFehler(BILDER_DATEI, nachweis.id, "kennlinie", "Deep-Sky-Bilder brauchen die log-Kennlinie");
-  const weiss = zustand.weissMagProArcsec2!;
-  if (Math.abs(weiss - kennlinie.magHell) > TOLERANZ_WEISS_MAG) {
-    throw new DatenFehler(OBJEKTE_DATEI, zustand.id, "weiss_mag_arcsec2", `${weiss} ist nicht mag_hell ${kennlinie.magHell} von "${nachweis.id}" (Quellweiss)`);
-  }
   for (const [n, iso] of (zustand.isophoten ?? []).entries()) {
     if (iso.magProArcsec2 < kennlinie.magHell || iso.magProArcsec2 > kennlinie.magDunkel) {
       throw new DatenFehler(

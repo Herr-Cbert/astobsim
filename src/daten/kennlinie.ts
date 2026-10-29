@@ -5,7 +5,8 @@
 //
 // Quellweiss eines Bilds mit log-Kennlinie ist mag_hell: Kode 255 dekodiert zu 1,0 (wie 255 bei
 // sRGB), sonst linear relativ dazu 10^(-0,4 (mu - mag_hell)) (docs/recherche/physik.md 13.1).
-// pruefeVerweise verlangt deshalb weiss_mag_arcsec2 des Zustands gleich mag_hell.
+// Deep-Sky-Zustaende tragen deshalb kein weiss_mag_arcsec2; objektzustand nimmt mag_hell
+// (Entscheidung Herbert 2026-10-29).
 
 import type { Bildnachweis } from "./bildnachweise";
 import { LINEAR_8BIT } from "./srgb";
