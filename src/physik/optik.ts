@@ -40,6 +40,15 @@ export function flaechenhelligkeitsfaktor(austrittspupilleMm: number, pupilleMm:
 }
 
 /**
+ * Transmission des Geraets mit Abschattung: tau (1 - eps^2) (Abschnitt 5.2 und 9). Die einzige Stelle
+ * des Abschattungsfaktors fuer Objekt und Himmel im Okular (okularhelligkeit in helligkeit.ts) und
+ * fuer den Himmel der Wahrnehmungsschwelle (schwelle.ts); vorher stand der Ausdruck dort zweimal.
+ */
+export function transmissionMitAbschattung(optik: Optik): number {
+  return optik.transmission * (1 - optik.obstruktion ** 2);
+}
+
+/**
  * Das Geraet als Skalare: Oeffnung in mm, Vergroesserung, Obstruktion 0 bis 0,5, Transmission
  * tau ohne Abschattung, Austrittspupille in mm, wahres Gesichtsfeld als Maske in Bogensekunden.
  * beidaeugig: Fernglas und blosses Auge (Feldfaktor F_T = 1 der Wahrnehmungsschwelle, Issue #96);
