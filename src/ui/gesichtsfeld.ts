@@ -18,7 +18,7 @@ import { sollMitte } from "./verschieben";
 import { warnzeilen, zeigeWarnzeilen } from "./warnungen";
 import { zeichneAnblick } from "./zeichne";
 import { verbindeBild } from "./ziehen";
-import { verschiebelage } from "./zoom";
+import { detailstart, verschiebelage } from "./zoom";
 
 /** Die Plaetze auf der Seite, die das Gesichtsfeld beschreibt (baut starte). */
 export interface GesichtsfeldPlaetze {
@@ -72,10 +72,14 @@ export function baueGesichtsfeld(plaetze: GesichtsfeldPlaetze, steuerung: Steuer
 
     // Eine Mitte ausserhalb der Grenze der gezeigten Ansicht (z. B. nach einem Zustandswechsel
     // mit kleinerem Objekt oder beim Wechsel vom Zoom zur Uebersicht) zurueckholen.
-    const lage = verschiebelage(stand.konfiguration, stand.zoom);
+    // Im Detail gilt dessen Grenze; die Startlage auf dem hellsten Stern (detailstart, Objekte ohne
+    // Quellbild) bleibt stehen, auch wo das Detail nicht verschiebbar ist.
+    const lage = verschiebelage(stand.konfiguration, stand.zoom, stand.detail);
     const m = stand.mitte;
+    const start = stand.zoom && stand.detail ? detailstart(stand.konfiguration) : undefined;
+    const amStart = start !== undefined && start.xArcsec === m.xArcsec && start.yArcsec === m.yArcsec;
     const soll = sollMitte(m, lage?.durchmesser, lage?.erlaubt ?? false);
-    if (soll.xArcsec !== m.xArcsec || soll.yArcsec !== m.yArcsec) steuerung.verschiebe(soll.xArcsec, soll.yArcsec);
+    if (!amStart && (soll.xArcsec !== m.xArcsec || soll.yArcsec !== m.yArcsec)) steuerung.verschiebe(soll.xArcsec, soll.yArcsec);
   });
 
   // Ziehen und Pfeiltasten verschieben (A-D2), Klick oder Eingabetaste oeffnet den Zoom (A-D3).

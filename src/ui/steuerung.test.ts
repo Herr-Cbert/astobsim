@@ -518,3 +518,37 @@ describe("Steuerung, Zustaende ohne Quellbild (QuelleLeer, Issue #109)", () => {
     expect(u.bildquellen).toEqual(["mond_ev", "jup_47"]);
   });
 });
+
+describe("Steuerung, Detail ohne Quellbild startet auf dem hellsten Stern (Herbert 2026-10-29)", () => {
+  it("Epsilon Lyrae am 80/600 bei 150x: Detail auf eps1 A, danach verschiebbar, zurueck zum Zoom bleibt die Mitte", async () => {
+    const { u, s } = neu();
+    await u.frame();
+    const start = mitZustand(s.konfiguration, "eps_lyr_2027");
+    const k = { ...start, geraet: { ...(start.geraet as Extract<Konfiguration["geraet"], { art: "fernrohr" }>), okular: { brennweiteMm: 4, scheinbaresGesichtsfeldGrad: 50 } } };
+    s.aendere(k);
+    await u.frame();
+    s.zoome(true);
+    await u.frame();
+    expect(s.stand.mitte).toEqual({ xArcsec: 0, yArcsec: 0 });
+    expect(detailbreiteArcsec(s.konfiguration)).toBeDefined();
+    s.zeigeDetail(true);
+    expect(s.stand.mitte).toEqual({ xArcsec: 14.251, yArcsec: 102.728 });
+    await u.frame();
+    expect(s.stand.zoombilder?.anblick.fenster).toMatchObject({ mitteXArcsec: 14.251, mitteYArcsec: 102.728 });
+    // Nur die Startlage: Verschieben im Detail gilt weiter.
+    s.verschiebe(10, 90);
+    await u.frame();
+    expect(s.stand.mitte).toEqual({ xArcsec: 10, yArcsec: 90 });
+    s.zeigeDetail(false);
+    expect(s.stand.detail).toBe(false);
+  });
+
+  it("Objekte mit Quellbild behalten die Fenstermitte (Mond)", async () => {
+    const { u, s } = neu();
+    await u.frame();
+    s.zoome(true);
+    await u.frame();
+    s.zeigeDetail(true);
+    expect(s.stand.mitte).toEqual({ xArcsec: 0, yArcsec: 0 });
+  });
+});

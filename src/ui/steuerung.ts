@@ -26,7 +26,7 @@ import { type Auswertung, auswerten, begrenze, type Hinweis, type Konfiguration,
 import { inUrl, type Kataloge } from "../zustand";
 import { type Ausschnittsanfrage, ausschnittsanfrage } from "./fenster";
 import { sollMitte } from "./verschieben";
-import { vergleichsparameter, verschiebelage, zoomfenster } from "./zoom";
+import { detailstart, vergleichsparameter, verschiebelage, zoomfenster } from "./zoom";
 
 /** Quelle eines Objektzustands mit dem asynchronen Vorladen, das rendere voraussetzt. */
 export interface Bildquelle {
@@ -204,7 +204,8 @@ export class Steuerung {
 
   /**
    * Schaltet im Zoom zwischen Zoomfenster (false) und Detailfenster (true, Issue #77); ausserhalb
-   * des Zooms wirkungslos. Die Fenstermitte bleibt wie bei zoome, soweit erlaubt.
+   * des Zooms wirkungslos. Die Fenstermitte bleibt wie bei zoome, soweit erlaubt; ohne Quellbild
+   * startet das Detail auf dem hellsten Stern (detailstart).
    */
   zeigeDetail(detail: boolean): void {
     if (!this.zustand.zoom || this.zustand.detail === detail) return;
@@ -213,7 +214,10 @@ export class Steuerung {
 
   private wechsleAnsicht(zoom: boolean, detail: boolean): void {
     const lage = verschiebelage(this.zustand.konfiguration, zoom, detail);
-    const mitte = sollMitte(this.zustand.mitte, lage?.durchmesser, lage?.erlaubt ?? false);
+    // Beim Oeffnen des Details ohne Quellbild auf den hellsten Stern (detailstart, nur Startlage;
+    // danach verschiebt der Nutzer wie sonst, soweit erlaubt).
+    const stern = detail && !this.zustand.detail ? detailstart(this.zustand.konfiguration) : undefined;
+    const mitte = stern ?? sollMitte(this.zustand.mitte, lage?.durchmesser, lage?.erlaubt ?? false);
     this.ueberhole();
     this.setze({ zoom, detail, mitte });
     this.plane();

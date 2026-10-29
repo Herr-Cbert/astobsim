@@ -120,6 +120,21 @@ export function verschiebelage(k: Konfiguration, zoom: boolean, detail = false):
   }
 }
 
+/**
+ * Startlage des Detailfensters bei Objekten ohne Quellbild (Doppel- und Mehrfachsterne, freies Paar,
+ * M45; Entscheidung Herbert 2026-10-29): der hellste Stern des Zustands, bei gleicher Magnitude der
+ * erste der Liste. Die Objektmitte ist dort oft leer (Epsilon Lyrae). undefined bei Objekten mit
+ * Quellbild oder ohne Sterne; dann gilt die Fenstermitte wie bisher.
+ */
+export function detailstart(k: Konfiguration): Mitte | undefined {
+  if (k.objekt.quelle !== undefined) return undefined;
+  let hellster: Konfiguration["objekt"]["sterne"][number] | undefined;
+  for (const stern of k.objekt.sterne) {
+    if (hellster === undefined || stern.magnitude < hellster.magnitude) hellster = stern;
+  }
+  return hellster === undefined ? undefined : { xArcsec: hellster.dxArcsec, yArcsec: hellster.dyArcsec };
+}
+
 /** Kernschluessel des Vergleichsbilds; kann keinem Kern aus physik gleichen. */
 const VERGLEICH = "vergleich";
 
