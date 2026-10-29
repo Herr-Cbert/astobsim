@@ -99,7 +99,7 @@ _Vermeiden_: Hintergrundstern
 Eigenschaft eines Zustands, dessen Winkelgroesse mal Vergroesserung unter der Aufloesung des Auges liegt (z. B. Jupiter mit blossem Auge). Er wird mit gleitendem Uebergang als Punktquelle statt als Flaeche dargestellt.
 
 **Punktebene**:
-Eigene Ebene im Arbeitsraster, in die bild die Punktquellen malt und lokal mit dem Kern faltet, getrennt vom Objektraster (Issue #72). Ihre Pixel werden je Pixel mit `Helligkeit.punktFaktor` und `punktExponent` auf die Anzeigehelligkeit abgebildet (physik.md Abschnitt 14).
+Eigene Ebene im Arbeitsraster, in die bild die Punktquellen malt und lokal mit dem Kern faltet, getrennt vom Objektraster (Issue #72). Ihre Pixel werden je Pixel mit `Helligkeit.punktFaktor` und `punktExponent` auf die Anzeigehelligkeit abgebildet (physik.md Abschnitt 14), bezogen auf das Punktweiss. Farbe und Deckkraft der Sterne traegt eine dreikanalige Faerbung neben der einkanaligen Punktebene (`docs/architektur.md` 5.3).
 
 **Winkelgroesse**:
 Scheinbarer Durchmesser eines Objekts oder Zustands in Bogensekunden, bei Planeten aequatorial.
@@ -182,6 +182,33 @@ _Vermeiden_: Anzeigewert (der Typ `Anzeigewerte` sind die Zahlen neben dem Bild)
 Der kleinste Kontrast gegen den Himmel im Okular, den der feste, voll dunkeladaptierte Normalbeobachter noch sieht, abhaengig von der Himmelsleuchtdichte und der Ausdehnung des Details; fuer Sterne folgt daraus die Grenzgroesse. Was darunter liegt, zeigt der Anblick als Himmel.
 _Vermeiden_: Sichtbarkeitsgrenze, Kontrastgrenze
 
+**Feldfaktor**:
+Faktor F, um den die Schwelle des festen Beobachters ueber Blackwells Laborschwelle liegt (Crumey 2014); in astobsim 1,4 (ADR-0004), am Fernrohr zusaetzlich sqrt 2 fuer einaeugiges Sehen. Steht fuer Erfahrung und Alter, keine Eingabe (A-P9).
+
+**Grenzgroesse**:
+Die Magnitude des schwaechsten Sterns, der bei der eingestellten Konfiguration an der Wahrnehmungsschwelle liegt (Deckkraft 0,5); im Infopanel angezeigt.
+_Vermeiden_: NELM (nur fuer das blosse Auge gebraeuchlich), Reichweite
+
+**Isophote**:
+Linie gleicher Flaechenhelligkeit eines Deep-Sky-Objekts am Himmel, in mag/arcsec². Die sichtbare Isophote ist die schwaechste, deren eingeschlossene Flaeche ueber der Wahrnehmungsschwelle liegt; darunter verblasst das Objekt gleitend in den Himmel.
+
+**Flaechentabelle**:
+Je Deep-Sky-Zustand die Liste "Isophote gegen eingeschlossene Flaeche" (`isophoten` in `daten/objekte.json`), von `tools/` am aufbereiteten Quellbild gemessen; aus ihr bestimmt physik die sichtbare Isophote, ohne Pixel zu sehen.
+
+**Deckkraft**:
+Anteil 0 bis 1, mit dem ein Stern oder ein Deep-Sky-Pixel ueber dem Himmel erscheint, nach Blackwells Wahrscheinlichkeitskurve aus dem Verhaeltnis Kontrast zu Schwelle (0,5 an der Schwelle). Macht die Wahrnehmungsschwelle gleitend.
+_Vermeiden_: Alpha, Transparenz (ist eine Bedingung)
+
+**Mischgewicht**:
+Anteil g zwischen 0 (Flaeche) und 1 (Punktquelle), mit dem ein unaufgeloester Zustand in die Punktebene statt in die Flaechenebene geht (A-P10); haengt an Winkelgroesse mal Vergroesserung.
+
+**Sockel**:
+Fester Zuschlag zur Anzeigehelligkeit eines Deep-Sky-Objekts, mit der Deckkraft gewichtet, damit ein Pixel an der Wahrnehmungsschwelle mindestens 3 sRGB-Kodes ueber dem Himmel liegt (Mindestsichtbarkeit, ADR-0004).
+_Vermeiden_: Verstaerkung, Offset
+
+**Anzeigeweiss**:
+Die Flaechenhelligkeit im Okular, die als Bildschirmweiss erscheint: 9,2 mag/arcsec² fuer Flaechen und Himmel (Version 2, vorher 3,35). Die Punktebene hat ein eigenes **Punktweiss** von 6,4 mag/arcsec² (ADR-0004, A-P13).
+
 **Uebersicht**:
 Die Grundansicht: der Anblick im ganzen wahren Gesichtsfeld (Standardfenster, verschiebbar nach A-D2). Gegenstueck zur Zoomansicht; die Steuerung wechselt mit `zoome` zwischen beiden.
 _Vermeiden_: Normalansicht, Hauptansicht
@@ -209,6 +236,9 @@ _Vermeiden_: Originalbild, Textur, Rohbild (Rohbild ist die unbearbeitete Datei 
 **Quellweiss**:
 Die Flaechenhelligkeit, die der Wert 1,0 (Weiss) im Quellbild eines Zustands bedeutet, in mag/arcsec² (`weissMagProArcsec2`, `daten/objekte.json`). Bezug aller linearen Helligkeiten im Quellbild und der Punktquellen. Geeicht ueber den Gesamtfluss des Quellbilds: Summe der linearen Pixelwerte mal Massstab² ergibt mit Quellweiss die Magnitude des Zustands (`docs/recherche/objekte.md` 5.3, `tools/quellweiss_eichen.py`). Nicht die mittlere Flaechenhelligkeit der Scheibe.
 
+**Kennlinie**:
+Die Zuordnung der 8-Bit-Kodes eines Quellbilds zu Flaechenhelligkeiten: sRGB bei Mond und Planeten, logarithmisch in mag bei Deep-Sky-Bildern (`kennlinie` in `daten/bilder.json`, ADR-0003 Nachtrag V2).
+
 **Bildnachweis**:
 Der Datensatz zu jedem Quellbild: Quelle, Mission, Lizenz, Namensnennung, Pixelmassstab, Bearbeitung.
 _Vermeiden_: Credit, Metadaten
@@ -230,4 +260,4 @@ Die von Hand erweiterbare Datendatei mit den vordefinierten Geraeten.
 Eine Zeile der Geraeteliste: id, Name, Kommentar und das Geraet ohne Okular; erst mit dem gewaehlten Okular wird daraus das Geraet der Konfiguration.
 
 **Testfall**:
-Einer der sechs Beobachtungs-Testfaelle T1 bis T6 aus den Anforderungen, mit dem der Anblick gegen Beobachtungserfahrung geprueft wird.
+Einer der Beobachtungs-Testfaelle T1 bis T6 (Version 1) und T7 bis T12 (Version 2) aus den Anforderungen, mit dem der Anblick gegen Beobachtungserfahrung geprueft wird.

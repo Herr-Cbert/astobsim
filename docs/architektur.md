@@ -94,3 +94,156 @@ Erster durchgehender Pfad (Milestone M1 in Phase 4): Mond im 80 mm Refraktor, fe
 - Worker oder Hauptthread fuer bild: mit WebGL2 reicht der Hauptthread (Faltung in Millisekunden); der Worker ist nur fuer den JavaScript-Fallback interessant. Vorschlag: Version 1 ohne Worker, Naht bleibt klonbar.
 - Kalibrierkonstante fuer die Tabellen-Tests T1 bis T5 (Kontrastschwelle "erkennbar") wird in Phase 6 am Bild festgelegt, die Tests frieren sie danach ein. **Erledigt (Issue #21):** `SCHWELLE_ERKENNBAR` = 0,125 fuer die Delle eines gefalteten Stufenprofils (`profilDelle`, physik.md 8.1) statt der MTF; Tests fuer T1 bis T6 in `src/physik/validierung.test.ts`, Herleitung in `docs/validierung.md`.
 - Speicher des Kachel-Caches (Issue #66, Messung aus PR #62: Mond-Pyramide 149 MB Float32, JS-Heap bis 345 MB). **Erledigt (Issue #66):** Kacheln aus dem Browser liegen als 8-Bit-sRGB im Cache (`KachelSrgb`) und werden erst in `QuelleKacheln.ausschnitt` ueber dieselbe Tabelle wie `rgbaZuRaster` linearisiert; der Ausschnitt ist bitgleich (Test in `kacheln.test.ts`). Gemessen in Node mit der Mond-Geometrie: Pyramide 148,6 statt 37,2 MB, feinste Stufe 113,2 statt 28,3 MB; Ausschnitt (Median aus 20) bei 300-fach (600'') 2,5 -> 4,7 ms, bei 150-fach (1200'') 11,4 -> 19,7 ms, ganze Scheibe auf Stufe 0 30,0 -> 52,7 ms. Eine Grenze in Bytes haette nicht geholfen: die Kacheln einer laufenden Anfrage sind geschuetzt.
+
+## 5. Version 2: Erweiterung der Naht (Phase 3 Version 2, 2026-10-29)
+
+Neu in Version 2: Objektklassen Doppelstern und Deep-Sky-Objekt (A-Z9, A-Z10), Sterne mit Farbe (A-P12), Wahrnehmungsschwelle (A-P11), unaufgeloeste Zustaende (A-P10), neue Konstanten der Anzeige (A-P13). Modell und Konstanten stehen in ADR-0004, Datenformat im Nachtrag zu ADR-0003. Die vier Stufen aus Abschnitt 3 bleiben.
+
+### 5.1 Design it twice
+
+Zwei Subagenten haben die Erweiterung unabhaengig entworfen (Volltexte `docs/entwuerfe/naht-v2-variante-a.md` und `-b.md`).
+
+**Variante A, minimal-additiv:** optionale Felder an `Objektzustand` (`klasse`, `sterne`, `isophoten?`, `paar?`, `quelle?`) und `Helligkeit` (`mischgewicht`, `deepSky?`); eine Pixelformel mit drei Faellen; Deckkraft ueber einen Schwellenwert q* je Objekt. Staerke: kleinster Umbau, V1-Ausdruck als Sonderfall nachweisbar, Sterne laufen durch den Pfad der Trabanten. Schwaeche: gueltige Feldkombinationen haengen an `klasse`, die Typen schliessen falsche nicht aus; Deckkraft und Farbe der Sterne stecken im Schluessel von Stufe 1, ein Zug an Bortle faltet bei M42 und M45 das Objektraster neu.
+
+**Variante B, Ebenenliste:** Stufe 3 wird `Abbildung` = Himmel + Liste typisierter Ebenen (`sonnensystem`, `deep_sky`, `punkte`); ein unaufgeloester Zustand ist zwei Ebenen auf demselben Inhalt; `Objektzustand.flaeche?` als Union; Deckkraft als Stuetzkurve je Isophote; Stufe 1 getrennt in Objekt und Punkte. Staerke: die drei Ebenen aus ADR-0004 als drei Typen, Kann-Punkte (Erdlicht) als weitere Ebene, Bortle-Zug rechnet nur die Punktebene neu. Schwaeche: Bruch `quelle` -> `flaeche?.quelle` quer durch alle Module, rund acht neue Typen, Reihenfolgekonvention traegt die Bitgleichheit.
+
+Gemeinsam (in beiden unabhaengig gefunden, damit gesetzt): Flaechentabelle aus `tools/` statt Histogramm in daten oder bild; Schwelle je Objekt, Anwendung je Pixel; Punktebene bleibt einkanalig (Fluss fuer die Kompression), Farbe und Deckkraft in einer optionalen dreikanaligen Faerbung, die `punktebene.ts` in JavaScript faltet; Falter (JS, WebGL2) unveraendert; die Objektmitte blendet nur bei Sonnensystem-Objekten (sonst blendete M13 seine eigenen Sterne); T5 Mars 6'' bei kleiner Vergroesserung und T6 aendern sich gewollt (A-P10).
+
+### 5.2 Entscheidung: Hybrid (Herbert, 2026-10-29)
+
+Variante A als Geruest. Aus Variante B: Stufe 1 getrennt in Objekt- und Punkte-Schluessel; fester Bezug 0 mag/arcsec^2 fuer `helligkeitRelativ` bei Zustaenden ohne Quellbild. Aus dem Prototyp (ADR-0004): additiver Sockel statt Verstaerkungsfaktor G. Gruende: die Ebenenliste zahlt jetzt fuer Kann-Punkte, die nicht kommen (dieselbe Abwaegung wie bei Variante 2 in Version 1); die Deckkraft ueber q* ist im Prototyp erprobt und braucht in bild zwei Zahlen; ohne getrennten Punkte-Schluessel faltete der JavaScript-Fallback bei jedem Bortle-Zug das Objektraster neu (bis 0,6 s).
+
+### 5.3 Die Naht Version 2 (Zielbild, verbindlich fuer Phase 4 und 5)
+
+```ts
+// src/naht/konfiguration.ts (Ergaenzungen)
+export const OBJEKTKLASSEN = ["sonnensystem", "doppelstern", "deep_sky"] as const;
+export type Objektklasse = (typeof OBJEKTKLASSEN)[number];
+/** Stern eines Doppel-, Mehrfachsterns oder Deep-Sky-Objekts: Lage wie Trabant, kein Durchmesser, B-V. */
+export interface Stern { name: string; dxArcsec: number; dyArcsec: number; magnitude: number; bv: number }
+/** Zeile der Flaechentabelle: Isophote am Himmel (mag/arcsec^2, V) und eingeschlossene Flaeche (arcsec^2). */
+export interface Isophote { magProArcsec2: number; flaecheArcsec2: number }
+/** Eingaben des freien Paars (A-Z9); Quelle der Wahrheit fuer URL und begrenze. */
+export interface Paareingaben { trennungArcsec: number; magnitudeA: number; magnitudeB: number; bvA: number; bvB: number }
+export interface Objektzustand {
+  kennung: string;
+  klasse: Objektklasse;          // aus objekte.json "typ": mond, planet -> sonnensystem
+  durchmesserArcsec: number;     // Doppelstern: groesster Sternabstand (nur Anzeige)
+  magnitude: number;             // Doppelstern: Gesamthelligkeit
+  quelle?: { breitePx: number; hoehePx: number; massstabArcsecProPx: number; weissMagProArcsec2: number };  // fehlt: Doppelstern, M45
+  trabanten: Trabant[];          // nur sonnensystem
+  sterne: Stern[];               // doppelstern, deep_sky; sonst []
+  isophoten?: Isophote[];        // nur deep_sky mit Quellbild; mag aufsteigend, Flaeche steigend
+  paar?: Paareingaben;           // nur das freie Paar (kennung "frei")
+}
+```
+
+```ts
+// src/naht/simulationsparameter.ts (Aenderungen)
+export interface Quellbild {
+  schluessel: string;            // Objektraster: kennung, massstab, rasterPx, mitte; OHNE Punktquellen
+  massstabArcsecProPx: number; rasterPx: number; mitteXArcsec: number; mitteYArcsec: number;
+  punkte: { schluessel: string; punktquellen: Punktquelle[] };   // Stufe 1b: Lage, Fluss, Deckkraft, Farbe
+}
+export interface Punktquelle {
+  name: string; xArcsec: number; yArcsec: number; durchmesserArcsec: number;
+  helligkeitRelativ: number;     // relativ zu Quellweiss; ohne Quellbild relativ zu 0 mag/arcsec^2
+  sichtbar: boolean;
+  grund?: "blendung" | "unter_schwelle";   // unter_schwelle: Deckkraft unter 1e-3, nicht gemalt
+  deckkraft?: number;            // (0, 1], Blackwell; fehlt = 1
+  farbe?: [number, number, number];        // linear sRGB (D65), Y = 1 (A-P12); fehlt = grau
+}
+export interface Helligkeit {
+  schluessel: string;
+  faktorObjekt: number;          // f: Anzeigehelligkeit von Quellweiss, Anzeigeweiss 9,2 (A-P13 i)
+  hintergrundRelativ: number;    // h = min(1, s^n)
+  hintergrundMagProArcsec2: number;
+  punktFaktor: number;           // aP: Leuchtdichte des Bezugs im Okular relativ zum Punktweiss 6,4 (A-P13 ii)
+  punktExponent: number;         // n = 1/3; f = aP^n gilt nicht mehr (zwei Weiss)
+  mischgewicht: number;          // g in [0, 1) (A-P10), nur sonnensystem; 0 = Flaeche wie Version 1
+  deepSky?: {                    // nur deep_sky mit Quellbild (ADR-0004 Ebene b)
+    faktor: number;              // a: Leuchtdichte von Quellweiss im Okular relativ zum Anzeigeweiss
+    himmel: number;              // s: Leuchtdichte des Himmels im Okular relativ zum Anzeigeweiss
+    schwelleRelativ: number;     // q*: Pixelwert (relativ zu Quellweiss) an der sichtbaren Isophote
+    breite: number;              // 0,484 (Blackwell); Konstante aus physik, nicht in bild
+    sockel: number;              // Anzeigehelligkeit, >= 0 (Mindestsichtbarkeit, ADR-0004)
+  };
+}
+// Stufe 2 (Kern) und 4 (Gesichtsfeld, Fenster) unveraendert.
+```
+
+```ts
+// src/physik/auswerten.ts (Ergaenzungen)
+export interface Anzeigewerte { /* Version-1-Felder */
+  grenzgroesseMag: number;                     // Sterne am Okular, mit Extinktion (A-P11)
+  isophote?: { magProArcsec2: number; flaecheArcsec2: number; alleSichtbar: boolean };  // deep_sky
+  mischgewicht?: number;                       // sonnensystem, fuer den Hilfetext "unaufgeloest"
+}
+export interface Warnung {
+  art: "ap-ueber-6" | "ap-unter-0-5" | "v-ueber-2d" | "ueberstrahlung";  // wert |Delta m|, grenze 4
+  wert: number; grenze: number;
+  sterne?: [string, string];                   // nur ueberstrahlung
+}
+```
+
+**Vertrag fuer bild (`tonwert`, je Arbeitspixel).** Eingaben: q gefaltetes Objektraster (1 oder 3 Kanaele; fehlt ohne Quellbild, dann q = 0), p gefaltete Punktebene (1 Kanal, Fluss), optional c gefaltete Faerbung (3 Kanaele: Summe je Stern Fluss mal Deckkraft mal Farbe). Mit f, h, aP, n, g, d = deepSky aus `Helligkeit`:
+
+| Fall | Flaechenanteil F_k |
+|---|---|
+| d fehlt, g = 0 | `f * q_k + h` (Version 1, gleicher Ausdruck, gleiche Reihenfolge) |
+| d fehlt, g > 0 | `(1 - g) * f * q_k + h + g * min(1, (aP * q_k)^n)` |
+| d vorhanden | `P = Phi((q / d.schwelleRelativ - 1) / d.breite)`; `F = h + P * (min(1, (d.faktor * q + d.himmel)^n) - h + d.sockel)` |
+
+Punktanteil, nur wo p > 0: `W = min(1, (aP * p)^n)`; `Pixel_k = F_k + (c ? c_k / p : 1) * W`. Ohne c (alle Punktquellen grau, Deckkraft 1) ist das der Ausdruck aus Version 1. Gibt es c, hat das Ergebnis 3 Kanaele. Phi (Normalverteilung) ist Mathematik in bild, alle physikalischen Konstanten kommen ueber die Naht. Begrenzt wird wie bisher erst das Pixel beim Zeichnen.
+
+**Bitgleichheit.** `mischgewicht` ist stetig abgeschnitten, `g = max(0, (g_roh - 0,005) / 0,995)`, also exakt 0 fuer x = theta V / 60'' > 24. Damit rechnen T1 bis T4 und T5 Mars 14'' den Ausdruck aus Version 1; ein Regressionstest mit den alten Konstanten (beide Weiss 3,35) prueft gleiche Bytes. Gewollt anders: T6 und Mars 6'' bei V < 240.
+
+### 5.4 Neue reine Funktionen in physik
+
+| Datei | Funktion | Quelle |
+|---|---|---|
+| `schwelle.ts` | `leuchtdichteCdM2(mu)`, `kontrastschwelle(flaecheSr, bCdM2)` (Gl. 47, F = 1, Nullhintergrund 1e-5), `schwelleAmOkular(optik, atmosphaere, muHimmel, flaecheArcsec2)` (Gl. 77 bis 80 mit F und F_T), `grenzgroesse(optik, atmosphaere, muHimmel, seeingFwhmArcsec)` (Gl. 68/88, Scheibe 2,8 FWHM), `sichtbareIsophote(isophoten, optik, atmosphaere, muHimmel)` (Vorzeichenwechsel, linear in mu und log Flaeche interpoliert, stetig in V und Bortle), `deckkraft(verhaeltnis)`, `deckkraftStern(m, mLim)` | wahrnehmung.md 1, 2, 4.4 |
+| `mischung.ts` | `mischgewicht(winkelgroesseArcsec, vergroesserung)` mit Schnitt, `sockel(a, s, qStern, deltaMinKodes, n)` (sRGB-Kodierung als reine Funktion) | wahrnehmung.md 3.2; ADR-0004 |
+| `sternfarbe.ts` | `bvZuTemperatur(bv)`, `temperaturZuRgb(t)` (Y = 1, Tabelle in 0,1 B-V), `beleuchtungAmAugeLx(m, optik, atmosphaere)`, `sternfarbe(bv, lx)` (undefined unter 3,1e-7 lx) | wahrnehmung.md 5 |
+| `doppelstern.ts` | `freiesPaar(e: Paareingaben): Objektzustand`, `ueberstrahlung(sterne): Warnung[]` (Abstand unter 10'', abs(Delta m) >= 4) | doppelsterne.md 3.2, 5 |
+
+`freiesPaar` liegt in physik, weil `begrenze` (einzige Stelle fuer Bereiche, A-F8) nach dem Schneiden von `paar` die Sterne neu bilden muss und physik daten nicht importiert; die Gesamthelligkeit ist eine Formel. zustand liest `z=frei` mit den Paar-Parametern und ruft `freiesPaar`, ui ebenso aus dem Formular; analog zu `mitOkular` beim freien Geraet.
+
+Reihenfolge in `auswerten`: optik -> atmosphaere -> aufloesung -> fenster -> arbeitsmassstab (ohne `quelle` faellt die Quellgrenze weg) -> kernbeschreibung -> baueKern -> **grenzgroesse** -> punktquellen (Trabanten und Sterne; Sterne mit `STERN_DURCHMESSER_ARCSEC`, Deckkraft, Farbe) -> helligkeit (intern **mischgewicht**, bei deep_sky **sichtbareIsophote** und **sockel**) -> anzeige -> warnungen mit **ueberstrahlung**.
+
+Schluessel: Stufe 1 Objekt ohne Punktquellen (Bortle, Transparenz und Seeing aendern ihn nicht); Stufe 1b Punkte mit Lage, Fluss, Deckkraft und Farbe je gemalter Punktquelle; Stufe 2 unveraendert, bild haelt `kern|quellbild` und `kern|punkte` getrennt; Stufe 3 zusaetzlich `mischgewicht` und die `deepSky`-Felder; Stufe 4 unveraendert.
+
+### 5.5 Folgen fuer die Module
+
+| Modul | Aenderung |
+|---|---|
+| daten | `objekte.ts`: Typen `doppelstern`, `deep_sky`; Felder nach ADR-0003 Nachtrag V2; Pruefung je Klasse (deep_sky mit Bild braucht `isophoten`, streng monoton; Doppelstern ohne Bild; Paar: abs(dx_B - dx_A) = Trennung). `objektzustand()` setzt `klasse`, `sterne`, `isophoten`, `quelle` nur mit Bild. `bildnachweise.ts`: `kennlinie` (log) mit Dekodierung ueber eine 256er-Tabelle wie `srgb.ts`; Einzelbild und Kacheln behalten 8 Bit im Cache. Neue `QuelleLeer` fuer Zustaende ohne Bild. Nachweis der Sterndaten. |
+| zustand | `z=frei` mit Paar-Parametern (Namen in `LIESMICH.md`), Rueckfall auf die Vorgaben 2'', 5, 6, 0,6, 0,6; `v=1` bleibt, alte Links gueltig. |
+| ui | Objektauswahl gruppiert nach `klasse` (A-D18), Paar-Eingaben nur bei `frei`; Infopanel mit Grenzgroesse, sichtbarer Isophote, Satz zu "unaufgeloest", Warnung `ueberstrahlung`; Hilfetext zu `grund`; Steuerung waehlt `QuelleLeer` ohne `quelle`; Vergleichsbild der Zoomansicht fuer Deep-Sky offen (5.7). |
+| bild | `tonwert` nach 5.3; `male.ts` liefert je Scheibchen Deckkraft und Farbe; `punktebene.ts` faltet bei Bedarf die Faerbung mit; getrennte Zwischenspeicher fuer Objekt und Punkte; ohne Quellbild kein `mittele`/`falte`. |
+| Falter | unveraendert (Deep-Sky-Raster einkanalig). |
+| tools | Deep-Sky-Aufbereitung (Linearisieren, Tonkurve gegen Profil, Quellweiss, log-Kennlinie, Flaechentabelle am dekodierten, sternbereinigten Bild in 0,1-mag-Schritten), Sternlisten aus Gaia/Hipparcos/WDS, `mond_kacheln.py` mit Frame als Parameter. |
+
+### 5.6 Zuordnung der Anforderungen
+
+| Anforderung | Feld oder Funktion |
+|---|---|
+| A-Z9 Doppelsterne, freies Paar | `klasse "doppelstern"`, `sterne`, `Paareingaben`, `freiesPaar`, `ueberstrahlung`; Kern wie bisher |
+| A-Z10 Deep-Sky | `klasse "deep_sky"`, `isophoten`, `Helligkeit.deepSky`, `sichtbareIsophote`, `sockel`; Sterne von M45, Trapez, M13 ueber `sterne` |
+| A-P10 unaufgeloest | `mischgewicht`, Fall 2 der Pixelformel, `Anzeigewerte.mischgewicht` |
+| A-P11 Schwelle, Grenzgroesse | `schwelle.ts`, `Punktquelle.deckkraft`, `grund "unter_schwelle"`, `Anzeigewerte.grenzgroesseMag` |
+| A-P12 Farbe | `sternfarbe.ts`, `Punktquelle.farbe`, Faerbung; Deep-Sky einkanalig grau |
+| A-P13, A-P4 V2 | `ANZEIGE_WEISS_MAG_PRO_ARCSEC2` 9,2, `PUNKT_WEISS_MAG_PRO_ARCSEC2` 6,4 |
+| A-B2 V2, A-P9 V2 | Bortle wirkt ueber `schwelle.ts`; Beobachter als Konstante `FELDFAKTOR` 1,4 |
+| A-D18 | `klasse`, URL `z=frei` |
+| A-X7 Mondphasen | nur Daten und `tools/mond_kacheln.py`, keine Nahtaenderung |
+| A-X11 grobe Deep-Sky-Bilder | `arbeitsmassstab` begrenzt schon ueber `quelle.massstabArcsecProPx`; Hilfetext |
+
+### 5.7 Offen fuer Phase 4 und 5
+
+- Vergleichsbild der Zoomansicht bei Deep-Sky: linear mit Quellweiss = Bildschirmweiss zeigt den schwachen Halo kaum; Vorschlag beim ui-Issue.
+- M13: Quellbild plus Katalogsterne zaehlt doppelt; Bild maskieren oder Sterne plus Restlicht (deep-sky.md 3.4), Entscheidung beim Daten-Issue.
+- Deckkraft auf das gefaltete q mit einer Tabelle aus dem ungefalteten Bild ist eine Naeherung; bei M57 am 80 mm (T10) pruefen.
+- Faerbung mischt ueberlappende Sterne flussgewichtet (Antares B im Halo von A bekommt eine Mischfarbe); hinnehmen oder beim Doppelstern-Issue pruefen.
+
+Reihenfolge fuer Phase 4: (1) Vorbereitungs-PR Naht-Typen und Konstanten (wie #46 in Version 1), (2) physik `schwelle.ts`, `mischung.ts`, `sternfarbe.ts`, `doppelstern.ts` parallel, (3) bild `tonwert` und Faerbung, daten Kennlinie und neue Typen parallel, (4) Daten und tools je Objekt (Doppelsterne, M45, Mondphasen zuerst, da ohne Kennlinie), (5) zustand und ui, (6) Validierung T1 bis T12 und Nachmessen der Konstanten.
