@@ -32,7 +32,8 @@ export interface Okularhelligkeit {
 
 /**
  * Abschnitt 9: Objekt L = L0 a tau (1 - eps^2) min(1, (AP/p)^2), nach oben 1, keine Blendung.
- * Der Abschattungsfaktor (1 - eps^2) steht genau hier, nicht in der Transmission.
+ * Der Abschattungsfaktor (1 - eps^2) steht hier, nicht in der Transmission; zweite Stelle ist der
+ * Himmel im Okular in schwelle.ts (Issue #96).
  * Hintergrund mu_ok = mu(b) - 2,5 log10[tau (1 - eps^2) min(1, (AP/p)^2)] (Abschnitt 6.2):
  * ohne Extinktion, der Himmel leuchtet in der Atmosphaere.
  */

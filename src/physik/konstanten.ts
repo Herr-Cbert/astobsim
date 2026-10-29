@@ -56,8 +56,9 @@ export const KASTEN_YOUNG = { a: 0.50572, b: 6.07995, c: -1.6364 } as const;
 
 /**
  * Transmission tau der Geraetearten einschliesslich Okular und Zenitspiegel (Abschnitt 5.2,
- * Groessenordnung nach [32, 38]). Ohne Abschattung: der Faktor (1 - eps^2) steht genau einmal
- * in helligkeit() (Abschnitt 9).
+ * Groessenordnung nach [32, 38]). Ohne Abschattung: der Faktor (1 - eps^2) steht in
+ * okularhelligkeit() (Abschnitt 9) und, fuer den Himmel im Okular der Wahrnehmungsschwelle, in
+ * schwelle.ts (Issue #96); eine gemeinsame Funktion ist offen (Kandidat fuer #100 oder #113).
  */
 export const TRANSMISSION: Readonly<Record<Bauart | "fernglas" | "auge", number>> = {
   refraktor: 0.9,

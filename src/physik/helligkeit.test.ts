@@ -16,6 +16,7 @@ function optikMit(teil: Partial<Optik>): Optik {
     transmission: 1,
     austrittspupilleMm: 0.8,
     gesichtsfeld: { form: "kreis", breiteArcsec: 1800, hoeheArcsec: 1800 },
+    beidaeugig: false,
     ...teil
   };
 }

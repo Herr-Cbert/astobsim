@@ -122,7 +122,7 @@ Faustformeln (nur Oeffnung): $7{,}7 + 5\log_{10} D_\mathrm{cm}$ ergibt 12,21 / 1
 Beobachtungen zur Tabelle:
 - Bei Bortle 1 und 3 erreicht 80 mm bei 80x den Nullhintergrund (gleiche Werte); die Formel ist ab dort nur noch von der Oeffnung abhaengig.
 - Bei 200x und 2'' Seeing ist das Sternscheibchen im Auge 18,7' gross (2,8 x 2'' x 200), die Grenze faellt um 0,2 bis 0,35 mag gegen den Punktwert (ber.). Abtastung 200 mm, Bortle 5: 25x 12,25, 50x 13,17, 100x 13,74, 200x 14,30, 300x 14,62, 400x 14,51 (ber., $F$ = 1,4); das Maximum liegt beim Nullhintergrund (AP etwa 0,7 mm), danach verliert das Seeing.
-- Fernglas 10x50, $\tau$ = 0,85, beidaeugig: Bortle 5 10,5 mag, Bortle 3 11,1 mag (ber., $F$ = 1,4; mit $F$ = 2 10,1 und 10,7).
+- Fernglas 10x50, $\tau$ = 0,85, beidaeugig: Bortle 5 10,5 mag, Bortle 3 11,0 mag (ber., $F$ = 1,4; mit $F$ = 2 10,1 und 10,7; Korrektur #96: vorher 11,1, ungerundet 11,05).
 
 ### 2.4 Vergleich mit Bortle
 
