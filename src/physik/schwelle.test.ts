@@ -184,11 +184,35 @@ describe("grenzgroesse: Crumey Gl. 68 und 88", () => {
   it("Seeing-Scheibe ist eine Flaeche: m_lim = mu_lim(alpha) - 2,5 log10 alpha (Gl. 88 gegen Gl. 77)", () => {
     const fwhm = 2;
     const alpha = Math.PI * ((2.8 * fwhm) / 2) ** 2;
-    for (const v of [25, 100, 300]) {
-      const flaeche = schwelleAmOkular(newton200(v), OHNE, BORTLE_5, alpha).grenzMagProArcsec2 - 2.5 * Math.log10(alpha);
-      // Z = 2,54e-6 lx und 12,58 mag/arcsec^2 passen bis auf 0,004 mag zusammen.
-      expect(Math.abs(grenzgroesse(newton200(v), OHNE, BORTLE_5, fwhm) - flaeche)).toBeLessThan(0.01);
+    // Auch unter dem Nullhintergrund (Bortle 1 und 3 ab etwa 200x, Bortle 5 bei 400x): Delta B fest.
+    for (const mu of [21.9, BORTLE_3, BORTLE_5]) {
+      for (const v of [25, 100, 200, 300, 400]) {
+        const flaeche = schwelleAmOkular(newton200(v), OHNE, mu, alpha).grenzMagProArcsec2 - 2.5 * Math.log10(alpha);
+        // Z = 2,54e-6 lx und 12,58 mag/arcsec^2 passen bis auf 0,004 mag zusammen.
+        expect(Math.abs(grenzgroesse(newton200(v), OHNE, mu, fwhm) - flaeche)).toBeLessThan(0.005);
+      }
     }
+  });
+  it("guenstigste Vergroesserung (wahrnehmung.md 1.4): mu_lim eines 10'-Objekts an Bortle 3 faellt oberhalb davon", () => {
+    const flaeche = Math.PI * arcmin(5) ** 2;
+    const vs = Array.from({ length: 381 }, (_, i) => 20 + i);
+    const muLim = vs.map((v) => schwelleAmOkular(newton200(v), OHNE, BORTLE_3, flaeche).grenzMagProArcsec2);
+    const beste = muLim.indexOf(Math.max(...muLim));
+    expect(vs[beste]).toBeGreaterThan(20);
+    expect(vs[beste]).toBeLessThan(400);
+    muLim.slice(beste + 1).forEach((m, i) => expect(m).toBeLessThan(muLim[beste + i]!));
+    expect(muLim[beste]! - muLim[muLim.length - 1]!).toBeGreaterThan(1);
+  });
+  it("unter dem Nullhintergrund bleibt Delta B = C_th B_a bei gleicher Flaeche im Auge fest (Gl. 50)", () => {
+    // Bortle 3, 200 mm, tau 0,75: B_a < 1e-5 ab etwa 157x. Flaeche am Himmel 1e8 / V^2, im Auge gleich.
+    const deltaB = (v: number): number => {
+      const bOkular = leuchtdichteCdM2(BORTLE_3) * 0.75 * (200 / v / 6) ** 2;
+      return schwelleAmOkular(newton200(v), OHNE, BORTLE_3, 1e8 / v ** 2).kontrast * bOkular;
+    };
+    erwarteRelativ(deltaB(300), deltaB(200), 1e-9);
+    erwarteRelativ(deltaB(400), deltaB(200), 1e-9);
+    // Ueber dem Nullhintergrund (100x, hellerer Himmel im Okular) ist Delta B groesser.
+    expect(deltaB(100)).toBeGreaterThan(deltaB(200));
   });
   it("wirft PhysikFehler bei negativem Seeing", () => {
     expect(() => grenzgroesse(newton200(100), OHNE, BORTLE_5, -1)).toThrow(PhysikFehler);
@@ -244,6 +268,20 @@ describe("sichtbareIsophote: Vorzeichenwechsel der Reserve, Crumeys Verfahren fu
     const ohne = sichtbareIsophote(SCHEIBE, newton200(50), OHNE, BORTLE_5);
     const mit = sichtbareIsophote(SCHEIBE, newton200(50), { ...OHNE, extinktionMag: 0.3 }, BORTLE_5);
     expect(mit.magProArcsec2).toBeLessThan(ohne.magProArcsec2);
+  });
+  it("schwelleMagProArcsec2 in allen drei Faellen: verhaeltnis = 10^(-0,4 (mu - Schwelle)), am Wechsel gleich mu", () => {
+    const faelle = [
+      sichtbareIsophote(SCHEIBE, newton200(50), OHNE, BORTLE_5),
+      sichtbareIsophote(scheibenTabelle(14, 900, 0.3).slice(0, 10), optik(AUGE), OHNE, 21.9),
+      sichtbareIsophote(scheibenTabelle(26, 60, 1), optik(AUGE), OHNE, 17.0)
+    ];
+    expect(faelle.map((f) => f.verhaeltnis > 1 || f.alleSichtbar)).toEqual([false, true, false]);
+    expect(faelle[0]!.schwelleMagProArcsec2).toBe(faelle[0]!.magProArcsec2);
+    for (const f of faelle) expect(f.verhaeltnis).toBeCloseTo(10 ** (-0.4 * (f.magProArcsec2 - f.schwelleMagProArcsec2)), 12);
+    // Zeilenfaelle: Schwelle ist mu_lim der Zeilenflaeche.
+    for (const [f, muHimmel] of [[faelle[1]!, 21.9], [faelle[2]!, 17.0]] as const) {
+      expect(f.schwelleMagProArcsec2).toBeCloseTo(schwelleAmOkular(optik(AUGE), OHNE, muHimmel, f.flaecheArcsec2).grenzMagProArcsec2, 12);
+    }
   });
   it("eine Zeile: diese Zeile; wirft PhysikFehler bei leerer Tabelle oder Flaeche <= 0", () => {
     const eine = [{ magProArcsec2: 21, flaecheArcsec2: 1e5 }];

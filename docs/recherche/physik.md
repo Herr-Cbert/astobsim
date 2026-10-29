@@ -757,13 +757,13 @@ Formeln, Herleitung und Quellen stehen in `docs/recherche/wahrnehmung.md` (dort 
 |---|---|---|
 | `leuchtdichteCdM2(mu)` | $B = 10^{(12{,}58 - \mu)/2{,}5}$ | wahrnehmung.md, Konventionen; [1, Abschn. 1.3] |
 | `kontrastschwelle(A, B)` | $C = [((r_1 B^{-1/4} + r_2)^2/A)^q + (k_1 B^{-1/4} + k_2)^q]^{1/q}$, $F$ = 1; $B$ auf $10^{-5}$ bis $3{,}426\cdot10^{-2}$ cd/m$^2$ begrenzt | wahrnehmung.md 1.2 und 7 Punkt 1; [1, Gl. 47 bis 50] |
-| `schwelleAmOkular` | $C_\mathrm{th} = \varphi[(R_a/A_a)^q + C_a^q]^{1/q}$, $A_a = V^2 A$, $B_a = \min(1, (AP/p)^2)\,\tau(1-\epsilon^2)\,B$, $\varphi = F F_T$ ($F_T$ = 1 bei Fernglas und Auge); $\mu_\mathrm{lim} = \mu_\mathrm{Himmel} - 2{,}5\log_{10} C_\mathrm{th} - $ Extinktion | wahrnehmung.md 1.3, 1.4; [1, Gl. 77 bis 80, 84] |
+| `schwelleAmOkular` | $C_\mathrm{th} = \varphi[(R_a/A_a)^q + C_a^q]^{1/q}$, $A_a = V^2 A$, $B_a = \min(1, (AP/p)^2)\,\tau(1-\epsilon^2)\,B$, $\varphi = F F_T$ ($F_T$ = 1 bei Fernglas und Auge), fuer $B_a < 10^{-5}$ mal $10^{-5}/B_a$; $\mu_\mathrm{lim} = \mu_\mathrm{Himmel} - 2{,}5\log_{10} C_\mathrm{th} - $ Extinktion | wahrnehmung.md 1.3, 1.4; [1, Gl. 77 bis 80, 84] |
 | `grenzgroesse` | $m_0 = -2{,}5\log_{10}(\Delta I/Z)$, $\Delta I = (\delta_\mathrm{max}/D)^2 F_t\,\varphi\,B_a R_a$; Scheibe 2,8 FWHM: $m_\mathrm{lim} = m_0 - (2{,}5/q)\log_{10}[(\alpha/\alpha_{TR})^q + 1] - $ Extinktion, $\alpha_{TR} = R_a/(V^2 C_a)$ | wahrnehmung.md 2.2; [1, Gl. 68, 71, 81, 88] |
 | `sichtbareIsophote` | Reserve $d_i = \mu_\mathrm{lim}(\alpha_i) - \mu_i$, letzter Vorzeichenwechsel linear in $\mu$ und $\log_{10}\alpha$; keine sichtbar: groesstes $d_i$ | wahrnehmung.md 4.4 Punkt 2; [1, Abschn. 3.1] |
 | `deckkraft(v)`, `deckkraftStern(m, m_lim)` | $P = \Phi((v - 1)/0{,}484)$, Stern $v = 10^{-0{,}4(m - m_\mathrm{lim})}$; $\Phi$ ueber erf nach Abramowitz und Stegun 7.1.26 (Fehler unter $1{,}5\cdot10^{-7}$) | wahrnehmung.md 1.3, 4.4 Punkt 3; [A&S] |
 
-Testwerte: wahrnehmung.md 6 (Crumey-Kontrollwerte mit $F$ = 1, 2, 2,36; Tabelle 2.3 mit $F$ = 1,4). Gegenprobe ohne Literaturwert: fuer eine Scheibe der Flaeche $\alpha$ gilt $m_\mathrm{lim} = \mu_\mathrm{lim}(\alpha) - 2{,}5\log_{10}\alpha$ (Gl. 88 gegen Gl. 77); die beiden Nullpunkte 12,58 mag/arcsec$^2$ und $Z$ passen bis auf 0,004 mag zusammen.
+Testwerte: wahrnehmung.md 6 (Crumey-Kontrollwerte mit $F$ = 1, 2, 2,36; Tabelle 2.3 mit $F$ = 1,4). Gegenprobe ohne Literaturwert: fuer eine Scheibe der Flaeche $\alpha$ gilt $m_\mathrm{lim} = \mu_\mathrm{lim}(\alpha) - 2{,}5\log_{10}\alpha$ (Gl. 88 gegen Gl. 77), auch unter dem Nullhintergrund, wenn $C_\mathrm{th}$ dort relativ zu $10^{-5}$ cd/m$^2$ gilt und mit $10^{-5}/B_a$ auf den echten Himmel umgerechnet wird ($\Delta B$ fest, wahrnehmung.md 1.1); die beiden Nullpunkte 12,58 mag/arcsec$^2$ und $Z$ passen bis auf 0,004 mag zusammen.
 
-Abweichung: wahrnehmung.md 2.3 nennt fuer das Fernglas 10x50 bei Bortle 3 mit $F$ = 1,4 11,1 mag; ungerundet ergibt die Rechnung 10,66 ($F$ = 2) + 0,387 = 11,05 (11,1 ist vermutlich 10,7 + 0,39).
+Korrektur: wahrnehmung.md 2.3, Fernglas 10x50 bei Bortle 3 mit $F$ = 1,4, von 11,1 auf 11,0 mag (ungerundet 11,05).
 
 Quelle [A&S]: Abramowitz, M., Stegun, I. A.: *Handbook of Mathematical Functions*, NBS Applied Mathematics Series 55, 1964, Formel 7.1.26.

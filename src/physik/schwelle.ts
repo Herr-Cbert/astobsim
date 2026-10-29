@@ -68,7 +68,9 @@ function potenznorm(ricco: number, flaecheSr: number, kontrastGross: number): nu
 /**
  * Kontrastschwelle C(A, B) ohne Feldfaktor (F = 1) fuer eine gleichmaessige Flaeche A in
  * Steradiant auf dem Hintergrund B (Gl. 47, wahrnehmung.md 1.2): kleine Ziele Ricco (C A = R),
- * grosse C_inf. Wirft PhysikFehler bei A <= 0 oder B < 0 oder NaN.
+ * grosse C_inf. Bezug ist max(B, 1e-5): unter dem Nullhintergrund gilt C relativ zu 1e-5 cd/m^2,
+ * Delta B = C max(B, 1e-5) bleibt fest (Gl. 50, wahrnehmung.md 1.1). Wirft PhysikFehler bei A <= 0
+ * oder B < 0 oder NaN.
  */
 export function kontrastschwelle(flaecheSr: number, bCdM2: number): number {
   pruefePositiv("flaecheSr", flaecheSr);
@@ -85,12 +87,12 @@ function steradiant(flaecheArcsec2: number): number {
 /**
  * Himmel im Okular und gesamter Feldfaktor (Gl. 78 bis 80): B_a = min(1, (AP/p)^2) B / F_t mit
  * 1/F_t = tau (1 - eps^2), dieselbe Transmission wie der Hintergrund in okularhelligkeit()
- * (physik.md 6.2); phi = F F_T F_M mit F_T = sqrt 2 einaeugig, 1 beidaeugig, F_M = 1.
+ * (physik.md 6.2; zweite Stelle des Abschattungsfaktors neben okularhelligkeit()); phi = F F_T F_M mit F_T = sqrt 2 einaeugig, 1 beidaeugig, F_M = 1.
  */
 function okular(optik: Optik, muHimmel: number, beobachter: Beobachter): { bOkular: number; transmission: number; phi: number } {
   const transmission = optik.transmission * (1 - optik.obstruktion ** 2);
   const bOkular = leuchtdichteCdM2(muHimmel) * transmission * flaechenhelligkeitsfaktor(optik.austrittspupilleMm, beobachter.pupilleMm);
-  const phi = beobachter.feldfaktor * (optik.beidaeugig === true ? 1 : FELDFAKTOR_FERNROHR);
+  const phi = beobachter.feldfaktor * (optik.beidaeugig ? 1 : FELDFAKTOR_FERNROHR);
   return { bOkular, transmission, phi };
 }
 
@@ -108,7 +110,10 @@ export interface Schwelle {
 /**
  * Crumey Gl. 77 bis 80 (wahrnehmung.md 1.4): C_th = phi [(R_a / A_a)^q + C_a^q]^(1/q) mit
  * A_a = V^2 A (Flaeche im Auge), R_a, C_a bei B_a, phi = F F_T. Blosses Auge (V = 1, AP = p,
- * tau = 1) ergibt Gl. 47 mit dem Feldfaktor. flaecheArcsec2 ist die Flaeche am Himmel.
+ * tau = 1) ergibt Gl. 47 mit dem Feldfaktor. flaecheArcsec2 ist die Flaeche am Himmel. Unter dem
+ * Nullhintergrund (B_a < 1e-5) gilt C_th relativ zu 1e-5 und wird mit 1e-5 / B_a auf den echten
+ * Himmel umgerechnet: Delta B bleibt fest, mehr Vergroesserung bringt dann nur noch Groesse, und
+ * fuer eine Scheibe gilt m_lim = mu_lim(alpha) - 2,5 log10 alpha wie in grenzgroesse().
  */
 export function schwelleAmOkular(
   optik: Optik,
@@ -120,7 +125,10 @@ export function schwelleAmOkular(
   pruefePositiv("flaecheArcsec2", flaecheArcsec2);
   const { bOkular, phi } = okular(optik, muHimmel, beobachter);
   const { ricco, kontrastGross } = crumey(bOkular);
-  const kontrast = phi * potenznorm(ricco, optik.vergroesserung ** 2 * steradiant(flaecheArcsec2), kontrastGross);
+  // Unter dem Nullhintergrund bleibt Delta B fest (Gl. 50, 71): der Kontrast gegen den dunkleren
+  // echten Himmel B_a waechst mit 1e-5 / B_a, wie die feste Schwelle in grenzgroesse().
+  const nullbezug = Math.max(NULLHINTERGRUND_CD_M2, bOkular) / bOkular;
+  const kontrast = phi * potenznorm(ricco, optik.vergroesserung ** 2 * steradiant(flaecheArcsec2), kontrastGross) * nullbezug;
   return { kontrast, grenzMagProArcsec2: muHimmel - 2.5 * Math.log10(kontrast) - atmosphaere.extinktionMag };
 }
 
@@ -156,13 +164,18 @@ export function grenzgroesse(
 /**
  * Sichtbare Isophote eines Deep-Sky-Objekts: Flaechenhelligkeit (ausserhalb der Atmosphaere) und
  * eingeschlossene Flaeche, alleSichtbar wenn auch die schwaechste Zeile der Tabelle sichtbar ist,
- * verhaeltnis = C / C_th an dieser Stelle (1 am Vorzeichenwechsel, unter 1 wenn keine sichtbar).
+ * verhaeltnis = C / C_th an dieser Stelle (1 am Vorzeichenwechsel, unter 1 wenn keine sichtbar,
+ * ueber 1 moeglich bei alleSichtbar). schwelleMagProArcsec2 ist mu_lim(alpha) an dieser Stelle,
+ * also die Flaechenhelligkeit, die dort genau Deckkraft 0,5 haette: in allen drei Faellen gilt
+ * verhaeltnis = 10^(-0,4 (magProArcsec2 - schwelleMagProArcsec2)), am Vorzeichenwechsel sind beide
+ * gleich. Daraus q* = 10^(-0,4 (schwelleMagProArcsec2 - Quellweiss)) fuer Helligkeit.deepSky.
  */
 export interface SichtbareIsophote {
   magProArcsec2: number;
   flaecheArcsec2: number;
   alleSichtbar: boolean;
   verhaeltnis: number;
+  schwelleMagProArcsec2: number;
 }
 
 /**
@@ -190,7 +203,8 @@ export function sichtbareIsophote(
     magProArcsec2: isophoten[k]!.magProArcsec2,
     flaecheArcsec2: isophoten[k]!.flaecheArcsec2,
     alleSichtbar,
-    verhaeltnis: Math.pow(10, 0.4 * reserve[k]!)
+    verhaeltnis: Math.pow(10, 0.4 * reserve[k]!),
+    schwelleMagProArcsec2: isophoten[k]!.magProArcsec2 + reserve[k]!
   });
   if (reserve[letzte]! >= 0) return zeile(letzte, true);
   // Von hinten: die erste Zeile mit d >= 0 hat einen Nachfolger mit d < 0.
@@ -200,11 +214,13 @@ export function sichtbareIsophote(
     const t = dK / (dK - reserve[k + 1]!);
     const a = isophoten[k]!;
     const b = isophoten[k + 1]!;
+    const mu = a.magProArcsec2 + t * (b.magProArcsec2 - a.magProArcsec2);
     return {
-      magProArcsec2: a.magProArcsec2 + t * (b.magProArcsec2 - a.magProArcsec2),
+      magProArcsec2: mu,
       flaecheArcsec2: Math.pow(10, Math.log10(a.flaecheArcsec2) + t * (Math.log10(b.flaecheArcsec2) - Math.log10(a.flaecheArcsec2))),
       alleSichtbar: false,
-      verhaeltnis: 1
+      verhaeltnis: 1,
+      schwelleMagProArcsec2: mu
     };
   }
   let beste = 0;

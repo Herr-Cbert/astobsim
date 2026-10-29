@@ -43,8 +43,7 @@ export function flaechenhelligkeitsfaktor(austrittspupilleMm: number, pupilleMm:
  * Das Geraet als Skalare: Oeffnung in mm, Vergroesserung, Obstruktion 0 bis 0,5, Transmission
  * tau ohne Abschattung, Austrittspupille in mm, wahres Gesichtsfeld als Maske in Bogensekunden.
  * beidaeugig: Fernglas und blosses Auge (Feldfaktor F_T = 1 der Wahrnehmungsschwelle, Issue #96);
- * fehlt oder false heisst einaeugig wie am Fernrohr (F_T = sqrt 2). Optional, damit Optik-Literale
- * in Tests ohne das Feld gueltig bleiben; optik() setzt es immer.
+ * false heisst einaeugig wie am Fernrohr (F_T = sqrt 2).
  */
 export interface Optik {
   oeffnungMm: number;
@@ -53,7 +52,7 @@ export interface Optik {
   transmission: number;
   austrittspupilleMm: number;
   gesichtsfeld: Gesichtsfeld;
-  beidaeugig?: boolean;
+  beidaeugig: boolean;
 }
 
 /**
