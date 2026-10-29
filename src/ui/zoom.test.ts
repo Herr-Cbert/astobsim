@@ -17,6 +17,7 @@ import {
   detailstart,
   objektausdehnungArcsec,
   STERN_RAND_PRO_FWHM,
+  VERGLEICH_DEEP_SKY,
   vergleichsparameter,
   verschiebelage,
   ZOOM_ARBEITSPIXEL_MIN,
@@ -205,12 +206,77 @@ describe("Zoom ohne Quellbild (Doppelsterne, M45, Issue #109)", () => {
   });
 });
 
-describe("Hilfetext zum Vergleichsbild (Issue #109)", () => {
-  it("ohne Aufnahme der Text zu den berechneten Sternpunkten, sonst der zum Quellbild", () => {
+describe("Hilfetext zum Vergleichsbild (Issue #109, #110)", () => {
+  it("ohne Aufnahme der Text zu den berechneten Sternpunkten, bei Deep-Sky der zur Abbildung, sonst der zum Quellbild", () => {
     expect(quellbildHilfe(mit("albireo_2025").objekt)).toBe(TEXTE.hilfe.quellbildOhneAufnahme);
     expect(quellbildHilfe(mit("m45").objekt)).toBe(TEXTE.hilfe.quellbildOhneAufnahme);
     expect(quellbildHilfe(mit("jup_47").objekt)).toBe(TEXTE.hilfe.quellbild);
-    expect(quellbildHilfe(mit("m57").objekt)).toBe(TEXTE.hilfe.quellbild);
+    expect(quellbildHilfe(mit("m57").objekt)).toBe(TEXTE.hilfe.quellbildDeepSky[VERGLEICH_DEEP_SKY]);
+    for (const art of ["linear", "kubikwurzel", "okularOhneSchwelle"] as const) {
+      expect(quellbildHilfe(mit("m57").objekt, art)).toBe(TEXTE.hilfe.quellbildDeepSky[art]);
+      expect(quellbildHilfe(mit("jup_47").objekt, art)).toBe(TEXTE.hilfe.quellbild);
+    }
+  });
+});
+
+describe("Vergleichsbild bei Deep-Sky (Issue #110, Vorschlag)", () => {
+  // M57 am 80/600 bei 60x mit Testquelle: Stufen 1, 1e-3 und 0 (Werte relativ zu Quellweiss).
+  const k = mit("m57");
+  const n = 64;
+  const raster = neuesRaster(n, n, 1, 0);
+  for (let i = 0; i < n * n; i++) raster.daten[i] = i % n < 16 ? 1 : i % n < 32 ? 1e-3 : 0;
+  const massstab = 2;
+  const kk: Konfiguration = { ...k, objekt: { ...k.objekt, durchmesserArcsec: n * massstab, quelle: { ...k.objekt.quelle!, breitePx: n, hoehePx: n, massstabArcsecProPx: massstab } } };
+  const quelle = new QuelleAusRaster(raster, massstab);
+  const anblick = auswerten(kk, { fenster: { breiteArcsec: n * massstab, mitteXArcsec: 0, mitteYArcsec: 0, px: n } }).parameter;
+  const zeile = (v: ReturnType<typeof vergleichsparameter>): number[] => {
+    const d = rendere(v, quelle, new FalterJs()).raster.daten;
+    const mitte = Math.floor(n / 2) * n;
+    return [d[mitte + 8]!, d[mitte + 24]!, d[mitte + 48]!];
+  };
+
+  it("Standard ist die Kubikwurzel", () => {
+    expect(VERGLEICH_DEEP_SKY).toBe("kubikwurzel");
+    expect(vergleichsparameter(anblick, massstab).helligkeit).toEqual(vergleichsparameter(anblick, massstab, "kubikwurzel").helligkeit);
+  });
+
+  it("linear: Quellweiss = Bildschirmweiss, ohne deepSky; der Halo bei 1e-3 bleibt fast schwarz", () => {
+    const v = vergleichsparameter(anblick, massstab, "linear");
+    expect(v.helligkeit.deepSky).toBeUndefined();
+    const [weiss, halo, himmel] = zeile(v);
+    expect(weiss).toBeCloseTo(1, 5);
+    expect(halo).toBeCloseTo(1e-3, 6);
+    expect(himmel).toBe(0);
+  });
+
+  it("kubikwurzel: Quellweiss = Bildschirmweiss, 1e-3 wird 0,1, Himmel schwarz, keine Schwelle", () => {
+    const v = vergleichsparameter(anblick, massstab, "kubikwurzel");
+    expect(v.helligkeit.deepSky).toMatchObject({ faktor: 1, himmel: 0, sockel: 0 });
+    expect(v.helligkeit.punktExponent).toBe(anblick.helligkeit.punktExponent);
+    const [weiss, halo, himmel] = zeile(v);
+    expect(weiss).toBeCloseTo(1, 5);
+    expect(halo).toBeCloseTo(0.1, 5);
+    expect(himmel).toBe(0);
+  });
+
+  it("okularOhneSchwelle: Helligkeit und Himmel wie im Anblick, ohne Schwelle und Sockel", () => {
+    const v = vergleichsparameter(anblick, massstab, "okularOhneSchwelle");
+    const ds = anblick.helligkeit.deepSky!;
+    expect(v.helligkeit.deepSky).toMatchObject({ faktor: ds.faktor, himmel: ds.himmel, sockel: 0 });
+    expect(v.helligkeit.punktFaktor).toBe(anblick.helligkeit.punktFaktor);
+    const [weiss, halo] = zeile(v);
+    expect(weiss).toBeCloseTo(Math.min(1, Math.pow(ds.faktor + ds.himmel, 1 / 3)), 4);
+    expect(halo).toBeCloseTo(Math.min(1, Math.pow(ds.faktor * 1e-3 + ds.himmel, 1 / 3)), 4);
+  });
+
+  it("jede Abbildung hat einen eigenen Helligkeitsschluessel, Planeten bleiben wie bisher", () => {
+    const schluessel = (["linear", "kubikwurzel", "okularOhneSchwelle"] as const).map((a) => vergleichsparameter(anblick, massstab, a).helligkeit.schluessel);
+    expect(new Set(schluessel).size).toBe(3);
+    const jup = mit("jup_47");
+    const p = auswerten(jup, { fenster: zoomfenster(jup, { xArcsec: 0, yArcsec: 0 }, 200) }).parameter;
+    for (const a of ["linear", "kubikwurzel", "okularOhneSchwelle"] as const) {
+      expect(vergleichsparameter(p, jup.objekt.quelle!.massstabArcsecProPx, a).helligkeit).toEqual(vergleichsparameter(p, jup.objekt.quelle!.massstabArcsecProPx, "linear").helligkeit);
+    }
   });
 });
 

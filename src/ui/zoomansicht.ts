@@ -13,7 +13,7 @@ import { hilfesymbol } from "./hilfe";
 import type { Steuerung, Zoombilder } from "./steuerung";
 import { zeichneAnblick } from "./zeichne";
 import { verbindeBild } from "./ziehen";
-import { detailbreiteArcsec, verschiebelage } from "./zoom";
+import { detailbreiteArcsec, VERGLEICH_DEEP_SKY, type Vergleichsabbildung, verschiebelage } from "./zoom";
 
 /** Die Plaetze, die die Zoomansicht braucht: ihr eigenes Element und das Gesichtsfeld, das sie ersetzt. */
 export interface ZoomPlaetze {
@@ -33,10 +33,12 @@ export interface Zoomansicht {
 
 /**
  * Hilfetext zum Vergleichsbild: bei Objekten ohne Aufnahme (ohne quelle, Issue #109) der Hinweis auf
- * die berechneten idealen Sternpunkte, sonst der Text zum Quellbild.
+ * die berechneten idealen Sternpunkte, bei Deep-Sky mit Aufnahme der Text zur Abbildung des
+ * Vergleichsbilds (Issue #110, zoom.ts), sonst der Text zum Quellbild.
  */
-export function quellbildHilfe(objekt: Objektzustand): string {
-  return objekt.quelle === undefined ? TEXTE.hilfe.quellbildOhneAufnahme : TEXTE.hilfe.quellbild;
+export function quellbildHilfe(objekt: Objektzustand, abbildung: Vergleichsabbildung = VERGLEICH_DEEP_SKY): string {
+  if (objekt.quelle === undefined) return TEXTE.hilfe.quellbildOhneAufnahme;
+  return objekt.klasse === "deep_sky" ? TEXTE.hilfe.quellbildDeepSky[abbildung] : TEXTE.hilfe.quellbild;
 }
 
 /** Ein Bild der Zoomansicht: Beschriftung mit Hilfesymbol ueber dem Canvas. */

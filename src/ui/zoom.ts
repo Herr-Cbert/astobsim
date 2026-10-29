@@ -5,7 +5,7 @@
 //
 // Koordinaten wie in der Naht: Objektmitte 0/0, +x rechts, +y Norden (A-D11), Bogensekunden.
 
-import type { Kern, Simulationsparameter } from "../naht/simulationsparameter";
+import type { Helligkeit, Kern, Simulationsparameter } from "../naht/simulationsparameter";
 import { arbeitsmassstabOhneFenster, atmosphaere, aufloesung, type Konfiguration, optik } from "../physik";
 import type { Mitte } from "./verschieben";
 import { verschiebbar } from "./verschieben";
@@ -139,11 +139,53 @@ export function detailstart(k: Konfiguration): Mitte | undefined {
 const VERGLEICH = "vergleich";
 
 /**
+ * Abbildung des Vergleichsbilds bei Deep-Sky-Objekten mit Quellbild (architektur.md 5.7, Issue
+ * #110; Vorschlag, Entscheidung Herbert). Linear mit Quellweiss = Bildschirmweiss zeigt den
+ * schwachen Halo kaum, deshalb drei Moeglichkeiten, alle ueber Helligkeit.deepSky ohne Aenderung an bild:
+ * - "linear": wie bei Mond und Planeten, Quellweiss = Bildschirmweiss, linear (deepSky entfaellt).
+ * - "kubikwurzel": Quellweiss = Bildschirmweiss, Pixel q^n mit dem Exponenten n des Anblicks
+ *   (1/3), ohne Himmel, Schwelle und Sockel; Punktquellen mit demselben Exponenten.
+ * - "okularOhneSchwelle": Helligkeit wie im Okular (faktor, Himmel und n des Anblicks), aber
+ *   ohne Schwelle und Sockel; Punktquellen wie im Anblick.
+ */
+export type Vergleichsabbildung = "linear" | "kubikwurzel" | "okularOhneSchwelle";
+
+/** Gewaehlte Abbildung fuer Deep-Sky (Vorschlag Issue #110); austauschbar an dieser einen Stelle. */
+export const VERGLEICH_DEEP_SKY: Vergleichsabbildung = "kubikwurzel";
+
+/**
+ * Schwelle q* des Vergleichsbilds: so klein, dass die Deckkraft Phi((q / q* - 1) / Breite) fuer
+ * jedes q > 0 aus einem 8-Bit-Quellbild (kleinster Wert ueber 1e-10) gleich 1 ist; bei q = 0
+ * bleibt das Pixel ohne Sockel und mit Himmel 0 schwarz.
+ */
+const OHNE_SCHWELLE = 1e-30;
+
+/** Helligkeit des Vergleichsbilds (schluessel VERGLEICH); bei deepSky nach der Abbildung, sonst linear. */
+function vergleichshelligkeit(h: Helligkeit, abbildung: Vergleichsabbildung): Helligkeit {
+  const linear: Helligkeit = { ...h, schluessel: VERGLEICH, faktorObjekt: 1, hintergrundRelativ: 0, punktFaktor: 1, punktExponent: 1 };
+  const ds = h.deepSky;
+  if (ds === undefined || abbildung === "linear") {
+    delete linear.deepSky;
+    return linear;
+  }
+  if (abbildung === "kubikwurzel") {
+    return {
+      ...linear,
+      schluessel: `${VERGLEICH}|${abbildung}`,
+      punktExponent: h.punktExponent,
+      deepSky: { faktor: 1, himmel: 0, schwelleRelativ: OHNE_SCHWELLE, breite: ds.breite, sockel: 0 }
+    };
+  }
+  return { ...h, schluessel: `${VERGLEICH}|${abbildung}|${h.schluessel}`, deepSky: { ...ds, schwelleRelativ: OHNE_SCHWELLE, sockel: 0 } };
+}
+
+/**
  * Parameter des Vergleichsbilds zum Zoom-Anblick (Entscheidung Herbert 2026-10-27): dasselbe
  * Fenster, Gesichtsfeld und dieselben Punktquellen, aber ein 1x1-Delta-Kern (keine Faltung) und
  * neutrale Helligkeit (faktorObjekt 1, hintergrundRelativ 0, also Quellweiss = Bildschirmweiss,
  * ohne die Leuchtdichte-Abbildung aus #55; Punktebene linear mit punktFaktor 1 und punktExponent 1,
  * also wie vor Issue #72 nur auf 1 begrenzt). So rechnet rendere ohne Aenderung an bild.
+ * Deep-Sky mit Quellbild (Helligkeit.deepSky): nach abbildung, Standard VERGLEICH_DEEP_SKY (Issue #110).
  *
  * Ohne Quellbild (quellmassstab 0) bestimmt allein die Anzeige das Raster.
  *
@@ -152,7 +194,11 @@ const VERGLEICH = "vergleich";
  * groben Raster des Anblicks waere das Vergleichsbild beim Hochskalieren bilinear verschmiert,
  * also nicht "unverschlechtert" (A-D3). Invariante rasterPx * massstab = fenster.breite bleibt.
  */
-export function vergleichsparameter(anblick: Simulationsparameter, quellmassstabArcsecProPx: number): Simulationsparameter {
+export function vergleichsparameter(
+  anblick: Simulationsparameter,
+  quellmassstabArcsecProPx: number,
+  abbildung: Vergleichsabbildung = VERGLEICH_DEEP_SKY
+): Simulationsparameter {
   const { fenster, quellbild, kern, helligkeit } = anblick;
   const massstabMin = Math.max(quellmassstabArcsecProPx, fenster.breiteArcsec / fenster.px);
   // 1e-9 wie in physik (arbeitsraster): breite / (breite / px) ergibt sonst px - 1e-13.
@@ -177,6 +223,6 @@ export function vergleichsparameter(anblick: Simulationsparameter, quellmassstab
       rasterPx
     },
     kern: delta,
-    helligkeit: { ...helligkeit, schluessel: VERGLEICH, faktorObjekt: 1, hintergrundRelativ: 0, punktFaktor: 1, punktExponent: 1 }
+    helligkeit: vergleichshelligkeit(helligkeit, abbildung)
   };
 }

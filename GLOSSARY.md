@@ -200,7 +200,7 @@ Anteil 0 bis 1, mit dem ein Stern oder ein Deep-Sky-Pixel ueber dem Himmel ersch
 _Vermeiden_: Alpha, Transparenz (ist eine Bedingung)
 
 **Mischgewicht**:
-Anteil g zwischen 0 (Flaeche) und 1 (Punktquelle), mit dem ein unaufgeloester Zustand in die Punktebene statt in die Flaechenebene geht (A-P10); haengt an Winkelgroesse mal Vergroesserung.
+Anteil g zwischen 0 (Flaeche) und 1 (Punktquelle), mit dem ein unaufgeloester Zustand in die Punktebene statt in die Flaechenebene geht (A-P10); haengt an Winkelgroesse mal Vergroesserung. Ab g = 0,5 (scheinbar etwa 1,7') nennt das Infopanel den Zustand "unaufgeloest" (#110).
 
 **Sockel**:
 Fester Zuschlag zur Anzeigehelligkeit eines Deep-Sky-Objekts, mit der Deckkraft gewichtet, damit ein Pixel an der Wahrnehmungsschwelle mindestens 3 sRGB-Kodes ueber dem Himmel liegt (Mindestsichtbarkeit, ADR-0004).
@@ -224,7 +224,7 @@ Das schmalere Fenster der Zoomansicht (Schaltflaeche "Detail", Issue #77): 120 A
 _Vermeiden_: Zoomstufe (ist eine Stufe der Kachelpyramide), Detailzoom
 
 **Vergleichsbild**:
-Das Quellbild rechts in der Zoomansicht: dasselbe Zoomfenster, dieselbe Maske und dieselben Punktquellen wie der Anblick, aber ohne Faltung (1x1-Delta-Kern) und ohne Helligkeitsanpassung (Quellweiss = Bildschirmweiss), auf einem Raster so fein wie Quelle und Anzeige es hergeben. Technisch ein `Anblick` aus `rendere`, inhaltlich kein Anblick.
+Das Quellbild rechts in der Zoomansicht: dasselbe Zoomfenster, dieselbe Maske und dieselben Punktquellen wie der Anblick, aber ohne Faltung (1x1-Delta-Kern) und ohne Helligkeitsanpassung (Quellweiss = Bildschirmweiss), auf einem Raster so fein wie Quelle und Anzeige es hergeben. Technisch ein `Anblick` aus `rendere`, inhaltlich kein Anblick. Bei Deep-Sky-Objekten mit Quellbild ist die Helligkeit gestreckt (Kubikwurzel, Quellweiss bleibt Bildschirmweiss, `Vergleichsabbildung` in `src/ui/zoom.ts`; Vorschlag aus #110, Entscheidung Herbert offen).
 _Vermeiden_: Originalbild, Referenzbild
 
 ### Daten
