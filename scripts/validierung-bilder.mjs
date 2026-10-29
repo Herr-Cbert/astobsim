@@ -35,9 +35,9 @@ const B = "b=5&t=klar&h=90";
 const refraktor = (d, f, ok) => `a=fernrohr&ba=refraktor&d=${d}&f=${f}&o=0&ok=${ok}&sg=50`;
 
 /**
- * Die Faelle aus docs/validierung.md: Name, Suchteil der URL, optional die Pfeiltaste und Anzahl
- * der Schritte mit Umschalt (je 25 % der Detailbreite), die das Detail an die gepruefte Stelle
- * schieben (T3: knapp rechts vom Terminator, Issue #77).
+ * Die Faelle aus docs/validierung.md (T1 bis T6, Mondphasen P1 bis P3): Name, Suchteil der URL,
+ * optional die Pfeiltaste und Anzahl der Schritte mit Umschalt (je 25 % der Detailbreite), die das
+ * Detail an die gepruefte Stelle schieben (T3: knapp rechts vom Terminator, Issue #77).
  */
 export const FAELLE = [
   ["T1", `${refraktor(70, 700, 7)}&z=jup_47&s=2`],
@@ -52,7 +52,14 @@ export const FAELLE = [
   ["T5b", `${refraktor(80, 960, 8)}&z=mars_6&s=1.5`],
   ["T6a", `g=auge&z=mond_ev&s=2`],
   ["T6b", `g=auge&z=jup_47&s=2`],
-  ["T6c", `g=fernglas-10x50&z=jup_47&s=2`]
+  ["T6c", `g=fernglas-10x50&z=jup_47&s=2`],
+  // Mondphasen (Issue #36): je Zustand blosses Auge und 10x50 bzw. 80 mm bei 100-fach wie T3.
+  ["P1a", `g=auge&z=mond_sichel&s=2`],
+  ["P1b", `g=fernglas-10x50&z=mond_sichel&s=2`],
+  ["P2a", `g=auge&z=mond_voll&s=2`],
+  ["P2b", `${refraktor(80, 800, 8)}&z=mond_voll&s=2`],
+  ["P3a", `g=auge&z=mond_lv&s=2`],
+  ["P3b", `${refraktor(80, 800, 8)}&z=mond_lv&s=2`]
 ].map(([name, such, detail]) => ({ name, such: `?v=1&${such}&${B}`, detail }));
 
 if (!existsSync(join(bau, "index.html"))) {
