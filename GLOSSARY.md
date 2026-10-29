@@ -64,6 +64,10 @@ _Vermeiden_: Kategorie, Typ
 Ein Objekt aus zwei Sternen mit Trennung in Bogensekunden, ohne Quellbild; aus einer festen Katalogliste oder als freies Paar eingestellt.
 _Vermeiden_: Doppel, Paar (allein)
 
+**Mehrfachstern**:
+Ein Objekt der Objektklasse Doppelstern aus mehr als zwei Sternen eines Systems (Epsilon Lyrae), in seiner echten Lage mit Norden oben; Doppelsterne aus zwei Sternen bleiben fest Ost-West (A-Z9). Entschieden in Phase 2 Version 2 (`docs/recherche/README.md`).
+_Vermeiden_: Vierfachstern, Doppel-Doppelstern
+
 **Deep-Sky-Objekt**:
 Ein Objekt ausserhalb des Sonnensystems mit eigener Flaechenhelligkeit (Nebel, Galaxie, Sternhaufen), z. B. M31, M42, M13, M45, M57. Kann Sterne enthalten.
 _Vermeiden_: DSO, Nebel (fuer alle)

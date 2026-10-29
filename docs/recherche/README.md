@@ -69,3 +69,81 @@ Noch offen: Punkte 4 (Hubble-Lizenz-Lesart), 7 (A-F8-Grenzen), 9 (Monddurchmesse
 - Objektzustaende, Mondstellungen und JSON-Vorschlag: objekte.md Abschnitt 6.
 - Empfohlene Bilder je Zustand mit URL, Lizenz, Pixelmass und Bildnachweis-Format: bilder.md Empfehlung und Abschnitt 8. Bilder werden erst nach Lizenzfreigabe geholt (bilder.md Abschnitt 9 nennt die Pruefschritte).
 - Mond: 7600 px Durchmesser bei 0,25"/px, als eine Datei 14 bis 22 MB JPEG; Kacheln oder Stufen sind fuer A-X6 noetig (bilder.md Abschnitt 7). Entscheidung in ADR-003.
+
+---
+
+# Recherche Version 2 (Phase 2, 2026-10-29)
+
+Input war `docs/anforderungen.md` Abschnitt 10. Vier Recherche-Auftraege liefen parallel, die Messung der Anzeigehelligkeit in der Hauptsession. Aufbau je Datei wie in Version 1.
+
+| Datei | Auftrag | Kennungen |
+|---|---|---|
+| [helligkeit-v2.md](helligkeit-v2.md) | Messung sRGB in T1 bis T6, Konstanten der Abbildung, Planeten als Punktquelle | A-P13, A-P4, A-P10 |
+| [wahrnehmung.md](wahrnehmung.md) | Kontrastschwelle (Blackwell, Crumey), Grenzgroesse, Uebergang Flaeche zu Punkt, gemeinsame oder getrennte Abbildung, Sternfarbe | A-P10, A-P11, A-P12, A-B2 |
+| [doppelsterne.md](doppelsterne.md) | Katalogliste aus WDS, ORB6, Hipparcos, BSC; Modellrechnung der Trennung; Datenformat | A-Z9, A-D18 |
+| [deep-sky.md](deep-sky.md) | Groessen, Helligkeiten, Profile von M31, M42, M13, M57; Sterne von M45, Trapez, M13 aus Gaia DR3; Datenformat | A-Z10, A-X9 |
+| [bilder-v2.md](bilder-v2.md) | Quellbilder M31, M42, M13, M57 mit Lizenz; Mondphasen aus NASA SVS 5587; Bildnachweise | A-X7, A-X11, A-Z10 |
+
+**Stichproben bei der Zusammenfuehrung** (alle stimmten): Harris 2010 fuer M13 ($V_t$ 5,78, $\mu_V(0)$ 16,59, $r_c$ 0,62', $c$ 1,53) im Katalog `mwgc.dat`; ESO eso1103a (Credit, 8948 x 8597 px, 35,49' x 34,10', WFI, Filter); Bildnummern der drei Mondphasen und von `mond_ev` gegen `data/roh/mooninfo_2026.json` (Zeit, Phase, Alter, Durchmesser); Ballesteros 2012 (B-V 0,65 ergibt 5778 K, nachgerechnet); Gaia/Hipparcos-Lizenz CC BY-NC 3.0 IGO in den ESA-Bedingungen der Weltraum-Archive; Crumey 2014 als MNRAS-Artikel (arXiv 1405.4209). Nicht pruefbar war die NOIRLab-Bildseite von M13 (Seite leer abgerufen); die Aussage "Kern nicht ueberbelichtet" bleibt bis zum Blick in die Datei offen.
+
+## Antworten auf die offenen Fragen aus Anforderungen Abschnitt 10
+
+| Nr | Frage | Antwort in Kurzform | Wo |
+|---|---|---|---|
+| 1 | Helligkeit A-P13 | Gemessen: Mond P99 bei AP 1 mm sRGB 113, mit blossem Auge 182; Jupiter mit blossem Auge 81. (i) braucht Faktor 6,2 linear. **Entschieden:** $n$ = 1/3 bleibt, Anzeigeweiss etwa 9,2 mag/arcsec$^2$ fuer Objekt und Himmel, Punktebene eigenes Weiss etwa 6,4; nach A-P10 nachmessen. | helligkeit-v2.md 1 bis 4 |
+| 2 | Uebergang Flaeche zu Punkt (A-P10) | Zwei Kriterien: Sichtbarkeit an der Schwelle ueber die Ricco-Flaeche (in Crumeys Formel enthalten), Form heller Objekte ueber die Sehschaerfe 1'. Mischgewicht $g = 1/(1 + 0{,}3466\,x^2)$, $x = \theta V / 60''$ (eigene Herleitung): Jupiter blosses Auge 0,83, 10x 0,045. | wahrnehmung.md 3 |
+| 3 | Kontrastschwelle (A-P11) | Crumey 2014 Gl. 47 (Auge), Gl. 77 bis 88 (Fernrohr), gueltig 1e-5 bis 3,4e-2 cd/m$^2$. **Entschieden:** Feldfaktor $F$ = 2 (typischer Beobachter). Grenzgroesse blosses Auge 6,2 / 6,0 / 5,5 / 5,0 / 4,8 bei Bortle 1/3/5/7/9; 80 mm 10,4 bis 12,7, 200 mm 12,1 bis 14,3. Bei dunklem Himmel 1 bis 2 mag unter Bortle (geuebter Beobachter). | wahrnehmung.md 1, 2, 7 |
+| 4 | Getrennte oder gemeinsame Abbildung | Getrennt haengt der angezeigte Kontrast an Quellweiss (M31-Aussenbereich Faktor 15 zu schwach), gemeinsam allein bleiben Objekte an der Schwelle 0 bis 2 sRGB-Stufen ueber dem Himmel. Vorschlag: Deep-Sky-Ebene gemeinsam mit dem Himmel, Sonnensystem getrennt wie bisher, Schwelle per Isophote vor der Abbildung, gleitend nach Blackwell, Mindestsichtbarkeit je Objekt. Entwurf ADR-0004. | wahrnehmung.md 4, `docs/adr/0004-helligkeit-und-wahrnehmungsschwelle.md` |
+| 5 | Sternfarbe (A-P12) | B-V ueber Ballesteros zu $T$, Planck und CIE 1931 zu sRGB (D65). Farbe ab $3{,}1\cdot10^{-7}$ lx am Auge, entspricht 2,3 mag mit blossem Auge, etwa 7,8 mag am 80 mm, 9,6 mag am 200 mm (Quelle duenn). | wahrnehmung.md 5 |
+| 6 | Doppelsternliste (A-Z9) | 14 Objekte, 16 Paare von Albireo (34,3'') bis 52 Ari (0,56''), ungleiche Paare Zeta Her, Antares ($\Delta m$ 4,44), Polaris; Bahnpaare mit ORB6-Ephemeride 2027,0. Ausgeschlossen: Sirius, Rigel, 44 Boo, Eta CrB, Lambda Cas, Zeta Boo. | doppelsterne.md 2, 5 |
+| 7 | Deep-Sky-Bilder und Sternkataloge | M31 NOIRLab LGS-Panorama (CC BY 4.0, auf 4''/px), M42 ESO eso1103a (CC BY 4.0, V-Kanal, Rohdaten CC BY 4.0), M13 NOIRLab Mayall 4 m (CC BY 4.0, Kern laut Seite nicht ueberbelichtet), M57 Hubble heic1310a bzw. linear OIII aus MAST. Profile: M31 Modell (Courteau 2011 + angepasste Scheibe), M13 King nach Harris 2010, M42 und M57 nur sekundaer. Sterne aus Gaia DR3: M45 44 Mitglieder bis V 8,5, Trapez A bis F, M13 2105 Mitglieder. | bilder-v2.md, deep-sky.md |
+| 8 | Mondphasen SVS 5587 | Frames 6173 (Sichel 4,0 d, 17 %), 6449 (Vollmond), 6615 (letztes Viertel), derselbe Umlauf wie `mond_ev` (6285). Nachtseite im Rendering etwa zehnfach heller als Erdlicht. | bilder-v2.md 8 |
+| 9 | Testfaelle T7 bis T12 | Vorschlag unten. | wahrnehmung.md 8, doppelsterne.md 6, deep-sky.md 8, bilder-v2.md 10 |
+
+## Vorschlag Testfaelle T7 bis T12 (A-Q5, Herbert bestaetigt)
+
+Bedingungen wie T1 bis T6, falls nicht anders genannt: klar, Bortle 5, Zenit.
+
+| Nr | Fall | Erwartung | Quelle |
+|---|---|---|---|
+| T7 | Pi Aql (1,40'') und Epsilon Ari (1,27''): 80 mm gegen 150 mm, Seeing 0,5'' | 80 mm: beide nicht getrennt (laenglich); 150 mm: beide getrennt | Dawes 1867, Haas; doppelsterne.md TD2 |
+| T8 | Epsilon Lyrae im 10x50 und am 80 mm bei 160x | 10x50: zwei runde Sterne; 80 mm, Seeing 0,5'': beide engen Paare getrennt; Seeing 2'': im Langzeitmittel nicht (wie T2) | Haas, Beobachtungsfuehrer; doppelsterne.md TD1 |
+| T9 | Antares am 150 mm, 200x | Seeing 0,5'': Begleiter getrennt, Hinweis "Ueberstrahlung nicht simuliert"; Seeing 1,5'' oder 15 Grad Hoehe: nicht getrennt | Haas, Lord; doppelsterne.md TD3 |
+| T10 | M57 am 80 mm, etwa 80x, und am 150 mm | 80 mm: kleines Oval sichtbar, Loch hoechstens angedeutet; 150 mm: Ring mit dunkler Mitte | Beobachtungsfuehrer (sekundaer, uneins); deep-sky.md 8 Punkt 1 |
+| T11 | Blosses Auge: M31 und Plejaden bei Bortle 3 und 7 | Bortle 3: M31 deutlich, laenglich, 1,5 bis 3 Grad; Plejaden 14 bis 21 Sterne. Bortle 7: M31 nur Kern sehr undeutlich; Plejaden sechs Sterne. Infopanel-Grenzgroesse etwa 6,0 bzw. 5,0 | Bortle 2001, Crumey 2014; wahrnehmung.md W1, W2; deep-sky.md 8 Punkte 2, 3 |
+| T12 | Helligkeit (A-P13) | Mond am 80 mm bei AP 1 mm: hellstes Perzentil Bildschirmweiss; Jupiter mit blossem Auge im Kern nahezu weiss, Mars 14'' und Saturn deutlich dunkler; T1 bis T6 weiter erfuellt | A-P13, helligkeit-v2.md |
+
+Reserve, falls Herbert tauschen will: M13 am 200 mm gegen 80 mm (Rand aufgeloest, deep-sky.md 8 Punkt 4), Trapez am 80 mm gegen 200 mm (E und F, Punkt 5), Grenzgroesse am 200 mm bei 50/100/200x (wahrnehmung.md W3), Sternfarbe Antares und Albireo (W4), Zeta Her (TD4).
+
+## Entschieden von Herbert am 2026-10-29
+
+- Konstanten der Abbildung (Frage 1): Empfehlung aus helligkeit-v2.md 4 angenommen.
+- Feldfaktor $F$ = 2 (wahrnehmung.md 7).
+- Entscheidungen 1 bis 7 unten: 1 ja (Sterndaten mit eigener Lizenz), 2 ja (lineare Archivdaten fuer M42, M57, M13; M31 per Tonkurve gegen das Profil), 3 Testfaelle mit Seeing 0,5'', A-B6 bleibt Kann, der Hilfetext nennt das Langzeitmittel, 4 Begriff "Mehrfachstern" fuer Systeme mit mehr als zwei Sternen (GLOSSARY), 5 ja, 6 Nachtseite auf Schwarz, 7 ja (Polaris B 8,6 mag).
+
+## Entscheidungen vor Phase 3 (alle entschieden, siehe oben)
+
+1. **Lizenz der Sterndaten.** Gaia DR3 und Hipparcos stehen unter CC BY-NC 3.0 IGO (nicht kommerziell); der Code steht unter MIT. Vorschlag: Sterndaten unter `daten/` behalten ihre eigene Lizenz wie die Bilder, Nachweis in den Daten und ein Abschnitt "Sterndaten" in README und Seitenfuss. Alternative ohne NC (WDS gemeinfrei, Yale BSC bis etwa 6,5 mag) deckt M13 und die schwachen Plejaden nicht. deep-sky.md 6, doppelsterne.md 3.
+2. **Linearitaet der Deep-Sky-Bilder.** Alle Pressebilder sind nichtlinear gestreckt, die Eichung von Quellweiss (objekte.md 5.3) setzt lineare Pixel voraus. Vorschlag: lineare Archivdaten, wo die Lizenz belegt ist (M42 ESO-Archiv, M57 MAST, M13 NOIRLab-Archiv), fuer M31 das Pressebild per Tonkurve gegen das Profil aus deep-sky.md zurueckrechnen. bilder-v2.md Unsicher 1.
+3. **Ruhiger Moment (A-B6).** Bei der Voreinstellung 2'' trennt das Langzeitmodell weder Epsilon Lyrae am 80 mm noch Paare an der Dawes-Grenze, wie bei der Cassini-Teilung (physik.md 15). Fuer Einsteiger ist "trenne ich Epsilon Lyrae?" die typische Frage. Optionen: A-B6 auf Muss V2 hochstufen, oder die Testfaelle mit Seeing 0,5'' fuehren und den Hilfetext ergaenzen. Ausserdem liegt die Schwelle "getrennt" ($\delta \ge$ 0,125) etwas hinter Dawes und Haas (Epsilon Ari am 100 mm auch ohne Seeing nicht getrennt). doppelsterne.md 4, 7.
+4. **Epsilon Lyrae mit vier Sternen** widerspricht GLOSSARY "Doppelstern: zwei Sterne", und die feste Ost-West-Lage (A-Z9) passt bei vier Sternen nicht. Vorschlag: Glossar "zwei oder mehr Sterne eines Systems", fuer Mehrfachsysteme die echte Geometrie (Norden oben), Paare weiter Ost-West. doppelsterne.md 7.
+5. **Blendungsregel fuer Sterne.** A-P6 (Abstand scheinbar unter 10', Unterschied ueber 6 mag) unterdrueckt Polaris B unter 33x. Vorschlag: Regel gilt auch fuer Sterne; der 4-mag-Hinweis nur bei Paaren unter etwa 10'' Trennung.
+6. **Nachtseite des Mondes** in den SVS-Bildern: Vorschlag auf Schwarz setzen (Erdlicht ist A-X8, Kann), Vermerk in `bearbeitung`. bilder-v2.md 8.
+7. **Polaris B:** WDS 9,10, SIMBAD 8,20, Usenko 8,60 mag; Vorschlag 8,6.
+
+## Fachliche Luecken
+
+- M31: Zentralhelligkeit der Scheibe ($\mu_{0,V}$ 20,2) an RC3 angepasst, nicht gemessen; sichtbare Ausdehnung etwa Faktor 1,5 unsicher (deep-sky.md 1).
+- M42 und M57: keine V-Profile aus der Fachliteratur, M57 V 8,8 nur sekundaer; ob bei Emissionsnebeln visuell die Leuchtdichte Y oder der Gruenkanal zaehlt, ist offen.
+- Uebergangsfunktion Flaeche zu Punkt: eigene Herleitung, belegt ist nur die Groessenordnung 1'.
+- Farbschwelle 2,3 mag nur aus einer Fussnote (Protte & Hoffmann 2020); Uebertragung aufs Fernrohr ist Annahme.
+- Blackwell, Knoll, Hecht, Clark und CIE 191:2010 nur ueber Crumey gelesen; Haas, Lord und Treanor nur ueber eine Amateur-Zusammenstellung.
+- Trapez E und F: Gaia und WDS bis 1,5 mag verschieden; B-V roter Sterne aus Gaia nur extrapoliert.
+- Mondbilder: Massstab 0,643''/px angenommen, nach dem Laden nachmessen; `tools/mond_kacheln.py` hat Frame 6285 fest eingebaut.
+
+## Was Phase 3 aus der Recherche Version 2 uebernimmt
+
+- ADR-0004 (Entwurf) mit den Entscheidungen oben; Glossar fuer Deep-Sky-Ebene, Isophote, Feldfaktor.
+- Formeln und Testwerte: wahrnehmung.md 6, helligkeit-v2.md, doppelsterne.md 4.
+- Datenformat: doppelsterne.md 3 (`typ: "doppelstern"`, `sterne[]`), deep-sky.md 7 (`typ: "deep_sky"`, `profil`, `sterne[]`); als Nachtrag zu ADR-0003.
+- Bildnachweise als JSON-Vorschlag: bilder-v2.md 9. Bilder erst nach Lizenzfreigabe holen.
