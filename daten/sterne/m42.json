@@ -1,0 +1,80 @@
+{
+  "objekt": "m42",
+  "quelle": "ESA Gaia DR3 (gaiadr3.gaia_source; Gaia Collaboration, Vallenari et al. 2023, A&A 674, A1) und Hipparcos (ESA 1997, ESA SP-1200, public.hipparcos), abgefragt im Gaia-Archiv https://gea.esac.esa.int/tap-server/tap/sync; V von Theta1 Ori E aus dem Washington Double Star Catalog (Mason et al., WDS 05353-0523, STF 748). Credit: ESA, Gaia DPAC; Hipparcos: ESA.",
+  "lizenz": "CC BY-NC 3.0 IGO (https://creativecommons.org/licenses/by-nc/3.0/igo/), Daten der ESA Space Science Archives; kommerzielle Nutzung nur nach Genehmigung (data.licences@esa.int, https://www.cosmos.esa.int/web/esdc/terms-and-conditions)",
+  "kommentar": "Erzeugt von tools/m42_sterne,py aus zwei Abfragen im Gaia-Archiv (Abruf 2026-10-29, ADQL und SHA-256 in data/roh/LIESMICH,md): Theta1 Ori A bis F (Trapez) und Theta2 Ori A und B (deep-sky,md 2,2), Lage aus Gaia DR3 (Epoche 2016,0) relativ zu Theta1 Ori C, dx nach Westen (Norden oben, Osten links), dy nach Norden; Probe gegen die WDS-Abstaende von STF 748 auf 0,5'', katalog nennt die Herkunft von V: HIP = Hipparcos (C, D, Theta2 A), Gaia DR3 = V aus G und BP-RP (physik,md 22; A, weil Hipparcos dort C mitzaehlt, B, F, Theta2 B), WDS fuer E, quelle_farbe: HIP oder GDR3 (BP-RP = f(B-V), Tabelle 5,9, invertiert), Unsicher: E und F bis 1,5 mag, E: WDS 11,1, Gaia ergaebe 10,06; F: Gaia 10,03, WDS 11,5. Beide stehen 4,5'' neben A bzw. C im hellsten Nebel; Gaia-BP/RP-Ueberschuss 1,43, also Fremdlicht in BP und RP. A (V1016 Ori) und B (BM Ori) sind Bedeckungsveraenderliche, C ist ein enges Paar. Summe der Sterne V 3,92.",
+  "sterne": [
+    {
+      "name": "Theta1 Ori C",
+      "dx_arcsec": 0.0,
+      "dy_arcsec": 0.0,
+      "magnitude": 5.13,
+      "b_v": 0.02,
+      "katalog": "HIP 26221",
+      "quelle_farbe": "HIP"
+    },
+    {
+      "name": "Theta1 Ori A",
+      "dx_arcsec": 9.59,
+      "dy_arcsec": 8.58,
+      "magnitude": 6.66,
+      "b_v": 0.06,
+      "katalog": "Gaia DR3 3017364132050194688",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Theta1 Ori D",
+      "dx_arcsec": -11.81,
+      "dy_arcsec": 6.34,
+      "magnitude": 6.71,
+      "b_v": 0.08,
+      "katalog": "HIP 26224",
+      "quelle_farbe": "HIP"
+    },
+    {
+      "name": "Theta1 Ori B",
+      "dx_arcsec": 4.98,
+      "dy_arcsec": 16.14,
+      "magnitude": 7.91,
+      "b_v": 0.34,
+      "katalog": "Gaia DR3 3017364132049943680",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Theta1 Ori E",
+      "dx_arcsec": 10.38,
+      "dy_arcsec": 13.04,
+      "magnitude": 11.1,
+      "b_v": 1.09,
+      "katalog": "WDS 05353-0523 E (V), Gaia DR3 3017364127743288704 (Lage)",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Theta1 Ori F",
+      "dx_arcsec": -3.94,
+      "dy_arcsec": -2.32,
+      "magnitude": 10.03,
+      "b_v": 0.24,
+      "katalog": "Gaia DR3 3017364063331140224",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Theta2 Ori A",
+      "dx_arcsec": -96.08,
+      "dy_arcsec": -94.89,
+      "magnitude": 4.98,
+      "b_v": -0.1,
+      "katalog": "HIP 26235",
+      "quelle_farbe": "HIP"
+    },
+    {
+      "name": "Theta2 Ori B",
+      "dx_arcsec": -148.34,
+      "dy_arcsec": -97.89,
+      "magnitude": 6.33,
+      "b_v": -0.08,
+      "katalog": "Gaia DR3 3017360833515044480",
+      "quelle_farbe": "GDR3"
+    }
+  ]
+}

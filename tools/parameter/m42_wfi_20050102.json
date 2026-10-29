@@ -1,0 +1,87 @@
+{
+  "kommentar": "M42: lineares V-Bild aus den WFI-Rohdaten des ESO-Archivs (Programm 273.C-5042(A), 02. und 03.01.2005), gestapelt und geeicht von tools/m42_wfi_stapeln.py (Issue #107, bilder-v2.md 3). Lizenz am 2026-10-29 auf lizenz_url gelesen: 'All data in the ESO archive retain ESO's copyright, and are distributed according to the terms of the Creative Commons Attribution 4.0 International license'; Weitergabe durch Dritte mit 'Credit to the ESO provenance of the data must be acknowledged, and the file headers preserved'. Das Pressebild eso1103a (CC BY 4.0) diente nur zur Orientierung.",
+  "id": "m42_wfi_20050102",
+  "objekt": "m42",
+  "zustand": "m42",
+  "datei": "m42/wfi_2005-01-02_v.webp",
+  "rohbild": "data/roh/m42/m42_wfi_v.fits",
+  "roh_url": "https://archive.eso.org/eso/eso_archive_main.html (Programm 273.C-5042(A), 22 Aufnahmen V/89 plus Kalibration, Liste in tools/m42_wfi_stapeln.py ROHDATEN)",
+  "roh_sha256": "7a087c363c740f4d2651dbf2e9a606f19955a7360ff3d5f133d94eac9475cda2",
+  "roh_bytes": 51845760,
+  "roh_abruf": "2026-10-29",
+  "original_pixel": "3600x3600",
+  "fits_erweiterung": "PRIMARY",
+  "roh_mitte_px": [
+    1799.5,
+    1799.5
+  ],
+  "mitte_beleg": "Theta1 Ori C (Gaia DR3 3017364063330718080) ist Bezugspunkt der Tangentialebene des Stapels (CRPIX 1800,5/1800,5)",
+  "bogensekunden_pro_pixel": 1.0,
+  "ueberabtastung": 2,
+  "leinwand_px": 1600,
+  "winkelgroesse_arcsec": 1600.0,
+  "eichung": {
+    "art": "nullpunkt",
+    "fits_schluessel": "MAGZP",
+    "quelle": "Aperturphotometrie von Gaia-DR3-Feldsternen mit 14 < V < 17,5 im 280-s-Stapel, V aus G und BP-RP nach physik.md 22, tools/m42_wfi_stapeln.py",
+    "vergleich_magnitude": 4.0,
+    "vergleich_quelle": "V = 4,0 fuer 65' x 60', deep-sky.md 2.1 (SEDS ueber Wikipedia, Sekundaerquelle)"
+  },
+  "kennlinie": {
+    "umfang_mag": 10.0
+  },
+  "sterne": {
+    "im_bild_entfernen": true,
+    "punktquellen": "Feldsterne und die Sterne des Trapezes und von Theta2 Ori (als Katalogsterne in daten/sterne/m42.json)",
+    "fenster_px": 9,
+    "schwelle_sigma": 6.0,
+    "kontrast": 0.5,
+    "zusaetzlich_px": [
+      [
+        577.5,
+        359.7,
+        25
+      ],
+      [
+        953.4,
+        133.0,
+        45
+      ],
+      [
+        1240.2,
+        1451.7,
+        50
+      ],
+      [
+        576.6,
+        913.5,
+        25
+      ],
+      [
+        899.0,
+        1070.3,
+        25
+      ],
+      [
+        11.0,
+        1051.0,
+        5
+      ]
+    ],
+    "zusaetzlich_beleg": "Kreise um die Hoefe und Beugungsspikes der Feldsterne mit V 6,8 bis 8,4 (Gaia DR3, Lage in Leinwandpixeln aus der Tangentialebene), deren Fluegel die Maske nicht erfasst: NU Ori in M43 (V 6,8; 25 px), V 7,9 bei 953/133 (45 px), V 8,0 bei 1240/1452 (50 px), V 8,3 bei 577/914 und V 8,4 bei 899/1070 (je 25 px). Dazu 14 Pixel ohne Daten am Ostrand (11/1051, 5 px; Chipluecke in allen Aufnahmen). Trapez und Theta2 Ori brauchen keine: ihre Kerne sind in allen Belichtungen gesaettigt, aus der Umgebung gefuellt und von der Maske erfasst"
+  },
+  "hintergrund": "in tools/m42_wfi_stapeln.py: Median der Standardsternaufnahme WFI.2005-01-02T01:28:31.304, 21,16 mag/arcsec^2, mit Krisciunas und Schaefer 1991 auf die Luftmasse der M42-Aufnahmen umgerechnet, 21,54 mag/arcsec^2 (physik.md 26); das Bildfeld hat keine nebelfreie Stelle",
+  "himmel_abgezogen": true,
+  "quelle_url": "https://archive.eso.org/wdb/wdb/eso/eso_archive_main/query?prog_id=273.C-5042(A)",
+  "quelle_datei": "22 WFI-Rohaufnahmen V/89 (10 x 280 s, 10 x 30 s, 2 x 3 s) vom 02. und 03.01.2005, 5 Bias, 5 Himmelsflats, 1 Standardfeld (Himmel); gestapelt zu m42_wfi_v.fits",
+  "mission": "MPG/ESO-2,2-m-Teleskop, La Silla",
+  "instrument": "Wide Field Imager (WFI), Breitbandfilter V/89 (ESO843), 8 CCD, 0,238\"/px",
+  "aufnahmedatum": "2005-01-02",
+  "lizenz": "CC BY 4.0 (ESO Science Archive)",
+  "lizenz_url": "https://archive.eso.org/cms/eso-data-access-policy.html",
+  "namensnennung": "Based on observations collected at the European Southern Observatory under ESO programme 273.C-5042(A); ESO Science Archive Facility",
+  "aenderungsvermerk": "aus den Rohdaten kalibriert, gestapelt, Himmel abgezogen, auf 1\"/px gebracht, Sterne entfernt, log-kodiert (astobsim)",
+  "orientierung": "Himmelsnorden oben, Osten links: Stapel in der Tangentialebene um Theta1 Ori C, je Chip und Aufnahme astrometrisch an Gaia DR3 angeschlossen (Polynom 3. Grades, Rest 0,02 bis 0,15\").",
+  "bearbeitung_kanal": "Graustufe aus dem Johnson-V-Breitbandfilter (ESO843, 539 nm), photometrisch in V geeicht; wie bei M57 ist das V-Band nur eine Naeherung an den Eindruck des dunkeladaptierten Auges (deep-sky.md 2.1).",
+  "hinweise": "Lineare Rohdaten statt des Pressebilds eso1103a (gestreckt). Der Stapel hat 0,5\"/px aus WFI-Pixeln zu 0,238\"/px; Seeing im Stapel etwa 1,5\" FWHM. Das Bild zeigt 26,7' um das Trapez, nicht die ganze Ausdehnung des Nebels (65' x 60')."
+}
