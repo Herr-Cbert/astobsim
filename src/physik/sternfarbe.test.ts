@@ -13,7 +13,7 @@ import {
 import { refraktorMitVergroesserung } from "./testdaten";
 
 // Testwerte aus docs/recherche/wahrnehmung.md Abschnitt 5 und 6 (B-V zu T, Tabelle 5.3, Farbgrenze)
-// und docs/recherche/physik.md Abschnitt 16.
+// und docs/recherche/physik.md Abschnitt 18.
 
 /** Ohne Extinktion, wie die Rechnung der Farbgrenze in wahrnehmung.md 5.1. */
 const OHNE_ATMOSPHAERE: Atmosphaere = { luftmasse: 1, seeingFwhmArcsec: 2, extinktionMag: 0, transmission: 1 };
@@ -78,6 +78,14 @@ describe("temperaturZuRgb: lineares sRGB (D65), Y = 1", () => {
     [1.6787, 0.8673, 0.3167].forEach((w, k) => expect(temperaturZuRgb(2000)[k]).toBeCloseTo(w, 12));
     expect(sternfarbe(3.0, 1)).toEqual([1.6787, 0.8673, 0.3167]);
   });
+  it("sehr hohe Temperatur (1e300, Infinity-nah) ergibt die blaue Randzeile statt eines Fehlers", () => {
+    [0.7429, 0.9879, 1.8776].forEach((w, k) => expect(temperaturZuRgb(1e300)[k]).toBeCloseTo(w, 12));
+    [0.7429, 0.9879, 1.8776].forEach((w, k) => expect(temperaturZuRgb(Number.MAX_VALUE)[k]).toBeCloseTo(w, 12));
+  });
+  it("am und unter dem Pol: bvZuTemperatur wirft, sternfarbe gibt die blaue Randzeile", () => {
+    expect(() => bvZuTemperatur(-0.7)).toThrow(PhysikFehler);
+    expect(sternfarbe(-0.7, 1)).toEqual([0.7429, 0.9879, 1.8776]);
+  });
   it("wirft PhysikFehler bei t <= 0 und NaN", () => {
     expect(() => temperaturZuRgb(0)).toThrow(PhysikFehler);
     expect(() => temperaturZuRgb(Number.NaN)).toThrow(PhysikFehler);
@@ -106,14 +114,16 @@ describe("beleuchtungAmAugeLx: Z 10^(-0,4 m) a tau (1 - eps^2) (min(D, pV) / p)^
   });
 });
 
-describe("sternfarbe: Farbe nur ab 3,1e-7 lx (A-P12)", () => {
+describe("sternfarbe: Farbe nur ab Z 10^-0,92 = 3,05e-7 lx (A-P12)", () => {
   it("Schwelle Z 10^(-0,4 2,3) = 3,05e-7 lx, gerundet 3,1e-7", () => {
     expect(FARBSCHWELLE_LX).toBeCloseTo(3.054e-7, 10);
     expect(Number(FARBSCHWELLE_LX.toPrecision(2))).toBe(3.1e-7);
   });
   it("unter der Schwelle undefined, ab der Schwelle die Farbe aus B-V", () => {
     expect(sternfarbe(1.5, FARBSCHWELLE_LX * 0.999)).toBeUndefined();
-    expect(sternfarbe(1.5, FARBSCHWELLE_LX)).toEqual(temperaturZuRgb(bvZuTemperatur(1.5)));
+    const farbe = sternfarbe(1.5, FARBSCHWELLE_LX);
+    expect(farbe).toBeDefined();
+    temperaturZuRgb(bvZuTemperatur(1.5)).forEach((w, k) => expect(farbe![k]).toBeCloseTo(w, 12));
   });
   it("Farbgrenze blosses Auge 2,3 mag", () => {
     expect(farbgrenzeMag(optik({ art: "auge" }))).toBeCloseTo(2.3, 10);

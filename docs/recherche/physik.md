@@ -751,14 +751,14 @@ A-Q2 T2 ist entsprechend angepasst (`docs/anforderungen.md`).
 
 ---
 
-## 16. Sternfarbe (Issue #98)
+## 18. Sternfarbe (Issue #98)
 
 **Datum:** 2026-10-29. **Kennungen:** A-P12, ADR-0004. Umsetzung in `src/physik/sternfarbe.ts`; Herleitung, Tabelle und Unsicherheiten in `docs/recherche/wahrnehmung.md` 5 und 9 Punkt 3 und 11, hier nur die Formeln mit Quelle.
 
 | Groesse | Formel | Quelle |
 |---|---|---|
 | Farbtemperatur | $T = 4600\,\mathrm{K}\,\bigl(1/(0{,}92\,(B-V) + 1{,}7) + 1/(0{,}92\,(B-V) + 0{,}62)\bigr)$, Pol bei $B-V = -0{,}674$ | Ballesteros 2012, Gl. 14 (wahrnehmung.md [14]) |
-| Farbe | Planck 360 bis 830 nm (1 nm), CIE 1931 2 Grad (Naeherung Wyman, Sloan, Shirley 2013), $XYZ$ mit $Y$ = 1, Matrix IEC 61966-2-1 (D65) [59]; Tabelle in 0,1-Schritten von B-V = -0,4 bis 2,0 (3169 bis 21 707 K), linear in B-V interpoliert, ausserhalb die Randzeile | wahrnehmung.md 5.3, [15], [16]; Erzeugung `tools/sternfarbe_tabelle.py` |
+| Farbe | Planck 360 bis 830 nm (1 nm), CIE 1931 2 Grad (Naeherung Wyman, Sloan, Shirley 2013), $XYZ$ mit $Y$ = 1, Matrix IEC 61966-2-1 (D65) [59]; Tabelle in 0,1-Schritten von B-V = -0,4 bis 2,0 (3169 bis 21 707 K), linear in B-V interpoliert, ausserhalb die Randzeile | wahrnehmung.md 5.3 (wahrnehmung.md [15], [16]); Erzeugung `tools/sternfarbe_tabelle.py` |
 | Beleuchtungsstaerke am Auge | $E = Z\,10^{-0{,}4m}\,a\,\tau\,(1-\epsilon^2)\,(\min(D, pV)/p)^2$, $Z = 2{,}54\cdot10^{-6}$ lx | Abschnitt 13.1; Crumey 2014 [32] fuer $Z$ |
 | Schwelle des Farbsehens | $E_\mathrm{Farbe} = Z\,10^{-0{,}4\cdot2{,}3} = 3{,}05\cdot10^{-7}$ lx (gerundet 3,1e-7), darunter grau | Protte und Hoffmann 2020, Fussnote 3 (wahrnehmung.md [13]) |
 

@@ -1,7 +1,7 @@
 // Sternfarbe aus B-V (A-P12, ADR-0004): B-V zu Farbtemperatur nach Ballesteros 2012, Farbtemperatur
 // zu linearem sRGB (D65) mit Y = 1 ueber eine Tabelle, Beleuchtungsstaerke am Auge und die Schwelle
 // des Farbsehens. Quelle: docs/recherche/wahrnehmung.md Abschnitt 5, docs/recherche/physik.md
-// Abschnitt 13.1 und 16. Deep-Sky-Flaechen bleiben grau, nur Sterne bekommen eine Farbe.
+// Abschnitt 13.1 und 18. Deep-Sky-Flaechen bleiben grau, nur Sterne bekommen eine Farbe.
 
 import type { Atmosphaere } from "./atmosphaere";
 import { PhysikFehler } from "./fehler";
@@ -82,8 +82,14 @@ function temperaturZuBv(t: number): number {
   return a / 0.92;
 }
 
-/** Lineare Interpolation in der Farbtabelle; ausserhalb -0,4 bis 2,0 gilt die Randzeile. */
+/**
+ * Lineare Interpolation in der Farbtabelle; ausserhalb -0,4 bis 2,0 gilt die Randzeile. NaN (aus
+ * temperaturZuBv bei sehr hohem T, wenn p * p ueberlaeuft) gilt als sehr heiss: blaue Randzeile.
+ */
 function farbeAusTabelle(bv: number): [number, number, number] {
+  if (Number.isNaN(bv)) {
+    bv = BV_ERSTE;
+  }
   const x = Math.min(Math.max((bv - BV_ERSTE) / BV_SCHRITT, 0), FARBTABELLE.length - 1);
   const i = Math.min(Math.floor(x), FARBTABELLE.length - 2);
   const w = x - i;
@@ -127,7 +133,9 @@ export function beleuchtungAmAugeLx(m: number, optik: Optik, atmosphaere: Atmosp
 /**
  * Farbe eines Sterns (A-P12): lineares sRGB mit Y = 1 aus B-V, wenn die Beleuchtungsstaerke am Auge
  * mindestens FARBSCHWELLE_LX ist; darunter undefined (grau, Punktquelle.farbe fehlt). Fester
- * Schnitt, ein gleitender Uebergang gehoert zu A-P8.
+ * Schnitt, ein gleitender Uebergang gehoert zu A-P8. Liest die Tabelle direkt mit B-V: anders als
+ * bvZuTemperatur wirft sie am und unter dem Pol -0,674 nicht, sondern gibt die blaue Randzeile
+ * (B-V -0,4), wie fuer jedes B-V unter -0,4.
  */
 export function sternfarbe(bv: number, lx: number): [number, number, number] | undefined {
   if (Number.isNaN(lx)) {
