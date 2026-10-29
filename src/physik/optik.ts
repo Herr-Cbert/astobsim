@@ -42,6 +42,9 @@ export function flaechenhelligkeitsfaktor(austrittspupilleMm: number, pupilleMm:
 /**
  * Das Geraet als Skalare: Oeffnung in mm, Vergroesserung, Obstruktion 0 bis 0,5, Transmission
  * tau ohne Abschattung, Austrittspupille in mm, wahres Gesichtsfeld als Maske in Bogensekunden.
+ * beidaeugig: Fernglas und blosses Auge (Feldfaktor F_T = 1 der Wahrnehmungsschwelle, Issue #96);
+ * fehlt oder false heisst einaeugig wie am Fernrohr (F_T = sqrt 2). Optional, damit Optik-Literale
+ * in Tests ohne das Feld gueltig bleiben; optik() setzt es immer.
  */
 export interface Optik {
   oeffnungMm: number;
@@ -50,6 +53,7 @@ export interface Optik {
   transmission: number;
   austrittspupilleMm: number;
   gesichtsfeld: Gesichtsfeld;
+  beidaeugig?: boolean;
 }
 
 /**
@@ -63,16 +67,16 @@ export function optik(geraet: Geraet): Optik {
     case "fernrohr": {
       const vergroesserung = geraet.brennweiteMm / geraet.okular.brennweiteMm;
       const wahresGesichtsfeldGrad = geraet.okular.scheinbaresGesichtsfeldGrad / vergroesserung;
-      return baueOptik(geraet.oeffnungMm, vergroesserung, geraet.obstruktion, TRANSMISSION[geraet.bauart], kreis(wahresGesichtsfeldGrad));
+      return baueOptik(geraet.oeffnungMm, vergroesserung, geraet.obstruktion, TRANSMISSION[geraet.bauart], kreis(wahresGesichtsfeldGrad), false);
     }
     case "fernglas":
-      return baueOptik(geraet.oeffnungMm, geraet.vergroesserung, 0, TRANSMISSION.fernglas, kreis(geraet.wahresGesichtsfeldGrad));
+      return baueOptik(geraet.oeffnungMm, geraet.vergroesserung, 0, TRANSMISSION.fernglas, kreis(geraet.wahresGesichtsfeldGrad), true);
     case "auge":
       return baueOptik(PUPILLE_MM, 1, 0, TRANSMISSION.auge, {
         form: "rechteck",
         breiteArcsec: AUGE_GESICHTSFELD_GRAD * ARCSEC_PRO_GRAD,
         hoeheArcsec: AUGE_GESICHTSFELD_GRAD * ARCSEC_PRO_GRAD
-      });
+      }, true);
   }
 }
 
@@ -82,7 +86,14 @@ function kreis(durchmesserGrad: number): Gesichtsfeld {
   return { form: "kreis", breiteArcsec, hoeheArcsec: breiteArcsec };
 }
 
-function baueOptik(oeffnungMm: number, vergroesserung: number, obstruktion: number, transmission: number, gesichtsfeld: Gesichtsfeld): Optik {
+function baueOptik(
+  oeffnungMm: number,
+  vergroesserung: number,
+  obstruktion: number,
+  transmission: number,
+  gesichtsfeld: Gesichtsfeld,
+  beidaeugig: boolean
+): Optik {
   pruefeBereich("oeffnungMm", oeffnungMm, Number.MIN_VALUE, Infinity);
   pruefeBereich("vergroesserung", vergroesserung, 1, Infinity);
   pruefeBereich("obstruktion", obstruktion, 0, 0.5);
@@ -93,6 +104,7 @@ function baueOptik(oeffnungMm: number, vergroesserung: number, obstruktion: numb
     obstruktion,
     transmission,
     austrittspupilleMm: austrittspupilleMm(oeffnungMm, vergroesserung),
-    gesichtsfeld
+    gesichtsfeld,
+    beidaeugig
   };
 }

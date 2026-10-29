@@ -748,3 +748,22 @@ A-Q2 T2 ist entsprechend angepasst (`docs/anforderungen.md`).
 
 - **Quellbild sat_20 (#79):** Der A-Ring ist im Hubble-Bild 0,50 (innen) und 0,21 (aussen) des aeusseren B-Rings hell (`tools/strukturprofile.py`). Damit zeigt selbst der ruhige Moment die Teilung kaum (0,029). Visuell wirkt der A-Ring heller; vermutlich ist das Pressebild nichtlinear gestreckt wie das Jupiterbild in #79. Photometrische Werte fuer das Verhaeltnis A zu B mit Quelle stehen noch aus. **Nachtrag #79 (2026-10-28):** Werte nach Salo und French 2010 (`objekte.md` 4.2): A innen 0,83, A aussen 0,56, Cassini-Zone 0,15. Das Bild ist mit einer Tonkurve angeglichen (eine Potenzkurve, die die A-Ringe trifft, haette die Teilung drei- bis viermal zu hell gemacht). Mit den neuen Stufen (A 0,82 / 0,54, Cassini 0,17) bleibt die Delle im Langzeitmittel 0,000; im ruhigen Moment ergibt sich am 100 mm 0,131 (Anhalt, Arbeitsmassstab des Langzeitkerns), am 60 mm 0,017.
 - **Ruhiger Moment (#29):** Der Tilt-Abzug aus 2.3 veraendert nicht nur Cassini, sondern auch T4d und T5b (15.2). Eine Umsetzung braucht eigene Erwartungen fuer den ruhigen Moment und darf die Schwelle nicht aus den Langzeit-Urteilen uebernehmen.
+
+## 16. Wahrnehmungsschwelle (Issue #96)
+
+Formeln, Herleitung und Quellen stehen in `docs/recherche/wahrnehmung.md` (dort [1] = Crumey 2014, MNRAS 442, 2600); hier nur die Zuordnung zu `src/physik/schwelle.ts`. Konstanten $F$ = 1,4, $F_T = \sqrt2$, 0,484 und Nullhintergrund $10^{-5}$ cd/m$^2$ in `konstanten.ts` (ADR-0004); die Koeffizienten $r_1, r_2, k_1, k_2, q$ von Gl. 47 bis 49, $Z = 2{,}54\cdot10^{-6}$ lx und die Seeing-Scheibe 2,8 FWHM nur in `schwelle.ts`.
+
+| Funktion | Formel | Quelle |
+|---|---|---|
+| `leuchtdichteCdM2(mu)` | $B = 10^{(12{,}58 - \mu)/2{,}5}$ | wahrnehmung.md, Konventionen; [1, Abschn. 1.3] |
+| `kontrastschwelle(A, B)` | $C = [((r_1 B^{-1/4} + r_2)^2/A)^q + (k_1 B^{-1/4} + k_2)^q]^{1/q}$, $F$ = 1; $B$ auf $10^{-5}$ bis $3{,}426\cdot10^{-2}$ cd/m$^2$ begrenzt | wahrnehmung.md 1.2 und 7 Punkt 1; [1, Gl. 47 bis 50] |
+| `schwelleAmOkular` | $C_\mathrm{th} = \varphi[(R_a/A_a)^q + C_a^q]^{1/q}$, $A_a = V^2 A$, $B_a = \min(1, (AP/p)^2)\,\tau(1-\epsilon^2)\,B$, $\varphi = F F_T$ ($F_T$ = 1 bei Fernglas und Auge); $\mu_\mathrm{lim} = \mu_\mathrm{Himmel} - 2{,}5\log_{10} C_\mathrm{th} - $ Extinktion | wahrnehmung.md 1.3, 1.4; [1, Gl. 77 bis 80, 84] |
+| `grenzgroesse` | $m_0 = -2{,}5\log_{10}(\Delta I/Z)$, $\Delta I = (\delta_\mathrm{max}/D)^2 F_t\,\varphi\,B_a R_a$; Scheibe 2,8 FWHM: $m_\mathrm{lim} = m_0 - (2{,}5/q)\log_{10}[(\alpha/\alpha_{TR})^q + 1] - $ Extinktion, $\alpha_{TR} = R_a/(V^2 C_a)$ | wahrnehmung.md 2.2; [1, Gl. 68, 71, 81, 88] |
+| `sichtbareIsophote` | Reserve $d_i = \mu_\mathrm{lim}(\alpha_i) - \mu_i$, letzter Vorzeichenwechsel linear in $\mu$ und $\log_{10}\alpha$; keine sichtbar: groesstes $d_i$ | wahrnehmung.md 4.4 Punkt 2; [1, Abschn. 3.1] |
+| `deckkraft(v)`, `deckkraftStern(m, m_lim)` | $P = \Phi((v - 1)/0{,}484)$, Stern $v = 10^{-0{,}4(m - m_\mathrm{lim})}$; $\Phi$ ueber erf nach Abramowitz und Stegun 7.1.26 (Fehler unter $1{,}5\cdot10^{-7}$) | wahrnehmung.md 1.3, 4.4 Punkt 3; [A&S] |
+
+Testwerte: wahrnehmung.md 6 (Crumey-Kontrollwerte mit $F$ = 1, 2, 2,36; Tabelle 2.3 mit $F$ = 1,4). Gegenprobe ohne Literaturwert: fuer eine Scheibe der Flaeche $\alpha$ gilt $m_\mathrm{lim} = \mu_\mathrm{lim}(\alpha) - 2{,}5\log_{10}\alpha$ (Gl. 88 gegen Gl. 77); die beiden Nullpunkte 12,58 mag/arcsec$^2$ und $Z$ passen bis auf 0,004 mag zusammen.
+
+Abweichung: wahrnehmung.md 2.3 nennt fuer das Fernglas 10x50 bei Bortle 3 mit $F$ = 1,4 11,1 mag; ungerundet ergibt die Rechnung 10,66 ($F$ = 2) + 0,387 = 11,05 (11,1 ist vermutlich 10,7 + 0,39).
+
+Quelle [A&S]: Abramowitz, M., Stegun, I. A.: *Handbook of Mathematical Functions*, NBS Applied Mathematics Series 55, 1964, Formel 7.1.26.
