@@ -4,7 +4,7 @@
 // Starteintrag, sind die Daten kaputt: DatenFehler, kein stiller Ersatz.
 
 import { DatenFehler, GERAETE_DATEI, mitOkular, OBJEKTE_DATEI, objektzustand } from "../daten";
-import type { Bedingungen, Konfiguration, Okular } from "../naht/konfiguration";
+import type { Bedingungen, Konfiguration, Okular, Paareingaben } from "../naht/konfiguration";
 import type { Kataloge } from "./kataloge";
 
 /** Startwerte nach A-D9; Geraet und Zustand als id in den Katalogen. */
@@ -14,6 +14,19 @@ export const VOREINSTELLUNG = {
   zustandId: "mond_ev",
   bedingungen: { seeingFwhmArcsec: 2, bortle: 5, transparenz: "klar", hoeheGrad: 45 }
 } as const satisfies { geraetId: string; okular: Okular; zustandId: string; bedingungen: Bedingungen };
+
+/**
+ * Vorgaben des freien Paars (A-Z9, docs/recherche/doppelsterne.md 3.2): Trennung 2'', Magnituden 5
+ * und 6, B-V je 0,6. Rueckfall der URL je Parameter und Startwerte, wenn das Formular auf das
+ * freie Paar wechselt.
+ */
+export const PAAR_VORGABE = {
+  trennungArcsec: 2,
+  magnitudeA: 5,
+  magnitudeB: 6,
+  bvA: 0.6,
+  bvB: 0.6
+} as const satisfies Paareingaben;
 
 /** Startkonfiguration A-D9 als frische Kopie; wirft DatenFehler, wenn Geraet oder Zustand fehlen. */
 export function voreinstellung(kataloge: Kataloge): Konfiguration {

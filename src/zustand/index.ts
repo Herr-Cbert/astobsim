@@ -3,4 +3,4 @@
 // erst die UI auf. Parameternamen in LIESMICH.md.
 export type { Kataloge } from "./kataloge";
 export { ausUrl, inUrl, listeneintragZu, PARAMETER } from "./url";
-export { VOREINSTELLUNG, voreinstellung } from "./voreinstellung";
+export { PAAR_VORGABE, VOREINSTELLUNG, voreinstellung } from "./voreinstellung";
