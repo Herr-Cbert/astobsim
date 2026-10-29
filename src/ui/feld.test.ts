@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { TEXTE } from "../texte";
-import { angezeigterWert, hinweisFuer, hinweistext, leseDezimal } from "./feld";
+import { angezeigterWert, hinweisFuer, hinweistext, leseDezimal, rasterBei } from "./feld";
 
 describe("leseDezimal", () => {
   it("liest Komma und Punkt", () => {
@@ -55,5 +55,16 @@ describe("hinweistext", () => {
     // Obstruktion in Prozent: 0,7 * 100 ist 70,00000000000001.
     expect(hinweistext({ feld: "geraet.obstruktion", eingabe: 0.7 * 100, wert: 50 }, 1)).toBe(text("70", "50,0"));
     expect(hinweistext({ feld: "bedingungen.hoeheGrad", eingabe: -5, wert: 10 }, 0)).toBe(text("-5", "10"));
+  });
+});
+
+describe("rasterBei (Grenze.grob)", () => {
+  it("nimmt ab grob.ab den groben Schritt und dessen Stellen, sonst die des Felds", () => {
+    const o = { schritt: 0.05, stellen: 2, grob: { ab: 10, schritt: 1, stellen: 0 } };
+    expect(rasterBei(o, 0.1)).toEqual({ schritt: 0.05, stellen: 2 });
+    expect(rasterBei(o, 9.95)).toEqual({ schritt: 0.05, stellen: 2 });
+    expect(rasterBei(o, 10)).toEqual({ schritt: 1, stellen: 0 });
+    expect(rasterBei(o, 600)).toEqual({ schritt: 1, stellen: 0 });
+    expect(rasterBei({ schritt: 0.1, stellen: 1 }, 50)).toEqual({ schritt: 0.1, stellen: 1 });
   });
 });

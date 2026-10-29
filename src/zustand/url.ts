@@ -12,13 +12,17 @@
 // die Felder dagegen generisch, ohne die Art zu kennen.
 
 import { type Geraeteeintrag, type Listengeraet, mitOkular, objektzustand, vorschlagObstruktionProzent } from "../daten";
-import { BAUARTEN, TRANSPARENZEN } from "../naht/konfiguration";
-import type { Bauart, Fernglas, Fernrohr, Geraet, Konfiguration, Okular } from "../naht/konfiguration";
-import { begrenze, type Hinweis } from "../physik";
+import { BAUARTEN, KENNUNG_FREIES_PAAR, TRANSPARENZEN } from "../naht/konfiguration";
+import type { Bauart, Fernglas, Fernrohr, Geraet, Konfiguration, Objektzustand, Okular, Paareingaben } from "../naht/konfiguration";
+import { begrenze, freiesPaar, type Hinweis } from "../physik";
 import type { Kataloge } from "./kataloge";
-import { VOREINSTELLUNG, voreinstellung } from "./voreinstellung";
+import { PAAR_VORGABE, VOREINSTELLUNG, voreinstellung } from "./voreinstellung";
 
-/** Version des URL-Formats; ausUrl liest heute jede Version wie Version 1. */
+/**
+ * Version des URL-Formats; ausUrl liest heute jede Version wie Version 1. Das freie Paar (z=frei
+ * mit tr, ma, mb, bva, bvb, Version 2 der Anwendung) erweitert das Format nur um Parameter: ein
+ * Link aus Version 1 bleibt gueltig und bedeutet dasselbe, deshalb bleibt v=1.
+ */
 const URL_VERSION = 1;
 
 /** Kurze Parameternamen der URL (Tabelle mit Einheiten in LIESMICH.md). */
@@ -38,7 +42,12 @@ export const PARAMETER = {
   seeing: "s",
   bortle: "b",
   transparenz: "t",
-  hoehe: "h"
+  hoehe: "h",
+  trennung: "tr",
+  magnitudeA: "ma",
+  magnitudeB: "mb",
+  bvA: "bva",
+  bvB: "bvb"
 } as const;
 
 const P = PARAMETER;
@@ -53,7 +62,7 @@ export function inUrl(eingabe: Konfiguration, kataloge: Kataloge): string {
   const q = new URLSearchParams();
   q.set(P.version, String(URL_VERSION));
   schreibeGeraet(q, konfiguration.geraet, kataloge);
-  q.set(P.zustand, konfiguration.objekt.kennung);
+  schreibeObjekt(q, konfiguration.objekt);
   const b = konfiguration.bedingungen;
   q.set(P.seeing, String(b.seeingFwhmArcsec));
   q.set(P.bortle, String(b.bortle));
@@ -75,7 +84,7 @@ export function ausUrl(search: string, kataloge: Kataloge): { konfiguration: Kon
   const zahl = (name: string): number | undefined => leseZahl(q.get(name));
 
   const geraet = leseGeraet(q, start.geraet, kataloge);
-  const objekt = objektzustand(kataloge.objekte, kataloge.nachweise, q.get(P.zustand) ?? "") ?? start.objekt;
+  const objekt = leseObjekt(q, start.objekt, kataloge);
   const s = start.bedingungen;
   const roh: Konfiguration = {
     geraet,
@@ -208,6 +217,46 @@ function leseFernglas(q: URLSearchParams, start: Geraet, kataloge: Kataloge): Ge
   const wahresGesichtsfeldGrad = leseZahl(q.get(P.wahresGesichtsfeld)) ?? basis?.wahresGesichtsfeldGrad;
   if (oeffnungMm === undefined || vergroesserung === undefined || wahresGesichtsfeldGrad === undefined) return start;
   return { art: "fernglas", oeffnungMm, vergroesserung, wahresGesichtsfeldGrad };
+}
+
+// ---------------------------------------------------------------------------------------------
+// Objekt schreiben und lesen
+
+/** Zustands-id; beim freien Paar (mit paar) z=frei und die fuenf Eingaben (A-D18). */
+function schreibeObjekt(q: URLSearchParams, objekt: Objektzustand): void {
+  const paar = objekt.paar;
+  if (paar === undefined) {
+    q.set(P.zustand, objekt.kennung);
+    return;
+  }
+  q.set(P.zustand, KENNUNG_FREIES_PAAR);
+  q.set(P.trennung, String(paar.trennungArcsec));
+  q.set(P.magnitudeA, String(paar.magnitudeA));
+  q.set(P.magnitudeB, String(paar.magnitudeB));
+  q.set(P.bvA, String(paar.bvA));
+  q.set(P.bvB, String(paar.bvB));
+}
+
+/**
+ * z=frei: das freie Paar aus tr, ma, mb, bva, bvb, je Parameter mit PAAR_VORGABE als Rueckfall
+ * (freiesPaar aus physik bildet die Sterne, begrenze schneidet danach). Sonst der Zustand zur id,
+ * bei unbekannter id der Zustand der Voreinstellung. Die Paar-Parameter ohne z=frei zaehlen nicht.
+ */
+function leseObjekt(q: URLSearchParams, start: Objektzustand, kataloge: Kataloge): Objektzustand {
+  const id = q.get(P.zustand) ?? "";
+  if (id === KENNUNG_FREIES_PAAR) {
+    const zahl = (name: string, rueckfall: number): number => leseZahl(q.get(name)) ?? rueckfall;
+    const v = PAAR_VORGABE;
+    const paar: Paareingaben = {
+      trennungArcsec: zahl(P.trennung, v.trennungArcsec),
+      magnitudeA: zahl(P.magnitudeA, v.magnitudeA),
+      magnitudeB: zahl(P.magnitudeB, v.magnitudeB),
+      bvA: zahl(P.bvA, v.bvA),
+      bvB: zahl(P.bvB, v.bvB)
+    };
+    return freiesPaar(paar);
+  }
+  return objektzustand(kataloge.objekte, kataloge.nachweise, id) ?? start;
 }
 
 // ---------------------------------------------------------------------------------------------

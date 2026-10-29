@@ -928,3 +928,17 @@ Die Umkehrung ist eindeutig: das Polynom steigt im ganzen Gueltigkeitsbereich (e
 V und B-V aus Hipparcos (ESA 1997) gelten, wo der Stern dort steht; Gaia nur, wo nicht. Die Herkunft steht je Stern in `katalog` (V) und `quelle_farbe` (B-V) in `daten/sterne/m45.json`.
 
 Quelle [GDR3-5.5.1]: Carrasco, J. M., Bellazzini, M.: Photometric relationships with other photometric systems. In: Gaia Data Release 3 Documentation, release 1.3, Kapitel 5.5.1, https://gea.esac.esa.int/archive/documentation/GDR3/Data_processing/chap_cu5pho/cu5pho_sec_photSystem/cu5pho_ssec_photRelations.html (gelesen 2026-10-29, Tabellen 5.9 und 5.10).
+
+## 24. Weicher Rand des Kerns fuer Punktquellen (Issue #109)
+
+**Problem (gerechnet im Review von PR #127).** Der Kern endet hart beim Radius $3\,\mathrm{FWHM_{gesamt}}$ (Abschnitt 9, `KERN_RADIUS_PRO_FWHM`), und zwar quadratisch. Fuer die Flaeche ist der Randwert (etwa $8{,}5\cdot10^{-4}$ des Scheitels bei Seeing-Fluegeln) unsichtbar. Die Punktebene geht aber durch $W = \min(1, (a_P\,p)^{1/3})$ (Abschnitt 14, ADR-0004). Die Kubikwurzel hebt den Randwert auf $(8{,}5\cdot10^{-4})^{1/3} \approx 9{,}5\,\%$ des Scheitels, danach faellt $W$ hart auf 0. Um helle Sterne entsteht so ein Quadrat. Zwischen zwei Sternen endet das Quadrat des einen mitten im Halo des anderen, so dass die Faerbung $c_k/p$ dort springt (Farbkante).
+
+**Modellannahme.** Nur fuer die Punktebene und die Faerbung (`src/bild/punktebene.ts`, `ausgeblendetKern`) wird der Kern mit einem Fenster multipliziert:
+
+$$w(\rho) = \begin{cases} 1 & \rho \le \rho_0 \\ \cos^2\!\left(\dfrac{\pi}{2}\,\dfrac{\rho-\rho_0}{\rho_E-\rho_0}\right) & \rho_0 < \rho < \rho_E \\ 0 & \rho \ge \rho_E \end{cases}, \qquad \rho_0 = \tfrac{2}{3}\,r,\ \rho_E = r + 0{,}5\ \mathrm{px}.$$
+
+Dabei ist $\rho$ der Abstand zur Kernmitte in Arbeitspixeln und $r$ der Kernradius. Das aeussere Drittel von $r = \lceil 3\,\mathrm{FWHM}/\text{Massstab}\rceil$ ist etwa die aeussere Gesamt-FWHM. Danach wird auf die alte Summe normiert, der Fluss bleibt also erhalten. Innen ($\rho \le \rho_0$) aendert sich die Form nicht, die Werte steigen nur um den Normierungsfaktor (bei Seeing-Fluegeln wenige Prozent, eig. Rechnung). Das Fenster ist rund, die Ecken des quadratischen Kerns fallen weg.
+
+**Warum ein cos²-Fenster.** Ein groesserer Radius allein verschiebt die Kante nur, weil die Kubikwurzel jeden Randwert sichtbar macht. Die Alternative $k' = \max(0, k - k_\text{Rand})$ geht nur linear gegen 0, unter der Kubikwurzel also wie $d^{1/3}$ (bei 10 % der Strecke noch 46 % des Werts). Das cos²-Fenster geht quadratisch gegen 0, also wie $d^{2/3}$ (bei 10 % noch 21 %). Der Halo laeuft damit sichtbar weich aus.
+
+**Grenzen.** Die Punktquellen verlieren Licht jenseits von etwa 2 Gesamt-FWHM an den Kern innen. Das ist dieselbe Groessenordnung, die der harte Schnitt bei 3 FWHM ohnehin abschneidet. Das Fenster ist ein Darstellungsfenster, keine Physik. Die Flaeche (Falter JS und WebGL2) faltet weiter mit dem unveraenderten Kern. Trabanten gehen ebenfalls durch die Punktebene; ihre Werte aendern sich deshalb in T1, T2, T4 und T6 geringfuegig (siehe PR #127).

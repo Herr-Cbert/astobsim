@@ -6,9 +6,15 @@
 // Koordinaten wie in der Naht: Objektmitte 0/0, +x rechts, +y Norden (A-D11), Bogensekunden.
 
 import type { Kern, Simulationsparameter } from "../naht/simulationsparameter";
-import { arbeitsmassstabOhneFenster, atmosphaere, aufloesung, type Konfiguration, optik, quelleVon } from "../physik";
+import { arbeitsmassstabOhneFenster, atmosphaere, aufloesung, type Konfiguration, optik } from "../physik";
 import type { Mitte } from "./verschieben";
 import { verschiebbar } from "./verschieben";
+
+/**
+ * Rand um Sterne im Zoom je Seite in Gesamt-FWHM: der Kernradius aus physik (KERN_RADIUS_PRO_FWHM,
+ * physik.md Abschnitt 9, dort nicht exportiert). Weiter reicht das Scheibchen eines Sterns nicht.
+ */
+export const STERN_RAND_PRO_FWHM = 3;
 
 /** Rand um das Objekt im Zoom als Anteil seiner Ausdehnung, je Seite. */
 export const ZOOM_RAND = 0.05;
@@ -37,11 +43,16 @@ const DETAIL_ANTEIL_ZOOM_MAX = 0.75;
 /**
  * Ausdehnung des Objekts in Bogensekunden: der groessere Wert aus Durchmesser und Quellbild
  * (Breite und Hoehe mal Massstab). Das Quellbild umfasst auch die Ringe des Saturn, die im
- * Durchmesser nicht stecken, und liegt sonst knapp um die Scheibe.
+ * Durchmesser nicht stecken, und liegt sonst knapp um die Scheibe. Ohne Quellbild (Doppelstern:
+ * groesster Sternabstand, M45) der Durchmesser plus je Seite den Kernradius (STERN_RAND_PRO_FWHM
+ * Gesamt-FWHM), damit die Sternscheibchen samt Halo ganz im Zoom liegen. Wirft wie optik.
  */
 export function objektausdehnungArcsec(k: Konfiguration): number {
-  const { durchmesserArcsec } = k.objekt;
-  const quelle = quelleVon(k.objekt);
+  const { durchmesserArcsec, quelle } = k.objekt;
+  if (quelle === undefined) {
+    const gesamtFwhm = aufloesung(optik(k.geraet), atmosphaere(k.bedingungen)).gesamtFwhmArcsec;
+    return durchmesserArcsec + 2 * STERN_RAND_PRO_FWHM * gesamtFwhm;
+  }
   return Math.max(durchmesserArcsec, quelle.breitePx * quelle.massstabArcsecProPx, quelle.hoehePx * quelle.massstabArcsecProPx);
 }
 
@@ -66,7 +77,7 @@ function breiten(k: Konfiguration): { zoom: number; detail: number } {
   const o = optik(k.geraet);
   const feld = Math.min(o.gesichtsfeld.breiteArcsec, o.gesichtsfeld.hoeheArcsec);
   const aufl = aufloesung(o, atmosphaere(k.bedingungen));
-  const arbeitspixel = arbeitsmassstabOhneFenster(aufl, quelleVon(k.objekt));
+  const arbeitspixel = arbeitsmassstabOhneFenster(aufl, k.objekt.quelle);
   const breite = Math.min(objektausdehnungArcsec(k) * (1 + 2 * ZOOM_RAND), feld * ZOOM_ANTEIL_GESICHTSFELD_MAX);
   return { zoom: Math.max(breite, arbeitspixel * ZOOM_ARBEITSPIXEL_MIN), detail: arbeitspixel * DETAIL_ARBEITSPIXEL };
 }
@@ -109,6 +120,21 @@ export function verschiebelage(k: Konfiguration, zoom: boolean, detail = false):
   }
 }
 
+/**
+ * Startlage des Detailfensters bei Objekten ohne Quellbild (Doppel- und Mehrfachsterne, freies Paar,
+ * M45; Entscheidung Herbert 2026-10-29): der hellste Stern des Zustands, bei gleicher Magnitude der
+ * erste der Liste. Die Objektmitte ist dort oft leer (Epsilon Lyrae). undefined bei Objekten mit
+ * Quellbild oder ohne Sterne; dann gilt die Fenstermitte wie bisher.
+ */
+export function detailstart(k: Konfiguration): Mitte | undefined {
+  if (k.objekt.quelle !== undefined) return undefined;
+  let hellster: Konfiguration["objekt"]["sterne"][number] | undefined;
+  for (const stern of k.objekt.sterne) {
+    if (hellster === undefined || stern.magnitude < hellster.magnitude) hellster = stern;
+  }
+  return hellster === undefined ? undefined : { xArcsec: hellster.dxArcsec, yArcsec: hellster.dyArcsec };
+}
+
 /** Kernschluessel des Vergleichsbilds; kann keinem Kern aus physik gleichen. */
 const VERGLEICH = "vergleich";
 
@@ -118,6 +144,8 @@ const VERGLEICH = "vergleich";
  * neutrale Helligkeit (faktorObjekt 1, hintergrundRelativ 0, also Quellweiss = Bildschirmweiss,
  * ohne die Leuchtdichte-Abbildung aus #55; Punktebene linear mit punktFaktor 1 und punktExponent 1,
  * also wie vor Issue #72 nur auf 1 begrenzt). So rechnet rendere ohne Aenderung an bild.
+ *
+ * Ohne Quellbild (quellmassstab 0) bestimmt allein die Anzeige das Raster.
  *
  * Abweichung: das Arbeitsraster ist nicht das des Anblicks (Gesamt-FWHM / 2,5), sondern so fein
  * wie Quelle und Anzeige es hergeben, max(Quellmassstab, fenster.breite / fenster.px). Mit dem

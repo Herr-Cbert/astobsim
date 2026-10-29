@@ -245,5 +245,6 @@ Schluessel: Stufe 1 Objekt ohne Punktquellen (Bortle, Transparenz und Seeing aen
 - M13: Quellbild plus Katalogsterne zaehlt doppelt; Bild maskieren oder Sterne plus Restlicht (deep-sky.md 3.4), Entscheidung beim Daten-Issue.
 - Deckkraft auf das gefaltete q mit einer Tabelle aus dem ungefalteten Bild ist eine Naeherung; bei M57 am 80 mm (T10) pruefen.
 - Faerbung mischt ueberlappende Sterne flussgewichtet (Antares B im Halo von A bekommt eine Mischfarbe); hinnehmen oder beim Doppelstern-Issue pruefen.
+- Punktebene mit weichem Kernrand (Issue #109, physik.md Abschnitt 24): bild faltet Punktquellen und Faerbung mit dem Kern mal einem cos²-Fenster ueber das aeussere Drittel des Radius, neu normiert. Grund: Unter der Kubikwurzel des Tonwerts wurde der harte, quadratische Kernrand als Quadrat bzw. Farbkante sichtbar. Die Naht bleibt unveraendert.
 
 Reihenfolge fuer Phase 4: (1) Vorbereitungs-PR Naht-Typen und Konstanten (wie #46 in Version 1), (2) physik `schwelle.ts`, `mischung.ts`, `sternfarbe.ts`, `doppelstern.ts` parallel, (3) bild `tonwert` und Faerbung, daten Kennlinie und neue Typen parallel, (4) Daten und tools je Objekt (Doppelsterne, M45, Mondphasen zuerst, da ohne Kennlinie), (5) zustand und ui, (6) Validierung T1 bis T12 und Nachmessen der Konstanten.

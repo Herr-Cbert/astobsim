@@ -480,3 +480,15 @@ body {
     grid-template-columns: minmax(0, 1fr);
   }
 }
+
+/* Eingaben des freien Paars (Issue #109), wie das Okular. */
+.objekt-paar {
+  margin: 4px 0 10px;
+  padding: 6px 10px 2px;
+  border: 1px solid var(--rand);
+}
+
+.objekt-paar legend {
+  padding: 0 4px;
+  color: var(--text-leise);
+}

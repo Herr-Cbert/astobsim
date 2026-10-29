@@ -8,7 +8,7 @@ import { BildFehler } from "./fehler";
 import { malePunktquellen } from "./male";
 import { brauchtFaerbung, falteFaerbung, faltePunkte } from "./punktebene";
 import { QuelleAusRaster, type Objektpunkt, type Quellausschnitt, type Quelle } from "./quelle";
-import { neuesRaster, pixelIndex, type Raster } from "./raster";
+import { neuesRaster, pixelIndex, type Raster, summe } from "./raster";
 import { phi, rendere, tonwert, type Zwischenspeicher } from "./rendere";
 import { deltaKern, kastenKern } from "./testkerne";
 
@@ -286,10 +286,13 @@ describe("male und punktebene: Deckkraft und Farbe", () => {
     expect(c.kanaele).toBe(3);
     const fluss = 1000 * Math.PI * 0.005 ** 2;
     const i = pixelIndex(p, 8, 7);
-    expect(p.daten[i]).toBeCloseTo((4 * fluss) / 9, 6);
-    expect(c.daten[3 * i]).toBeCloseTo((fluss * 0.6 + 3 * fluss) / 9, 6);
-    expect(c.daten[3 * i + 1]).toBeCloseTo((fluss * 0.5 + 3 * fluss) / 9, 6);
-    expect(c.daten[3 * i + 2]).toBeCloseTo((fluss * 0.3 + 3 * fluss) / 9, 6);
+    // Beide Sterne liegen im selben Pixel, also derselbe (ausgeblendete) Kernwert k: p = 4 fluss k,
+    // c_k = (fluss * deckkraft * farbe_k + 3 fluss) k. Der Gesamtfluss bleibt 4 fluss.
+    expect(summe(p)).toBeCloseTo(4 * fluss, 6);
+    expect(p.daten[i]).toBeGreaterThan(0);
+    expect(c.daten[3 * i]).toBeCloseTo(((p.daten[i] as number) * (0.6 + 3)) / 4, 6);
+    expect(c.daten[3 * i + 1]).toBeCloseTo(((p.daten[i] as number) * (0.5 + 3)) / 4, 6);
+    expect(c.daten[3 * i + 2]).toBeCloseTo(((p.daten[i] as number) * (0.3 + 3)) / 4, 6);
     expect(falteFaerbung([], kern, N)).toBeUndefined();
   });
 });

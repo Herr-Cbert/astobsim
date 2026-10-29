@@ -299,6 +299,13 @@ describe("pruefeObjekte Doppelstern", () => {
     zustandVon(roh)["id"] = "frei";
     expect(fehlerVon(() => katalog(roh)).eintrag).toBe("frei");
   });
+
+  it("reserviert die Kennung frei auch als Objekt-id (Wert des freien Paars in der Objektauswahl, Issue #109)", () => {
+    const roh = paar();
+    roh["id"] = "frei";
+    const f = fehlerVon(() => katalog(roh));
+    expect([f.eintrag, f.feld]).toEqual(["frei", "id"]);
+  });
 });
 
 describe("pruefeObjekte Deep-Sky", () => {
