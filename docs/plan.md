@@ -102,3 +102,84 @@ Die 14 Kann-Anforderungen (A-Z8, A-Z9, A-Z10, A-F9, A-B5, A-B6, A-P8, A-D12 bis 
 - Worker fuer die JavaScript-Faltung: Version 1 ohne Worker (architektur.md Abschnitt 4); wird nur noetig, wenn #19 die 0,5 s im Fallback verfehlt.
 - Kontrastschwelle "erkennbar": in #21 am Bild festgelegt (0,125, Delle eines gefalteten Stufenprofils) und in `src/physik/validierung.test.ts` eingefroren, siehe `docs/validierung.md`.
 - Hubble-Lizenzlesart: beide Angaben im Bildnachweis (#12), siehe `docs/recherche/bilder.md` 6.3.
+
+---
+
+# Version 2: Zerlegung in Arbeitspakete (Phase 4 Version 2)
+
+Ergebnis von Phase 4 Version 2, erstellt am 2026-10-29. Einziger Input fuer Phase 5 (Umsetzung) von Version 2. Die Issue-Texte stehen nur auf GitHub (Schablone `docs/prozess.md`), dieses Dokument nennt Abhaengigkeiten, Wellen und Zuordnung.
+
+Grundlagen: `docs/anforderungen.md` (Stufe Muss V2), `docs/architektur.md` Abschnitt 5 (Naht V2, verbindlich; Reihenfolge in 5.7), ADR-0003 Nachtrag V2, ADR-0004, `docs/recherche/README.md` Abschnitt "Recherche Version 2" mit den Testfaellen T7 bis T12.
+
+Entscheidungen Herbert (2026-10-29): T7 bis T12 und A-Q4 bestaetigt (T11 und die Tabellen in `docs/recherche/wahrnehmung.md` in dieser Phase auf F = 1,4 umgerechnet); ein Milestone "Version 2" ohne Zwischenziele; #93, #25 und #26 bleiben als **Sammel-Issues** mit GitHub-Sub-Issues und schliessen, wenn alle Teile fertig sind; #36 bleibt ein normales Arbeitspaket; die vier neuen Physik-Dateien als vier parallele Issues.
+
+## 7. Issues fuer Version 2
+
+Labels wie in Version 1. Alle im Milestone "Version 2".
+
+| Nr | Titel | Label | Sammel | Blockiert durch |
+|---|---|---|---|---|
+| #95 | Vorbereitung Naht Version 2: Typen und Konstanten ohne Verhaltensaenderung | physik | #93 | - |
+| #96 | Physik: Wahrnehmungsschwelle und Grenzgroesse (schwelle.ts) | physik | #26 | #95 |
+| #97 | Physik: Mischgewicht unaufgeloest und Sockel (mischung.ts) | physik | #93 | #95 |
+| #98 | Physik: Sternfarbe aus B-V (sternfarbe.ts) | physik | #25 | #95 |
+| #99 | Physik: Freies Paar und Ueberstrahlungshinweis (doppelstern.ts) | physik | #25 | #95 |
+| #100 | Physik: auswerten Version 2 mit Schwelle, Sternen, Mischgewicht und neuen Konstanten | physik | #93 | #96 bis #99 |
+| #101 | Bild: Tonwert Version 2 mit Deep-Sky-Ebene, Mischgewicht und Sternfaerbung | bild | #93 | #95 |
+| #102 | Daten: Objektklassen, Sterne, Flaechentabelle, log-Kennlinie und QuelleLeer | daten | #26 | #95 |
+| #36 | Mondphasen: Sichel, Vollmond, letztes Viertel | daten | - | #100 |
+| #103 | Daten: Doppelsternkatalog und Nachweis der Sterndaten | daten | #25 | #102 |
+| #104 | Daten: Plejaden (M45) als Sternliste aus Gaia DR3 | daten | #26 | #102 |
+| #105 | Tools: Deep-Sky-Aufbereitung mit Flaechentabelle, erstes Objekt M57 | daten | #26 | #102 |
+| #106 | Daten: Andromedagalaxie (M31) mit Tonkurve gegen das Profil | daten | #26 | #105 |
+| #107 | Daten: Orionnebel (M42) mit Trapez | daten | #26 | #105 |
+| #108 | Daten: Kugelsternhaufen M13 aus Bild und Katalogsternen | daten | #26 | #105 |
+| #109 | UI-Durchstich Objektklassen: gruppierte Auswahl, freies Paar, URL | ui | #25 | #100, #101, #102, #103 |
+| #110 | UI: Infopanel, Hilfetexte und Vergleichsbild fuer Version 2 | ui | #26 | #109 |
+| #111 | Helligkeit: Konstanten nachmessen und T12 | physik | #93 | #100, #101, #109 |
+| #112 | Validierung Version 2: Testfaelle T7 bis T12 | physik | - | #111, #110, #104, #106 bis #108, #36 |
+| #113 | Sicherheit und Vereinfachung vor Version 2 | infra | - | #112 |
+| #114 | Abschluss Version 2: README, Lizenzen, Retrospektive, Tag v2.0 | infra | - | #113 |
+
+Zuordnung der Muss-V2-Anforderungen: A-Z9 Doppelsterne in #99, #100, #103, #109; A-Z10 Deep-Sky in #96, #100, #101, #102, #104 bis #108; A-P4 V2 und A-P13 in #100, #111; A-P10 in #97, #100, #101, #110; A-P11 in #96, #100, #110; A-P12 in #98, #100, #101; A-B2 V2 in #96, #110; A-D18 in #109; A-X7 in #36; A-X9 V2 in #102 bis #104, #108; A-X11 in #102, #106, #107, #110; A-Q5 in #112 (Testfaelle bestaetigt in Phase 4); A-Q4 in #114.
+
+## 8. Abhaengigkeiten und Reihenfolge Version 2
+
+```
+#95 Naht V2 ──┬─> #96 schwelle ──┐
+              ├─> #97 mischung ──┤
+              ├─> #98 sternfarbe ┼─> #100 auswerten V2 ──┬─> #36 Mondphasen
+              ├─> #99 doppelstern┘                       │
+              ├─> #101 bild tonwert ─────────────────────┤
+              └─> #102 daten ──┬─> #103 Doppelsterne ────┴─> #109 UI-Durchstich ──> #110 Infopanel
+                               ├─> #104 M45                        │
+                               └─> #105 Tools + M57 ──> #106 M31, #107 M42, #108 M13
+#100, #101, #109 ──> #111 Konstanten, T12
+#111, #110, #104, #106 bis #108, #36 ──> #112 Validierung ──> #113 Sicherheit ──> #114 Abschluss, v2.0
+```
+
+**Welle 0, sequentiell:** #95 allein (wie PR #46 in Version 1). Danach liegen alle gemeinsamen Typen und Konstanten an ihrem Platz; die Validierungsbilder sind byte-gleich.
+
+**Welle 1, parallel (vier Worktrees):** #96, #97, #98, #99. Jede legt eine neue Datei in `src/physik/` an; gemeinsam beruehrt werden nur `src/physik/index.ts` (Exportzeilen) und `docs/recherche/physik.md` (Quellen), Konflikte dort sind trivial. #99 aendert zusaetzlich `begrenze.ts`.
+
+**Welle 2, parallel (drei Worktrees):** #100 (physik), #101 (bild), #102 (daten). #101 und #102 koennen schon mit Welle 1 starten, da sie nur von #95 abhaengen; #101 testet mit synthetischen `Simulationsparameter`.
+
+**Welle 3, parallel (Daten je Objekt):** #103, #104, #105 und #36 zuerst (#103 und #104 teilen den Abschnitt "Sterndaten": #103 legt ihn an, #104 ergaenzt); danach #106, #107, #108 parallel. Die Daten-Issues brauchen Herberts Freigabe der Lizenzen und Rohdaten in `data/roh/` (Symlinks in Worktrees, Lehre aus Version 1).
+
+**Welle 4, UI:** #109 (Durchstich, sobald #100 bis #103 gemerged sind; ab hier ist ein Doppelstern auf der Seite), danach #110. Welle 3 und 4 laufen ueberlappend.
+
+**Welle 5, sequentiell:** #111 (Herbert legt die Konstanten am Bild fest), #112, #113, #114.
+
+Lehren aus Version 1, die jede Welle einhaelt (`docs/retrospektive.md` 7): Integrationsprobe aller PRs einer Welle in einem Wegwerf-Worktree vor dem Merge; Screenshots je Welle ansehen, nicht erst in der Validierung; Agenten kennzeichnen Geprueftes, Gerechnetes und Vermutetes; Lizenzangaben selbst gegenlesen; die Freigabe zum Merge steht ausdruecklich in der Anweisung.
+
+Spielregeln je Issue wie Abschnitt 4. Bei Sammel-Issues verweist der PR mit "Closes #n" auf das Sub-Issue.
+
+## 9. Offene Punkte, die Phase 5 Version 2 mitnimmt
+
+- Vergleichsbild der Zoomansicht bei Deep-Sky (architektur.md 5.7): Vorschlag und Entscheidung in #110.
+- M13 Bild maskieren oder Sterne plus Restlicht (5.7): Entscheidung in #108.
+- Deckkraft am gefalteten q als Naeherung (5.7): Pruefung bei M57 am 80 mm in #112 (T10), erster Blick schon in #105.
+- Mischfarbe ueberlappender Sterne (Antares B im Halo von A, 5.7): Pruefung in #112 (T9).
+- Konstanten Anzeigeweiss 9,2 und Punktweiss 6,4 sind Startwerte; Festlegung am Bild in #111.
+- Magnitude je Mondphase mit Quelle (Krisciunas und Schaefer) fehlt noch in `docs/recherche/objekte.md`: in #36.
+- M31-Profil innen moeglicherweise zu schwach (ADR-0004 Befund 2): T11 erwartet mit F = 1,4 bei Bortle 5 nur einen Hauch; Pruefung in #106 und #112.

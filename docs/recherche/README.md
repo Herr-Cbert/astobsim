@@ -98,9 +98,11 @@ Input war `docs/anforderungen.md` Abschnitt 10. Vier Recherche-Auftraege liefen 
 | 6 | Doppelsternliste (A-Z9) | 14 Objekte, 16 Paare von Albireo (34,3'') bis 52 Ari (0,56''), ungleiche Paare Zeta Her, Antares ($\Delta m$ 4,44), Polaris; Bahnpaare mit ORB6-Ephemeride 2027,0. Ausgeschlossen: Sirius, Rigel, 44 Boo, Eta CrB, Lambda Cas, Zeta Boo. | doppelsterne.md 2, 5 |
 | 7 | Deep-Sky-Bilder und Sternkataloge | M31 NOIRLab LGS-Panorama (CC BY 4.0, auf 4''/px), M42 ESO eso1103a (CC BY 4.0, V-Kanal, Rohdaten CC BY 4.0), M13 NOIRLab Mayall 4 m (CC BY 4.0, Kern laut Seite nicht ueberbelichtet), M57 Hubble heic1310a bzw. linear OIII aus MAST. Profile: M31 Modell (Courteau 2011 + angepasste Scheibe), M13 King nach Harris 2010, M42 und M57 nur sekundaer. Sterne aus Gaia DR3: M45 44 Mitglieder bis V 8,5, Trapez A bis F, M13 2105 Mitglieder. | bilder-v2.md, deep-sky.md |
 | 8 | Mondphasen SVS 5587 | Frames 6173 (Sichel 4,0 d, 17 %), 6449 (Vollmond), 6615 (letztes Viertel), derselbe Umlauf wie `mond_ev` (6285). Nachtseite im Rendering etwa zehnfach heller als Erdlicht. | bilder-v2.md 8 |
-| 9 | Testfaelle T7 bis T12 | Vorschlag unten. | wahrnehmung.md 8, doppelsterne.md 6, deep-sky.md 8, bilder-v2.md 10 |
+| 9 | Testfaelle T7 bis T12 | Unten, von Herbert bestaetigt. | wahrnehmung.md 8, doppelsterne.md 6, deep-sky.md 8, bilder-v2.md 10 |
 
-## Vorschlag Testfaelle T7 bis T12 (A-Q5, Herbert bestaetigt)
+## Testfaelle T7 bis T12 (A-Q5)
+
+Bestaetigt von Herbert am 2026-10-29 (Phase 4 Version 2), ebenso A-Q4. T11 ist mit dem Feldfaktor $F$ = 1,4 aus ADR-0004 nachgerechnet (`wahrnehmung.md` 2.3, 8), die uebrigen Faelle haengen nicht an $F$.
 
 Bedingungen wie T1 bis T6, falls nicht anders genannt: klar, Bortle 5, Zenit.
 
@@ -110,7 +112,7 @@ Bedingungen wie T1 bis T6, falls nicht anders genannt: klar, Bortle 5, Zenit.
 | T8 | Epsilon Lyrae im 10x50 und am 80 mm bei 160x | 10x50: zwei runde Sterne; 80 mm, Seeing 0,5'': beide engen Paare getrennt; Seeing 2'': im Langzeitmittel nicht (wie T2) | Haas, Beobachtungsfuehrer; doppelsterne.md TD1 |
 | T9 | Antares am 150 mm, 200x | Seeing 0,5'': Begleiter getrennt, Hinweis "Ueberstrahlung nicht simuliert"; Seeing 1,5'' oder 15 Grad Hoehe: nicht getrennt | Haas, Lord; doppelsterne.md TD3 |
 | T10 | M57 am 80 mm, etwa 80x, und am 150 mm | 80 mm: kleines Oval sichtbar, Loch hoechstens angedeutet; 150 mm: Ring mit dunkler Mitte | Beobachtungsfuehrer (sekundaer, uneins); deep-sky.md 8 Punkt 1 |
-| T11 | Blosses Auge: M31 und Plejaden bei Bortle 3 und 7 | Bortle 3: M31 deutlich, laenglich, 1,5 bis 3 Grad; Plejaden 14 bis 21 Sterne. Bortle 7: M31 nur Kern sehr undeutlich; Plejaden sechs Sterne. Infopanel-Grenzgroesse etwa 6,0 bzw. 5,0 | Bortle 2001, Crumey 2014; wahrnehmung.md W1, W2; deep-sky.md 8 Punkte 2, 3 |
+| T11 | Blosses Auge: M31 und Plejaden bei Bortle 3 und 7 | Bortle 3: M31 sichtbar, laenglich, 1,5 bis 3 Grad (Prototyp 106'); Plejaden 11 bis 14 Sterne (Grenze 6,2 zwischen den Zaehlstufen 6,0 und 6,5 in deep-sky.md 4.2; die Literatur nennt bis 14). Bortle 7: M31 hoechstens als Hauch des Kerns (bestes $C/C_\mathrm{th}$ 0,42, Deckkraft um 0,1); Plejaden sechs Sterne, Pleione mit Atlas verschmolzen. Infopanel-Grenzgroesse etwa 6,2 bzw. 5,2 (mit 0,2 mag Extinktion im Zenit) | Bortle 2001, Crumey 2014; wahrnehmung.md W1, W2; deep-sky.md 8 Punkte 2, 3 |
 | T12 | Helligkeit (A-P13) | Mond am 80 mm bei AP 1 mm: hellstes Perzentil Bildschirmweiss; Jupiter mit blossem Auge im Kern nahezu weiss, Mars 14'' und Saturn deutlich dunkler; T1 bis T6 weiter erfuellt | A-P13, helligkeit-v2.md |
 
 Reserve, falls Herbert tauschen will: M13 am 200 mm gegen 80 mm (Rand aufgeloest, deep-sky.md 8 Punkt 4), Trapez am 80 mm gegen 200 mm (E und F, Punkt 5), Grenzgroesse am 200 mm bei 50/100/200x (wahrnehmung.md W3), Sternfarbe Antares und Albireo (W4), Zeta Her (TD4).
@@ -118,7 +120,7 @@ Reserve, falls Herbert tauschen will: M13 am 200 mm gegen 80 mm (Rand aufgeloest
 ## Entschieden von Herbert am 2026-10-29
 
 - Konstanten der Abbildung (Frage 1): Empfehlung aus helligkeit-v2.md 4 angenommen.
-- Feldfaktor $F$ = 2 (wahrnehmung.md 7). **Geaendert in Phase 3 Version 2 (2026-10-29): $F$ = 1,4** nach dem Prototyp (M31 mit blossem Auge, ADR-0004); Tabellen und Testwerte mit $F$ = 2 in wahrnehmung.md werden in Phase 4 umgerechnet (Grenzgroesse plus 0,39 mag).
+- Feldfaktor $F$ = 2 (wahrnehmung.md 7). **Geaendert in Phase 3 Version 2 (2026-10-29): $F$ = 1,4** nach dem Prototyp (M31 mit blossem Auge, ADR-0004); Tabellen und Testwerte mit $F$ = 2 in wahrnehmung.md werden in Phase 4 umgerechnet (Grenzgroesse plus 0,39 mag); erledigt am 2026-10-29.
 - Entscheidungen 1 bis 7 unten: 1 ja (Sterndaten mit eigener Lizenz), 2 ja (lineare Archivdaten fuer M42, M57, M13; M31 per Tonkurve gegen das Profil), 3 Testfaelle mit Seeing 0,5'', A-B6 bleibt Kann, der Hilfetext nennt das Langzeitmittel, 4 Begriff "Mehrfachstern" fuer Systeme mit mehr als zwei Sternen (GLOSSARY), 5 ja, 6 Nachtseite auf Schwarz, 7 ja (Polaris B 8,6 mag).
 
 ## Entscheidungen vor Phase 3 (alle entschieden, siehe oben)

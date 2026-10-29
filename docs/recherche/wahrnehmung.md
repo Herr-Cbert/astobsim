@@ -4,6 +4,7 @@
 **Datum:** 2026-10-29
 **Zugeordnete Kennungen:** A-P10, A-P11, A-P12, A-P13 (nur Hinweise), A-B2, A-Q5. Offene Fragen 2, 3, 4, 5 und 9 aus `docs/anforderungen.md` Abschnitt 10.
 **Konventionen:** wie `docs/recherche/physik.md`. $B$ Leuchtdichte in cd/m$^2$, $\mu$ Flaechenhelligkeit in mag/arcsec$^2$, Umrechnung $\mu = 12{,}58 - 2{,}5\log_{10} B$ [1, Abschn. 1.3]; Beleuchtungsstaerke $\Delta I$ in lx, Magnitude $m = -2{,}5\log_{10}(\Delta I / Z)$ mit $Z = 2{,}54\cdot10^{-6}$ lx [1]. $A$ Flaeche des Ziels in Steradiant, $\alpha$ in Quadratbogenminuten. $V$ Vergroesserung, $AP$ Austrittspupille, $p$ = 6 mm Augenpupille (A-P4), $\tau$ Transmission ($F_t = 1/\tau$). Werte mit "(ber.)" habe ich mit einem Python-Skript nachgerechnet (nicht im Repo); jede Rechnung ist aus den angegebenen Formeln nachvollziehbar. Quellen in eckigen Klammern, Liste am Ende. Begriffe nach `GLOSSARY.md` (Wahrnehmungsschwelle, Punktquelle, Unaufgeloest, Punktebene, Quellweiss, Anzeigehelligkeit).
+**Nachtrag 2026-10-29 (Phase 4 Version 2):** Feldfaktor $F$ = 1,4 statt 2 (ADR-0004, Entscheidung Herbert nach dem Prototyp). Tabellen und Testwerte fuer astobsim sind auf $F$ = 1,4 umgerechnet (ber., Skript wie oben); Crumeys Kontrollwerte mit $F$ = 1, 2 oder 2,36 bleiben als Literaturbezug stehen und sind so gekennzeichnet. $F$ wirkt als Faktor auf die Schwelle: Kontrastschwellen sinken um den Faktor 0,7, Grenzgroessen von Sternen steigen um $2{,}5\log_{10}(2/1{,}4)$ = 0,387 mag, auch mit Seeing-Scheibe und Nullhintergrund (beide haengen nicht an $F$).
 
 ---
 
@@ -47,7 +48,7 @@ Werte der Formel ohne Feldfaktor ($F$ = 1), Zielflaeche als Scheibe mit Durchmes
 | 18,3 | 5,15e-3 | 38,4 | 4,48 | 0,495 | 0,0981 | 0,0353 | 0,0241 | 0,0213 | 21,0' |
 | 17,0 | 1,71e-2 | 14,1 | 1,68 | 0,200 | 0,0463 | 0,0202 | 0,0152 | 0,0140 | 15,7' |
 
-Lesehilfe: ein Detail von 10' auf einem Bortle-5-Himmel (20,0) braucht mit $F$ = 2 den Kontrast 2,8, also 1,1 mag heller als der Himmel; eine Flaeche von 6 Grad nur 8 % ueber dem Himmel. Crumeys eigene Kontrollwerte bei 21,83 mag/arcsec$^2$ ($F$ = 1): Grenzgroesse 6,93, Grenzflaechenhelligkeit $\mu_\infty$ = 24,94, Ricco-Radius 37,6' [1, Abschn. 3.1, Gl. 63]; die Tabelle trifft alle drei (ber.: 6,936 / 24,939 / 37,57'). Blackwells "kritischer Sehwinkel" (Beginn der Abweichung von Ricco) ist bei diesem Himmel nur etwa 4,5' Radius [1, nach Abb. 17 in 2]; die Ricco-Flaeche als Schnittpunkt der Asymptoten ist die groessere, konventionelle Groesse [1].
+Lesehilfe: ein Detail von 10' auf einem Bortle-5-Himmel (20,0) braucht mit $F$ = 1,4 den Kontrast 1,9, also 0,7 mag heller als der Himmel ($F$ = 2: 2,8 und 1,1 mag); eine Flaeche von 6 Grad nur 6 % ueber dem Himmel ($F$ = 2: 8 %). Crumeys eigene Kontrollwerte bei 21,83 mag/arcsec$^2$ ($F$ = 1): Grenzgroesse 6,93, Grenzflaechenhelligkeit $\mu_\infty$ = 24,94, Ricco-Radius 37,6' [1, Abschn. 3.1, Gl. 63]; die Tabelle trifft alle drei (ber.: 6,936 / 24,939 / 37,57'). Blackwells "kritischer Sehwinkel" (Beginn der Abweichung von Ricco) ist bei diesem Himmel nur etwa 4,5' Radius [1, nach Abb. 17 in 2]; die Ricco-Flaeche als Schnittpunkt der Asymptoten ist die groessere, konventionelle Groesse [1].
 
 ### 1.3 Feldfaktor: 50-%-Schwelle gegen sichere Wahrnehmung
 
@@ -57,7 +58,7 @@ Lesehilfe: ein Detail von 10' auf einem Bortle-5-Himmel (20,0) braucht mit $F$ =
 - Crumey fasst alles (Laborskalierung, Beobachter, Ziel, Medium) in einen Feldfaktor $F$; er verschiebt die Schwellenkurve auf log-Achsen nur nach oben oder unten, die Form bleibt [1, Abschn. 1.2]. Mit realen Grenzgroessen um 6,0 bis 6,6 bei dunklem Himmel liegt $F$ zwischen 2,4 und 1,4; als typischen Wert nimmt Crumey $F$ = 2 (Grenzgroesse 6,18 bei 21,83) [1, Abschn. 3.1]. Bowen (49 Jahre) ergibt $F$ = 2,74, Herschel 2,36 [1, Abschn. 3.2, 3.3].
 - Fernrohr: zusaetzlich $F_T = \sqrt2$ (einaeugig statt beidaeugig, Lythgoe & Phillips 1938 nach [1]) und $F_M$ = 1 (bis zur Grenze, ab der das Auge selbst beugungsbegrenzt ist) [1, Abschn. 1.6.4]. Beim Fernglas und blossen Auge ist $F_T$ = 1 (beidaeugig).
 
-Folge fuer den "festen Normalbeobachter" aus A-P9: $F$ = 2 (blosses Auge, Fernglas), $\varphi = \sqrt2\,F = 2{,}83$ (Fernrohr). Das ist ein typischer erwachsener Beobachter, deutlich schwaecher als die Bortle-Grenzgroessen (Abschnitt 2.4).
+Folge fuer den "festen Normalbeobachter" aus A-P9: urspruenglich $F$ = 2 (typischer erwachsener Beobachter); nach dem Prototyp **$F$ = 1,4** (blosses Auge, Fernglas), $\varphi = \sqrt2\,F = 1{,}98$ (Fernrohr), das untere Ende von Crumeys Spanne, ein erfahrenerer Beobachter (ADR-0004). Er bleibt schwaecher als die Bortle-Grenzgroessen (Abschnitt 2.4).
 
 ### 1.4 Wirkung der Vergroesserung
 
@@ -80,7 +81,7 @@ $$\mu_\mathrm{lim} = \mu_\infty - \frac{2{,}5}{q}\log_{10}\!\left[\left(\frac{\a
 - Schaefer 1990 [5]: vollstaendiges Modell der teleskopischen Grenzgroesse auf Hecht-Basis mit einzeln geschaetzten Faktoren (Extinktion, Farbe, Alter, Pupille, Stiles-Crawford, einaeugig, Seeing), getestet an 314 Beobachtungen, Fehler typisch 0,5 mag nach Abzug der Erfahrung [5, Abstract]. Crumey zeigt an Bowens Daten (Mount Wilson 1947) einen mittleren Fehler von 0,37 mag fuer Schaefer gegen 0,09 mag fuer sein Modell [1, Abschn. 3.2]. Schaefers Formel fuer das blosse Auge im Zenit: $m_z = 8{,}68 - 2{,}5\log_{10} F_s - 1{,}2\,k_v - 5\log_{10}(1 + 0{,}158\,B_s^{1/2})$ mit $B_s = 34{,}08\,\exp(20{,}7233 - 0{,}92104\,\mu)$ in nL [5, Gl. 17, 18].
 - Clark 1990 [6] zeichnet Blackwells Kurven fuer Deep-Sky-Vorhersagen grafisch; Crumey ersetzt das durch Formeln [1]. Clark nicht im Buch eingesehen.
 
-**Empfehlung:** Crumey Gl. 47 bzw. 77 als einzige Schwellenformel, mit $F$ = 2 und $F_T = \sqrt2$ am Fernrohr.
+**Empfehlung:** Crumey Gl. 47 bzw. 77 als einzige Schwellenformel, mit $F$ = 1,4 (urspruenglich 2, ADR-0004) und $F_T = \sqrt2$ am Fernrohr.
 
 ---
 
@@ -100,35 +101,35 @@ Crumey nach Tousey & Hulburt 1948 [1, Gl. 66 bis 72], $D$ und $\delta$ in gleich
 
 $$\Delta I = \left(\frac{\delta_\mathrm{max}}{D}\right)^2 F_t\,F_M\,F_T\,F\,(r_1 B_a^{1/4} + r_2 B_a^{1/2})^2,\qquad B_a \ge 10^{-5}\ \text{cd/m}^2$$
 
-Unter dem Nullhintergrund bleibt die Schwelle fest: $m_\mathrm{cut} = 5\log_{10} D - 2{,}5\log_{10}(Z^{-1}\zeta\,p^2 F_t F_M F_T F)$ mit $\zeta = 1{,}150\cdot10^{-9}$ lx [1, Gl. 71, 72]. Mit $p$ = 7 mm, $\tau$ = 0,75, $F_T = \sqrt2$, $F$ = 2 folgt die Faustformel $m_\mathrm{cut} = 7{,}69 + 5\log_{10} D_\mathrm{cm}$ [1, Gl. 73], gleich Sinnotts 7,7 [nach 1]. In mm: $2{,}7 + 5\log_{10} D_\mathrm{mm}$; die gelegentlich genannte Form $2 + 5\log_{10} D_\mathrm{mm}$ entspricht $F \approx 3{,}8$, also einem schwaecheren Beobachter oder hellerem Himmel.
+Unter dem Nullhintergrund bleibt die Schwelle fest: $m_\mathrm{cut} = 5\log_{10} D - 2{,}5\log_{10}(Z^{-1}\zeta\,p^2 F_t F_M F_T F)$ mit $\zeta = 1{,}150\cdot10^{-9}$ lx [1, Gl. 71, 72]. Mit $p$ = 7 mm, $\tau$ = 0,75, $F_T = \sqrt2$, $F$ = 2 folgt die Faustformel $m_\mathrm{cut} = 7{,}69 + 5\log_{10} D_\mathrm{cm}$ [1, Gl. 73], gleich Sinnotts 7,7 [nach 1]. In mm: $2{,}7 + 5\log_{10} D_\mathrm{mm}$; die gelegentlich genannte Form $2 + 5\log_{10} D_\mathrm{mm}$ entspricht $F \approx 3{,}8$, also einem schwaecheren Beobachter oder hellerem Himmel. Mit $F$ = 1,4 (sonst gleich) wird daraus $8{,}08 + 5\log_{10} D_\mathrm{cm}$ (ber.).
 
 Der Verlauf ueber der Austrittspupille hat drei Geraden: Steigung 5 fuer $AP \ge p$, 2,131 fuer $p \ge AP \ge d_0$, 0 darunter; Bowens Messungen am 6-Zoll-Refraktor: $m_0 = -5\log d + 1{,}02$ / $-2{,}131\log d + 7{,}57$ / 13,96 ($d$ in m) [1, Gl. 74]. Wird das Seeing-Scheibchen im Auge groesser als etwa 10', ist der Stern kein Punkt mehr; Crumey behandelt ihn dann als Flaeche mit Durchmesser 2,8 FWHM (99 bis 100 % des Lichts einer Gauss-Scheibe) in Gl. 88 [1, Abschn. 1.6.2, 3.3]. Schaefer korrigiert mit $F_r = (2\theta V/900'')^{0{,}5}$ fuer $2\theta V > 900''$ [5, Gl. 7].
 
 ### 2.3 Tabelle Grenzgroesse (ber.)
 
-Annahmen: Zenit, ohne Extinktion, $p$ = 6 mm (A-P4), $F$ = 2, Fernrohr $F_T = \sqrt2$, $F_M$ = 1; 80 mm Refraktor $\tau$ = 0,90; 150 und 200 mm Newton $\tau = 0{,}80\cdot(1 - 0{,}25^2) = 0{,}75$ (`physik.md` 5.2); Seeing 2'' als Scheibe 2,8 FWHM mit Gl. 88; $\mu$ nach `physik.md` 6.1 (Spalte Vorschlag astobsim). Je Oeffnung zwei Vergroesserungen: AP 2 mm und AP 1 mm.
+Annahmen: Zenit, ohne Extinktion, $p$ = 6 mm (A-P4), $F$ = 1,4 (umgerechnet am 2026-10-29; mit $F$ = 2 jeder Wert 0,39 mag kleiner, Spalte "Crumey $F$=2"), Fernrohr $F_T = \sqrt2$, $F_M$ = 1; 80 mm Refraktor $\tau$ = 0,90; 150 und 200 mm Newton $\tau = 0{,}80\cdot(1 - 0{,}25^2) = 0{,}75$ (`physik.md` 5.2); Seeing 2'' als Scheibe 2,8 FWHM mit Gl. 88; $\mu$ nach `physik.md` 6.1 (Spalte Vorschlag astobsim). Je Oeffnung zwei Vergroesserungen: AP 2 mm und AP 1 mm.
 
-| Bortle | $\mu$ | NELM Bortle [7] | Crumey $F$=2 | Schaefer Gl. 18 | 80 mm 40x | 80 mm 80x | 150 mm 75x | 150 mm 150x | 200 mm 100x | 200 mm 200x |
-|---|---|---|---|---|---|---|---|---|---|---|
-| 1 | 21,9 | 7,6 bis 8,0 | 6,21 | 6,71 | 12,40 | 12,68 | 13,62 | 13,77 | 14,22 | 14,34 |
-| 3 | 21,4 | 6,6 bis 7,0 | 6,01 | 6,42 | 12,17 | 12,68 | 13,39 | 13,77 | 13,99 | 14,34 |
-| 5 | 20,0 | 5,6 bis 6,0 | 5,49 | 5,48 | 11,55 | 12,18 | 12,76 | 13,35 | 13,35 | 13,92 |
-| 7 | 18,3 | 4,6 bis 5,0 | 4,98 | 4,10 | 10,85 | 11,41 | 12,04 | 12,56 | 12,61 | 13,11 |
-| 9 | 17,0 | <= 4,0 | 4,78 | 2,94 | 10,38 | 10,86 | 11,54 | 11,98 | 12,10 | 12,51 |
+| Bortle | $\mu$ | NELM Bortle [7] | Crumey $F$=2 | Crumey $F$=1,4 | Schaefer Gl. 18 | 80 mm 40x | 80 mm 80x | 150 mm 75x | 150 mm 150x | 200 mm 100x | 200 mm 200x |
+|---|---|---|---|---|---|---|---|---|---|---|---|
+| 1 | 21,9 | 7,6 bis 8,0 | 6,21 | 6,60 | 6,71 | 12,79 | 13,06 | 14,01 | 14,16 | 14,61 | 14,73 |
+| 3 | 21,4 | 6,6 bis 7,0 | 6,01 | 6,40 | 6,42 | 12,56 | 13,06 | 13,78 | 14,16 | 14,37 | 14,73 |
+| 5 | 20,0 | 5,6 bis 6,0 | 5,49 | 5,87 | 5,48 | 11,94 | 12,56 | 13,15 | 13,74 | 13,74 | 14,30 |
+| 7 | 18,3 | 4,6 bis 5,0 | 4,98 | 5,37 | 4,10 | 11,24 | 11,80 | 12,42 | 12,95 | 13,00 | 13,50 |
+| 9 | 17,0 | <= 4,0 | 4,78 | 5,17 | 2,94 | 10,77 | 11,25 | 11,92 | 12,37 | 12,49 | 12,90 |
 
 Faustformeln (nur Oeffnung): $7{,}7 + 5\log_{10} D_\mathrm{cm}$ ergibt 12,21 / 13,57 / 14,20, $2 + 5\log_{10} D_\mathrm{mm}$ 11,52 / 12,88 / 13,51 fuer 80 / 150 / 200 mm (ber.). Schaefer Gl. 18 mit $k_v$ = 0,2, $F_s$ = 1.
 
 Beobachtungen zur Tabelle:
 - Bei Bortle 1 und 3 erreicht 80 mm bei 80x den Nullhintergrund (gleiche Werte); die Formel ist ab dort nur noch von der Oeffnung abhaengig.
-- Bei 200x und 2'' Seeing ist das Sternscheibchen im Auge 18,7' gross (2,8 x 2'' x 200), die Grenze faellt um 0,2 bis 0,35 mag gegen den Punktwert (ber.). Abtastung 200 mm, Bortle 5: 25x 11,86, 50x 12,78, 100x 13,35, 200x 13,92, 300x 14,23, 400x 14,12 (ber.); das Maximum liegt beim Nullhintergrund (AP etwa 0,7 mm), danach verliert das Seeing.
-- Fernglas 10x50, $\tau$ = 0,85, beidaeugig: Bortle 5 10,1 mag, Bortle 3 10,7 mag (ber.).
+- Bei 200x und 2'' Seeing ist das Sternscheibchen im Auge 18,7' gross (2,8 x 2'' x 200), die Grenze faellt um 0,2 bis 0,35 mag gegen den Punktwert (ber.). Abtastung 200 mm, Bortle 5: 25x 12,25, 50x 13,17, 100x 13,74, 200x 14,30, 300x 14,62, 400x 14,51 (ber., $F$ = 1,4); das Maximum liegt beim Nullhintergrund (AP etwa 0,7 mm), danach verliert das Seeing.
+- Fernglas 10x50, $\tau$ = 0,85, beidaeugig: Bortle 5 10,5 mag, Bortle 3 11,1 mag (ber., $F$ = 1,4; mit $F$ = 2 10,1 und 10,7).
 
 ### 2.4 Vergleich mit Bortle
 
-Bortle [7] nennt fuer jede Klasse auch die Grenze eines 32-cm-Reflektors (12,5 Zoll): Klasse 1 17,5 "with effort", 2 16 bis 17, 3 16, 4 15,5, 5 14,5 bis 15, 6 14,0 bis 14,5, 7 knapp 14, 8 kaum besser als 13. Das Modell (320 mm, $\tau$ = 0,75, 160x, 2'' Seeing, ber.) ergibt 15,2 / 15,1 / 14,9 / 14,8 / 14,3 / 13,8 / 13,5 / 13,2 fuer die Klassen 1 bis 8.
+Bortle [7] nennt fuer jede Klasse auch die Grenze eines 32-cm-Reflektors (12,5 Zoll): Klasse 1 17,5 "with effort", 2 16 bis 17, 3 16, 4 15,5, 5 14,5 bis 15, 6 14,0 bis 14,5, 7 knapp 14, 8 kaum besser als 13. Das Modell (320 mm, $\tau$ = 0,75, 160x, 2'' Seeing, ber.) ergibt mit $F$ = 1,4 15,6 / 15,5 / 15,3 / 15,2 / 14,7 / 14,2 / 13,9 / 13,6 fuer die Klassen 1 bis 8 (mit $F$ = 2 je 0,39 mag weniger).
 
-- Bei dunklem Himmel liegt das Modell mit $F$ = 2 um 1 bis 2 mag (blosses Auge) bzw. 1 bis 2,3 mag (32 cm) unter Bortle; um Bortle zu treffen, braeuchte es $F \approx 0{,}5$, also besser als Blackwells 50-%-Laborschwelle. Crumey: Bortle ueberschaetzt den typischen Beobachter, Werte ueber 7 sind meist Szintillations-Aufblitzer oder Ausnahmebeobachter [1, Abschn. 1.6.5; 8].
-- Bei Bortle 5 bis 7 passen Modell und Bortle (Abweichung unter 0,5 mag). Bei Bortle 8 und 9 ist das Modell heller als Bortle; dort sind die Himmelswerte geschaetzt (`physik.md` 10 Punkt 6) und der Himmel ist mesopisch, also ausserhalb von Crumeys Anwendungsbereich.
+- Bei dunklem Himmel liegt das Modell mit $F$ = 1,4 um 0,2 bis 1,4 mag (blosses Auge) bzw. 0,7 bis 1,9 mag (32 cm) unter Bortle ($F$ = 2: 1 bis 2 bzw. 1 bis 2,3 mag); um Bortle zu treffen, braeuchte es $F \approx 0{,}5$, also besser als Blackwells 50-%-Laborschwelle. Crumey: Bortle ueberschaetzt den typischen Beobachter, Werte ueber 7 sind meist Szintillations-Aufblitzer oder Ausnahmebeobachter [1, Abschn. 1.6.5; 8].
+- Bei Bortle 5 bis 7 passen Modell und Bortle (mit $F$ = 1,4 Bortle 5 im Bereich, Bortle 7 mit 5,37 gegen 4,6 bis 5,0 bis 0,8 mag darueber). Bei Bortle 8 und 9 ist das Modell heller als Bortle; dort sind die Himmelswerte geschaetzt (`physik.md` 10 Punkt 6) und der Himmel ist mesopisch, also ausserhalb von Crumeys Anwendungsbereich.
 - Schaefers Formel ist bei hellem Himmel viel steiler (Bortle 9: 2,9); das ist Hechts zweiter Zweig.
 
 ---
@@ -178,15 +179,15 @@ Der angezeigte Kontrast haengt also an $q$, das heisst an der willkuerlichen Wah
 
 ### 4.2 Zahlen (ber.)
 
-Beispiele mit $\mu_\mathrm{weiss}$ = 3,35, $n$ = 1/3, ohne Extinktion beim blossen Auge; sRGB-Kode nach [9]. Die Deep-Sky-Werte sind Beispielwerte zur Begruendung, keine Objektdaten (die liefert die Deep-Sky-Recherche): "M31-artig" = Kern 17,0 und Aussenscheibe 22,5 mag/arcsec$^2$ auf Bortle 3 (21,4); M57 als Ring mit etwa 17,8 mag/arcsec$^2$ (8,8 mag auf 1,4' x 1,0', ber.) an 80 mm bei 50x (AP 1,6 mm, $\tau$ = 0,9, Faktor +2,98 mag) auf Bortle 5. Schwelle mit Crumey Gl. 47 / 77 fuer die scheinbare Groesse, $F$ = 2 bzw. $\varphi$ = 2,83.
+Beispiele mit $\mu_\mathrm{weiss}$ = 3,35, $n$ = 1/3, ohne Extinktion beim blossen Auge; sRGB-Kode nach [9]. Die Deep-Sky-Werte sind Beispielwerte zur Begruendung, keine Objektdaten (die liefert die Deep-Sky-Recherche): "M31-artig" = Kern 17,0 und Aussenscheibe 22,5 mag/arcsec$^2$ auf Bortle 3 (21,4); M57 als Ring mit etwa 17,8 mag/arcsec$^2$ (8,8 mag auf 1,4' x 1,0', ber.) an 80 mm bei 50x (AP 1,6 mm, $\tau$ = 0,9, Faktor +2,98 mag) auf Bortle 5. Schwelle mit Crumey Gl. 47 / 77 fuer die scheinbare Groesse, $F$ = 1,4 bzw. $\varphi$ = 1,98 (umgerechnet am 2026-10-29: $C_\mathrm{th}$ mal 0,7; die Spalten ohne Schwelle aendern sich nicht).
 
 | Fall | $C$ physikalisch | Schwelle $C_\mathrm{th}$ | $C/C_\mathrm{th}$ | Quellweiss | getrennt: $C_\mathrm{Anzeige}$ | gemeinsam: $(1+C)^{1/3} - 1$ | sRGB Himmel / Objekt+Himmel getrennt / gemeinsam |
 |---|---|---|---|---|---|---|---|
-| M31-artig Aussenscheibe, 60' | 0,363 | 0,384 | 0,95 | 17,0 (Kern) | 0,024 | 0,109 | 12,7 / 13,0 / 13,9 |
-| dasselbe | 0,363 | 0,384 | 0,95 | 19,3 | 0,100 | 0,109 | 12,7 / 13,8 / 13,9 |
-| M31-artig Kern, 10' | 57,5 | 5,9 | 9,7 | 17,0 | 3,86 | 2,88 | 12,7 / 37,6 / 33,0 |
-| M57 80 mm 50x, 60' scheinbar | 5,86 | 1,06 | 5,5 | 17,3 (Ring) | 1,33 | 0,90 | 7,9 / 17,0 / 14,5 |
-| Flaeche $C$ = 0,1 am M57-Himmel | 0,10 | 1,06 | 0,09 | 17,3 | 0,023 | 0,032 | 7,9 / 8,1 / 8,2 |
+| M31-artig Aussenscheibe, 60' | 0,363 | 0,269 | 1,35 | 17,0 (Kern) | 0,024 | 0,109 | 12,7 / 13,0 / 13,9 |
+| dasselbe | 0,363 | 0,269 | 1,35 | 19,3 | 0,100 | 0,109 | 12,7 / 13,8 / 13,9 |
+| M31-artig Kern, 10' | 57,5 | 4,1 | 14 | 17,0 | 3,86 | 2,88 | 12,7 / 37,6 / 33,0 |
+| M57 80 mm 50x, 60' scheinbar | 5,86 | 0,74 | 7,9 | 17,3 (Ring) | 1,33 | 0,90 | 7,9 / 17,0 / 14,5 |
+| Flaeche $C$ = 0,1 am M57-Himmel | 0,10 | 0,74 | 0,13 | 17,3 | 0,023 | 0,032 | 7,9 / 8,1 / 8,2 |
 
 Folgen:
 1. **Abhaengigkeit von der Eichung:** dieselbe Aussenscheibe erscheint getrennt abgebildet mit 2,4 % oder 10 % Kontrast, je nachdem ob Quellweiss auf den Kern oder 2,3 mag tiefer gelegt wird. Gemeinsam abgebildet ist der angezeigte Kontrast eine feste Funktion von $C$: $(1+C)^{1/3} - 1$, unabhaengig von Quellweiss.
@@ -201,9 +202,9 @@ Ward 1994 [10] und Ward Larson et al. 1997 [11] (`physik.md` [56, 57]) bilden so
 
 1. **Deep-Sky-Ebene gemeinsam mit dem Himmel abbilden.** Deep-Sky-Flaechen (A-Z10) bekommen eine eigene Ebene im Arbeitsraster; je Pixel $w = \min(1, (a\,q + s)^{n})$ statt $q\,a^n + s^n$. Sonnensystem-Flaechen bleiben getrennt wie in `physik.md` 12.3 (T1 bis T6 bitgleich, Binnenkontrast linear; dort ist der Himmel um mindestens 8,9 mag dunkler und die Frage stellt sich nicht). Begruendung: unabhaengig von Quellweiss, Kontrast monoton in $C$, Himmel und Objekt verschmelzen am Rand stetig.
 2. **Schwelle physikalisch, vor der Abbildung.** Fuer jedes Deep-Sky-Objekt sucht physik die schwaechste sichtbare Isophote nach Crumeys Verfahren fuer M33 und M31 [1, Abschn. 3.1, Abb. 12]: fuer Isophoten $\mu_i$ mit eingeschlossener Flaeche $\alpha_i$ ist die Isophote sichtbar, wenn $\mu_i \le \mu_\mathrm{lim}(\alpha_i)$ (Gl. 84 mit $V$, $B_a$, $\varphi$). Pixel unter der sichtbaren Isophote zeigt der Anblick als Himmel. Fuer Sterne (Doppelsterne, M45, Trapez, Trabanten) gilt die Grenzgroesse $m_\mathrm{lim}$ aus Gl. 68 bzw. 88 mit dem Seeing-Scheibchen.
-3. **Gleitend statt Sprung.** Ausblenden nach Blackwells Wahrscheinlichkeitskurve [1, Abschn. 1.2]: Deckkraft $P = \Phi\big((C/C_\mathrm{th} - 1)/0{,}484\big)$ mit $C_\mathrm{th}$ bei $F$ = 2; fuer Sterne mit $C/C_\mathrm{th} = 10^{-0{,}4(m - m_\mathrm{lim})}$. 10 % bei 1,05 mag unter, 90 % bei 0,52 mag ueber der Schwelle (ber.).
-4. **Mindestsichtbarkeit auf dem Schirm.** Je Objekt und Konfiguration ein fester Verstaerkungsfaktor $G \ge 1$ fuer den Zuwachs ueber dem Himmel, so dass ein Pixel an der Schwelle mindestens $\Delta_\mathrm{min}$ sRGB-Kodes ueber dem Himmel liegt (Vorschlag 3 Kodes); $G$ = 1, wenn die Abbildung das schon leistet. Ein Faktor je Objekt erhaelt die Monotonie im Objekt. $\Delta_\mathrm{min}$ legt Herbert am Bild fest, wie $\mu_\mathrm{weiss}$ (`physik.md` 12.5 Punkt 3).
-5. **Konstanten:** $F$ = 2, $F_T = \sqrt2$ (Fernrohr) bzw. 1 (Fernglas, Auge), $F_M$ = 1, $q$ = 0,6, Nullhintergrund $10^{-5}$ cd/m$^2$, Seeing-Scheibe 2,8 FWHM.
+3. **Gleitend statt Sprung.** Ausblenden nach Blackwells Wahrscheinlichkeitskurve [1, Abschn. 1.2]: Deckkraft $P = \Phi\big((C/C_\mathrm{th} - 1)/0{,}484\big)$ mit $C_\mathrm{th}$ bei $F$ = 1,4 (urspruenglich 2); fuer Sterne mit $C/C_\mathrm{th} = 10^{-0{,}4(m - m_\mathrm{lim})}$. 10 % bei 1,05 mag unter, 90 % bei 0,52 mag ueber der Schwelle (ber.).
+4. **Mindestsichtbarkeit auf dem Schirm.** Je Objekt und Konfiguration ein fester Verstaerkungsfaktor $G \ge 1$ fuer den Zuwachs ueber dem Himmel, so dass ein Pixel an der Schwelle mindestens $\Delta_\mathrm{min}$ sRGB-Kodes ueber dem Himmel liegt (Vorschlag 3 Kodes); $G$ = 1, wenn die Abbildung das schon leistet. Ein Faktor je Objekt erhaelt die Monotonie im Objekt. $\Delta_\mathrm{min}$ legt Herbert am Bild fest, wie $\mu_\mathrm{weiss}$ (`physik.md` 12.5 Punkt 3). Ersetzt in ADR-0004 durch einen additiven Sockel, $\Delta_\mathrm{min}$ = 3 Kodes.
+5. **Konstanten:** $F$ = 1,4 (urspruenglich 2, ADR-0004), $F_T = \sqrt2$ (Fernrohr) bzw. 1 (Fernglas, Auge), $F_M$ = 1, $q$ = 0,6, Nullhintergrund $10^{-5}$ cd/m$^2$, Seeing-Scheibe 2,8 FWHM.
 
 Verworfen:
 - **Getrennte Abbildung auch fuer Deep-Sky:** angezeigter Kontrast haengt an Quellweiss (Faktor 4 bei 2,3 mag Eichunterschied), schwache Teile bis Faktor 15 zu schwach (4.2).
@@ -255,6 +256,7 @@ Alle Werte liegen im sRGB-Gamut (kein negativer Kanal). Die Spalte "$Y$ = 1" ist
 | $\mu \to B$ | 21,83 / 25,08 | 1,995e-4 / 1,00e-5 cd/m$^2$ | [1, Abschn. 1.3] |
 | $m_0$ blosses Auge, $F$ = 1 | 21,83 | 6,93 (ber. 6,936) | [1, Abschn. 3.1] |
 | $m_0$, $F$ = 2 | 21,83 / 20,0 / 18,3 | 6,18 / 5,49 / 4,98 | [1]; ber. |
+| $m_0$, $F$ = 1,4 (astobsim) | 21,83 / 20,0 / 18,3 | 6,57 / 5,87 / 5,37 | ber. |
 | $\mu_\infty$, $F$ = 1 | 21,83 | 24,94 (ber. 24,939) | [1, Gl. 56] |
 | Ricco-Radius | 21,83 | 37,6' (ber. 37,57') | [1, Gl. 63] |
 | $C(A,B)$, $F$ = 1 | $B$ = 2e-4, $d$ = 1' / 10' / 100' | 325,2 / 3,713 / 0,1395 | ber. aus [1, Gl. 47] |
@@ -263,7 +265,8 @@ Alle Werte liegen im sRGB-Gamut (kein negativer Kanal). Die Spalte "$Y$ = 1" ist
 | Herschel | 475 mm, 157x, $p$ 5,08, $F_t$ 1,6, 21,83, $F$ 2,36 | $m_0$ 15,66; $\mu_\infty$ 23,18; $\alpha_{TR}^{0{,}6}$ 0,468 | [1, Abschn. 3.3, Gl. 89] |
 | Nullhintergrund | 100 mm, $F_t F_M F_T F$ = 3,77, $p$ 7 mm | $m_\mathrm{cut}$ 12,7 (ber. 12,69) | [1, Abb. 13] |
 | Faustformel | $D$ = 10 cm, $F$ = 2, $p$ 7, $\tau$ 0,75 | 12,70 | [1, Gl. 73] |
-| Tabelle 2.3 | 200 mm, $\tau$ 0,75, Bortle 5, 100x, 2'' | 13,35 (Punkt 13,47) | ber. |
+| Tabelle 2.3, $F$ = 2 | 200 mm, $\tau$ 0,75, Bortle 5, 100x, 2'' | 13,35 (Punkt 13,47) | ber. |
+| Tabelle 2.3, $F$ = 1,4 | dasselbe | 13,74 (Punkt 13,86) | ber. |
 | Ausblenden | $C/C_\mathrm{th}$ = 1 / 1,62 / 0,5 | $P$ = 0,5 / 0,90 / 0,15 | ber. aus [1, Abschn. 1.2] |
 | Uebergang | $x$ = 0 / 0,783 / 7,83 | $g$ = 1 / 0,825 / 0,045 | ber. (3.2) |
 | B-V zu T | 0,65 / 0 / 1,5 | 5778 / 10 125 / 3794 K | [14]; ber. |
@@ -274,10 +277,10 @@ Alle Werte liegen im sRGB-Gamut (kein negativer Kanal). Die Spalte "$Y$ = 1" ist
 
 ## 7. Empfehlung fuer astobsim
 
-**Entschieden von Herbert am 2026-10-29:** Feldfaktor $F$ = 2 (typischer Beobachter, Abschnitt 1.3), nicht der geuebte Beobachter der Bortle-Grenzgroessen.
+**Entschieden von Herbert am 2026-10-29:** Feldfaktor $F$ = 2 (typischer Beobachter, Abschnitt 1.3), nicht der geuebte Beobachter der Bortle-Grenzgroessen. **Geaendert in Phase 3 Version 2: $F$ = 1,4** (ADR-0004, Prototyp M31); die Punkte unten gelten mit diesem Wert.
 
-1. **Schwelle (A-P11):** Crumey Gl. 47 (blosses Auge, Fernglas) und Gl. 77 bis 88 (Fernrohr) als reine Funktionen in `src/physik/`; Eingaben $\mu_\mathrm{Himmel}$ (aus `physik.md` 6.1), $V$, $AP$, $\tau$, $D$, Flaeche des Ziels. Fester Beobachter $F$ = 2, $F_T = \sqrt2$ am Fernrohr. Gueltig skotopisch; fuer $B_a < 10^{-5}$ den Nullhintergrund einsetzen; fuer $B > 3{,}4\cdot10^{-2}$ cd/m$^2$ (nur blosses Auge bei hellstem Stadthimmel) mit dem Randwert rechnen und im Hilfetext sagen, dass das Modell dort unsicher ist.
-2. **Grenzgroesse (A-P11, Infopanel):** $m_\mathrm{lim}$ aus Gl. 68 bzw. 88 mit Seeing-Scheibe 2,8 FWHM und Extinktion; im Infopanel anzeigen ("Grenzgroesse etwa 12,2 mag"). Hilfetext: typischer Beobachter, geuebte erreichen 0,5 bis 1 mag mehr (Bortle-Werte).
+1. **Schwelle (A-P11):** Crumey Gl. 47 (blosses Auge, Fernglas) und Gl. 77 bis 88 (Fernrohr) als reine Funktionen in `src/physik/`; Eingaben $\mu_\mathrm{Himmel}$ (aus `physik.md` 6.1), $V$, $AP$, $\tau$, $D$, Flaeche des Ziels. Fester Beobachter $F$ = 1,4, $F_T = \sqrt2$ am Fernrohr. Gueltig skotopisch; fuer $B_a < 10^{-5}$ den Nullhintergrund einsetzen; fuer $B > 3{,}4\cdot10^{-2}$ cd/m$^2$ (nur blosses Auge bei hellstem Stadthimmel) mit dem Randwert rechnen und im Hilfetext sagen, dass das Modell dort unsicher ist.
+2. **Grenzgroesse (A-P11, Infopanel):** $m_\mathrm{lim}$ aus Gl. 68 bzw. 88 mit Seeing-Scheibe 2,8 FWHM und Extinktion; im Infopanel anzeigen ("Grenzgroesse etwa 12,6 mag"). Hilfetext: erfahrener Beobachter, sehr geuebte erreichen bei dunklem Himmel bis 1 mag mehr (Bortle-Werte).
 3. **Unaufgeloest (A-P10):** Mischgewicht $g(x) = 1/(1 + 0{,}3466\,x^2)$ mit $x = \theta V/60''$ zwischen linearer Objektabbildung und Punktebenen-Abbildung.
 4. **Abbildung (offene Frage 4):** Deep-Sky-Ebene gemeinsam mit dem Himmel komprimieren, Sonnensystem unveraendert getrennt; Schwelle per Isophote, Ausblenden nach Blackwells Kurve, Verstaerkung je Objekt fuer Mindestsichtbarkeit (4.4). Als ADR-0004 festhalten.
 5. **Sternfarbe (A-P12):** B-V ueber Ballesteros zu $T$, $T$ ueber Planck und CIE 1931 zu linearem sRGB mit $Y$ = 1 (Tabelle 5.3 als Stuetzstellen oder Rechnung zur Laufzeit; eine kleine Tabelle in 0,1-Schritten von B-V reicht). Farbe nur, wenn die Beleuchtungsstaerke am Auge $\ge 3{,}1\cdot10^{-7}$ lx (entspricht 2,3 mag mit blossem Auge), sonst grau; gleitend gehoert zu A-P8.
@@ -289,9 +292,9 @@ Alle Werte liegen im sRGB-Gamut (kein negativer Kanal). Die Spalte "$Y$ = 1" ist
 
 | Vorschlag | Konfiguration | Erwartung | Quelle |
 |---|---|---|---|
-| W1 Grenzgroesse blosses Auge | Blosses Auge, Zenit (90 Grad), klar, Bortle 3 und Bortle 7; Infopanel und ein Sternfeld (z. B. M45) | Infopanel etwa 6,0 bzw. 5,0 mag; Bortle nennt 6,6 bis 7,0 bzw. 4,6 bis 5,0. Bei Bortle 7 Uebereinstimmung, bei Bortle 3 bewusst etwa 0,6 bis 1 mag unter Bortle (typischer statt geuebter Beobachter) | Bortle 2001 [7]; Crumey [1, Abschn. 3.1] |
-| W2 M31 mit blossem Auge | Blosses Auge, M31, Bortle 3, 5 und 8 | Bortle 3 und 5: sichtbar als laenglicher Nebel, bei 3 groesser; Bortle 8: Kern hoechstens angedeutet bzw. unsichtbar. Crumey: mit $F$ = 2 gerade sichtbar bei etwa 19,2 mag/arcsec$^2$ (zwischen Bortle 5 und 6) | Bortle [7]: Klasse 6 "M31 only modestly apparent", Klasse 7 "may be glimpsed ... very indistinct", Klasse 8 "barely glimpsed by an experienced observer"; Crumey [1, Abschn. 3.1, Abb. 12] |
-| W3 Grenzgroesse am Fernrohr | 200 mm Newton, Bortle 5, Seeing 2'', 100x; dasselbe Feld bei 50x und 200x | Grenzgroesse steigt mit der Vergroesserung (50x etwa 12,8, 100x 13,4, 200x 13,9 mag). Vergleich Bortle: 32 cm bei Bortle 5 "about 14,5 to 15", auf 200 mm umgerechnet ($-5\log(320/200)$ = $-1{,}0$) etwa 13,5 bis 14 | Bortle [7]; Crumey [1, Abschn. 3.2, Bowen-Daten Abb. 14] |
+| W1 Grenzgroesse blosses Auge | Blosses Auge, Zenit (90 Grad), klar, Bortle 3 und Bortle 7; Infopanel und ein Sternfeld (z. B. M45) | Infopanel etwa 6,2 bzw. 5,2 mag ($F$ = 1,4, mit Extinktion 0,2 mag im Zenit; ohne 6,40 bzw. 5,37); Bortle nennt 6,6 bis 7,0 bzw. 4,6 bis 5,0. Bei Bortle 3 bewusst 0,4 bis 0,8 mag unter Bortle, bei Bortle 7 0,2 bis 0,6 mag darueber | Bortle 2001 [7]; Crumey [1, Abschn. 3.1] |
+| W2 M31 mit blossem Auge | Blosses Auge, M31, Bortle 3, 5 und 8 | Bortle 3: sichtbar als laenglicher Nebel, etwa 1,8 Grad (Prototyp ADR-0004: 106'); Bortle 5: knapp unter der Schwelle (bestes $C/C_\mathrm{th}$ 0,78), also schwach angedeutet (Deckkraft etwa 0,3); Bortle 7 und 8: unsichtbar (0,42 bei Bortle 7). Strenger als Crumeys Rechnung mit $F$ = 2 (gerade sichtbar bei etwa 19,2 mag/arcsec$^2$); Ursache vermutlich das zu schwache Scheibenprofil (deep-sky.md 1, ADR-0004 Befund 2) | Bortle [7]: Klasse 6 "M31 only modestly apparent", Klasse 7 "may be glimpsed ... very indistinct", Klasse 8 "barely glimpsed by an experienced observer"; Crumey [1, Abschn. 3.1, Abb. 12] |
+| W3 Grenzgroesse am Fernrohr | 200 mm Newton, Bortle 5, Seeing 2'', 100x; dasselbe Feld bei 50x und 200x | Grenzgroesse steigt mit der Vergroesserung ($F$ = 1,4: 50x etwa 13,2, 100x 13,7, 200x 14,3 mag). Vergleich Bortle: 32 cm bei Bortle 5 "about 14,5 to 15", auf 200 mm umgerechnet ($-5\log(320/200)$ = $-1{,}0$) etwa 13,5 bis 14 | Bortle [7]; Crumey [1, Abschn. 3.2, Bowen-Daten Abb. 14] |
 | W4 (optional) Sternfarbe | Antares und Albireo mit blossem Auge; Albireo im 80 mm bei 30x | Antares (etwa 1 mag, B-V 1,8) mit blossem Auge orange, Albireo (3 mag) grau; im 80 mm Albireo A gelb-orange, B blaeulich | Farbgrenze 2,3 mag [13]; Albireo-Farben als Standardbeschreibung der Beobachtungsliteratur (Quelle in der Doppelstern-Recherche festlegen) |
 
 Jupiter mit blossem Auge (Punkt) und im 10x50 (Scheibchen) ist schon T6; der Uebergang (3.2) erfuellt ihn. Der Mond bei 1 mm Austrittspupille gehoert zu A-P13 (i) und offener Frage 1, nicht zur Schwelle.
@@ -300,7 +303,7 @@ Jupiter mit blossem Auge (Punkt) und im 10x50 (Scheibchen) ist schon T6; der Ueb
 
 ## 9. Unsicher oder zu pruefen
 
-1. **Feldfaktor und Bortle:** $F$ = 2 ist Crumeys "notional" Wert; die Bortle-Grenzen verlangen $F \approx 0{,}5$. Entschieden von Herbert am 2026-10-29: astobsim zeigt den typischen Beobachter, $F$ = 2 (Abschnitt 7 Punkt 1). Mit $F$ = 1 lagen alle Grenzen 0,75 mag tiefer; die Form der Kurven bleibt.
+1. **Feldfaktor und Bortle:** $F$ = 2 ist Crumeys "notional" Wert; die Bortle-Grenzen verlangen $F \approx 0{,}5$. Entschieden von Herbert am 2026-10-29: astobsim zeigt den typischen Beobachter, $F$ = 2 (Abschnitt 7 Punkt 1); nach dem Prototyp geaendert auf $F$ = 1,4 (ADR-0004), alle Sterngrenzen 0,39 mag tiefer als mit $F$ = 2, die Form der Kurven bleibt.
 2. **Uebergangsfunktion A-P10:** $g(x) = 1/(1 + 0{,}3466\,x^2)$ ist eine eigene Herleitung aus Varianzen (Augen-PSF gegen Scheibe), keine Messung; belegt ist nur die Groessenordnung des Kriteriums (1' bei Licht). Die belegte Potenznorm nach Crumey ist fuer die Schwelle gemacht und fuer die Form zu flach. Am Bild in Phase 6 pruefen (T6).
 3. **Farbschwelle 2,3 mag:** stammt aus einer Fussnote ("aus Beobachtungserfahrung") [13]; eine Messung fuer Punktquellen habe ich nicht gefunden. Die Uebertragung aufs Fernrohr ueber die Beleuchtungsstaerke setzt voraus, dass die Farbwahrnehmung am dunklen Okularhimmel genauso von der Beleuchtungsstaerke abhaengt wie mit blossem Auge.
 4. **$C_\infty$ (grosse Ziele):** aus Taylor 1960 (obere Schranken, andere Methode), weniger belastbar als die Punktdaten [1, Abschn. 2.3]; trifft M31, M42 im Fernglas.
