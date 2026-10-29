@@ -230,7 +230,7 @@ Stand 2026-10-28. Je Muss-Anforderung aus `docs/anforderungen.md` das Issue mit 
 
 ## 9. Mondphasen (Issue #36)
 
-Drei weitere Mondzustaende aus NASA SVS 5587 (`mond_sichel`, `mond_voll`, `mond_lv`, `docs/recherche/bilder-v2.md` 8.5). Bilder mit `node scripts/validierung-bilder.mjs P1a P1b P2a P2b P3a P3b` am 2026-10-29 (SwiftShader, Stand main 15da6ee plus #36). Die Faelle sind Sichtpruefungen der Daten, keine Testfaelle nach A-Q2. T1 bis T6 waren mit den drei neuen Zustaenden allein byte-gleich mit main 15da6ee (27 Dateien); seit der Vereinheitlichung von `mond_ev` aendern sich T3 und T6a (Nachtrag unten). Die eingecheckten T-Bilder sind aelter (vor #100) und bleiben unveraendert.
+Drei weitere Mondzustaende aus NASA SVS 5587 (`mond_sichel`, `mond_voll`, `mond_lv`, `docs/recherche/bilder-v2.md` 8.5). Bilder mit `node scripts/validierung-bilder.mjs P1a P1b P2a P2b P3a P3b` am 2026-10-29 (SwiftShader, Stand main 15da6ee plus #36). Die Faelle sind Sichtpruefungen der Daten, keine Testfaelle nach A-Q2. T1 bis T6 waren mit den drei neuen Zustaenden allein byte-gleich mit main 15da6ee (27 Dateien); seit der Vereinheitlichung von `mond_ev` aendern sich T3 und T6a (Nachtrag unten). Die eingecheckten T-Bilder waren aelter (vor #100); seit der Zusammenfuehrung von Welle 3 (2026-10-29) zeigen alle T- und P-Bilder den Stand nach #100, #127 (weicher Kernrand der Punktquellen, physik.md 24) und #128, erzeugt mit SwiftShader.
 
 | Fall | Suchteil | Bild |
 |---|---|---|
