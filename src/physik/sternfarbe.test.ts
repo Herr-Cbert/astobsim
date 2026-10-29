@@ -1,15 +1,9 @@
 import { describe, expect, it } from "vitest";
 import type { Atmosphaere } from "./atmosphaere";
 import { PhysikFehler } from "./fehler";
+import { BELEUCHTUNG_NULL_MAG_LX, FARBSCHWELLE_LX } from "./konstanten";
 import { optik } from "./optik";
-import {
-  BELEUCHTUNG_NULL_MAG_LX,
-  beleuchtungAmAugeLx,
-  bvZuTemperatur,
-  FARBSCHWELLE_LX,
-  sternfarbe,
-  temperaturZuRgb
-} from "./sternfarbe";
+import { beleuchtungAmAugeLx, bvZuTemperatur, sternfarbe, temperaturZuRgb } from "./sternfarbe";
 import { refraktorMitVergroesserung } from "./testdaten";
 
 // Testwerte aus docs/recherche/wahrnehmung.md Abschnitt 5 und 6 (B-V zu T, Tabelle 5.3, Farbgrenze)

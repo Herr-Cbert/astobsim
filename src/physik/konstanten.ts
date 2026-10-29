@@ -151,6 +151,18 @@ export const BLENDUNG_ABSTAND_SCHEINBAR_ARCSEC = 600;
 export const BLENDUNG_DELTA_MAG = 6;
 
 /**
+ * Hinweis "Ueberstrahlung nicht simuliert" ab diesem Helligkeitsunterschied |Delta m| in mag
+ * (A-Z9, doppelsterne.md 5) ...
+ */
+export const UEBERSTRAHLUNG_DELTA_MAG = 4;
+
+/**
+ * ... und nur unter diesem Sternabstand am Himmel in Bogensekunden (Entscheidung 5 in
+ * docs/recherche/README.md; bei weiten Paaren wie Polaris, 18,4'', zaehlt Ueberstrahlung kaum).
+ */
+export const UEBERSTRAHLUNG_ABSTAND_ARCSEC = 10;
+
+/**
  * Feldfaktor F der Wahrnehmungsschwelle (A-P11, A-P9 V2): fester, erfahrener Beobachter, gilt fuer
  * alle Geraete (ADR-0004 Punkt 2, docs/recherche/wahrnehmung.md 1.3; Crumey 2014 nennt 2 als typisch).
  */
@@ -179,6 +191,22 @@ export const STERN_DURCHMESSER_ARCSEC = 0.01;
 export const SOCKEL_DELTA_KODES = 3;
 
 /**
+ * Reserve in sRGB-Kodes gegen das Runden beim Zeichnen: Himmel und Schwellenpixel werden einzeln
+ * auf ganze Kodes gerundet (Float32-Raster, Tabelle in src/ui/zeichne.ts). Ohne Reserve blieben bei
+ * etwa 0,6 % der Himmelskodes (Nachkommateil um 0,43 bis 0,58, meist Kode unter 40) nur
+ * Delta_min - 1 Kodes Abstand; mit 0,15 im Test ueber Kode 0,5 bis 240 keiner (Review PR #118,
+ * physik.md Abschnitt 17).
+ */
+export const SOCKEL_RESERVE_KODES = 0.15;
+
+/**
+ * Schnitt des Mischgewichts: g' = max(0, (g - 0,005) / 0,995), stetig in g, exakt 0 ab
+ * x = sqrt(199 / 0,3466) = 23,96 (ADR-0004, architektur.md 5.3). Damit rechnen T1 bis T4 und
+ * T5 Mars 14'' den Ausdruck aus Version 1.
+ */
+export const MISCHGEWICHT_SCHNITT = 0.005;
+
+/**
  * Kontrastschwelle "erkennbar" der Tabellen-Tests (A-Q2, docs/validierung.md): eine Struktur gilt
  * als erkennbar, wenn ihre Delle nach der Faltung (profilDelle, physik.md 8.1) darueber liegt.
  * Kalibrierkonstante, keine Physik: am Bild der Testfaelle T1 bis T6 festgelegt, als geometrisches
@@ -186,3 +214,17 @@ export const SOCKEL_DELTA_KODES = 3;
  * erkennbaren Delle (T4c). Nur die Tests verwenden sie; das Bild haengt nicht davon ab.
  */
 export const SCHWELLE_ERKENNBAR = 0.125;
+
+/** Beleuchtungsstaerke eines Sterns der Magnitude 0 ausserhalb der Atmosphaere in lx (wahrnehmung.md, Konventionen; Crumey 2014). */
+export const BELEUCHTUNG_NULL_MAG_LX = 2.54e-6;
+
+/** Grenze des Farbsehens mit blossem Auge: Sterne ab etwa 2,3 mag sind farbig (wahrnehmung.md 5.1, [13]). */
+export const FARBGRENZE_AUGE_MAG = 2.3;
+
+/**
+ * Schwelle des Farbsehens als Beleuchtungsstaerke am Auge: Z 10^(-0,4 2,3) = 3,05e-7 lx, in der
+ * Recherche gerundet 3,1e-7 (wahrnehmung.md 5.1). Aus der Magnitude gerechnet, damit die Grenze
+ * mit blossem Auge genau 2,3 mag ist.
+ */
+export const FARBSCHWELLE_LX = BELEUCHTUNG_NULL_MAG_LX * Math.pow(10, -0.4 * FARBGRENZE_AUGE_MAG);
+

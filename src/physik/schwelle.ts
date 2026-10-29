@@ -8,7 +8,7 @@
 import type { Isophote } from "../naht/konfiguration";
 import type { Atmosphaere } from "./atmosphaere";
 import { PhysikFehler, pruefeBereich, pruefePositiv } from "./fehler";
-import { ARCSEC_PRO_RAD, BLACKWELL_BREITE, FELDFAKTOR, FELDFAKTOR_FERNROHR, NULLHINTERGRUND_CD_M2, PUPILLE_MM } from "./konstanten";
+import { ARCSEC_PRO_RAD, BELEUCHTUNG_NULL_MAG_LX, BLACKWELL_BREITE, FELDFAKTOR, FELDFAKTOR_FERNROHR, NULLHINTERGRUND_CD_M2, PUPILLE_MM } from "./konstanten";
 import { flaechenhelligkeitsfaktor, type Optik } from "./optik";
 
 // Koeffizienten des skotopischen Zweigs (Crumey Gl. 47 bis 49, wahrnehmung.md 1.2). Nur hier
@@ -24,9 +24,6 @@ const B_MAX_CD_M2 = 3.426e-2;
 
 /** Leuchtdichte von 0 mag/arcsec^2 ist 10^(12,58 / 2,5) cd/m^2 (wahrnehmung.md, Konventionen, [1, Abschn. 1.3]). */
 const MU_NULLPUNKT = 12.58;
-
-/** Beleuchtungsstaerke eines Sterns 0 mag in lx: m = -2,5 log10(I / Z) (wahrnehmung.md, Konventionen, [1]). */
-const Z_LX = 2.54e-6;
 
 /** Durchmesser der Seeing-Scheibe in Seeing-FWHM, 99 bis 100 % des Lichts (wahrnehmung.md 2.2, [1, Abschn. 3.3]). */
 const SEEING_SCHEIBE_PRO_FWHM = 2.8;
@@ -154,7 +151,7 @@ export function grenzgroesse(
   // dI am Auge = phi B_a R_a (Gl. 32, 53), auf die Oeffnung umgerechnet (Gl. 68).
   const deltaMax = Math.max(optik.austrittspupilleMm, beobachter.pupilleMm);
   const beleuchtungLx = ((deltaMax / optik.oeffnungMm) ** 2 / transmission) * phi * bWirksam * ricco;
-  const punktgrenze = -2.5 * Math.log10(beleuchtungLx / Z_LX);
+  const punktgrenze = -2.5 * Math.log10(beleuchtungLx / BELEUCHTUNG_NULL_MAG_LX);
   const scheibeSr = steradiant(Math.PI * ((SEEING_SCHEIBE_PRO_FWHM * seeingFwhmArcsec) / 2) ** 2);
   const riccoFlaecheSr = ricco / (optik.vergroesserung ** 2 * kontrastGross);
   const scheibe = (2.5 / Q) * Math.log10(Math.pow(scheibeSr / riccoFlaecheSr, Q) + 1);

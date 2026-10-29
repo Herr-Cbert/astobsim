@@ -39,9 +39,9 @@ export { geblendet, helligkeitRelativ, punktquellen, scheibenFlaechenhelligkeit 
 export { GRENZEN, type Grenze, type Hinweis, aufSchritt, begrenze } from "./begrenze";
 export { baueKern, kernFwhmArcsec, kontrastUebertragung, type Profilstufe, profilDelle } from "./kern";
 export { type Anzeigewerte, type Auswertoptionen, type Auswertung, type Warnung, auswerten } from "./auswerten";
-export { freiesPaar, gesamthelligkeit, KENNUNG_FREIES_PAAR, UEBERSTRAHLUNG_ABSTAND_ARCSEC, UEBERSTRAHLUNG_DELTA_MAG, ueberstrahlung } from "./doppelstern";
+export { freiesPaar, gesamthelligkeit, ueberstrahlung } from "./doppelstern";
 export { mischgewicht, sockel } from "./mischung";
-export { BELEUCHTUNG_NULL_MAG_LX, FARBSCHWELLE_LX, beleuchtungAmAugeLx, bvZuTemperatur, sternfarbe, temperaturZuRgb } from "./sternfarbe";
+export { beleuchtungAmAugeLx, bvZuTemperatur, sternfarbe, temperaturZuRgb } from "./sternfarbe";
 export {
   type Beobachter,
   deckkraft,

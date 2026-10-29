@@ -79,6 +79,9 @@ export interface Trabant {
 export const OBJEKTKLASSEN = ["sonnensystem", "doppelstern", "deep_sky"] as const;
 export type Objektklasse = (typeof OBJEKTKLASSEN)[number];
 
+/** Kennung des freien Paars in Objektzustand und URL (z=frei, A-D18); objekte.json darf sie nicht verwenden. */
+export const KENNUNG_FREIES_PAAR = "frei";
+
 /**
  * Stern eines Doppel-, Mehrfachsterns oder Deep-Sky-Objekts: Lage wie Trabant (relativ zur
  * Objektmitte, +x rechts, +y Norden), kein Durchmesser, Farbindex B-V (A-P12).

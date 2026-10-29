@@ -770,15 +770,15 @@ Zwei gleiche Sterne: $m - 2{,}5\log_{10}2 = m - 0{,}753$.
 | Albireo 34,3'', $\Delta m$ 1,49 | | keine Warnung |
 | Polaris 18,4'', $\Delta m$ 6,56 | nicht unter 10'' | keine Warnung |
 
-## 16. Mischgewicht und Sockel (Issue #97)
+## 17. Mischgewicht und Sockel (Issue #97)
 
 Umsetzung der Festlegungen "Unaufgeloest" und "Mindestsichtbarkeit als additiver Sockel" aus ADR-0004 in `src/physik/mischung.ts`; Pixelformel und Bitgleichheit in `docs/architektur.md` 5.3.
 
-### 16.1 Mischgewicht (A-P10)
+### 17.1 Mischgewicht (A-P10)
 
 Uebergangsfunktion nach `wahrnehmung.md` 3.2 (eigene Herleitung aus den Varianzen von Augen-PSF und Scheibe, keine Messung): $g(x) = 1/(1 + \tfrac{\ln 2}{2}\,x^2)$, $x = \theta V / 60''$ mit der Augenaufloesung 60'' (`AUGE_AUFLOESUNG_ARCSEC`, 3.1). Der Faktor steht im Code als $\ln 2/2$ = 0,34657, gerundet 0,3466 wie in ADR-0004. Stetiger Schnitt nach ADR-0004: $g' = \max\big(0, (g - 0{,}005)/0{,}995\big)$; $g' = 0$ genau fuer $x \ge \sqrt{199 \cdot 2/\ln 2} = 23{,}96$ (ber.), also fuer $\theta V \ge 1438''$.
 
-### 16.2 Sockel (Mindestsichtbarkeit)
+### 17.2 Sockel (Mindestsichtbarkeit)
 
 Deep-Sky-Pixel nach ADR-0004: $h + P\,(w(q) - h + \sigma)$ mit $w(q) = \min(1, (a q + s)^n)$, $h = \min(1, s^n)$. An der Schwelle ist $q = q^*$ und $P$ = 0,5. Gefordert ist, dass dort das Pixel mindestens $\Delta_\mathrm{min}$ sRGB-Kodes ueber dem Himmel $h$ (ohne Sockel, ADR-0004 Nachtrag) liegt: $h + \tfrac12\,(w(q^*) - h + \sigma) \ge L_\mathrm{ziel}$ mit $L_\mathrm{ziel} = \mathrm{lin}\big(\min(255, K(h) + \Delta_\mathrm{min} + 0{,}15)/255\big)$, $K(h) = 255\,\mathrm{sRGB}(h)$. Der kleinste Sockel ist (ber.)
 
@@ -786,7 +786,7 @@ $$\sigma = \max\big(0,\; 2\,(L_\mathrm{ziel} - h) - (w(q^*) - h)\big).$$
 
 Der Kode des Himmels geht stetig ein, nicht gerundet (wie im Prototyp). **Reserve 0,15 Kodes** (`SOCKEL_RESERVE_KODES`, Review PR #118): beim Zeichnen werden Himmel und Schwellenpixel einzeln gerundet, aus einem Float32-Raster und ueber die Tabelle in `src/ui/zeichne.ts`. Ohne Reserve blieben bei etwa 0,6 % der Himmelskodes ($K$ = 0,5 bis 240, $C = a q^*/s$ = 0,135, $\Delta_\mathrm{min}$ = 3) nur 2 statt 3 Kodes Abstand, und zwar dort, wo der Nachkommateil von $K$ um 0,43 bis 0,58 liegt, meist bei $K < 40$. Mit der Reserve ergibt der Test ueber denselben Bereich (Schritt 0,003, Float32 und Tabelle nachgebaut) ueberall mindestens 3 (ber.). sRGB-Kennlinie und Umkehrung nach IEC 61966-2-1 [59] als reine Funktionen in `mischung.ts` (dieselbe Kennlinie wie `src/ui/zeichne.ts` und `src/daten/srgb.ts`; physik importiert diese Module nicht). $\Delta_\mathrm{min}$ = 3 (`SOCKEL_DELTA_KODES`) ist ein Vorschlag ohne Quelle, am Bild festgelegt (`wahrnehmung.md` 9 Punkt 8).
 
-### 16.3 Testwerte (A-Q1)
+### 17.3 Testwerte (A-Q1)
 
 | Groesse | Eingabe | Erwartung | Herkunft |
 |---|---|---|---|
@@ -799,11 +799,11 @@ Der Kode des Himmels geht stetig ein, nicht gerundet (wie im Prototyp). **Reserv
 | $\sigma$ | Prototyp M31 im 10x50, Bortle 5: $a$ = 7,566e-4 (Kern = 1), $s$ = 2,825e-5, $q^*$ = 5,040e-3, $\Delta_\mathrm{min}$ = 3, $n$ = 1/3 | 0,006279 mit Reserve (Prototyp ohne Reserve 0,005905); Kern sRGB 86 -> 88 (stetig 88,41) | ADR-0004 Befund 3; `prototyp/deep_sky.py` mit `additiv.py` nachgerechnet, ohne Reserve stellengleich (mit $F$ = 1,4 ohne Reserve: $q^*$ = 3,43e-3, $\sigma$ = 0,00631, Kern ebenfalls 88) |
 | $\sigma$ | $a q^*$ = 10 $s$, $\Delta_\mathrm{min}$ = 3 | 0 (Abstand an der Schwelle etwa 14 Kodes) | ber. |
 
-### 16.4 Unsicher
+### 17.4 Unsicher
 
 1. **Uebergangsfunktion:** eigene Herleitung, siehe `wahrnehmung.md` 9 Punkt 2; am Bild bei T6 pruefen.
 2. **Sockel bei hellem Himmel:** liegt $K(h) + \Delta_\mathrm{min}$ ueber 255, wird das Ziel auf Weiss begrenzt; dann ist der Abstand kleiner als $\Delta_\mathrm{min}$. Kommt erst bei einem Himmel nahe Bildschirmweiss vor, also nicht in den Testfaellen.
-3. **Quantisierung beim Zeichnen:** durch die Reserve abgedeckt (16.2); geprueft nur fuer $C$ = 0,135 und $K \le 240$, die Tabelle in `src/ui/zeichne.ts` ist im Test nachgebaut, nicht importiert.
+3. **Quantisierung beim Zeichnen:** durch die Reserve abgedeckt (17.2); geprueft nur fuer $C$ = 0,135 und $K \le 240$, die Tabelle in `src/ui/zeichne.ts` ist im Test nachgebaut, nicht importiert.
 4. **Sockel hebt den Himmel:** bei $q$ = 0 ist $P_0 = \Phi(-1/0{,}484)$ = 0,019, der gemalte Himmel liegt also um $P_0\,\sigma$ ueber $h$ (ADR-0004 Nachtrag).
 
 ---
@@ -823,7 +823,7 @@ Der Kode des Himmels geht stetig ein, nicht gerundet (wie im Prototyp). **Reserv
 
 **Modellentscheidung:** Die Schwelle ist aus 2,3 mag gerechnet (3,054e-7 lx), nicht der gerundete Wert 3,1e-7 aus ADR-0004; der Unterschied ist 0,016 mag.
 
-## 16. Wahrnehmungsschwelle (Issue #96)
+## 19. Wahrnehmungsschwelle (Issue #96)
 
 Formeln, Herleitung und Quellen stehen in `docs/recherche/wahrnehmung.md` (dort [1] = Crumey 2014, MNRAS 442, 2600); hier nur die Zuordnung zu `src/physik/schwelle.ts`. Konstanten $F$ = 1,4, $F_T = \sqrt2$, 0,484 und Nullhintergrund $10^{-5}$ cd/m$^2$ in `konstanten.ts` (ADR-0004); die Koeffizienten $r_1, r_2, k_1, k_2, q$ von Gl. 47 bis 49, $Z = 2{,}54\cdot10^{-6}$ lx und die Seeing-Scheibe 2,8 FWHM nur in `schwelle.ts`.
 

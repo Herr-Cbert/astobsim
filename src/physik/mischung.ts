@@ -5,7 +5,7 @@
 // Testwerte in docs/recherche/physik.md Abschnitt 17 (Mischgewicht und Sockel). Reine Funktionen, keine Pixel.
 
 import { PhysikFehler, pruefeBereich, pruefePositiv } from "./fehler";
-import { AUGE_AUFLOESUNG_ARCSEC } from "./konstanten";
+import { AUGE_AUFLOESUNG_ARCSEC, MISCHGEWICHT_SCHNITT, SOCKEL_RESERVE_KODES } from "./konstanten";
 
 /**
  * Faktor ln 2 / 2 = 0,3466 der Uebergangsfunktion g(x) = 1/(1 + 0,3466 x^2): Varianz der Gauss-PSF
@@ -14,24 +14,8 @@ import { AUGE_AUFLOESUNG_ARCSEC } from "./konstanten";
  */
 const UEBERGANG_FAKTOR = Math.LN2 / 2;
 
-/**
- * Schnitt des Mischgewichts: g' = max(0, (g - 0,005) / 0,995), stetig in g, exakt 0 ab
- * x = sqrt(199 / 0,3466) = 23,96 (ADR-0004, architektur.md 5.3). Damit rechnen T1 bis T4 und
- * T5 Mars 14'' den Ausdruck aus Version 1.
- */
-const MISCHGEWICHT_SCHNITT = 0.005;
-
 /** Hoechster sRGB-Kode bei 8 Bit; der Sockel rechnet mit Kodes als stetiger Groesse. */
 const SRGB_KODE_MAX = 255;
-
-/**
- * Reserve in sRGB-Kodes gegen das Runden beim Zeichnen: Himmel und Schwellenpixel werden einzeln
- * auf ganze Kodes gerundet (Float32-Raster, Tabelle in src/ui/zeichne.ts). Ohne Reserve blieben bei
- * etwa 0,6 % der Himmelskodes (Nachkommateil um 0,43 bis 0,58, meist Kode unter 40) nur
- * Delta_min - 1 Kodes Abstand; mit 0,15 im Test ueber Kode 0,5 bis 240 keiner (Review PR #118,
- * physik.md Abschnitt 17).
- */
-const SOCKEL_RESERVE_KODES = 0.15;
 
 /**
  * Uebergangsfunktion vor dem Schnitt: Anteil der Punktebene g(x) = 1/(1 + 0,3466 x^2) mit

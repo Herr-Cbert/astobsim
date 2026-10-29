@@ -4,23 +4,9 @@
 // Liegt in physik, weil begrenze nach dem Schneiden von paar die Sterne neu bilden muss
 // (docs/architektur.md 5.4). Die Bereiche der Eingaben stehen nur in begrenze (A-F8).
 
-import type { Objektzustand, Paareingaben, Stern } from "../naht/konfiguration";
+import { KENNUNG_FREIES_PAAR, type Objektzustand, type Paareingaben, type Stern } from "../naht/konfiguration";
+import { UEBERSTRAHLUNG_ABSTAND_ARCSEC, UEBERSTRAHLUNG_DELTA_MAG } from "./konstanten";
 import type { Warnung } from "./auswerten";
-
-/** Kennung des freien Paars in Objektzustand und URL (z=frei, A-D18). */
-export const KENNUNG_FREIES_PAAR = "frei";
-
-/**
- * Hinweis "Ueberstrahlung nicht simuliert" ab diesem Helligkeitsunterschied |Delta m| in mag
- * (A-Z9, doppelsterne.md 5) ...
- */
-export const UEBERSTRAHLUNG_DELTA_MAG = 4;
-
-/**
- * ... und nur unter diesem Sternabstand am Himmel in Bogensekunden (Entscheidung 5 in
- * docs/recherche/README.md; bei weiten Paaren wie Polaris, 18,4'', zaehlt Ueberstrahlung kaum).
- */
-export const UEBERSTRAHLUNG_ABSTAND_ARCSEC = 10;
 
 /**
  * Gesamthelligkeit mehrerer Sterne in mag: Fluesse addieren sich,

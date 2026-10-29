@@ -17,7 +17,7 @@
 
 import { BILDER_DATEI, type Bildnachweis } from "./bildnachweise";
 import { DatenFehler } from "./fehler";
-import type { Isophote, Objektklasse, Trabant } from "../naht/konfiguration";
+import { KENNUNG_FREIES_PAAR, type Isophote, type Objektklasse, type Trabant } from "../naht/konfiguration";
 import { alsListe, alsObjekt, ladeJson, nurBekannteFelder, optional, text, wahl, zahl, type Ort } from "./pruefe";
 
 export const OBJEKTE_DATEI = "objekte.json";
@@ -34,9 +34,6 @@ const KLASSE_ZU_TYP: Record<Objekttyp, Objektklasse> = {
   doppelstern: "doppelstern",
   deep_sky: "deep_sky"
 };
-
-/** Kennung des freien Paars (A-Z9); es entsteht aus der URL, nie aus objekte.json. */
-const KENNUNG_FREIES_PAAR = "frei";
 
 /** Grenze fuer Lagen von Trabanten und Sternen relativ zur Objektmitte (M45 bis 4600''). */
 const LAGE_MAX_ARCSEC = 7200;

@@ -6,20 +6,7 @@
 import type { Atmosphaere } from "./atmosphaere";
 import { PhysikFehler } from "./fehler";
 import type { Optik } from "./optik";
-import { PUPILLE_MM } from "./konstanten";
-
-/** Beleuchtungsstaerke eines Sterns der Magnitude 0 ausserhalb der Atmosphaere in lx (wahrnehmung.md, Konventionen; Crumey 2014). */
-export const BELEUCHTUNG_NULL_MAG_LX = 2.54e-6;
-
-/** Grenze des Farbsehens mit blossem Auge: Sterne ab etwa 2,3 mag sind farbig (wahrnehmung.md 5.1, [13]). */
-export const FARBGRENZE_AUGE_MAG = 2.3;
-
-/**
- * Schwelle des Farbsehens als Beleuchtungsstaerke am Auge: Z 10^(-0,4 2,3) = 3,05e-7 lx, in der
- * Recherche gerundet 3,1e-7 (wahrnehmung.md 5.1). Aus der Magnitude gerechnet, damit die Grenze
- * mit blossem Auge genau 2,3 mag ist.
- */
-export const FARBSCHWELLE_LX = BELEUCHTUNG_NULL_MAG_LX * Math.pow(10, -0.4 * FARBGRENZE_AUGE_MAG);
+import { BELEUCHTUNG_NULL_MAG_LX, FARBSCHWELLE_LX, PUPILLE_MM } from "./konstanten";
 
 /** Erste Stuetzstelle und Schrittweite der Farbtabelle in B-V. */
 const BV_ERSTE = -0.4;

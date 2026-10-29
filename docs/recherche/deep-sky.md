@@ -331,6 +331,8 @@ Quellweiss wird bei den Planeten ueber den Gesamtfluss des Bilds geeicht (`objek
 
 ### 7.3 Datenformat-Vorschlag (`objekte.json`)
 
+> Nachtrag 2026-10-29: Das gueltige Format steht in ADR-0003 (Nachtrag Version 2) und `src/daten/objekte.ts`. Abweichungen von diesem Vorschlag: Farbindex heisst `b_v`, Sternlisten liegen in `daten/sterne/<objekt>.json` (`sterne_datei`), und Deep-Sky-Zustaende mit Bild haben kein `weiss_mag_arcsec2`, Quellweiss ist `kennlinie.mag_hell` im Bildnachweis (PR #122).
+
 Passend zu ADR-0003 und `objekte.md` 6.2: Einheiten im Feldnamen, Dezimalpunkt, keine doppelt gespeicherten Groessen. Neu ist `typ: "deep_sky"` (Objektklasse Deep-Sky-Objekt, GLOSSARY). Die Felder `winkelgroesse_arcsec` und `polar_arcsec` behalten ihre Bedeutung als grosse und kleine Achse; dazu kommen `positionswinkel_grad`, `profil` und `sterne[]`. Ein Stern hat anders als ein Trabant keinen Durchmesser, dafuer `bv`.
 
 ```json
