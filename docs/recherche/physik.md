@@ -748,3 +748,20 @@ A-Q2 T2 ist entsprechend angepasst (`docs/anforderungen.md`).
 
 - **Quellbild sat_20 (#79):** Der A-Ring ist im Hubble-Bild 0,50 (innen) und 0,21 (aussen) des aeusseren B-Rings hell (`tools/strukturprofile.py`). Damit zeigt selbst der ruhige Moment die Teilung kaum (0,029). Visuell wirkt der A-Ring heller; vermutlich ist das Pressebild nichtlinear gestreckt wie das Jupiterbild in #79. Photometrische Werte fuer das Verhaeltnis A zu B mit Quelle stehen noch aus. **Nachtrag #79 (2026-10-28):** Werte nach Salo und French 2010 (`objekte.md` 4.2): A innen 0,83, A aussen 0,56, Cassini-Zone 0,15. Das Bild ist mit einer Tonkurve angeglichen (eine Potenzkurve, die die A-Ringe trifft, haette die Teilung drei- bis viermal zu hell gemacht). Mit den neuen Stufen (A 0,82 / 0,54, Cassini 0,17) bleibt die Delle im Langzeitmittel 0,000; im ruhigen Moment ergibt sich am 100 mm 0,131 (Anhalt, Arbeitsmassstab des Langzeitkerns), am 60 mm 0,017.
 - **Ruhiger Moment (#29):** Der Tilt-Abzug aus 2.3 veraendert nicht nur Cassini, sondern auch T4d und T5b (15.2). Eine Umsetzung braucht eigene Erwartungen fuer den ruhigen Moment und darf die Schwelle nicht aus den Langzeit-Urteilen uebernehmen.
+
+---
+
+## 16. Sternfarbe (Issue #98)
+
+**Datum:** 2026-10-29. **Kennungen:** A-P12, ADR-0004. Umsetzung in `src/physik/sternfarbe.ts`; Herleitung, Tabelle und Unsicherheiten in `docs/recherche/wahrnehmung.md` 5 und 9 Punkt 3 und 11, hier nur die Formeln mit Quelle.
+
+| Groesse | Formel | Quelle |
+|---|---|---|
+| Farbtemperatur | $T = 4600\,\mathrm{K}\,\bigl(1/(0{,}92\,(B-V) + 1{,}7) + 1/(0{,}92\,(B-V) + 0{,}62)\bigr)$, Pol bei $B-V = -0{,}674$ | Ballesteros 2012, Gl. 14 (wahrnehmung.md [14]) |
+| Farbe | Planck 360 bis 830 nm (1 nm), CIE 1931 2 Grad (Naeherung Wyman, Sloan, Shirley 2013), $XYZ$ mit $Y$ = 1, Matrix IEC 61966-2-1 (D65) [59]; Tabelle in 0,1-Schritten von B-V = -0,4 bis 2,0 (3169 bis 21 707 K), linear in B-V interpoliert, ausserhalb die Randzeile | wahrnehmung.md 5.3, [15], [16]; Erzeugung `tools/sternfarbe_tabelle.py` |
+| Beleuchtungsstaerke am Auge | $E = Z\,10^{-0{,}4m}\,a\,\tau\,(1-\epsilon^2)\,(\min(D, pV)/p)^2$, $Z = 2{,}54\cdot10^{-6}$ lx | Abschnitt 13.1; Crumey 2014 [32] fuer $Z$ |
+| Schwelle des Farbsehens | $E_\mathrm{Farbe} = Z\,10^{-0{,}4\cdot2{,}3} = 3{,}05\cdot10^{-7}$ lx (gerundet 3,1e-7), darunter grau | Protte und Hoffmann 2020, Fussnote 3 (wahrnehmung.md [13]) |
+
+**Testwerte (A-Q1, ber. mit `tools/sternfarbe_tabelle.py`):** B-V 0,65 / 0 / 1,5 ergibt 5778 / 10 125 / 3794 K; Tabelle wahrnehmung.md 5.3 (Spalte $Y$ = 1) auf 0,01 getroffen, an den sechs Stuetzstellen sogar auf 0,001; Interpolationsfehler bei B-V 0,65 gegen die direkte Rechnung (1,1095 / 0,9763 / 0,9133) unter 0,001. Farbgrenze ohne Extinktion: blosses Auge 2,30 mag, 80 mm Refraktor ($\tau$ 0,9, $AP \le p$) 7,81 mag, 200 mm Newton ($\tau$ 0,8, $\epsilon$ 0,25) 9,60 mag.
+
+**Modellentscheidung:** Die Schwelle ist aus 2,3 mag gerechnet (3,054e-7 lx), nicht der gerundete Wert 3,1e-7 aus ADR-0004; der Unterschied ist 0,016 mag.
