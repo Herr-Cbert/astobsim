@@ -805,3 +805,20 @@ Der Kode des Himmels geht stetig ein, nicht gerundet (wie im Prototyp). **Reserv
 2. **Sockel bei hellem Himmel:** liegt $K(h) + \Delta_\mathrm{min}$ ueber 255, wird das Ziel auf Weiss begrenzt; dann ist der Abstand kleiner als $\Delta_\mathrm{min}$. Kommt erst bei einem Himmel nahe Bildschirmweiss vor, also nicht in den Testfaellen.
 3. **Quantisierung beim Zeichnen:** durch die Reserve abgedeckt (16.2); geprueft nur fuer $C$ = 0,135 und $K \le 240$, die Tabelle in `src/ui/zeichne.ts` ist im Test nachgebaut, nicht importiert.
 4. **Sockel hebt den Himmel:** bei $q$ = 0 ist $P_0 = \Phi(-1/0{,}484)$ = 0,019, der gemalte Himmel liegt also um $P_0\,\sigma$ ueber $h$ (ADR-0004 Nachtrag).
+
+---
+
+## 18. Sternfarbe (Issue #98)
+
+**Datum:** 2026-10-29. **Kennungen:** A-P12, ADR-0004. Umsetzung in `src/physik/sternfarbe.ts`; Herleitung, Tabelle und Unsicherheiten in `docs/recherche/wahrnehmung.md` 5 und 9 Punkt 3 und 11, hier nur die Formeln mit Quelle.
+
+| Groesse | Formel | Quelle |
+|---|---|---|
+| Farbtemperatur | $T = 4600\,\mathrm{K}\,\bigl(1/(0{,}92\,(B-V) + 1{,}7) + 1/(0{,}92\,(B-V) + 0{,}62)\bigr)$, Pol bei $B-V = -0{,}674$ | Ballesteros 2012, Gl. 14 (wahrnehmung.md [14]) |
+| Farbe | Planck 360 bis 830 nm (1 nm), CIE 1931 2 Grad (Naeherung Wyman, Sloan, Shirley 2013), $XYZ$ mit $Y$ = 1, Matrix IEC 61966-2-1 (D65) [59]; Tabelle in 0,1-Schritten von B-V = -0,4 bis 2,0 (3169 bis 21 707 K), linear in B-V interpoliert, ausserhalb die Randzeile | wahrnehmung.md 5.3 (wahrnehmung.md [15], [16]); Erzeugung `tools/sternfarbe_tabelle.py` |
+| Beleuchtungsstaerke am Auge | $E = Z\,10^{-0{,}4m}\,a\,\tau\,(1-\epsilon^2)\,(\min(D, pV)/p)^2$, $Z = 2{,}54\cdot10^{-6}$ lx | Abschnitt 13.1; Crumey 2014 [32] fuer $Z$ |
+| Schwelle des Farbsehens | $E_\mathrm{Farbe} = Z\,10^{-0{,}4\cdot2{,}3} = 3{,}05\cdot10^{-7}$ lx (gerundet 3,1e-7), darunter grau | Protte und Hoffmann 2020, Fussnote 3 (wahrnehmung.md [13]) |
+
+**Testwerte (A-Q1, ber. mit `tools/sternfarbe_tabelle.py`):** B-V 0,65 / 0 / 1,5 ergibt 5778 / 10 125 / 3794 K; Tabelle wahrnehmung.md 5.3 (Spalte $Y$ = 1) auf 0,01 getroffen, an den sechs Stuetzstellen sogar auf 0,001; Interpolationsfehler bei B-V 0,65 gegen die direkte Rechnung (1,1095 / 0,9763 / 0,9133) unter 0,001. Farbgrenze ohne Extinktion: blosses Auge 2,30 mag, 80 mm Refraktor ($\tau$ 0,9, $AP \le p$) 7,81 mag, 200 mm Newton ($\tau$ 0,8, $\epsilon$ 0,25) 9,60 mag.
+
+**Modellentscheidung:** Die Schwelle ist aus 2,3 mag gerechnet (3,054e-7 lx), nicht der gerundete Wert 3,1e-7 aus ADR-0004; der Unterschied ist 0,016 mag.
