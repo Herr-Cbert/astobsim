@@ -1,0 +1,137 @@
+{
+  "kommentar": "M31: NOIRLab-Pressebild noao-m31lgs_ubvIha (Local Group Survey, Mayall 4 m, Mosaic I), Publication TIFF 10K (Issue #106). Kein linearer Datensatz mit belegter Lizenz (LGGS-FITS ohne Lizenzangabe, bilder-v2.md 2); Entscheidung 2 in docs/recherche/README.md: Pressebild per Tonkurve gegen das Profil zurueckrechnen. Lizenz am 2026-10-29 auf lizenz_url gelesen: 'Unless specifically noted, the images ... are licensed under a Creative Commons Attribution 4.0 International License ... provided the credit is clear and visible'; die Bildseite nennt keine Ausnahme.",
+  "id": "m31_noirlab_lgs",
+  "objekt": "m31",
+  "zustand": "m31",
+  "datei": "m31/noirlab_lgs_g.webp",
+  "rohformat": "tiff_tonkurve",
+  "rohbild": "data/roh/m31/noao-m31lgs_ubvIha_10k.tif",
+  "roh_url": "https://storage.noirlab.edu/media/archives/images/publicationtiff10k/noao-m31lgs_ubvIha.tif",
+  "roh_sha256": "c37531e4123eaaf19c0fe8fdb0536c8ac8a6e83fe04fb1b80125195856ebd177",
+  "roh_bytes": 31329224,
+  "roh_abruf": "2026-10-29",
+  "original_pixel": "10000x2521",
+  "tiff_kanal": "G",
+  "roh_massstab_arcsec": 1.30572,
+  "roh_nordwinkel_rechts_grad": 125.8,
+  "roh_mitte_px": [
+    5108.66,
+    1392.16
+  ],
+  "mitte_beleg": "Schwerpunkt der gesaettigten Kernpixel (Gruenkanal >= 250 im Kreis 40 px)",
+  "bogensekunden_pro_pixel": 4.0,
+  "ueberabtastung": 3,
+  "leinwand_px": 3200,
+  "winkelgroesse_arcsec": 11432.0,
+  "tonkurve": {
+    "positionswinkel_grad": 37.5,
+    "positionswinkel_beleg": "grosse Achse der Flaechenmomente im Rohbild, Gruenkanal-Pegel 25 bis 70 (37,4 bis 38,4 Grad; innen 35 bis 39 Grad)",
+    "kanten_innen_arcsec": [
+      0,
+      5,
+      10,
+      15,
+      20,
+      30,
+      40,
+      60,
+      80,
+      100,
+      130,
+      160,
+      200
+    ],
+    "radius_max_arcsec": 6500,
+    "kanten_aussen_anzahl": 30,
+    "streifen_min_arcsec": 10,
+    "streifen_anteil": 0.03,
+    "masken_arcsec": [
+      [
+        -28.2,
+        -1452.5,
+        240
+      ]
+    ],
+    "masken_beleg": "M32 (SIMBAD ICRS 00 42 41.82 +40 51 54.6 gegen den M31-Kern 00 42 44.33 +41 16 07.5), Kreis 4'",
+    "kode_himmel": 7,
+    "kode_himmel_beleg": "Median des Gruenkanals in den Ecken des Mosaiks ausserhalb 25' von der grossen Achse und 75' von der Mitte",
+    "grenzen": "Kern im Pressebild in allen Kanaelen gesaettigt (Kode 255 innerhalb etwa 30\" auf der grossen Achse), dort zeigt das Bild eine flache Kuppe auf der Hoehe des Profils bei etwa 25\" statt des Anstiegs zur Mitte."
+  },
+  "eichung": {
+    "art": "tonkurve",
+    "quelle": "Profil deep-sky.md 1.2 (Sersic-Bulge plus Scheibe, mu0 V = 20,2 an RC3 angepasst)"
+  },
+  "kennlinie": {
+    "umfang_mag": 9.0
+  },
+  "sterne": {
+    "im_bild_entfernen": true,
+    "punktquellen": "Vordergrundsterne der Milchstrasse, helle Einzelobjekte in M31 (Kugelsternhaufen, Ueberriesen) und Rauschspitzen in der schwachen Aussenscheibe",
+    "fenster_px": 9,
+    "schwelle_sigma": 10.0,
+    "kontrast": 0.5,
+    "wachsen_sigma": 2.0,
+    "rand_px": 4,
+    "zusaetzlich_px": [
+      [
+        1929.5,
+        2573.5,
+        30
+      ],
+      [
+        2237.5,
+        2135.5,
+        22
+      ],
+      [
+        1750.5,
+        2464.5,
+        24
+      ],
+      [
+        660.5,
+        412.5,
+        24
+      ],
+      [
+        1625.5,
+        2229.5,
+        26
+      ],
+      [
+        2510.5,
+        2430.5,
+        30
+      ],
+      [
+        800.5,
+        720.5,
+        22
+      ],
+      [
+        820.5,
+        820.5,
+        22
+      ],
+      [
+        1720.5,
+        2120.5,
+        22
+      ]
+    ],
+    "zusaetzlich_beleg": "Kreise (Leinwandpixel) um die Hoefe von neun hellen Vordergrundsternen, deren Fluegel die Maske nicht ganz erfasst (am bereinigten Bild als Ringe sichtbar)"
+  },
+  "hintergrund": "kein Abzug, der Schwarzpunkt des Pressebilds liegt auf dem Himmel (Kode 7 wird 0)",
+  "quelle_url": "https://noirlab.edu/public/images/noao-m31lgs_ubvIha/",
+  "quelle_datei": "noao-m31lgs_ubvIha.tif (Publication TIFF 10K, 10000x2521 RGB, 8 Bit, Farbprofil sRGB IEC61966-2.1)",
+  "mission": "KPNO Mayall 4 m, Local Group Survey",
+  "instrument": "Mosaic I, Filter U, B, V, I und H-alpha, zehn Felder; Farbzuordnung laut Bildseite U violett, B blau, V cyan, I orange, H-alpha rot",
+  "aufnahmedatum": "2000/2001 (Local Group Survey, bilder-v2.md 9; Bildseite: Veroeffentlichung 2020-06-30)",
+  "lizenz": "CC-BY-4.0",
+  "lizenz_url": "https://noirlab.edu/public/copyright/",
+  "namensnennung": "Local Group Survey Team and T.A. Rector (University of Alaska Anchorage)",
+  "aenderungsvermerk": "gedreht (Norden oben), Graustufe aus dem Gruenkanal, per Tonkurve gegen ein Flaechenhelligkeitsprofil linearisiert, skaliert, Sterne entfernt",
+  "orientierung": "Himmelsnorden oben, Osten links: Bildseite 'North is 125.8 deg right of vertical', 'East to the left'; geprueft an M32 (Abstand 1452,8\" bei PA 181,1 Grad aus SIMBAD; im Rohbild 1114,1 px bei 125,85 Grad, also 1,304\"/px gegen 1,3057 aus dem Feld 217,62') und an der grossen Achse (Flaechenmomente 37 bis 39 Grad, gespiegelt waeren es 142,5 Grad).",
+  "bearbeitung_kanal": "Graustufe aus dem Gruenkanal: nach der Farbzuordnung der Bildseite traegt er V (cyan) und einen Teil von I (orange), aber kein H-alpha (rot), sodass die HII-Knoten nicht hervortreten (bilder-v2.md 2).",
+  "hinweise": "Grobes Quellbild: 4\"/px (A-X11), Kern gesaettigt. Flaechentabelle in daten/objekte.json (m31, isophoten) aus demselben Lauf."
+}

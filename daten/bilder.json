@@ -382,5 +382,34 @@
       ]
     },
     "hinweise": "Rendering, zugelassen als Ausnahme A-X9 (ADR-0002). Winkelgroesse 1936,4\" ist die des Rendering-Zeitpunkts; der Zustand mond_lv zeigt den Mittelwert 1865\". Scheibe gemessen: Flaechendurchmesser aus dem Alphakanal 3004,3 px, Bounding-Box 3006x3007 px (Alpha >= 128); verwendet 3004 px. Das Rendering hellt die Nachtseite kuenstlich auf (gemessen an Frame 6173: Median der linearen Leuchtdichte 0,0036 fern vom Terminator gegen 0,21 auf der Tagseite, etwa 1,7 Prozent; um eine Groessenordnung heller als Erdlicht, docs/recherche/bilder-v2.md 8.3); sie ist hier geschwaerzt. Rohdatei moon.6615.tif: 11993450 Byte, SHA-256 3624dd84f049493d2a537264bf61b2dd9cd527b79f2bbd7b41d2eba105137d7f, abgerufen 2026-10-29. Die SVS-Seite hat keine einzelne Credit-Zeile; Namensnennung aus dem Abschnitt Credits."
+  },
+  {
+    "id": "m31_noirlab_lgs",
+    "objekt": "m31",
+    "zustand": "m31",
+    "datei": "m31/noirlab_lgs_g.webp",
+    "quelle_url": "https://noirlab.edu/public/images/noao-m31lgs_ubvIha/",
+    "quelle_datei": "noao-m31lgs_ubvIha.tif (Publication TIFF 10K, 10000x2521 RGB, 8 Bit, Farbprofil sRGB IEC61966-2.1)",
+    "mission": "KPNO Mayall 4 m, Local Group Survey",
+    "instrument": "Mosaic I, Filter U, B, V, I und H-alpha, zehn Felder; Farbzuordnung laut Bildseite U violett, B blau, V cyan, I orange, H-alpha rot",
+    "aufnahmedatum": "2000/2001 (Local Group Survey, bilder-v2.md 9; Bildseite: Veroeffentlichung 2020-06-30)",
+    "lizenz": "CC-BY-4.0",
+    "lizenz_url": "https://noirlab.edu/public/copyright/",
+    "namensnennung": "Local Group Survey Team and T.A. Rector (University of Alaska Anchorage); bearbeitet: gedreht (Norden oben), Graustufe aus dem Gruenkanal, per Tonkurve gegen ein Flaechenhelligkeitsprofil linearisiert, skaliert, Sterne entfernt",
+    "pixel_breite": 3200,
+    "pixel_hoehe": 3200,
+    "original_pixel": "10000x2521",
+    "winkelgroesse_arcsec": 11432.0,
+    "objekt_durchmesser_px": 2858,
+    "bogensekunden_pro_pixel": 4.0,
+    "norden_oben": true,
+    "datei_bytes": 621656,
+    "bearbeitung": "Graustufe aus dem Gruenkanal: nach der Farbzuordnung der Bildseite traegt er V (cyan) und einen Teil von I (orange), aber kein H-alpha (rot), sodass die HII-Knoten nicht hervortreten (bilder-v2.md 2). Pressebild nichtlinear gestreckt; zurueckgerechnet mit einer monotonen Tonkurve Kode -> mag/arcsec^2 gegen das Profil des Zustands (daten/objekte.json, profil): je Ring auf der grossen Achse (Positionswinkel 37.5 Grad, 42 Ringe bis 6500\") Median des Kodes gegen Median des Modells, isoton geglaettet, 38 Knoten, dazwischen linear in mag; unter dem dunkelsten Knoten linear in der Helligkeit bis 0 bei Kode 7 (Median des Gruenkanals in den Ecken des Mosaiks ausserhalb 25' von der grossen Achse und 75' von der Mitte). Kern im Pressebild in allen Kanaelen gesaettigt (Kode 255 innerhalb etwa 30\" auf der grossen Achse), dort zeigt das Bild eine flache Kuppe auf der Hoehe des Profils bei etwa 25\" statt des Anstiegs zur Mitte. Himmel: kein Abzug, der Schwarzpunkt des Pressebilds liegt auf dem Himmel (Kode 7 wird 0). Ausgerichtet ueber Massstab 1.30572\"/px und Nordrichtung 125.8 Grad im Uhrzeigersinn von der Senkrechten des Rohbilds (nicht gespiegelt), Objektmitte (Pixel 5108.66/1392.16 im Rohbild, Zeile 0 oben, Schwerpunkt der gesaettigten Kernpixel (Gruenkanal >= 250 im Kreis 40 px)) auf die Mitte einer Leinwand von 3200x3200 px, von 1.3057 auf 4.0\"/px bilinear auf einem 3-fach feineren Gitter abgetastet und blockweise gemittelt (flusserhaltend); 8401036 Pixel ohne Daten auf 0. 11137 Punktquellen (Vordergrundsterne der Milchstrasse, helle Einzelobjekte in M31 (Kugelsternhaufen, Ueberriesen) und Rauschspitzen in der schwachen Aussenscheibe) erkannt und durch den Median der Umgebung ersetzt (Rest gegen Median 9 px ueber 10.0 lokalen Streuungen); zusaetzlich maskiert: Kreise (Leinwandpixel) um die Hoefe von neun hellen Vordergrundsternen, deren Fluegel die Maske nicht ganz erfasst (am bereinigten Bild als Ringe sichtbar). Quellweiss mag_hell aus der Tonkurve (absolute Flaechenhelligkeit des hellsten Pixels; Profil deep-sky.md 1.2 (Sersic-Bulge plus Scheibe, mu0 V = 20,2 an RC3 angepasst)). Kodiert als 8-Bit-Grauwert mit log-Kennlinie (ADR-0003 Nachtrag Version 2): Kode 255 = mag_hell 16.22 (hellstes Pixel), Kode 1 = mag_dunkel 25.22, Kode 0 Schwarz (Rauschen und Werte unter Kode 1). Himmelsnorden oben, Osten links: Bildseite 'North is 125.8 deg right of vertical', 'East to the left'; geprueft an M32 (Abstand 1452,8\" bei PA 181,1 Grad aus SIMBAD; im Rohbild 1114,1 px bei 125,85 Grad, also 1,304\"/px gegen 1,3057 aus dem Feld 217,62') und an der grossen Achse (Flaechenmomente 37 bis 39 Grad, gespiegelt waeren es 142,5 Grad). WebP verlustfrei (tools/deep_sky_aufbereiten.py).",
+    "hinweise": "Grobes Quellbild: 4\"/px (A-X11), Kern gesaettigt. Flaechentabelle in daten/objekte.json (m31, isophoten) aus demselben Lauf. Rohdatei noao-m31lgs_ubvIha_10k.tif von https://storage.noirlab.edu/media/archives/images/publicationtiff10k/noao-m31lgs_ubvIha.tif: 31329224 Byte, SHA-256 c37531e4123eaaf19c0fe8fdb0536c8ac8a6e83fe04fb1b80125195856ebd177, abgerufen 2026-10-29. Native Aufloesung 1.3057\"/px, Repo-Datei 3.06-fach verkleinert.",
+    "kennlinie": {
+      "art": "log",
+      "mag_hell": 16.22,
+      "mag_dunkel": 25.22
+    }
   }
 ]
