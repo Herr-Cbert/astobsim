@@ -5,6 +5,14 @@
 // wenige Pixel, also wenige Millisekunden. Die Falter (JS, WebGL2) bleiben unberuehrt.
 // Version 2 (docs/architektur.md 5.3): bei Bedarf dazu die dreikanalige Faerbung, Fluss mal Deckkraft
 // mal Farbe je Scheibchen, mit demselben Kern und auf demselben Weg gefaltet.
+//
+// Weicher Rand (Issue #109): Der Kern der Naht endet hart beim Radius (3 Gesamt-FWHM, quadratisch).
+// Fuer die Flaeche ist das unsichtbar, fuer Punkte nicht: tonwert hebt den Randwert mit
+// W = min(1, (aP * p)^(1/3)) auf etwa ein Zehntel des Scheitels, danach faellt er hart auf 0
+// (Quadrate um helle Sterne, Farbkante zwischen zwei Sternen). Die Punktebene faltet deshalb mit
+// ausgeblendetKern: der Kern mal einem cos^2-Fenster ueber das aeussere Drittel des Radius (etwa
+// die aeussere Gesamt-FWHM), rund statt quadratisch, neu auf Summe 1 normiert (Fluss bleibt).
+// Begruendung und Grenzen: docs/recherche/physik.md Abschnitt 24.
 
 import type { Kern } from "../naht/simulationsparameter";
 import { pruefeKern } from "./falter";
@@ -13,7 +21,7 @@ import type { Scheibchen } from "./male";
 import { neuesRaster, type Raster } from "./raster";
 
 /**
- * Faltet jedes Scheibchen mit dem Kern (echte Faltung; die Kerne der Naht sind punktsymmetrisch)
+ * Faltet jedes Scheibchen mit dem ausgeblendeten Kern (ausgeblendetKern; echte Faltung; die Kerne der Naht sind punktsymmetrisch)
  * und addiert das Ergebnis in eine mit 0 belegte Ebene rasterPx x rasterPx (ein Kanal, Werte
  * relativ zu Quellweiss). Rand wie bei male: der Kern wird nicht neu normiert, was ausserhalb des
  * Rasters faellt, fehlt; innen behaelt ein angeschnittener Punkt seine Helligkeit. Der Gesamtfluss
@@ -43,13 +51,57 @@ export function falteFaerbung(scheibchen: readonly Scheibchen[], kern: Kern, ras
   return falteInEbene(scheibchen, kern, rasterPx, 3);
 }
 
+/** Das Fenster beginnt bei diesem Anteil des Kernradius (aeusseres Drittel, etwa eine Gesamt-FWHM). */
+const FENSTER_ANFANG_PRO_RADIUS = 2 / 3;
+/** Das Fenster erreicht 0 einen halben Pixel ausserhalb des Radius: die Pixel auf der Achse bleiben knapp ueber 0. */
+const FENSTER_ENDE_ZUSATZ_PX = 0.5;
+
+const ausgeblendet = new WeakMap<Kern, Float32Array>();
+
+/**
+ * Kerndaten fuer die Punktebene: kern.daten mal w(rho), w = 1 bis rho0 = 2/3 Radius, dann
+ * cos^2(pi/2 * (rho - rho0) / (rhoE - rho0)) bis rhoE = Radius + 0,5 px, darueber 0 (rho Abstand
+ * zur Kernmitte in Pixeln); danach auf die Summe der urspruenglichen Daten normiert, so dass der
+ * Fluss erhalten bleibt. Ein Delta (Radius 0, Vergleichsbild) bleibt unveraendert. Zwischengespeichert je Kern.
+ */
+export function ausgeblendetKern(kern: Kern): Float32Array {
+  const fertig = ausgeblendet.get(kern);
+  if (fertig !== undefined) return fertig;
+  const r = kern.radius | 0;
+  const g = kern.groesse | 0;
+  const rho0 = FENSTER_ANFANG_PRO_RADIUS * r;
+  const rhoE = r + FENSTER_ENDE_ZUSATZ_PX;
+  const daten = new Float32Array(kern.daten.length);
+  let vorher = 0;
+  let nachher = 0;
+  for (let b = 0; b < g; b++) {
+    for (let a = 0; a < g; a++) {
+      const i = b * g + a;
+      const wert = kern.daten[i] as number;
+      const rho = Math.hypot(a - r, b - r);
+      const w = rho <= rho0 ? 1 : rho >= rhoE ? 0 : Math.cos(((Math.PI / 2) * (rho - rho0)) / (rhoE - rho0)) ** 2;
+      vorher += wert;
+      nachher += wert * w;
+      daten[i] = wert * w;
+    }
+  }
+  if (nachher > 0) {
+    const faktor = vorher / nachher;
+    for (let i = 0; i < daten.length; i++) daten[i] = (daten[i] as number) * faktor;
+  } else {
+    daten.set(kern.daten);
+  }
+  ausgeblendet.set(kern, daten);
+  return daten;
+}
+
 function falteInEbene(scheibchen: readonly Scheibchen[], kern: Kern, rasterPx: number, kanaele: 1 | 3): Raster | undefined {
   pruefePositivGanz("rasterPx", rasterPx);
   if (scheibchen.length === 0) return undefined;
   pruefeKern(kern);
   const r = kern.radius | 0;
   const g = kern.groesse | 0;
-  const k = kern.daten;
+  const k = ausgeblendetKern(kern);
   const n = rasterPx | 0;
   let ebene: Raster | undefined;
   for (const s of scheibchen) {

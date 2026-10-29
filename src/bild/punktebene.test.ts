@@ -3,7 +3,7 @@ import type { Helligkeit, Punktquelle, Quellbild } from "../naht/simulationspara
 import { FalterJs } from "./falter";
 import { BildFehler } from "./fehler";
 import { malePunktquellen } from "./male";
-import { faltePunkte } from "./punktebene";
+import { ausgeblendetKern, faltePunkte } from "./punktebene";
 import { neuesRaster, pixelIndex, summe, type Raster } from "./raster";
 import { tonwert } from "./rendere";
 import { deltaKern, kastenKern, kernAusDaten, verschobenerDeltaKern } from "./testkerne";
@@ -47,12 +47,12 @@ describe("faltePunkte", () => {
     expect(summe(faltePunkte(s, gaussKern(), N)!)).toBeCloseTo(fluss(p), 6);
   });
 
-  it("gleich der Faltung des ganzen Rasters mit FalterJs, auch fuer einen unsymmetrischen Kern (Richtung)", () => {
+  it("gleich der Faltung des ganzen Rasters mit FalterJs und dem ausgeblendeten Kern, auch unsymmetrisch (Richtung)", () => {
     const q = quellbild([punkt(), punkt({ name: "Europa", xArcsec: -7.7, yArcsec: 5.2, durchmesserArcsec: 3, helligkeitRelativ: 0.2 })]);
     const gemalt = faltePunkte(malePunktquellen(q), deltaKern(1), N)!;
     for (const kern of [gaussKern(), verschobenerDeltaKern(1, 2, 5)]) {
       const lokal = faltePunkte(malePunktquellen(q), kern, N)!;
-      const ganz = new FalterJs().falte(gemalt, kern);
+      const ganz = new FalterJs().falte(gemalt, kernAusDaten(kern.groesse, ausgeblendetKern(kern), "aus"));
       for (let i = 0; i < lokal.daten.length; i++) expect(lokal.daten[i]).toBeCloseTo(ganz.daten[i] as number, 6);
     }
   });
@@ -75,6 +75,33 @@ describe("faltePunkte", () => {
       for (let i = 24; i < N; i++) expect(rand.daten[pixelIndex(rand, i, j)]).toBeCloseTo(gross.daten[pixelIndex(gross, i, j + 16)] as number, 7);
     }
     expect(summe(rand)).toBeLessThan(0.7 * fluss(p));
+  });
+
+  it("ausgeblendeter Kern (Issue #109): Summe erhalten, innen nur skaliert, rund, zum Rand stetig gegen 0", () => {
+    // Breiter Gauss 17 x 17 (Sigma 4 px): am harten Rand noch deutlich ueber 0, wie die Seeing-Fluegel.
+    const g = 17;
+    const r = 8;
+    const roh = new Float32Array(g * g);
+    let s = 0;
+    for (let j = 0; j < g; j++) for (let i = 0; i < g; i++) s += roh[j * g + i] = Math.exp(-((i - r) ** 2 + (j - r) ** 2) / (2 * 4 ** 2));
+    for (let k = 0; k < roh.length; k++) roh[k] = (roh[k] as number) / s;
+    const kern = kernAusDaten(g, roh, "breit");
+    const k = ausgeblendetKern(kern);
+    expect(ausgeblendetKern(kern)).toBe(k);
+    expect(k.reduce((a, b) => a + b, 0)).toBeCloseTo(1, 6);
+    // Innen (rho <= 2/3 r) ein gemeinsamer Faktor >= 1.
+    const faktor = (k[r * g + r] as number) / (roh[r * g + r] as number);
+    expect(faktor).toBeGreaterThanOrEqual(1);
+    expect((k[r * g + r + 5] as number) / (roh[r * g + r + 5] as number)).toBeCloseTo(faktor, 5);
+    // Ecken (rho > r + 0,5) sind 0, auf der Achse am Rand knapp ueber 0, deutlich unter dem rohen Wert.
+    expect(k[0]).toBe(0);
+    expect(k[g * g - 1]).toBe(0);
+    expect(k[r * g + 2 * r] as number).toBeGreaterThan(0);
+    expect(k[r * g + 2 * r] as number).toBeLessThan(0.1 * (roh[r * g + 2 * r] as number));
+    // Entlang der Achse monoton fallend (kein Sprung).
+    for (let a = r; a < 2 * r; a++) expect(k[r * g + a + 1] as number).toBeLessThan(k[r * g + a] as number);
+    // Ein Delta bleibt ein Delta (Vergleichsbild).
+    expect(Array.from(ausgeblendetKern(deltaKern(1)))).toEqual([1]);
   });
 
   it("wirft BildFehler bei unstimmigem Kern oder Scheibchen", () => {
