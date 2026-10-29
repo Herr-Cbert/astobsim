@@ -1,0 +1,4787 @@
+{
+  "objekt": "m13",
+  "quelle": "ESA Gaia DR3 (gaiadr3.gaia_source; Gaia Collaboration, Vallenari et al. 2023, A&A 674, A1), abgefragt im Gaia-Archiv https://gea.esac.esa.int/tap-server/tap/sync. Credit: ESA, Gaia DPAC.",
+  "lizenz": "CC BY-NC 3.0 IGO (https://creativecommons.org/licenses/by-nc/3.0/igo/), Daten der ESA Space Science Archives; kommerzielle Nutzung nur nach Genehmigung (data.licences@esa.int, https://www.cosmos.esa.int/web/esdc/terms-and-conditions)",
+  "kommentar": "Erzeugt von tools/m13_aufbereiten.py aus einer Abfrage im Gaia-Archiv (Abruf 2026-10-29, ADQL und SHA-256 in data/roh/LIESMICH.md): Kegel 15' um 16 41 41,24 +36 27 35,5 (Harris 2010), G < 17, 3082 Quellen. Mitglieder nach deep-sky.md 3.3 (Eigenbewegung innerhalb 1,2 mas/a um (-3,15; -2,57) mas/a, Parallaxe unter 1 mas): 2184, davon 79 ohne BP-RP (kein V, bleiben in der Flaeche). Hier die 531 Mitglieder bis V 15; V aus G und BP-RP nach Gaia DR3 Dokumentation 5.5.1 Tabelle 5.9, B-V aus BP-RP = f(B-V) derselben Tabelle, invertiert (physik.md 22; fuer die roten Riesen Extrapolation der Plejaden-Probe, deep-sky.md 6.3). Lage dx nach Westen (Norden oben, Osten links), dy nach Norden, Gaia-Epoche 2016,0. Im Quellbild (bilder.json m13_noirlab_mayall) ist ihr Licht entfernt, die Flaeche traegt den Rest (Entscheidung Herbert 2026-10-29, Issue #108). Summe der Sterne V 6,97, 33,5 % von V_t 5,78.",
+  "sterne": [
+    {
+      "name": "Gaia DR3 1328057763997754112",
+      "dx_arcsec": 55.6,
+      "dy_arcsec": -60.1,
+      "magnitude": 11.92,
+      "b_v": 1.38,
+      "katalog": "Gaia DR3 1328057763997754112",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057871377540224",
+      "dx_arcsec": 69.2,
+      "dy_arcsec": -8.1,
+      "magnitude": 11.97,
+      "b_v": 1.33,
+      "katalog": "Gaia DR3 1328057871377540224",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057149822883328",
+      "dx_arcsec": -8.5,
+      "dy_arcsec": -43.8,
+      "magnitude": 11.98,
+      "b_v": 1.42,
+      "katalog": "Gaia DR3 1328057149822883328",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057145522507648",
+      "dx_arcsec": -15.8,
+      "dy_arcsec": -39.4,
+      "magnitude": 12.01,
+      "b_v": 1.37,
+      "katalog": "Gaia DR3 1328057145522507648",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328058696010941568",
+      "dx_arcsec": -116.7,
+      "dy_arcsec": 78.8,
+      "magnitude": 12.06,
+      "b_v": 1.38,
+      "katalog": "Gaia DR3 1328058696010941568",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328105150377778048",
+      "dx_arcsec": 213.7,
+      "dy_arcsec": 161.7,
+      "magnitude": 12.07,
+      "b_v": 1.37,
+      "katalog": "Gaia DR3 1328105150377778048",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328056703145773696",
+      "dx_arcsec": -109.3,
+      "dy_arcsec": -200.0,
+      "magnitude": 12.08,
+      "b_v": 1.37,
+      "katalog": "Gaia DR3 1328056703145773696",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328058077536075264",
+      "dx_arcsec": 111.5,
+      "dy_arcsec": 54.5,
+      "magnitude": 12.09,
+      "b_v": 1.33,
+      "katalog": "Gaia DR3 1328058077536075264",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057012383752704",
+      "dx_arcsec": 30.8,
+      "dy_arcsec": -117.6,
+      "magnitude": 12.11,
+      "b_v": 1.31,
+      "katalog": "Gaia DR3 1328057012383752704",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328058657351049344",
+      "dx_arcsec": -101.9,
+      "dy_arcsec": 13.2,
+      "magnitude": 12.12,
+      "b_v": 1.3,
+      "katalog": "Gaia DR3 1328058657351049344",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057802657985792",
+      "dx_arcsec": 24.9,
+      "dy_arcsec": -13.4,
+      "magnitude": 12.16,
+      "b_v": 1.26,
+      "katalog": "Gaia DR3 1328057802657985792",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057081103004032",
+      "dx_arcsec": -69.6,
+      "dy_arcsec": -98.0,
+      "magnitude": 12.16,
+      "b_v": 1.3,
+      "katalog": "Gaia DR3 1328057081103004032",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057351677265920",
+      "dx_arcsec": 105.1,
+      "dy_arcsec": -173.0,
+      "magnitude": 12.21,
+      "b_v": 1.26,
+      "katalog": "Gaia DR3 1328057351677265920",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057905737087488",
+      "dx_arcsec": 11.9,
+      "dy_arcsec": -4.1,
+      "magnitude": 12.21,
+      "b_v": 1.23,
+      "katalog": "Gaia DR3 1328057905737087488",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328058077536011520",
+      "dx_arcsec": 78.2,
+      "dy_arcsec": 24.0,
+      "magnitude": 12.22,
+      "b_v": 1.26,
+      "katalog": "Gaia DR3 1328058077536011520",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328059413265278720",
+      "dx_arcsec": -74.6,
+      "dy_arcsec": 52.8,
+      "magnitude": 12.23,
+      "b_v": 1.26,
+      "katalog": "Gaia DR3 1328059413265278720",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057871377511808",
+      "dx_arcsec": 77.5,
+      "dy_arcsec": -15.9,
+      "magnitude": 12.28,
+      "b_v": 1.25,
+      "katalog": "Gaia DR3 1328057871377511808",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328058249334814208",
+      "dx_arcsec": 88.4,
+      "dy_arcsec": 150.1,
+      "magnitude": 12.33,
+      "b_v": 1.25,
+      "katalog": "Gaia DR3 1328058249334814208",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057523479525760",
+      "dx_arcsec": 207.1,
+      "dy_arcsec": -124.8,
+      "magnitude": 12.35,
+      "b_v": 1.22,
+      "katalog": "Gaia DR3 1328057523479525760",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057970156207872",
+      "dx_arcsec": 17.1,
+      "dy_arcsec": 53.5,
+      "magnitude": 12.38,
+      "b_v": 1.19,
+      "katalog": "Gaia DR3 1328057970156207872",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057837017750784",
+      "dx_arcsec": 81.6,
+      "dy_arcsec": -59.1,
+      "magnitude": 12.4,
+      "b_v": 1.21,
+      "katalog": "Gaia DR3 1328057837017750784",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328058107595085440",
+      "dx_arcsec": 170.8,
+      "dy_arcsec": 24.8,
+      "magnitude": 12.46,
+      "b_v": 1.17,
+      "katalog": "Gaia DR3 1328058107595085440",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328059726803469312",
+      "dx_arcsec": -43.5,
+      "dy_arcsec": 195.8,
+      "magnitude": 12.51,
+      "b_v": 1.2,
+      "katalog": "Gaia DR3 1328059726803469312",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328056630126385536",
+      "dx_arcsec": 59.8,
+      "dy_arcsec": -145.2,
+      "magnitude": 12.56,
+      "b_v": 1.16,
+      "katalog": "Gaia DR3 1328056630126385536",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057184182441472",
+      "dx_arcsec": -71.5,
+      "dy_arcsec": 8.2,
+      "magnitude": 12.57,
+      "b_v": 1.16,
+      "katalog": "Gaia DR3 1328057184182441472",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057832717224192",
+      "dx_arcsec": 67.0,
+      "dy_arcsec": -46.7,
+      "magnitude": 12.58,
+      "b_v": 1.11,
+      "katalog": "Gaia DR3 1328057832717224192",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057905737211136",
+      "dx_arcsec": 19.8,
+      "dy_arcsec": 2.5,
+      "magnitude": 12.58,
+      "b_v": 1.12,
+      "katalog": "Gaia DR3 1328057905737211136",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057970156194560",
+      "dx_arcsec": 38.4,
+      "dy_arcsec": 13.8,
+      "magnitude": 12.58,
+      "b_v": 1.14,
+      "katalog": "Gaia DR3 1328057970156194560",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057798357517824",
+      "dx_arcsec": 15.2,
+      "dy_arcsec": -54.0,
+      "magnitude": 12.6,
+      "b_v": 1.15,
+      "katalog": "Gaia DR3 1328057798357517824",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057974456544384",
+      "dx_arcsec": 43.8,
+      "dy_arcsec": 20.3,
+      "magnitude": 12.61,
+      "b_v": 1.14,
+      "katalog": "Gaia DR3 1328057974456544384",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057905737161344",
+      "dx_arcsec": 1.5,
+      "dy_arcsec": -12.7,
+      "magnitude": 12.62,
+      "b_v": 1.03,
+      "katalog": "Gaia DR3 1328057905737161344",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057390341058304",
+      "dx_arcsec": 83.0,
+      "dy_arcsec": -150.8,
+      "magnitude": 12.63,
+      "b_v": 1.15,
+      "katalog": "Gaia DR3 1328057390341058304",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328058279393978880",
+      "dx_arcsec": 83.3,
+      "dy_arcsec": 157.7,
+      "magnitude": 12.67,
+      "b_v": 1.15,
+      "katalog": "Gaia DR3 1328058279393978880",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057905737200384",
+      "dx_arcsec": -2.6,
+      "dy_arcsec": 15.9,
+      "magnitude": 12.69,
+      "b_v": 1.07,
+      "katalog": "Gaia DR3 1328057905737200384",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328105184737443072",
+      "dx_arcsec": 129.3,
+      "dy_arcsec": 127.9,
+      "magnitude": 12.7,
+      "b_v": 1.13,
+      "katalog": "Gaia DR3 1328105184737443072",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057905737016576",
+      "dx_arcsec": 2.0,
+      "dy_arcsec": 19.3,
+      "magnitude": 12.7,
+      "b_v": 1.0,
+      "katalog": "Gaia DR3 1328057905737016576",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057179882279808",
+      "dx_arcsec": -67.0,
+      "dy_arcsec": -31.8,
+      "magnitude": 12.71,
+      "b_v": 1.12,
+      "katalog": "Gaia DR3 1328057179882279808",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057145522523776",
+      "dx_arcsec": -41.4,
+      "dy_arcsec": -51.7,
+      "magnitude": 12.73,
+      "b_v": 1.11,
+      "katalog": "Gaia DR3 1328057145522523776",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057149822810240",
+      "dx_arcsec": -25.9,
+      "dy_arcsec": -20.0,
+      "magnitude": 12.73,
+      "b_v": 1.07,
+      "katalog": "Gaia DR3 1328057149822810240",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057802657585920",
+      "dx_arcsec": 16.5,
+      "dy_arcsec": -56.6,
+      "magnitude": 12.75,
+      "b_v": 1.16,
+      "katalog": "Gaia DR3 1328057802657585920",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057871379640960",
+      "dx_arcsec": 36.8,
+      "dy_arcsec": 0.9,
+      "magnitude": 12.75,
+      "b_v": 1.02,
+      "katalog": "Gaia DR3 1328057871379640960",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057905737137920",
+      "dx_arcsec": -22.4,
+      "dy_arcsec": 1.0,
+      "magnitude": 12.75,
+      "b_v": 1.01,
+      "katalog": "Gaia DR3 1328057905737137920",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057905737097984",
+      "dx_arcsec": -5.7,
+      "dy_arcsec": -16.8,
+      "magnitude": 12.76,
+      "b_v": 1.0,
+      "katalog": "Gaia DR3 1328057905737097984",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057145522513152",
+      "dx_arcsec": -24.8,
+      "dy_arcsec": -68.1,
+      "magnitude": 12.76,
+      "b_v": 1.12,
+      "katalog": "Gaia DR3 1328057145522513152",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057970156196864",
+      "dx_arcsec": 35.4,
+      "dy_arcsec": 54.4,
+      "magnitude": 12.77,
+      "b_v": 1.08,
+      "katalog": "Gaia DR3 1328057970156196864",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057626558742016",
+      "dx_arcsec": 200.3,
+      "dy_arcsec": -110.4,
+      "magnitude": 12.77,
+      "b_v": 1.12,
+      "katalog": "Gaia DR3 1328057626558742016",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057111162822656",
+      "dx_arcsec": -101.5,
+      "dy_arcsec": -25.3,
+      "magnitude": 12.78,
+      "b_v": 1.1,
+      "katalog": "Gaia DR3 1328057111162822656",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057459060642944",
+      "dx_arcsec": 122.8,
+      "dy_arcsec": -96.7,
+      "magnitude": 12.81,
+      "b_v": 1.11,
+      "katalog": "Gaia DR3 1328057459060642944",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328058210674357888",
+      "dx_arcsec": 48.2,
+      "dy_arcsec": 121.2,
+      "magnitude": 12.83,
+      "b_v": 1.1,
+      "katalog": "Gaia DR3 1328058210674357888",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328059413265271680",
+      "dx_arcsec": -65.0,
+      "dy_arcsec": 44.7,
+      "magnitude": 12.84,
+      "b_v": 1.02,
+      "katalog": "Gaia DR3 1328059413265271680",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057798357510016",
+      "dx_arcsec": 27.0,
+      "dy_arcsec": -11.6,
+      "magnitude": 12.85,
+      "b_v": 1.02,
+      "katalog": "Gaia DR3 1328057798357510016",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328053610769234432",
+      "dx_arcsec": -236.5,
+      "dy_arcsec": -241.9,
+      "magnitude": 12.87,
+      "b_v": 1.05,
+      "katalog": "Gaia DR3 1328053610769234432",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328059516344476800",
+      "dx_arcsec": -50.9,
+      "dy_arcsec": 143.0,
+      "magnitude": 12.92,
+      "b_v": 1.08,
+      "katalog": "Gaia DR3 1328059516344476800",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328058180615238784",
+      "dx_arcsec": 50.7,
+      "dy_arcsec": 72.8,
+      "magnitude": 12.92,
+      "b_v": 1.08,
+      "katalog": "Gaia DR3 1328058180615238784",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057798357505920",
+      "dx_arcsec": 33.7,
+      "dy_arcsec": -19.7,
+      "magnitude": 12.92,
+      "b_v": 1.06,
+      "katalog": "Gaia DR3 1328057798357505920",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057905736968832",
+      "dx_arcsec": 20.5,
+      "dy_arcsec": -14.7,
+      "magnitude": 12.92,
+      "b_v": 1.03,
+      "katalog": "Gaia DR3 1328057905736968832",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328056290828910208",
+      "dx_arcsec": -33.0,
+      "dy_arcsec": -301.9,
+      "magnitude": 12.93,
+      "b_v": 1.01,
+      "katalog": "Gaia DR3 1328056290828910208",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057935796509824",
+      "dx_arcsec": -47.3,
+      "dy_arcsec": 37.6,
+      "magnitude": 12.94,
+      "b_v": 1.06,
+      "katalog": "Gaia DR3 1328057935796509824",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057940096949760",
+      "dx_arcsec": -7.7,
+      "dy_arcsec": 38.1,
+      "magnitude": 12.94,
+      "b_v": 1.05,
+      "katalog": "Gaia DR3 1328057940096949760",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057905729756672",
+      "dx_arcsec": -13.5,
+      "dy_arcsec": 15.3,
+      "magnitude": 12.99,
+      "b_v": 0.97,
+      "katalog": "Gaia DR3 1328057905729756672",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328058038875633408",
+      "dx_arcsec": 107.4,
+      "dy_arcsec": -0.8,
+      "magnitude": 13.0,
+      "b_v": 1.06,
+      "katalog": "Gaia DR3 1328058038875633408",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328056870644650624",
+      "dx_arcsec": -96.7,
+      "dy_arcsec": -168.5,
+      "magnitude": 13.0,
+      "b_v": 1.06,
+      "katalog": "Gaia DR3 1328056870644650624",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057935796496384",
+      "dx_arcsec": -25.7,
+      "dy_arcsec": 5.1,
+      "magnitude": 13.0,
+      "b_v": 1.04,
+      "katalog": "Gaia DR3 1328057935796496384",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057184182439424",
+      "dx_arcsec": -52.2,
+      "dy_arcsec": -17.3,
+      "magnitude": 13.02,
+      "b_v": 1.01,
+      "katalog": "Gaia DR3 1328057184182439424",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057076803054080",
+      "dx_arcsec": -52.4,
+      "dy_arcsec": -80.8,
+      "magnitude": 13.02,
+      "b_v": 1.07,
+      "katalog": "Gaia DR3 1328057076803054080",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328055844152232320",
+      "dx_arcsec": -405.0,
+      "dy_arcsec": -15.6,
+      "magnitude": 13.02,
+      "b_v": 1.07,
+      "katalog": "Gaia DR3 1328055844152232320",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057974456757888",
+      "dx_arcsec": 41.0,
+      "dy_arcsec": 33.3,
+      "magnitude": 13.05,
+      "b_v": 0.94,
+      "katalog": "Gaia DR3 1328057974456757888",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057802657604352",
+      "dx_arcsec": 18.1,
+      "dy_arcsec": -57.5,
+      "magnitude": 13.06,
+      "b_v": 1.16,
+      "katalog": "Gaia DR3 1328057802657604352",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328059417565672960",
+      "dx_arcsec": -77.5,
+      "dy_arcsec": 92.5,
+      "magnitude": 13.08,
+      "b_v": 1.04,
+      "katalog": "Gaia DR3 1328059417565672960",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328059451925444608",
+      "dx_arcsec": -81.4,
+      "dy_arcsec": 137.5,
+      "magnitude": 13.08,
+      "b_v": 1.04,
+      "katalog": "Gaia DR3 1328059451925444608",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057940096939904",
+      "dx_arcsec": -16.1,
+      "dy_arcsec": 35.3,
+      "magnitude": 13.09,
+      "b_v": 1.0,
+      "katalog": "Gaia DR3 1328057940096939904",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328056905004415360",
+      "dx_arcsec": -155.1,
+      "dy_arcsec": -86.5,
+      "magnitude": 13.09,
+      "b_v": 1.05,
+      "katalog": "Gaia DR3 1328056905004415360",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057145522508288",
+      "dx_arcsec": -16.8,
+      "dy_arcsec": -67.2,
+      "magnitude": 13.1,
+      "b_v": 0.97,
+      "katalog": "Gaia DR3 1328057145522508288",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057871377439488",
+      "dx_arcsec": 50.3,
+      "dy_arcsec": -24.8,
+      "magnitude": 13.11,
+      "b_v": 1.03,
+      "katalog": "Gaia DR3 1328057871377439488",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328056870644656256",
+      "dx_arcsec": -105.9,
+      "dy_arcsec": -145.1,
+      "magnitude": 13.12,
+      "b_v": 0.98,
+      "katalog": "Gaia DR3 1328056870644656256",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057935796485120",
+      "dx_arcsec": -7.7,
+      "dy_arcsec": 42.8,
+      "magnitude": 13.13,
+      "b_v": 1.0,
+      "katalog": "Gaia DR3 1328057935796485120",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328056767565424128",
+      "dx_arcsec": -74.1,
+      "dy_arcsec": -144.6,
+      "magnitude": 13.13,
+      "b_v": 1.04,
+      "katalog": "Gaia DR3 1328056767565424128",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057802657974528",
+      "dx_arcsec": 21.8,
+      "dy_arcsec": -26.7,
+      "magnitude": 13.13,
+      "b_v": 1.0,
+      "katalog": "Gaia DR3 1328057802657974528",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057871377553280",
+      "dx_arcsec": 76.1,
+      "dy_arcsec": -5.0,
+      "magnitude": 13.14,
+      "b_v": 0.92,
+      "katalog": "Gaia DR3 1328057871377553280",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057905737084928",
+      "dx_arcsec": -4.3,
+      "dy_arcsec": 6.0,
+      "magnitude": 13.14,
+      "b_v": 0.96,
+      "katalog": "Gaia DR3 1328057905737084928",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328059516344569344",
+      "dx_arcsec": -50.6,
+      "dy_arcsec": 155.8,
+      "magnitude": 13.14,
+      "b_v": 0.98,
+      "katalog": "Gaia DR3 1328059516344569344",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057837019703296",
+      "dx_arcsec": 82.0,
+      "dy_arcsec": -29.3,
+      "magnitude": 13.16,
+      "b_v": 1.02,
+      "katalog": "Gaia DR3 1328057837019703296",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057867076964864",
+      "dx_arcsec": 64.5,
+      "dy_arcsec": 13.0,
+      "magnitude": 13.16,
+      "b_v": 0.56,
+      "katalog": "Gaia DR3 1328057867076964864",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057940099175808",
+      "dx_arcsec": -18.0,
+      "dy_arcsec": 48.8,
+      "magnitude": 13.16,
+      "b_v": 0.9,
+      "katalog": "Gaia DR3 1328057940099175808",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057802657938816",
+      "dx_arcsec": 17.1,
+      "dy_arcsec": -41.7,
+      "magnitude": 13.17,
+      "b_v": 1.01,
+      "katalog": "Gaia DR3 1328057802657938816",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057763997734144",
+      "dx_arcsec": 91.4,
+      "dy_arcsec": -87.8,
+      "magnitude": 13.17,
+      "b_v": -0.18,
+      "katalog": "Gaia DR3 1328057763997734144",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057935796514560",
+      "dx_arcsec": -53.8,
+      "dy_arcsec": 22.1,
+      "magnitude": 13.17,
+      "b_v": 1.04,
+      "katalog": "Gaia DR3 1328057935796514560",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057871371163136",
+      "dx_arcsec": 70.9,
+      "dy_arcsec": -6.1,
+      "magnitude": 13.17,
+      "b_v": 1.0,
+      "katalog": "Gaia DR3 1328057871371163136",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057459060628608",
+      "dx_arcsec": 105.8,
+      "dy_arcsec": -75.7,
+      "magnitude": 13.17,
+      "b_v": 1.03,
+      "katalog": "Gaia DR3 1328057459060628608",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328058657351053952",
+      "dx_arcsec": -113.0,
+      "dy_arcsec": 43.3,
+      "magnitude": 13.18,
+      "b_v": 1.01,
+      "katalog": "Gaia DR3 1328058657351053952",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328058004515968512",
+      "dx_arcsec": -18.5,
+      "dy_arcsec": 83.6,
+      "magnitude": 13.19,
+      "b_v": 1.02,
+      "katalog": "Gaia DR3 1328058004515968512",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328056320885119232",
+      "dx_arcsec": 30.9,
+      "dy_arcsec": -295.6,
+      "magnitude": 13.19,
+      "b_v": 1.03,
+      "katalog": "Gaia DR3 1328056320885119232",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328058004515972992",
+      "dx_arcsec": -25.6,
+      "dy_arcsec": 69.2,
+      "magnitude": 13.2,
+      "b_v": 1.01,
+      "katalog": "Gaia DR3 1328058004515972992",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057905729737856",
+      "dx_arcsec": 19.4,
+      "dy_arcsec": -4.8,
+      "magnitude": 13.2,
+      "b_v": 0.96,
+      "katalog": "Gaia DR3 1328057905729737856",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057905737050368",
+      "dx_arcsec": -15.5,
+      "dy_arcsec": -5.0,
+      "magnitude": 13.22,
+      "b_v": 0.96,
+      "katalog": "Gaia DR3 1328057905737050368",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328058382473166976",
+      "dx_arcsec": -161.3,
+      "dy_arcsec": -12.7,
+      "magnitude": 13.23,
+      "b_v": 1.03,
+      "katalog": "Gaia DR3 1328058382473166976",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057420400321920",
+      "dx_arcsec": 158.0,
+      "dy_arcsec": -127.9,
+      "magnitude": 13.27,
+      "b_v": 0.94,
+      "katalog": "Gaia DR3 1328057420400321920",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057149822551808",
+      "dx_arcsec": -38.8,
+      "dy_arcsec": -58.4,
+      "magnitude": 13.29,
+      "b_v": 0.99,
+      "katalog": "Gaia DR3 1328057149822551808",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057179882292480",
+      "dx_arcsec": -89.1,
+      "dy_arcsec": -11.7,
+      "magnitude": 13.29,
+      "b_v": 0.87,
+      "katalog": "Gaia DR3 1328057179882292480",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328104841140179584",
+      "dx_arcsec": 419.3,
+      "dy_arcsec": 38.2,
+      "magnitude": 13.29,
+      "b_v": 1.01,
+      "katalog": "Gaia DR3 1328104841140179584",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057905737089920",
+      "dx_arcsec": 8.5,
+      "dy_arcsec": 11.1,
+      "magnitude": 13.3,
+      "b_v": 0.92,
+      "katalog": "Gaia DR3 1328057905737089920",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057390341068160",
+      "dx_arcsec": 83.2,
+      "dy_arcsec": -140.3,
+      "magnitude": 13.3,
+      "b_v": 1.02,
+      "katalog": "Gaia DR3 1328057390341068160",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057974456589568",
+      "dx_arcsec": 26.2,
+      "dy_arcsec": 11.9,
+      "magnitude": 13.32,
+      "b_v": 0.97,
+      "katalog": "Gaia DR3 1328057974456589568",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328058038875625856",
+      "dx_arcsec": 120.5,
+      "dy_arcsec": 26.8,
+      "magnitude": 13.36,
+      "b_v": 1.0,
+      "katalog": "Gaia DR3 1328058038875625856",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328056874944522880",
+      "dx_arcsec": -97.4,
+      "dy_arcsec": -129.3,
+      "magnitude": 13.37,
+      "b_v": 1.0,
+      "katalog": "Gaia DR3 1328056874944522880",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328081923194738432",
+      "dx_arcsec": 702.9,
+      "dy_arcsec": 6.3,
+      "magnitude": 13.37,
+      "b_v": 1.01,
+      "katalog": "Gaia DR3 1328081923194738432",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328059451925409408",
+      "dx_arcsec": -108.4,
+      "dy_arcsec": 127.6,
+      "magnitude": 13.39,
+      "b_v": 0.92,
+      "katalog": "Gaia DR3 1328059451925409408",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057867076959488",
+      "dx_arcsec": 72.3,
+      "dy_arcsec": 7.9,
+      "magnitude": 13.4,
+      "b_v": 0.97,
+      "katalog": "Gaia DR3 1328057867076959488",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057905729818752",
+      "dx_arcsec": 2.9,
+      "dy_arcsec": -0.4,
+      "magnitude": 13.41,
+      "b_v": 0.89,
+      "katalog": "Gaia DR3 1328057905729818752",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057940096891904",
+      "dx_arcsec": -39.2,
+      "dy_arcsec": 29.9,
+      "magnitude": 13.42,
+      "b_v": 0.85,
+      "katalog": "Gaia DR3 1328057940096891904",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057867076979712",
+      "dx_arcsec": 37.7,
+      "dy_arcsec": -13.1,
+      "magnitude": 13.45,
+      "b_v": 0.84,
+      "katalog": "Gaia DR3 1328057867076979712",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057660918491008",
+      "dx_arcsec": 155.3,
+      "dy_arcsec": -31.7,
+      "magnitude": 13.45,
+      "b_v": 0.98,
+      "katalog": "Gaia DR3 1328057660918491008",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057184182430976",
+      "dx_arcsec": -45.1,
+      "dy_arcsec": -10.7,
+      "magnitude": 13.48,
+      "b_v": 0.86,
+      "katalog": "Gaia DR3 1328057184182430976",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057798357521536",
+      "dx_arcsec": 9.6,
+      "dy_arcsec": -36.7,
+      "magnitude": 13.48,
+      "b_v": 0.81,
+      "katalog": "Gaia DR3 1328057798357521536",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057390341068288",
+      "dx_arcsec": 75.4,
+      "dy_arcsec": -130.3,
+      "magnitude": 13.49,
+      "b_v": 0.98,
+      "katalog": "Gaia DR3 1328057390341068288",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328060276559277952",
+      "dx_arcsec": -171.1,
+      "dy_arcsec": 351.1,
+      "magnitude": 13.51,
+      "b_v": 0.85,
+      "katalog": "Gaia DR3 1328060276559277952",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328059722502999296",
+      "dx_arcsec": -48.7,
+      "dy_arcsec": 211.3,
+      "magnitude": 13.53,
+      "b_v": 0.97,
+      "katalog": "Gaia DR3 1328059722502999296",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328058279393979008",
+      "dx_arcsec": 81.9,
+      "dy_arcsec": 149.3,
+      "magnitude": 13.54,
+      "b_v": 0.98,
+      "katalog": "Gaia DR3 1328058279393979008",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057802657602432",
+      "dx_arcsec": 27.0,
+      "dy_arcsec": -60.4,
+      "magnitude": 13.54,
+      "b_v": 0.94,
+      "katalog": "Gaia DR3 1328057802657602432",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057867076976384",
+      "dx_arcsec": 44.5,
+      "dy_arcsec": -20.3,
+      "magnitude": 13.55,
+      "b_v": 0.82,
+      "katalog": "Gaia DR3 1328057867076976384",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057562140047104",
+      "dx_arcsec": 292.4,
+      "dy_arcsec": -107.5,
+      "magnitude": 13.56,
+      "b_v": 0.97,
+      "katalog": "Gaia DR3 1328057562140047104",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057386040597120",
+      "dx_arcsec": 120.3,
+      "dy_arcsec": -137.2,
+      "magnitude": 13.57,
+      "b_v": 0.96,
+      "katalog": "Gaia DR3 1328057386040597120",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328058661651160960",
+      "dx_arcsec": -107.5,
+      "dy_arcsec": 40.2,
+      "magnitude": 13.58,
+      "b_v": 0.95,
+      "katalog": "Gaia DR3 1328058661651160960",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328105184737460992",
+      "dx_arcsec": 125.7,
+      "dy_arcsec": 157.5,
+      "magnitude": 13.63,
+      "b_v": 0.89,
+      "katalog": "Gaia DR3 1328105184737460992",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057802651315584",
+      "dx_arcsec": 27.9,
+      "dy_arcsec": -12.1,
+      "magnitude": 13.63,
+      "b_v": 1.04,
+      "katalog": "Gaia DR3 1328057802651315584",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057935796506624",
+      "dx_arcsec": -42.0,
+      "dy_arcsec": 40.5,
+      "magnitude": 13.64,
+      "b_v": 0.95,
+      "katalog": "Gaia DR3 1328057935796506624",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328056664486055296",
+      "dx_arcsec": -42.6,
+      "dy_arcsec": -248.3,
+      "magnitude": 13.65,
+      "b_v": 0.96,
+      "katalog": "Gaia DR3 1328056664486055296",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057763997760640",
+      "dx_arcsec": 46.2,
+      "dy_arcsec": -89.7,
+      "magnitude": 13.65,
+      "b_v": 0.94,
+      "katalog": "Gaia DR3 1328057763997760640",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328058141954845312",
+      "dx_arcsec": 113.7,
+      "dy_arcsec": 79.9,
+      "magnitude": 13.66,
+      "b_v": 0.94,
+      "katalog": "Gaia DR3 1328058141954845312",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057905737121536",
+      "dx_arcsec": 15.4,
+      "dy_arcsec": -2.6,
+      "magnitude": 13.67,
+      "b_v": 0.75,
+      "katalog": "Gaia DR3 1328057905737121536",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057489116219520",
+      "dx_arcsec": 258.4,
+      "dy_arcsec": -177.3,
+      "magnitude": 13.69,
+      "b_v": 0.93,
+      "katalog": "Gaia DR3 1328057489116219520",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328056874944510592",
+      "dx_arcsec": -97.5,
+      "dy_arcsec": -143.2,
+      "magnitude": 13.7,
+      "b_v": 0.88,
+      "katalog": "Gaia DR3 1328056874944510592",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057111162818048",
+      "dx_arcsec": -93.2,
+      "dy_arcsec": -34.8,
+      "magnitude": 13.72,
+      "b_v": 0.81,
+      "katalog": "Gaia DR3 1328057111162818048",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057111162816640",
+      "dx_arcsec": -90.9,
+      "dy_arcsec": -45.2,
+      "magnitude": 13.72,
+      "b_v": 0.94,
+      "katalog": "Gaia DR3 1328057111162816640",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057179882282240",
+      "dx_arcsec": -71.0,
+      "dy_arcsec": -6.8,
+      "magnitude": 13.72,
+      "b_v": 0.85,
+      "katalog": "Gaia DR3 1328057179882282240",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057179882272640",
+      "dx_arcsec": -57.5,
+      "dy_arcsec": -31.8,
+      "magnitude": 13.72,
+      "b_v": 0.91,
+      "katalog": "Gaia DR3 1328057179882272640",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328104909859635840",
+      "dx_arcsec": 314.0,
+      "dy_arcsec": 108.5,
+      "magnitude": 13.73,
+      "b_v": 0.94,
+      "katalog": "Gaia DR3 1328104909859635840",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328059481984726400",
+      "dx_arcsec": -32.2,
+      "dy_arcsec": 80.8,
+      "magnitude": 13.73,
+      "b_v": 0.93,
+      "katalog": "Gaia DR3 1328059481984726400",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328058038875623552",
+      "dx_arcsec": 126.4,
+      "dy_arcsec": -19.5,
+      "magnitude": 13.75,
+      "b_v": 0.93,
+      "katalog": "Gaia DR3 1328058038875623552",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057149822698368",
+      "dx_arcsec": -45.3,
+      "dy_arcsec": -31.4,
+      "magnitude": 13.76,
+      "b_v": 0.88,
+      "katalog": "Gaia DR3 1328057149822698368",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328056668786032512",
+      "dx_arcsec": -61.5,
+      "dy_arcsec": -265.5,
+      "magnitude": 13.76,
+      "b_v": 0.93,
+      "katalog": "Gaia DR3 1328056668786032512",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328042856171060352",
+      "dx_arcsec": -683.2,
+      "dy_arcsec": -202.9,
+      "magnitude": 13.77,
+      "b_v": 0.94,
+      "katalog": "Gaia DR3 1328042856171060352",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057940096766464",
+      "dx_arcsec": -23.2,
+      "dy_arcsec": 17.9,
+      "magnitude": 13.77,
+      "b_v": 0.87,
+      "katalog": "Gaia DR3 1328057940096766464",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057905737008768",
+      "dx_arcsec": 6.6,
+      "dy_arcsec": -19.1,
+      "magnitude": 13.78,
+      "b_v": 0.88,
+      "katalog": "Gaia DR3 1328057905737008768",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328059417565645056",
+      "dx_arcsec": -76.9,
+      "dy_arcsec": 81.2,
+      "magnitude": 13.78,
+      "b_v": 0.92,
+      "katalog": "Gaia DR3 1328059417565645056",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057042443279616",
+      "dx_arcsec": 6.8,
+      "dy_arcsec": -75.5,
+      "magnitude": 13.78,
+      "b_v": 0.59,
+      "katalog": "Gaia DR3 1328057042443279616",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328058008816490112",
+      "dx_arcsec": 1.4,
+      "dy_arcsec": 74.3,
+      "magnitude": 13.78,
+      "b_v": 0.93,
+      "katalog": "Gaia DR3 1328058008816490112",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057145522513536",
+      "dx_arcsec": -24.6,
+      "dy_arcsec": -33.9,
+      "magnitude": 13.79,
+      "b_v": 0.89,
+      "katalog": "Gaia DR3 1328057145522513536",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057184182417024",
+      "dx_arcsec": -52.9,
+      "dy_arcsec": -20.6,
+      "magnitude": 13.79,
+      "b_v": 0.77,
+      "katalog": "Gaia DR3 1328057184182417024",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057905736994688",
+      "dx_arcsec": 16.9,
+      "dy_arcsec": -7.5,
+      "magnitude": 13.8,
+      "b_v": 0.87,
+      "katalog": "Gaia DR3 1328057905736994688",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328051961501737088",
+      "dx_arcsec": -243.9,
+      "dy_arcsec": -609.4,
+      "magnitude": 13.8,
+      "b_v": 0.2,
+      "katalog": "Gaia DR3 1328051961501737088",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328059447625041408",
+      "dx_arcsec": -124.8,
+      "dy_arcsec": 120.7,
+      "magnitude": 13.81,
+      "b_v": 0.82,
+      "katalog": "Gaia DR3 1328059447625041408",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328058622991336832",
+      "dx_arcsec": -165.2,
+      "dy_arcsec": 6.4,
+      "magnitude": 13.83,
+      "b_v": 0.92,
+      "katalog": "Gaia DR3 1328058622991336832",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057867076973184",
+      "dx_arcsec": 49.4,
+      "dy_arcsec": -13.1,
+      "magnitude": 13.83,
+      "b_v": 0.9,
+      "katalog": "Gaia DR3 1328057867076973184",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057179882283136",
+      "dx_arcsec": -71.6,
+      "dy_arcsec": 14.1,
+      "magnitude": 13.84,
+      "b_v": 0.9,
+      "katalog": "Gaia DR3 1328057179882283136",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057179882277248",
+      "dx_arcsec": -63.4,
+      "dy_arcsec": 9.8,
+      "magnitude": 13.85,
+      "b_v": 0.91,
+      "katalog": "Gaia DR3 1328057179882277248",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057905730540160",
+      "dx_arcsec": 26.2,
+      "dy_arcsec": -8.0,
+      "magnitude": 13.86,
+      "b_v": 0.86,
+      "katalog": "Gaia DR3 1328057905730540160",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328056978023822848",
+      "dx_arcsec": -28.0,
+      "dy_arcsec": -109.7,
+      "magnitude": 13.86,
+      "b_v": 0.91,
+      "katalog": "Gaia DR3 1328056978023822848",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328056703145755264",
+      "dx_arcsec": -110.1,
+      "dy_arcsec": -233.9,
+      "magnitude": 13.86,
+      "b_v": 0.92,
+      "katalog": "Gaia DR3 1328056703145755264",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328059516344571264",
+      "dx_arcsec": -80.2,
+      "dy_arcsec": 179.0,
+      "magnitude": 13.87,
+      "b_v": 0.93,
+      "katalog": "Gaia DR3 1328059516344571264",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057871377499776",
+      "dx_arcsec": 55.1,
+      "dy_arcsec": -14.5,
+      "magnitude": 13.88,
+      "b_v": 0.79,
+      "katalog": "Gaia DR3 1328057871377499776",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057042443295616",
+      "dx_arcsec": -20.0,
+      "dy_arcsec": -85.3,
+      "magnitude": 13.89,
+      "b_v": 0.9,
+      "katalog": "Gaia DR3 1328057042443295616",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328059520645012992",
+      "dx_arcsec": -52.2,
+      "dy_arcsec": 177.2,
+      "magnitude": 13.9,
+      "b_v": 0.92,
+      "katalog": "Gaia DR3 1328059520645012992",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057905736985728",
+      "dx_arcsec": -12.7,
+      "dy_arcsec": -17.5,
+      "magnitude": 13.9,
+      "b_v": 0.65,
+      "katalog": "Gaia DR3 1328057905736985728",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057935796506880",
+      "dx_arcsec": -42.9,
+      "dy_arcsec": 62.2,
+      "magnitude": 13.91,
+      "b_v": 0.9,
+      "katalog": "Gaia DR3 1328057935796506880",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057076803058816",
+      "dx_arcsec": -59.0,
+      "dy_arcsec": -65.6,
+      "magnitude": 13.91,
+      "b_v": 0.82,
+      "katalog": "Gaia DR3 1328057076803058816",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328058146255572608",
+      "dx_arcsec": 120.2,
+      "dy_arcsec": 76.0,
+      "magnitude": 13.91,
+      "b_v": 0.92,
+      "katalog": "Gaia DR3 1328058146255572608",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057974456554880",
+      "dx_arcsec": 13.7,
+      "dy_arcsec": 28.7,
+      "magnitude": 13.94,
+      "b_v": 0.87,
+      "katalog": "Gaia DR3 1328057974456554880",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328105184737459072",
+      "dx_arcsec": 127.0,
+      "dy_arcsec": 151.9,
+      "magnitude": 13.94,
+      "b_v": 0.92,
+      "katalog": "Gaia DR3 1328105184737459072",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057905730423168",
+      "dx_arcsec": 13.5,
+      "dy_arcsec": -11.9,
+      "magnitude": 13.94,
+      "b_v": 0.82,
+      "katalog": "Gaia DR3 1328057905730423168",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328058004515967744",
+      "dx_arcsec": -16.8,
+      "dy_arcsec": 66.5,
+      "magnitude": 13.94,
+      "b_v": 0.9,
+      "katalog": "Gaia DR3 1328058004515967744",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057905737098752",
+      "dx_arcsec": -9.9,
+      "dy_arcsec": -18.3,
+      "magnitude": 13.95,
+      "b_v": 0.81,
+      "katalog": "Gaia DR3 1328057905737098752",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057042443290112",
+      "dx_arcsec": -11.9,
+      "dy_arcsec": -72.1,
+      "magnitude": 13.95,
+      "b_v": 0.89,
+      "katalog": "Gaia DR3 1328057042443290112",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057905736996864",
+      "dx_arcsec": 13.1,
+      "dy_arcsec": -7.3,
+      "magnitude": 13.95,
+      "b_v": 0.63,
+      "katalog": "Gaia DR3 1328057905736996864",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057802657975936",
+      "dx_arcsec": 30.5,
+      "dy_arcsec": -38.5,
+      "magnitude": 13.95,
+      "b_v": 0.89,
+      "katalog": "Gaia DR3 1328057802657975936",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328105146077106688",
+      "dx_arcsec": 198.8,
+      "dy_arcsec": 159.6,
+      "magnitude": 13.95,
+      "b_v": 0.92,
+      "katalog": "Gaia DR3 1328105146077106688",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328105287816732928",
+      "dx_arcsec": 138.7,
+      "dy_arcsec": 260.7,
+      "magnitude": 13.95,
+      "b_v": 0.77,
+      "katalog": "Gaia DR3 1328105287816732928",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057970156217984",
+      "dx_arcsec": 1.6,
+      "dy_arcsec": 34.3,
+      "magnitude": 13.96,
+      "b_v": 0.85,
+      "katalog": "Gaia DR3 1328057970156217984",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057905737009152",
+      "dx_arcsec": -1.9,
+      "dy_arcsec": -8.2,
+      "magnitude": 13.96,
+      "b_v": 0.73,
+      "katalog": "Gaia DR3 1328057905737009152",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057837017753600",
+      "dx_arcsec": 80.2,
+      "dy_arcsec": -52.8,
+      "magnitude": 13.96,
+      "b_v": 0.9,
+      "katalog": "Gaia DR3 1328057837017753600",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328058176314622720",
+      "dx_arcsec": 42.9,
+      "dy_arcsec": 78.6,
+      "magnitude": 13.96,
+      "b_v": 0.89,
+      "katalog": "Gaia DR3 1328058176314622720",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057837011471616",
+      "dx_arcsec": 89.1,
+      "dy_arcsec": -24.7,
+      "magnitude": 13.96,
+      "b_v": 0.86,
+      "katalog": "Gaia DR3 1328057837011471616",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057184175152000",
+      "dx_arcsec": -58.1,
+      "dy_arcsec": -14.3,
+      "magnitude": 13.97,
+      "b_v": 0.85,
+      "katalog": "Gaia DR3 1328057184175152000",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057179882273536",
+      "dx_arcsec": -58.7,
+      "dy_arcsec": -19.0,
+      "magnitude": 13.98,
+      "b_v": 0.89,
+      "katalog": "Gaia DR3 1328057179882273536",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328056801925176704",
+      "dx_arcsec": -100.9,
+      "dy_arcsec": -175.6,
+      "magnitude": 13.99,
+      "b_v": 0.8,
+      "katalog": "Gaia DR3 1328056801925176704",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057454760075136",
+      "dx_arcsec": 117.4,
+      "dy_arcsec": -89.0,
+      "magnitude": 13.99,
+      "b_v": 0.9,
+      "katalog": "Gaia DR3 1328057454760075136",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057046743352064",
+      "dx_arcsec": -12.3,
+      "dy_arcsec": -89.5,
+      "magnitude": 13.99,
+      "b_v": 0.88,
+      "katalog": "Gaia DR3 1328057046743352064",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328058214975013888",
+      "dx_arcsec": 53.3,
+      "dy_arcsec": 113.3,
+      "magnitude": 13.99,
+      "b_v": 0.92,
+      "katalog": "Gaia DR3 1328058214975013888",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328059417565634176",
+      "dx_arcsec": -65.7,
+      "dy_arcsec": 52.9,
+      "magnitude": 14.0,
+      "b_v": 0.89,
+      "katalog": "Gaia DR3 1328059417565634176",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057970156189696",
+      "dx_arcsec": 47.7,
+      "dy_arcsec": 32.7,
+      "magnitude": 14.0,
+      "b_v": 0.85,
+      "katalog": "Gaia DR3 1328057970156189696",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057111162811136",
+      "dx_arcsec": -81.1,
+      "dy_arcsec": -33.3,
+      "magnitude": 14.01,
+      "b_v": 0.9,
+      "katalog": "Gaia DR3 1328057111162811136",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328029387153681024",
+      "dx_arcsec": 58.1,
+      "dy_arcsec": -627.5,
+      "magnitude": 14.01,
+      "b_v": 0.91,
+      "katalog": "Gaia DR3 1328029387153681024",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057763997751808",
+      "dx_arcsec": 59.8,
+      "dy_arcsec": -78.4,
+      "magnitude": 14.02,
+      "b_v": 0.88,
+      "katalog": "Gaia DR3 1328057763997751808",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057905737087616",
+      "dx_arcsec": -12.3,
+      "dy_arcsec": 9.6,
+      "magnitude": 14.03,
+      "b_v": 0.82,
+      "katalog": "Gaia DR3 1328057905737087616",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057149822803968",
+      "dx_arcsec": -10.9,
+      "dy_arcsec": -38.1,
+      "magnitude": 14.03,
+      "b_v": 0.86,
+      "katalog": "Gaia DR3 1328057149822803968",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057459060616320",
+      "dx_arcsec": 124.9,
+      "dy_arcsec": -123.8,
+      "magnitude": 14.03,
+      "b_v": 0.9,
+      "katalog": "Gaia DR3 1328057459060616320",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328058696010894080",
+      "dx_arcsec": -134.4,
+      "dy_arcsec": 63.9,
+      "magnitude": 14.03,
+      "b_v": 0.91,
+      "katalog": "Gaia DR3 1328058696010894080",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057935796483328",
+      "dx_arcsec": -4.7,
+      "dy_arcsec": 33.9,
+      "magnitude": 14.04,
+      "b_v": 0.83,
+      "katalog": "Gaia DR3 1328057935796483328",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057905736984576",
+      "dx_arcsec": -16.6,
+      "dy_arcsec": 15.9,
+      "magnitude": 14.04,
+      "b_v": 0.84,
+      "katalog": "Gaia DR3 1328057905736984576",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328059481984734848",
+      "dx_arcsec": -45.4,
+      "dy_arcsec": 99.7,
+      "magnitude": 14.05,
+      "b_v": 0.89,
+      "katalog": "Gaia DR3 1328059481984734848",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328056290828904576",
+      "dx_arcsec": -54.0,
+      "dy_arcsec": -285.5,
+      "magnitude": 14.05,
+      "b_v": 0.9,
+      "katalog": "Gaia DR3 1328056290828904576",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328054263604224896",
+      "dx_arcsec": -345.1,
+      "dy_arcsec": -309.5,
+      "magnitude": 14.05,
+      "b_v": 0.79,
+      "katalog": "Gaia DR3 1328054263604224896",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057905736989568",
+      "dx_arcsec": 10.5,
+      "dy_arcsec": -3.3,
+      "magnitude": 14.06,
+      "b_v": 1.05,
+      "katalog": "Gaia DR3 1328057905736989568",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328058038875613440",
+      "dx_arcsec": 154.5,
+      "dy_arcsec": -2.3,
+      "magnitude": 14.07,
+      "b_v": 0.89,
+      "katalog": "Gaia DR3 1328058038875613440",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057974456456192",
+      "dx_arcsec": 31.1,
+      "dy_arcsec": 23.5,
+      "magnitude": 14.07,
+      "b_v": 0.85,
+      "katalog": "Gaia DR3 1328057974456456192",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328053885647205248",
+      "dx_arcsec": -194.2,
+      "dy_arcsec": -133.9,
+      "magnitude": 14.07,
+      "b_v": 0.9,
+      "katalog": "Gaia DR3 1328053885647205248",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057184182277760",
+      "dx_arcsec": -77.3,
+      "dy_arcsec": -25.2,
+      "magnitude": 14.08,
+      "b_v": 0.86,
+      "katalog": "Gaia DR3 1328057184182277760",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057905737086080",
+      "dx_arcsec": -11.6,
+      "dy_arcsec": 17.0,
+      "magnitude": 14.08,
+      "b_v": 0.79,
+      "katalog": "Gaia DR3 1328057905737086080",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057970156212736",
+      "dx_arcsec": 10.7,
+      "dy_arcsec": 44.2,
+      "magnitude": 14.08,
+      "b_v": 0.84,
+      "katalog": "Gaia DR3 1328057970156212736",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328058283689165440",
+      "dx_arcsec": 58.0,
+      "dy_arcsec": 196.1,
+      "magnitude": 14.09,
+      "b_v": 0.09,
+      "katalog": "Gaia DR3 1328058283689165440",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057974456589312",
+      "dx_arcsec": 27.1,
+      "dy_arcsec": 29.7,
+      "magnitude": 14.09,
+      "b_v": 0.84,
+      "katalog": "Gaia DR3 1328057974456589312",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328056909304244736",
+      "dx_arcsec": -151.1,
+      "dy_arcsec": -81.7,
+      "magnitude": 14.1,
+      "b_v": 0.89,
+      "katalog": "Gaia DR3 1328056909304244736",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328058210674376704",
+      "dx_arcsec": 16.7,
+      "dy_arcsec": 101.7,
+      "magnitude": 14.1,
+      "b_v": 0.9,
+      "katalog": "Gaia DR3 1328058210674376704",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328058176314602368",
+      "dx_arcsec": 76.6,
+      "dy_arcsec": 94.8,
+      "magnitude": 14.1,
+      "b_v": 0.88,
+      "katalog": "Gaia DR3 1328058176314602368",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328059413265281920",
+      "dx_arcsec": -81.2,
+      "dy_arcsec": 94.2,
+      "magnitude": 14.1,
+      "b_v": 0.52,
+      "katalog": "Gaia DR3 1328059413265281920",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057046736424832",
+      "dx_arcsec": 15.5,
+      "dy_arcsec": -85.5,
+      "magnitude": 14.1,
+      "b_v": 0.88,
+      "katalog": "Gaia DR3 1328057046736424832",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328106937084160256",
+      "dx_arcsec": 5.3,
+      "dy_arcsec": 395.9,
+      "magnitude": 14.1,
+      "b_v": 0.9,
+      "katalog": "Gaia DR3 1328106937084160256",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328058210674370560",
+      "dx_arcsec": 27.2,
+      "dy_arcsec": 95.2,
+      "magnitude": 14.11,
+      "b_v": 0.88,
+      "katalog": "Gaia DR3 1328058210674370560",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328058524211999488",
+      "dx_arcsec": -207.1,
+      "dy_arcsec": 55.6,
+      "magnitude": 14.11,
+      "b_v": 0.88,
+      "katalog": "Gaia DR3 1328058524211999488",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057974450139264",
+      "dx_arcsec": 9.9,
+      "dy_arcsec": 34.5,
+      "magnitude": 14.11,
+      "b_v": 0.12,
+      "katalog": "Gaia DR3 1328057974450139264",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328056909304275840",
+      "dx_arcsec": -130.9,
+      "dy_arcsec": -66.6,
+      "magnitude": 14.12,
+      "b_v": 0.08,
+      "katalog": "Gaia DR3 1328056909304275840",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328058180615227648",
+      "dx_arcsec": 39.1,
+      "dy_arcsec": 74.1,
+      "magnitude": 14.12,
+      "b_v": 0.75,
+      "katalog": "Gaia DR3 1328058180615227648",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328104669341378432",
+      "dx_arcsec": 219.6,
+      "dy_arcsec": 29.8,
+      "magnitude": 14.12,
+      "b_v": 0.69,
+      "katalog": "Gaia DR3 1328104669341378432",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328059417558643840",
+      "dx_arcsec": -71.3,
+      "dy_arcsec": 50.7,
+      "magnitude": 14.12,
+      "b_v": 0.89,
+      "katalog": "Gaia DR3 1328059417558643840",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328058283694543360",
+      "dx_arcsec": 50.4,
+      "dy_arcsec": 182.2,
+      "magnitude": 14.13,
+      "b_v": 0.91,
+      "katalog": "Gaia DR3 1328058283694543360",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328059486285190016",
+      "dx_arcsec": -60.1,
+      "dy_arcsec": 117.6,
+      "magnitude": 14.13,
+      "b_v": 0.89,
+      "katalog": "Gaia DR3 1328059486285190016",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328056290828896640",
+      "dx_arcsec": -59.8,
+      "dy_arcsec": -293.8,
+      "magnitude": 14.14,
+      "b_v": 0.88,
+      "katalog": "Gaia DR3 1328056290828896640",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057149822690048",
+      "dx_arcsec": -35.7,
+      "dy_arcsec": -14.6,
+      "magnitude": 14.14,
+      "b_v": 0.82,
+      "katalog": "Gaia DR3 1328057149822690048",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328058691710796032",
+      "dx_arcsec": -121.4,
+      "dy_arcsec": 68.0,
+      "magnitude": 14.15,
+      "b_v": 0.87,
+      "katalog": "Gaia DR3 1328058691710796032",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057940096891264",
+      "dx_arcsec": -43.6,
+      "dy_arcsec": 38.7,
+      "magnitude": 14.15,
+      "b_v": 0.84,
+      "katalog": "Gaia DR3 1328057940096891264",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057149822548608",
+      "dx_arcsec": -48.9,
+      "dy_arcsec": -50.5,
+      "magnitude": 14.16,
+      "b_v": 0.84,
+      "katalog": "Gaia DR3 1328057149822548608",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057935796507264",
+      "dx_arcsec": -44.1,
+      "dy_arcsec": 48.0,
+      "magnitude": 14.17,
+      "b_v": 0.84,
+      "katalog": "Gaia DR3 1328057935796507264",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057798357518720",
+      "dx_arcsec": 13.8,
+      "dy_arcsec": -35.6,
+      "magnitude": 14.17,
+      "b_v": 0.83,
+      "katalog": "Gaia DR3 1328057798357518720",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057837011469696",
+      "dx_arcsec": 94.0,
+      "dy_arcsec": -24.7,
+      "magnitude": 14.18,
+      "b_v": 0.71,
+      "katalog": "Gaia DR3 1328057837011469696",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057184175359488",
+      "dx_arcsec": -63.2,
+      "dy_arcsec": -7.7,
+      "magnitude": 14.18,
+      "b_v": 0.46,
+      "katalog": "Gaia DR3 1328057184175359488",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057905737182720",
+      "dx_arcsec": 13.1,
+      "dy_arcsec": -26.1,
+      "magnitude": 14.18,
+      "b_v": 0.67,
+      "katalog": "Gaia DR3 1328057905737182720",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057871377561344",
+      "dx_arcsec": 69.9,
+      "dy_arcsec": 11.0,
+      "magnitude": 14.18,
+      "b_v": 0.85,
+      "katalog": "Gaia DR3 1328057871377561344",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057115462774400",
+      "dx_arcsec": -95.0,
+      "dy_arcsec": -29.6,
+      "magnitude": 14.19,
+      "b_v": 0.87,
+      "katalog": "Gaia DR3 1328057115462774400",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057355981346304",
+      "dx_arcsec": 131.7,
+      "dy_arcsec": -179.3,
+      "magnitude": 14.19,
+      "b_v": 0.72,
+      "katalog": "Gaia DR3 1328057355981346304",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328058008809849088",
+      "dx_arcsec": -1.1,
+      "dy_arcsec": 42.4,
+      "magnitude": 14.2,
+      "b_v": 0.74,
+      "katalog": "Gaia DR3 1328058008809849088",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328055191317166720",
+      "dx_arcsec": -425.7,
+      "dy_arcsec": -156.9,
+      "magnitude": 14.2,
+      "b_v": 0.88,
+      "katalog": "Gaia DR3 1328055191317166720",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057081095339136",
+      "dx_arcsec": -69.3,
+      "dy_arcsec": -65.5,
+      "magnitude": 14.2,
+      "b_v": 0.66,
+      "katalog": "Gaia DR3 1328057081095339136",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328058382473166592",
+      "dx_arcsec": -160.1,
+      "dy_arcsec": -66.8,
+      "magnitude": 14.2,
+      "b_v": 0.69,
+      "katalog": "Gaia DR3 1328058382473166592",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328105111717166208",
+      "dx_arcsec": 202.0,
+      "dy_arcsec": 122.3,
+      "magnitude": 14.21,
+      "b_v": 0.88,
+      "katalog": "Gaia DR3 1328105111717166208",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057454760067712",
+      "dx_arcsec": 134.1,
+      "dy_arcsec": -60.0,
+      "magnitude": 14.21,
+      "b_v": 0.74,
+      "katalog": "Gaia DR3 1328057454760067712",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328058180615268608",
+      "dx_arcsec": 76.2,
+      "dy_arcsec": 75.8,
+      "magnitude": 14.22,
+      "b_v": 0.87,
+      "katalog": "Gaia DR3 1328058180615268608",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057940089438848",
+      "dx_arcsec": -28.8,
+      "dy_arcsec": 2.5,
+      "magnitude": 14.23,
+      "b_v": 0.63,
+      "katalog": "Gaia DR3 1328057940089438848",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328065121281746560",
+      "dx_arcsec": -482.8,
+      "dy_arcsec": 377.8,
+      "magnitude": 14.23,
+      "b_v": 0.77,
+      "katalog": "Gaia DR3 1328065121281746560",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057076803059072",
+      "dx_arcsec": -59.2,
+      "dy_arcsec": -78.6,
+      "magnitude": 14.24,
+      "b_v": 0.88,
+      "katalog": "Gaia DR3 1328057076803059072",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328056870644655872",
+      "dx_arcsec": -104.9,
+      "dy_arcsec": -121.4,
+      "magnitude": 14.24,
+      "b_v": 0.74,
+      "katalog": "Gaia DR3 1328056870644655872",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057974456500608",
+      "dx_arcsec": 17.6,
+      "dy_arcsec": 31.1,
+      "magnitude": 14.24,
+      "b_v": 0.08,
+      "katalog": "Gaia DR3 1328057974456500608",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328058833449879808",
+      "dx_arcsec": -185.1,
+      "dy_arcsec": 147.2,
+      "magnitude": 14.25,
+      "b_v": 0.88,
+      "katalog": "Gaia DR3 1328058833449879808",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328058210674361216",
+      "dx_arcsec": 42.5,
+      "dy_arcsec": 113.8,
+      "magnitude": 14.25,
+      "b_v": 0.75,
+      "katalog": "Gaia DR3 1328058210674361216",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328058592923773824",
+      "dx_arcsec": -126.2,
+      "dy_arcsec": -2.9,
+      "magnitude": 14.25,
+      "b_v": 0.86,
+      "katalog": "Gaia DR3 1328058592923773824",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328059829882720640",
+      "dx_arcsec": -53.1,
+      "dy_arcsec": 251.8,
+      "magnitude": 14.26,
+      "b_v": 0.88,
+      "katalog": "Gaia DR3 1328059829882720640",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057905736996224",
+      "dx_arcsec": -11.0,
+      "dy_arcsec": -24.3,
+      "magnitude": 14.27,
+      "b_v": 0.8,
+      "katalog": "Gaia DR3 1328057905736996224",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057145522518400",
+      "dx_arcsec": -32.7,
+      "dy_arcsec": -24.0,
+      "magnitude": 14.27,
+      "b_v": 0.82,
+      "katalog": "Gaia DR3 1328057145522518400",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328053782567938816",
+      "dx_arcsec": -195.1,
+      "dy_arcsec": -260.2,
+      "magnitude": 14.28,
+      "b_v": 0.89,
+      "katalog": "Gaia DR3 1328053782567938816",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328106696565945984",
+      "dx_arcsec": 66.3,
+      "dy_arcsec": 224.3,
+      "magnitude": 14.28,
+      "b_v": 0.87,
+      "katalog": "Gaia DR3 1328106696565945984",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328058043172963328",
+      "dx_arcsec": 121.5,
+      "dy_arcsec": 19.3,
+      "magnitude": 14.28,
+      "b_v": 0.85,
+      "katalog": "Gaia DR3 1328058043172963328",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057149822713984",
+      "dx_arcsec": -24.1,
+      "dy_arcsec": -40.3,
+      "magnitude": 14.28,
+      "b_v": 0.81,
+      "katalog": "Gaia DR3 1328057149822713984",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328056978024785920",
+      "dx_arcsec": -40.3,
+      "dy_arcsec": -102.1,
+      "magnitude": 14.29,
+      "b_v": 0.86,
+      "katalog": "Gaia DR3 1328056978024785920",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328055358815372544",
+      "dx_arcsec": -230.8,
+      "dy_arcsec": -130.7,
+      "magnitude": 14.3,
+      "b_v": 0.86,
+      "katalog": "Gaia DR3 1328055358815372544",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328058180615276288",
+      "dx_arcsec": 74.3,
+      "dy_arcsec": 89.0,
+      "magnitude": 14.3,
+      "b_v": 0.84,
+      "katalog": "Gaia DR3 1328058180615276288",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328080514445337600",
+      "dx_arcsec": 541.3,
+      "dy_arcsec": -317.0,
+      "magnitude": 14.31,
+      "b_v": 0.87,
+      "katalog": "Gaia DR3 1328080514445337600",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328059761163275648",
+      "dx_arcsec": 31.7,
+      "dy_arcsec": 181.3,
+      "magnitude": 14.31,
+      "b_v": 0.89,
+      "katalog": "Gaia DR3 1328059761163275648",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328056973723814784",
+      "dx_arcsec": -14.1,
+      "dy_arcsec": -114.3,
+      "magnitude": 14.32,
+      "b_v": 0.86,
+      "katalog": "Gaia DR3 1328056973723814784",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057940090139136",
+      "dx_arcsec": -19.4,
+      "dy_arcsec": 35.1,
+      "magnitude": 14.33,
+      "b_v": 0.83,
+      "katalog": "Gaia DR3 1328057940090139136",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328058146255553408",
+      "dx_arcsec": 98.9,
+      "dy_arcsec": 75.1,
+      "magnitude": 14.33,
+      "b_v": 0.86,
+      "katalog": "Gaia DR3 1328058146255553408",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057940099171456",
+      "dx_arcsec": -37.0,
+      "dy_arcsec": 44.9,
+      "magnitude": 14.33,
+      "b_v": 0.8,
+      "katalog": "Gaia DR3 1328057940099171456",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057527780192640",
+      "dx_arcsec": 199.6,
+      "dy_arcsec": -136.1,
+      "magnitude": 14.33,
+      "b_v": 0.86,
+      "katalog": "Gaia DR3 1328057527780192640",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057974456513152",
+      "dx_arcsec": 45.9,
+      "dy_arcsec": 16.8,
+      "magnitude": 14.34,
+      "b_v": 0.83,
+      "katalog": "Gaia DR3 1328057974456513152",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057940089553408",
+      "dx_arcsec": -14.8,
+      "dy_arcsec": 26.0,
+      "magnitude": 14.34,
+      "b_v": 0.77,
+      "katalog": "Gaia DR3 1328057940089553408",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057149825061760",
+      "dx_arcsec": -27.2,
+      "dy_arcsec": -33.1,
+      "magnitude": 14.34,
+      "b_v": 0.79,
+      "katalog": "Gaia DR3 1328057149825061760",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057940096879360",
+      "dx_arcsec": -44.8,
+      "dy_arcsec": 25.6,
+      "magnitude": 14.35,
+      "b_v": 0.74,
+      "katalog": "Gaia DR3 1328057940096879360",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328056943664097024",
+      "dx_arcsec": 5.1,
+      "dy_arcsec": -141.0,
+      "magnitude": 14.36,
+      "b_v": 0.87,
+      "katalog": "Gaia DR3 1328056943664097024",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328058558571710976",
+      "dx_arcsec": -266.5,
+      "dy_arcsec": 96.6,
+      "magnitude": 14.37,
+      "b_v": 0.86,
+      "katalog": "Gaia DR3 1328058558571710976",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057355981328512",
+      "dx_arcsec": 113.6,
+      "dy_arcsec": -178.3,
+      "magnitude": 14.37,
+      "b_v": 0.85,
+      "katalog": "Gaia DR3 1328057355981328512",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057081095299456",
+      "dx_arcsec": -56.4,
+      "dy_arcsec": -84.9,
+      "magnitude": 14.38,
+      "b_v": 0.83,
+      "katalog": "Gaia DR3 1328057081095299456",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057149822540416",
+      "dx_arcsec": -36.7,
+      "dy_arcsec": -75.8,
+      "magnitude": 14.38,
+      "b_v": 0.84,
+      "katalog": "Gaia DR3 1328057149822540416",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057905736996736",
+      "dx_arcsec": -11.5,
+      "dy_arcsec": -22.2,
+      "magnitude": 14.38,
+      "b_v": 0.81,
+      "katalog": "Gaia DR3 1328057905736996736",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057046743335808",
+      "dx_arcsec": 0.6,
+      "dy_arcsec": -109.7,
+      "magnitude": 14.39,
+      "b_v": 0.87,
+      "katalog": "Gaia DR3 1328057046743335808",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328059142688301056",
+      "dx_arcsec": -267.3,
+      "dy_arcsec": 162.7,
+      "magnitude": 14.39,
+      "b_v": 0.86,
+      "katalog": "Gaia DR3 1328059142688301056",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057905737040640",
+      "dx_arcsec": -14.7,
+      "dy_arcsec": -13.2,
+      "magnitude": 14.39,
+      "b_v": 0.72,
+      "katalog": "Gaia DR3 1328057905737040640",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057905737102208",
+      "dx_arcsec": -4.7,
+      "dy_arcsec": 3.3,
+      "magnitude": 14.41,
+      "b_v": 0.71,
+      "katalog": "Gaia DR3 1328057905737102208",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057802651304448",
+      "dx_arcsec": 27.1,
+      "dy_arcsec": -14.4,
+      "magnitude": 14.41,
+      "b_v": 0.62,
+      "katalog": "Gaia DR3 1328057802651304448",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328059692443767040",
+      "dx_arcsec": -4.9,
+      "dy_arcsec": 190.9,
+      "magnitude": 14.41,
+      "b_v": 0.85,
+      "katalog": "Gaia DR3 1328059692443767040",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328056870644655488",
+      "dx_arcsec": -104.1,
+      "dy_arcsec": -132.6,
+      "magnitude": 14.43,
+      "b_v": 0.86,
+      "katalog": "Gaia DR3 1328056870644655488",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057935796509952",
+      "dx_arcsec": -47.5,
+      "dy_arcsec": 44.2,
+      "magnitude": 14.44,
+      "b_v": 0.82,
+      "katalog": "Gaia DR3 1328057935796509952",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057763997755136",
+      "dx_arcsec": 53.5,
+      "dy_arcsec": -65.2,
+      "magnitude": 14.44,
+      "b_v": 0.84,
+      "katalog": "Gaia DR3 1328057763997755136",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057802657944320",
+      "dx_arcsec": 24.6,
+      "dy_arcsec": -32.3,
+      "magnitude": 14.44,
+      "b_v": 0.76,
+      "katalog": "Gaia DR3 1328057802657944320",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057905729764864",
+      "dx_arcsec": -24.2,
+      "dy_arcsec": 3.4,
+      "magnitude": 14.45,
+      "b_v": 0.76,
+      "katalog": "Gaia DR3 1328057905729764864",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328059413265271296",
+      "dx_arcsec": -64.2,
+      "dy_arcsec": 108.6,
+      "magnitude": 14.45,
+      "b_v": 0.85,
+      "katalog": "Gaia DR3 1328059413265271296",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328058176314605056",
+      "dx_arcsec": 71.6,
+      "dy_arcsec": 73.6,
+      "magnitude": 14.46,
+      "b_v": 0.84,
+      "katalog": "Gaia DR3 1328058176314605056",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057871371160832",
+      "dx_arcsec": 64.0,
+      "dy_arcsec": 2.1,
+      "magnitude": 14.46,
+      "b_v": 0.8,
+      "katalog": "Gaia DR3 1328057871371160832",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328056973723815680",
+      "dx_arcsec": -15.7,
+      "dy_arcsec": -133.2,
+      "magnitude": 14.47,
+      "b_v": 0.86,
+      "katalog": "Gaia DR3 1328056973723815680",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057046743483008",
+      "dx_arcsec": -16.1,
+      "dy_arcsec": -68.7,
+      "magnitude": 14.47,
+      "b_v": 1.19,
+      "katalog": "Gaia DR3 1328057046743483008",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057974456490624",
+      "dx_arcsec": 21.3,
+      "dy_arcsec": 38.6,
+      "magnitude": 14.47,
+      "b_v": 0.8,
+      "katalog": "Gaia DR3 1328057974456490624",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057905737005312",
+      "dx_arcsec": 3.1,
+      "dy_arcsec": -9.8,
+      "magnitude": 14.48,
+      "b_v": 0.77,
+      "katalog": "Gaia DR3 1328057905737005312",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057149815681920",
+      "dx_arcsec": -28.1,
+      "dy_arcsec": -24.3,
+      "magnitude": 14.48,
+      "b_v": 0.08,
+      "katalog": "Gaia DR3 1328057149815681920",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057046743352192",
+      "dx_arcsec": -12.0,
+      "dy_arcsec": -87.7,
+      "magnitude": 14.49,
+      "b_v": 0.72,
+      "katalog": "Gaia DR3 1328057046743352192",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057905729784832",
+      "dx_arcsec": -10.5,
+      "dy_arcsec": 6.1,
+      "magnitude": 14.5,
+      "b_v": 1.14,
+      "katalog": "Gaia DR3 1328057905729784832",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328104944219362816",
+      "dx_arcsec": 283.7,
+      "dy_arcsec": 114.4,
+      "magnitude": 14.5,
+      "b_v": 0.84,
+      "katalog": "Gaia DR3 1328104944219362816",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057905737044352",
+      "dx_arcsec": -1.0,
+      "dy_arcsec": -11.5,
+      "magnitude": 14.51,
+      "b_v": 0.74,
+      "katalog": "Gaia DR3 1328057905737044352",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328109410985449856",
+      "dx_arcsec": 553.0,
+      "dy_arcsec": 487.8,
+      "magnitude": 14.51,
+      "b_v": 0.86,
+      "katalog": "Gaia DR3 1328109410985449856",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328081064201169408",
+      "dx_arcsec": 423.4,
+      "dy_arcsec": -132.8,
+      "magnitude": 14.51,
+      "b_v": 0.84,
+      "katalog": "Gaia DR3 1328081064201169408",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328056458324071296",
+      "dx_arcsec": 156.6,
+      "dy_arcsec": -274.9,
+      "magnitude": 14.51,
+      "b_v": 0.84,
+      "katalog": "Gaia DR3 1328056458324071296",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328106765285473280",
+      "dx_arcsec": 96.2,
+      "dy_arcsec": 293.0,
+      "magnitude": 14.52,
+      "b_v": 0.85,
+      "katalog": "Gaia DR3 1328106765285473280",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328059481984718720",
+      "dx_arcsec": -18.8,
+      "dy_arcsec": 121.1,
+      "magnitude": 14.52,
+      "b_v": 0.82,
+      "katalog": "Gaia DR3 1328059481984718720",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328058421132748160",
+      "dx_arcsec": -209.6,
+      "dy_arcsec": 10.9,
+      "magnitude": 14.52,
+      "b_v": 0.85,
+      "katalog": "Gaia DR3 1328058421132748160",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057905737118976",
+      "dx_arcsec": 11.9,
+      "dy_arcsec": 16.1,
+      "magnitude": 14.52,
+      "b_v": 0.74,
+      "katalog": "Gaia DR3 1328057905737118976",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057596499790720",
+      "dx_arcsec": 262.3,
+      "dy_arcsec": -61.5,
+      "magnitude": 14.53,
+      "b_v": 0.82,
+      "katalog": "Gaia DR3 1328057596499790720",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328058073235377024",
+      "dx_arcsec": 94.9,
+      "dy_arcsec": 18.8,
+      "magnitude": 14.53,
+      "b_v": 0.84,
+      "katalog": "Gaia DR3 1328058073235377024",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057974450199552",
+      "dx_arcsec": 31.5,
+      "dy_arcsec": 14.1,
+      "magnitude": 14.54,
+      "b_v": 0.87,
+      "katalog": "Gaia DR3 1328057974450199552",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057871371333760",
+      "dx_arcsec": 66.5,
+      "dy_arcsec": 23.0,
+      "magnitude": 14.54,
+      "b_v": 0.65,
+      "katalog": "Gaia DR3 1328057871371333760",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057940089940736",
+      "dx_arcsec": -39.9,
+      "dy_arcsec": 17.3,
+      "magnitude": 14.55,
+      "b_v": 0.64,
+      "katalog": "Gaia DR3 1328057940089940736",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328056978023794816",
+      "dx_arcsec": -43.5,
+      "dy_arcsec": -124.0,
+      "magnitude": 14.55,
+      "b_v": 0.83,
+      "katalog": "Gaia DR3 1328056978023794816",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057149815765888",
+      "dx_arcsec": -18.2,
+      "dy_arcsec": -41.5,
+      "magnitude": 14.55,
+      "b_v": 0.73,
+      "katalog": "Gaia DR3 1328057149815765888",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057042443270016",
+      "dx_arcsec": 19.5,
+      "dy_arcsec": -101.5,
+      "magnitude": 14.56,
+      "b_v": 0.74,
+      "katalog": "Gaia DR3 1328057042443270016",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057184175443968",
+      "dx_arcsec": -66.6,
+      "dy_arcsec": 21.3,
+      "magnitude": 14.56,
+      "b_v": 0.79,
+      "katalog": "Gaia DR3 1328057184175443968",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057974450004096",
+      "dx_arcsec": 30.6,
+      "dy_arcsec": 3.4,
+      "magnitude": 14.56,
+      "b_v": 0.78,
+      "katalog": "Gaia DR3 1328057974450004096",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057867076966528",
+      "dx_arcsec": 61.6,
+      "dy_arcsec": -32.5,
+      "magnitude": 14.57,
+      "b_v": 0.79,
+      "katalog": "Gaia DR3 1328057867076966528",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328058004515942528",
+      "dx_arcsec": 22.8,
+      "dy_arcsec": 72.6,
+      "magnitude": 14.57,
+      "b_v": 0.82,
+      "katalog": "Gaia DR3 1328058004515942528",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328058077530079872",
+      "dx_arcsec": 91.8,
+      "dy_arcsec": 47.4,
+      "magnitude": 14.57,
+      "b_v": 0.67,
+      "katalog": "Gaia DR3 1328058077530079872",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057905737038720",
+      "dx_arcsec": -8.3,
+      "dy_arcsec": 5.3,
+      "magnitude": 14.57,
+      "b_v": 0.7,
+      "katalog": "Gaia DR3 1328057905737038720",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057837017734144",
+      "dx_arcsec": 88.9,
+      "dy_arcsec": -82.3,
+      "magnitude": 14.58,
+      "b_v": 0.83,
+      "katalog": "Gaia DR3 1328057837017734144",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328105493975171072",
+      "dx_arcsec": 139.3,
+      "dy_arcsec": 278.0,
+      "magnitude": 14.58,
+      "b_v": 0.84,
+      "katalog": "Gaia DR3 1328105493975171072",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057149822569600",
+      "dx_arcsec": -8.0,
+      "dy_arcsec": -49.4,
+      "magnitude": 14.58,
+      "b_v": 0.79,
+      "katalog": "Gaia DR3 1328057149822569600",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328058661643694848",
+      "dx_arcsec": -84.3,
+      "dy_arcsec": 30.7,
+      "magnitude": 14.59,
+      "b_v": 0.81,
+      "katalog": "Gaia DR3 1328058661643694848",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328059791222472192",
+      "dx_arcsec": 8.8,
+      "dy_arcsec": 240.9,
+      "magnitude": 14.59,
+      "b_v": 0.83,
+      "katalog": "Gaia DR3 1328059791222472192",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328056943664065408",
+      "dx_arcsec": 8.8,
+      "dy_arcsec": -172.6,
+      "magnitude": 14.59,
+      "b_v": 0.84,
+      "katalog": "Gaia DR3 1328056943664065408",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057115462780800",
+      "dx_arcsec": -96.8,
+      "dy_arcsec": -20.2,
+      "magnitude": 14.6,
+      "b_v": 0.82,
+      "katalog": "Gaia DR3 1328057115462780800",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057111162824320",
+      "dx_arcsec": -104.5,
+      "dy_arcsec": -59.9,
+      "magnitude": 14.6,
+      "b_v": 0.82,
+      "katalog": "Gaia DR3 1328057111162824320",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328058008816488704",
+      "dx_arcsec": -3.8,
+      "dy_arcsec": 91.2,
+      "magnitude": 14.6,
+      "b_v": 0.81,
+      "katalog": "Gaia DR3 1328058008816488704",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328058764730193408",
+      "dx_arcsec": -212.7,
+      "dy_arcsec": 93.8,
+      "magnitude": 14.6,
+      "b_v": 0.84,
+      "katalog": "Gaia DR3 1328058764730193408",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328106730925673728",
+      "dx_arcsec": 21.8,
+      "dy_arcsec": 267.4,
+      "magnitude": 14.61,
+      "b_v": 0.84,
+      "katalog": "Gaia DR3 1328106730925673728",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328058657351048192",
+      "dx_arcsec": -100.2,
+      "dy_arcsec": 28.1,
+      "magnitude": 14.61,
+      "b_v": 0.8,
+      "katalog": "Gaia DR3 1328058657351048192",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328056905004401664",
+      "dx_arcsec": -123.0,
+      "dy_arcsec": -95.4,
+      "magnitude": 14.61,
+      "b_v": 0.82,
+      "katalog": "Gaia DR3 1328056905004401664",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328058657351044480",
+      "dx_arcsec": -93.2,
+      "dy_arcsec": 43.4,
+      "magnitude": 14.61,
+      "b_v": 0.83,
+      "katalog": "Gaia DR3 1328058657351044480",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057905736994304",
+      "dx_arcsec": 19.6,
+      "dy_arcsec": -10.9,
+      "magnitude": 14.61,
+      "b_v": 0.77,
+      "katalog": "Gaia DR3 1328057905736994304",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328033991359461888",
+      "dx_arcsec": 315.3,
+      "dy_arcsec": -221.6,
+      "magnitude": 14.62,
+      "b_v": 0.84,
+      "katalog": "Gaia DR3 1328033991359461888",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328058180615247232",
+      "dx_arcsec": 46.5,
+      "dy_arcsec": 90.5,
+      "magnitude": 14.63,
+      "b_v": 0.82,
+      "katalog": "Gaia DR3 1328058180615247232",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057867076957312",
+      "dx_arcsec": 76.2,
+      "dy_arcsec": 4.4,
+      "magnitude": 14.63,
+      "b_v": 0.81,
+      "katalog": "Gaia DR3 1328057867076957312",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057935796497280",
+      "dx_arcsec": -26.9,
+      "dy_arcsec": 44.9,
+      "magnitude": 14.63,
+      "b_v": 0.76,
+      "katalog": "Gaia DR3 1328057935796497280",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328059413265275776",
+      "dx_arcsec": -70.3,
+      "dy_arcsec": 98.1,
+      "magnitude": 14.63,
+      "b_v": 0.69,
+      "katalog": "Gaia DR3 1328059413265275776",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328056664486056320",
+      "dx_arcsec": -83.2,
+      "dy_arcsec": -239.4,
+      "magnitude": 14.63,
+      "b_v": 0.84,
+      "katalog": "Gaia DR3 1328056664486056320",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057802651274240",
+      "dx_arcsec": 30.9,
+      "dy_arcsec": -26.7,
+      "magnitude": 14.63,
+      "b_v": 0.76,
+      "katalog": "Gaia DR3 1328057802651274240",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328056836284934784",
+      "dx_arcsec": -144.4,
+      "dy_arcsec": -132.2,
+      "magnitude": 14.65,
+      "b_v": 0.82,
+      "katalog": "Gaia DR3 1328056836284934784",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057935796495488",
+      "dx_arcsec": -24.5,
+      "dy_arcsec": 39.6,
+      "magnitude": 14.65,
+      "b_v": 0.56,
+      "katalog": "Gaia DR3 1328057935796495488",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057802657656320",
+      "dx_arcsec": 33.3,
+      "dy_arcsec": -64.8,
+      "magnitude": 14.65,
+      "b_v": 0.85,
+      "katalog": "Gaia DR3 1328057802657656320",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057905736991488",
+      "dx_arcsec": -12.8,
+      "dy_arcsec": -7.1,
+      "magnitude": 14.65,
+      "b_v": 0.77,
+      "katalog": "Gaia DR3 1328057905736991488",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328058661643452672",
+      "dx_arcsec": -106.4,
+      "dy_arcsec": 11.9,
+      "magnitude": 14.65,
+      "b_v": 0.83,
+      "katalog": "Gaia DR3 1328058661643452672",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057871371162880",
+      "dx_arcsec": 65.6,
+      "dy_arcsec": 1.8,
+      "magnitude": 14.65,
+      "b_v": 1.0,
+      "katalog": "Gaia DR3 1328057871371162880",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057149822693632",
+      "dx_arcsec": -32.4,
+      "dy_arcsec": -11.5,
+      "magnitude": 14.66,
+      "b_v": 0.63,
+      "katalog": "Gaia DR3 1328057149822693632",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057802657947776",
+      "dx_arcsec": 50.1,
+      "dy_arcsec": -35.3,
+      "magnitude": 14.66,
+      "b_v": 0.72,
+      "katalog": "Gaia DR3 1328057802657947776",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328058657351040384",
+      "dx_arcsec": -86.4,
+      "dy_arcsec": 28.7,
+      "magnitude": 14.67,
+      "b_v": 0.79,
+      "katalog": "Gaia DR3 1328058657351040384",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057905736994560",
+      "dx_arcsec": -17.7,
+      "dy_arcsec": -4.4,
+      "magnitude": 14.67,
+      "b_v": 0.43,
+      "katalog": "Gaia DR3 1328057905736994560",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328058008809778944",
+      "dx_arcsec": -21.4,
+      "dy_arcsec": 66.7,
+      "magnitude": 14.67,
+      "b_v": -0.03,
+      "katalog": "Gaia DR3 1328058008809778944",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057974456584192",
+      "dx_arcsec": 37.9,
+      "dy_arcsec": 20.3,
+      "magnitude": 14.68,
+      "b_v": 0.76,
+      "katalog": "Gaia DR3 1328057974456584192",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328104630680821120",
+      "dx_arcsec": 265.6,
+      "dy_arcsec": -21.0,
+      "magnitude": 14.68,
+      "b_v": 0.83,
+      "katalog": "Gaia DR3 1328104630680821120",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328052305099114368",
+      "dx_arcsec": -360.9,
+      "dy_arcsec": -553.1,
+      "magnitude": 14.68,
+      "b_v": 0.82,
+      "katalog": "Gaia DR3 1328052305099114368",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057905729805824",
+      "dx_arcsec": 23.9,
+      "dy_arcsec": 1.1,
+      "magnitude": 14.69,
+      "b_v": 0.67,
+      "katalog": "Gaia DR3 1328057905729805824",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328058004515966080",
+      "dx_arcsec": -14.4,
+      "dy_arcsec": 62.3,
+      "magnitude": 14.69,
+      "b_v": 0.79,
+      "katalog": "Gaia DR3 1328058004515966080",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057145522526080",
+      "dx_arcsec": -45.5,
+      "dy_arcsec": -55.9,
+      "magnitude": 14.69,
+      "b_v": 0.8,
+      "katalog": "Gaia DR3 1328057145522526080",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057905737117568",
+      "dx_arcsec": -14.5,
+      "dy_arcsec": 9.6,
+      "magnitude": 14.69,
+      "b_v": 0.71,
+      "katalog": "Gaia DR3 1328057905737117568",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328058176314597248",
+      "dx_arcsec": 87.0,
+      "dy_arcsec": 79.9,
+      "magnitude": 14.69,
+      "b_v": 0.79,
+      "katalog": "Gaia DR3 1328058176314597248",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057901436758528",
+      "dx_arcsec": -25.7,
+      "dy_arcsec": -6.6,
+      "magnitude": 14.7,
+      "b_v": 0.74,
+      "katalog": "Gaia DR3 1328057901436758528",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328059829882683904",
+      "dx_arcsec": -81.9,
+      "dy_arcsec": 243.7,
+      "magnitude": 14.7,
+      "b_v": 0.82,
+      "katalog": "Gaia DR3 1328059829882683904",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057802650876160",
+      "dx_arcsec": 7.7,
+      "dy_arcsec": -52.3,
+      "magnitude": 14.7,
+      "b_v": 0.76,
+      "katalog": "Gaia DR3 1328057802650876160",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057974450012032",
+      "dx_arcsec": 31.8,
+      "dy_arcsec": -1.5,
+      "magnitude": 14.7,
+      "b_v": 0.75,
+      "katalog": "Gaia DR3 1328057974450012032",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328059722502998016",
+      "dx_arcsec": -18.3,
+      "dy_arcsec": 200.6,
+      "magnitude": 14.7,
+      "b_v": 0.62,
+      "katalog": "Gaia DR3 1328059722502998016",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057046743440256",
+      "dx_arcsec": -1.7,
+      "dy_arcsec": -56.8,
+      "magnitude": 14.7,
+      "b_v": 0.74,
+      "katalog": "Gaia DR3 1328057046743440256",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057905736985984",
+      "dx_arcsec": -12.7,
+      "dy_arcsec": -18.7,
+      "magnitude": 14.7,
+      "b_v": 0.62,
+      "katalog": "Gaia DR3 1328057905736985984",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057974450199808",
+      "dx_arcsec": 31.7,
+      "dy_arcsec": 12.2,
+      "magnitude": 14.7,
+      "b_v": 0.55,
+      "katalog": "Gaia DR3 1328057974450199808",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057974456569472",
+      "dx_arcsec": 15.4,
+      "dy_arcsec": 25.2,
+      "magnitude": 14.71,
+      "b_v": 0.65,
+      "katalog": "Gaia DR3 1328057974456569472",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057252902114560",
+      "dx_arcsec": 146.8,
+      "dy_arcsec": -221.0,
+      "magnitude": 14.71,
+      "b_v": 0.82,
+      "katalog": "Gaia DR3 1328057252902114560",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328056909304271872",
+      "dx_arcsec": -113.7,
+      "dy_arcsec": -88.1,
+      "magnitude": 14.71,
+      "b_v": 0.82,
+      "katalog": "Gaia DR3 1328056909304271872",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328055569274301696",
+      "dx_arcsec": -425.4,
+      "dy_arcsec": -81.8,
+      "magnitude": 14.71,
+      "b_v": 0.83,
+      "katalog": "Gaia DR3 1328055569274301696",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057149822605824",
+      "dx_arcsec": -23.4,
+      "dy_arcsec": -58.5,
+      "magnitude": 14.71,
+      "b_v": 0.74,
+      "katalog": "Gaia DR3 1328057149822605824",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057974450271616",
+      "dx_arcsec": 18.1,
+      "dy_arcsec": 42.7,
+      "magnitude": 14.71,
+      "b_v": 0.75,
+      "katalog": "Gaia DR3 1328057974450271616",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057179882275200",
+      "dx_arcsec": -60.5,
+      "dy_arcsec": -5.0,
+      "magnitude": 14.72,
+      "b_v": 0.78,
+      "katalog": "Gaia DR3 1328057179882275200",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328056978023797248",
+      "dx_arcsec": -29.4,
+      "dy_arcsec": -141.1,
+      "magnitude": 14.72,
+      "b_v": 0.82,
+      "katalog": "Gaia DR3 1328056978023797248",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328056806224972928",
+      "dx_arcsec": -147.2,
+      "dy_arcsec": -178.1,
+      "magnitude": 14.72,
+      "b_v": 0.82,
+      "katalog": "Gaia DR3 1328056806224972928",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057149815415296",
+      "dx_arcsec": -16.8,
+      "dy_arcsec": -65.2,
+      "magnitude": 14.72,
+      "b_v": 0.78,
+      "katalog": "Gaia DR3 1328057149815415296",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328104531902419072",
+      "dx_arcsec": 276.7,
+      "dy_arcsec": -54.7,
+      "magnitude": 14.72,
+      "b_v": 0.82,
+      "katalog": "Gaia DR3 1328104531902419072",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328058696003650560",
+      "dx_arcsec": -119.0,
+      "dy_arcsec": 68.7,
+      "magnitude": 14.72,
+      "b_v": 0.83,
+      "katalog": "Gaia DR3 1328058696003650560",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328058073235379200",
+      "dx_arcsec": 92.0,
+      "dy_arcsec": 17.2,
+      "magnitude": 14.73,
+      "b_v": 0.81,
+      "katalog": "Gaia DR3 1328058073235379200",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328052957934181888",
+      "dx_arcsec": -128.6,
+      "dy_arcsec": -480.6,
+      "magnitude": 14.73,
+      "b_v": 0.82,
+      "katalog": "Gaia DR3 1328052957934181888",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328059451926878080",
+      "dx_arcsec": -97.4,
+      "dy_arcsec": 95.9,
+      "magnitude": 14.73,
+      "b_v": 0.81,
+      "katalog": "Gaia DR3 1328059451926878080",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328104841140186496",
+      "dx_arcsec": 436.4,
+      "dy_arcsec": 45.3,
+      "magnitude": 14.73,
+      "b_v": 0.82,
+      "katalog": "Gaia DR3 1328104841140186496",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057871370971136",
+      "dx_arcsec": 55.4,
+      "dy_arcsec": -17.3,
+      "magnitude": 14.74,
+      "b_v": 0.73,
+      "katalog": "Gaia DR3 1328057871370971136",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328105081658259584",
+      "dx_arcsec": 156.9,
+      "dy_arcsec": 146.2,
+      "magnitude": 14.74,
+      "b_v": 0.83,
+      "katalog": "Gaia DR3 1328105081658259584",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057386040606720",
+      "dx_arcsec": 102.4,
+      "dy_arcsec": -117.3,
+      "magnitude": 14.74,
+      "b_v": 0.82,
+      "katalog": "Gaia DR3 1328057386040606720",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057214238314752",
+      "dx_arcsec": 174.7,
+      "dy_arcsec": -249.8,
+      "magnitude": 14.74,
+      "b_v": 0.82,
+      "katalog": "Gaia DR3 1328057214238314752",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328056870644643456",
+      "dx_arcsec": -82.0,
+      "dy_arcsec": -149.8,
+      "magnitude": 14.74,
+      "b_v": 0.82,
+      "katalog": "Gaia DR3 1328056870644643456",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328056015950946688",
+      "dx_arcsec": -465.8,
+      "dy_arcsec": 130.5,
+      "magnitude": 14.74,
+      "b_v": 0.83,
+      "katalog": "Gaia DR3 1328056015950946688",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328059692443714304",
+      "dx_arcsec": -15.8,
+      "dy_arcsec": 142.0,
+      "magnitude": 14.74,
+      "b_v": 0.83,
+      "katalog": "Gaia DR3 1328059692443714304",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328056565706929792",
+      "dx_arcsec": 22.4,
+      "dy_arcsec": -214.3,
+      "magnitude": 14.74,
+      "b_v": 0.82,
+      "katalog": "Gaia DR3 1328056565706929792",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057974450346496",
+      "dx_arcsec": 19.0,
+      "dy_arcsec": 55.8,
+      "magnitude": 14.74,
+      "b_v": 0.79,
+      "katalog": "Gaia DR3 1328057974450346496",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328058592923867648",
+      "dx_arcsec": -107.9,
+      "dy_arcsec": -11.3,
+      "magnitude": 14.75,
+      "b_v": 0.8,
+      "katalog": "Gaia DR3 1328058592923867648",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057905737107968",
+      "dx_arcsec": 14.6,
+      "dy_arcsec": -8.7,
+      "magnitude": 14.75,
+      "b_v": 0.76,
+      "katalog": "Gaia DR3 1328057905737107968",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328058111895863168",
+      "dx_arcsec": 160.5,
+      "dy_arcsec": 63.9,
+      "magnitude": 14.75,
+      "b_v": 0.83,
+      "katalog": "Gaia DR3 1328058111895863168",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057660918486272",
+      "dx_arcsec": 171.1,
+      "dy_arcsec": -44.6,
+      "magnitude": 14.75,
+      "b_v": 0.82,
+      "katalog": "Gaia DR3 1328057660918486272",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328105219097177088",
+      "dx_arcsec": 89.0,
+      "dy_arcsec": 171.5,
+      "magnitude": 14.76,
+      "b_v": 0.82,
+      "katalog": "Gaia DR3 1328105219097177088",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057149815675008",
+      "dx_arcsec": -22.0,
+      "dy_arcsec": -50.2,
+      "magnitude": 14.76,
+      "b_v": 0.79,
+      "katalog": "Gaia DR3 1328057149815675008",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057012376846208",
+      "dx_arcsec": 37.0,
+      "dy_arcsec": -100.6,
+      "magnitude": 14.76,
+      "b_v": 0.8,
+      "katalog": "Gaia DR3 1328057012376846208",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057974456500096",
+      "dx_arcsec": 37.5,
+      "dy_arcsec": 24.0,
+      "magnitude": 14.76,
+      "b_v": 0.75,
+      "katalog": "Gaia DR3 1328057974456500096",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328058661651042432",
+      "dx_arcsec": -93.5,
+      "dy_arcsec": 11.6,
+      "magnitude": 14.76,
+      "b_v": 0.8,
+      "katalog": "Gaia DR3 1328058661651042432",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328104600621952256",
+      "dx_arcsec": 308.2,
+      "dy_arcsec": 14.5,
+      "magnitude": 14.76,
+      "b_v": 0.82,
+      "katalog": "Gaia DR3 1328104600621952256",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057905729849216",
+      "dx_arcsec": -27.6,
+      "dy_arcsec": -5.8,
+      "magnitude": 14.76,
+      "b_v": 0.72,
+      "katalog": "Gaia DR3 1328057905729849216",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328053129732913152",
+      "dx_arcsec": -20.5,
+      "dy_arcsec": -467.1,
+      "magnitude": 14.76,
+      "b_v": 0.83,
+      "katalog": "Gaia DR3 1328053129732913152",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328053610769226368",
+      "dx_arcsec": -247.8,
+      "dy_arcsec": -253.0,
+      "magnitude": 14.76,
+      "b_v": 0.82,
+      "katalog": "Gaia DR3 1328053610769226368",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328059481984728192",
+      "dx_arcsec": -34.0,
+      "dy_arcsec": 90.2,
+      "magnitude": 14.76,
+      "b_v": 0.8,
+      "katalog": "Gaia DR3 1328059481984728192",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057974456496768",
+      "dx_arcsec": 35.5,
+      "dy_arcsec": 25.6,
+      "magnitude": 14.77,
+      "b_v": 0.76,
+      "katalog": "Gaia DR3 1328057974456496768",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057974456709248",
+      "dx_arcsec": 8.0,
+      "dy_arcsec": 41.0,
+      "magnitude": 14.77,
+      "b_v": 0.78,
+      "katalog": "Gaia DR3 1328057974456709248",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328107521199759744",
+      "dx_arcsec": 23.2,
+      "dy_arcsec": 495.3,
+      "magnitude": 14.77,
+      "b_v": 0.46,
+      "katalog": "Gaia DR3 1328107521199759744",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057940096805248",
+      "dx_arcsec": -26.4,
+      "dy_arcsec": 26.1,
+      "magnitude": 14.77,
+      "b_v": 0.71,
+      "katalog": "Gaia DR3 1328057940096805248",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057871377551360",
+      "dx_arcsec": 68.1,
+      "dy_arcsec": 4.2,
+      "magnitude": 14.77,
+      "b_v": 0.79,
+      "katalog": "Gaia DR3 1328057871377551360",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328066461312217984",
+      "dx_arcsec": -349.1,
+      "dy_arcsec": 615.4,
+      "magnitude": 14.78,
+      "b_v": 0.83,
+      "katalog": "Gaia DR3 1328066461312217984",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057798357497344",
+      "dx_arcsec": 48.3,
+      "dy_arcsec": -49.2,
+      "magnitude": 14.78,
+      "b_v": 0.79,
+      "katalog": "Gaia DR3 1328057798357497344",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328059417565620736",
+      "dx_arcsec": -79.6,
+      "dy_arcsec": 66.3,
+      "magnitude": 14.78,
+      "b_v": 0.79,
+      "katalog": "Gaia DR3 1328059417565620736",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328058592923429760",
+      "dx_arcsec": -135.9,
+      "dy_arcsec": -34.0,
+      "magnitude": 14.78,
+      "b_v": 0.78,
+      "katalog": "Gaia DR3 1328058592923429760",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328058077536467840",
+      "dx_arcsec": 94.0,
+      "dy_arcsec": 6.2,
+      "magnitude": 14.78,
+      "b_v": 0.81,
+      "katalog": "Gaia DR3 1328058077536467840",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328060104760407040",
+      "dx_arcsec": -257.1,
+      "dy_arcsec": 297.1,
+      "magnitude": 14.78,
+      "b_v": 0.82,
+      "katalog": "Gaia DR3 1328060104760407040",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328058386773029760",
+      "dx_arcsec": -158.1,
+      "dy_arcsec": -21.8,
+      "magnitude": 14.78,
+      "b_v": 0.82,
+      "katalog": "Gaia DR3 1328058386773029760",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328105012938879616",
+      "dx_arcsec": 333.6,
+      "dy_arcsec": 177.8,
+      "magnitude": 14.78,
+      "b_v": 0.83,
+      "katalog": "Gaia DR3 1328105012938879616",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328059413265273856",
+      "dx_arcsec": -67.4,
+      "dy_arcsec": 116.4,
+      "magnitude": 14.78,
+      "b_v": 0.81,
+      "katalog": "Gaia DR3 1328059413265273856",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057871371358208",
+      "dx_arcsec": 63.7,
+      "dy_arcsec": 29.0,
+      "magnitude": 14.79,
+      "b_v": 0.76,
+      "katalog": "Gaia DR3 1328057871371358208",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057042443288576",
+      "dx_arcsec": -9.1,
+      "dy_arcsec": -105.4,
+      "magnitude": 14.79,
+      "b_v": 0.81,
+      "katalog": "Gaia DR3 1328057042443288576",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057974456482176",
+      "dx_arcsec": 23.1,
+      "dy_arcsec": 23.5,
+      "magnitude": 14.79,
+      "b_v": 0.54,
+      "katalog": "Gaia DR3 1328057974456482176",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328056630126389504",
+      "dx_arcsec": 52.9,
+      "dy_arcsec": -189.7,
+      "magnitude": 14.79,
+      "b_v": 0.81,
+      "katalog": "Gaia DR3 1328056630126389504",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057970156184960",
+      "dx_arcsec": 54.6,
+      "dy_arcsec": 31.3,
+      "magnitude": 14.79,
+      "b_v": 0.62,
+      "katalog": "Gaia DR3 1328057970156184960",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057905729860096",
+      "dx_arcsec": -5.3,
+      "dy_arcsec": 21.7,
+      "magnitude": 14.8,
+      "b_v": 0.62,
+      "katalog": "Gaia DR3 1328057905729860096",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328105081658238208",
+      "dx_arcsec": 146.3,
+      "dy_arcsec": 121.8,
+      "magnitude": 14.8,
+      "b_v": 0.82,
+      "katalog": "Gaia DR3 1328105081658238208",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328055053878224256",
+      "dx_arcsec": -358.2,
+      "dy_arcsec": -182.4,
+      "magnitude": 14.8,
+      "b_v": 0.82,
+      "katalog": "Gaia DR3 1328055053878224256",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328105489676933888",
+      "dx_arcsec": 168.3,
+      "dy_arcsec": 287.0,
+      "magnitude": 14.8,
+      "b_v": 0.82,
+      "katalog": "Gaia DR3 1328105489676933888",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328058661643838336",
+      "dx_arcsec": -88.6,
+      "dy_arcsec": 14.1,
+      "magnitude": 14.8,
+      "b_v": 0.78,
+      "katalog": "Gaia DR3 1328058661643838336",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328081098560920320",
+      "dx_arcsec": 380.9,
+      "dy_arcsec": -50.6,
+      "magnitude": 14.8,
+      "b_v": 0.82,
+      "katalog": "Gaia DR3 1328081098560920320",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057867076961664",
+      "dx_arcsec": 68.1,
+      "dy_arcsec": -16.2,
+      "magnitude": 14.8,
+      "b_v": 0.79,
+      "katalog": "Gaia DR3 1328057867076961664",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328107929211246720",
+      "dx_arcsec": 134.1,
+      "dy_arcsec": 472.9,
+      "magnitude": 14.8,
+      "b_v": 0.83,
+      "katalog": "Gaia DR3 1328107929211246720",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328058077529859968",
+      "dx_arcsec": 81.9,
+      "dy_arcsec": 19.3,
+      "magnitude": 14.81,
+      "b_v": 0.79,
+      "katalog": "Gaia DR3 1328058077529859968",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328056939364071552",
+      "dx_arcsec": -6.7,
+      "dy_arcsec": -145.7,
+      "magnitude": 14.81,
+      "b_v": 0.82,
+      "katalog": "Gaia DR3 1328056939364071552",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057149822530688",
+      "dx_arcsec": -57.8,
+      "dy_arcsec": -38.6,
+      "magnitude": 14.81,
+      "b_v": 0.77,
+      "katalog": "Gaia DR3 1328057149822530688",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328058073235381760",
+      "dx_arcsec": 87.5,
+      "dy_arcsec": 16.1,
+      "magnitude": 14.81,
+      "b_v": 0.81,
+      "katalog": "Gaia DR3 1328058073235381760",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057454760083584",
+      "dx_arcsec": 102.1,
+      "dy_arcsec": -85.7,
+      "magnitude": 14.82,
+      "b_v": 0.81,
+      "katalog": "Gaia DR3 1328057454760083584",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328058902169045504",
+      "dx_arcsec": -345.6,
+      "dy_arcsec": 128.3,
+      "magnitude": 14.82,
+      "b_v": 0.82,
+      "katalog": "Gaia DR3 1328058902169045504",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057940090308096",
+      "dx_arcsec": -18.7,
+      "dy_arcsec": 51.9,
+      "magnitude": 14.82,
+      "b_v": 0.75,
+      "katalog": "Gaia DR3 1328057940090308096",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328059486285206912",
+      "dx_arcsec": -36.8,
+      "dy_arcsec": 105.5,
+      "magnitude": 14.82,
+      "b_v": 0.79,
+      "katalog": "Gaia DR3 1328059486285206912",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057871378030336",
+      "dx_arcsec": 77.5,
+      "dy_arcsec": -13.0,
+      "magnitude": 14.82,
+      "b_v": 0.79,
+      "katalog": "Gaia DR3 1328057871378030336",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328058210674382336",
+      "dx_arcsec": 8.9,
+      "dy_arcsec": 128.7,
+      "magnitude": 14.82,
+      "b_v": 0.8,
+      "katalog": "Gaia DR3 1328058210674382336",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328058691710803712",
+      "dx_arcsec": -137.1,
+      "dy_arcsec": 50.9,
+      "magnitude": 14.82,
+      "b_v": 0.82,
+      "katalog": "Gaia DR3 1328058691710803712",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328058661651373952",
+      "dx_arcsec": -97.7,
+      "dy_arcsec": 72.1,
+      "magnitude": 14.82,
+      "b_v": 0.78,
+      "katalog": "Gaia DR3 1328058661651373952",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057184182430208",
+      "dx_arcsec": -52.4,
+      "dy_arcsec": -26.9,
+      "magnitude": 14.82,
+      "b_v": 0.71,
+      "katalog": "Gaia DR3 1328057184182430208",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328058279393822464",
+      "dx_arcsec": 67.7,
+      "dy_arcsec": 127.0,
+      "magnitude": 14.82,
+      "b_v": 0.81,
+      "katalog": "Gaia DR3 1328058279393822464",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328053370251032064",
+      "dx_arcsec": -195.7,
+      "dy_arcsec": -459.8,
+      "magnitude": 14.82,
+      "b_v": 0.82,
+      "katalog": "Gaia DR3 1328053370251032064",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328056909304272512",
+      "dx_arcsec": -103.8,
+      "dy_arcsec": -95.1,
+      "magnitude": 14.83,
+      "b_v": 0.8,
+      "katalog": "Gaia DR3 1328056909304272512",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057184175404544",
+      "dx_arcsec": -60.6,
+      "dy_arcsec": 2.5,
+      "magnitude": 14.83,
+      "b_v": 0.29,
+      "katalog": "Gaia DR3 1328057184175404544",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328056084670441472",
+      "dx_arcsec": -454.2,
+      "dy_arcsec": 160.0,
+      "magnitude": 14.83,
+      "b_v": 0.82,
+      "katalog": "Gaia DR3 1328056084670441472",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328056600066729728",
+      "dx_arcsec": 73.6,
+      "dy_arcsec": -212.5,
+      "magnitude": 14.83,
+      "b_v": 0.81,
+      "katalog": "Gaia DR3 1328056600066729728",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328055947231509760",
+      "dx_arcsec": -380.4,
+      "dy_arcsec": 105.6,
+      "magnitude": 14.83,
+      "b_v": 0.82,
+      "katalog": "Gaia DR3 1328055947231509760",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057802651047040",
+      "dx_arcsec": 16.9,
+      "dy_arcsec": -33.0,
+      "magnitude": 14.84,
+      "b_v": 0.59,
+      "katalog": "Gaia DR3 1328057802651047040",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057935796498688",
+      "dx_arcsec": -29.8,
+      "dy_arcsec": 73.2,
+      "magnitude": 14.84,
+      "b_v": 0.8,
+      "katalog": "Gaia DR3 1328057935796498688",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328056978023833088",
+      "dx_arcsec": -18.8,
+      "dy_arcsec": -111.2,
+      "magnitude": 14.84,
+      "b_v": 0.81,
+      "katalog": "Gaia DR3 1328056978023833088",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057905737007360",
+      "dx_arcsec": 6.2,
+      "dy_arcsec": 11.1,
+      "magnitude": 14.84,
+      "b_v": 0.71,
+      "katalog": "Gaia DR3 1328057905737007360",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328058245034077568",
+      "dx_arcsec": 79.4,
+      "dy_arcsec": 137.8,
+      "magnitude": 14.85,
+      "b_v": 0.81,
+      "katalog": "Gaia DR3 1328058245034077568",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328059413265264256",
+      "dx_arcsec": -53.8,
+      "dy_arcsec": 57.9,
+      "magnitude": 14.85,
+      "b_v": 0.79,
+      "katalog": "Gaia DR3 1328059413265264256",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328056870644645760",
+      "dx_arcsec": -86.4,
+      "dy_arcsec": -108.5,
+      "magnitude": 14.85,
+      "b_v": 0.21,
+      "katalog": "Gaia DR3 1328056870644645760",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057940096753792",
+      "dx_arcsec": -20.9,
+      "dy_arcsec": 28.1,
+      "magnitude": 14.85,
+      "b_v": 0.74,
+      "katalog": "Gaia DR3 1328057940096753792",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328058455492441728",
+      "dx_arcsec": -266.1,
+      "dy_arcsec": 19.7,
+      "magnitude": 14.85,
+      "b_v": 0.82,
+      "katalog": "Gaia DR3 1328058455492441728",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328059417565632896",
+      "dx_arcsec": -63.1,
+      "dy_arcsec": 53.7,
+      "magnitude": 14.85,
+      "b_v": 0.81,
+      "katalog": "Gaia DR3 1328059417565632896",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057905736971520",
+      "dx_arcsec": 7.9,
+      "dy_arcsec": -10.3,
+      "magnitude": 14.85,
+      "b_v": 0.73,
+      "katalog": "Gaia DR3 1328057905736971520",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328111919246350080",
+      "dx_arcsec": 260.9,
+      "dy_arcsec": 827.5,
+      "magnitude": 14.85,
+      "b_v": 0.82,
+      "katalog": "Gaia DR3 1328111919246350080",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057974450142464",
+      "dx_arcsec": 12.5,
+      "dy_arcsec": 51.4,
+      "magnitude": 14.86,
+      "b_v": 0.74,
+      "katalog": "Gaia DR3 1328057974450142464",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057184182413952",
+      "dx_arcsec": -73.9,
+      "dy_arcsec": -1.9,
+      "magnitude": 14.86,
+      "b_v": 0.77,
+      "katalog": "Gaia DR3 1328057184182413952",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057905737070976",
+      "dx_arcsec": 3.0,
+      "dy_arcsec": -23.6,
+      "magnitude": 14.86,
+      "b_v": 0.72,
+      "katalog": "Gaia DR3 1328057905737070976",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328059451918432000",
+      "dx_arcsec": -93.1,
+      "dy_arcsec": 85.6,
+      "magnitude": 14.86,
+      "b_v": 0.77,
+      "katalog": "Gaia DR3 1328059451918432000",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057940089977216",
+      "dx_arcsec": -43.8,
+      "dy_arcsec": 36.1,
+      "magnitude": 14.86,
+      "b_v": 0.72,
+      "katalog": "Gaia DR3 1328057940089977216",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057179882276480",
+      "dx_arcsec": -61.9,
+      "dy_arcsec": 4.5,
+      "magnitude": 14.86,
+      "b_v": 0.31,
+      "katalog": "Gaia DR3 1328057179882276480",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328058077530125568",
+      "dx_arcsec": 103.6,
+      "dy_arcsec": 26.6,
+      "magnitude": 14.87,
+      "b_v": 0.42,
+      "katalog": "Gaia DR3 1328058077530125568",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328104669341400320",
+      "dx_arcsec": 231.7,
+      "dy_arcsec": 56.4,
+      "magnitude": 14.87,
+      "b_v": 0.82,
+      "katalog": "Gaia DR3 1328104669341400320",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057424700951552",
+      "dx_arcsec": 173.8,
+      "dy_arcsec": -126.8,
+      "magnitude": 14.87,
+      "b_v": 0.81,
+      "katalog": "Gaia DR3 1328057424700951552",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328058107595092864",
+      "dx_arcsec": 146.2,
+      "dy_arcsec": 35.0,
+      "magnitude": 14.88,
+      "b_v": 0.81,
+      "katalog": "Gaia DR3 1328058107595092864",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328060242199596800",
+      "dx_arcsec": -113.3,
+      "dy_arcsec": 342.8,
+      "magnitude": 14.88,
+      "b_v": 0.19,
+      "katalog": "Gaia DR3 1328060242199596800",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328056733205657472",
+      "dx_arcsec": -32.4,
+      "dy_arcsec": -173.7,
+      "magnitude": 14.9,
+      "b_v": 0.82,
+      "katalog": "Gaia DR3 1328056733205657472",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328058008810058752",
+      "dx_arcsec": 8.9,
+      "dy_arcsec": 58.7,
+      "magnitude": 14.9,
+      "b_v": 0.75,
+      "katalog": "Gaia DR3 1328058008810058752",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328061822746704640",
+      "dx_arcsec": -591.9,
+      "dy_arcsec": 206.4,
+      "magnitude": 14.9,
+      "b_v": 0.29,
+      "katalog": "Gaia DR3 1328061822746704640",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328058043176331136",
+      "dx_arcsec": 149.5,
+      "dy_arcsec": 0.8,
+      "magnitude": 14.9,
+      "b_v": 0.79,
+      "katalog": "Gaia DR3 1328058043176331136",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328106245584069376",
+      "dx_arcsec": 306.6,
+      "dy_arcsec": 342.2,
+      "magnitude": 14.9,
+      "b_v": 0.82,
+      "katalog": "Gaia DR3 1328106245584069376",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328041997177592448",
+      "dx_arcsec": -657.0,
+      "dy_arcsec": -460.8,
+      "magnitude": 14.91,
+      "b_v": 0.82,
+      "katalog": "Gaia DR3 1328041997177592448",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057076803052544",
+      "dx_arcsec": -50.6,
+      "dy_arcsec": -105.2,
+      "magnitude": 14.91,
+      "b_v": 0.2,
+      "katalog": "Gaia DR3 1328057076803052544",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328054950798996480",
+      "dx_arcsec": -540.3,
+      "dy_arcsec": -30.8,
+      "magnitude": 14.91,
+      "b_v": 0.82,
+      "katalog": "Gaia DR3 1328054950798996480",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057974458946304",
+      "dx_arcsec": 34.6,
+      "dy_arcsec": 64.1,
+      "magnitude": 14.91,
+      "b_v": 0.73,
+      "katalog": "Gaia DR3 1328057974458946304",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057905737110144",
+      "dx_arcsec": 10.6,
+      "dy_arcsec": 2.3,
+      "magnitude": 14.91,
+      "b_v": 0.7,
+      "katalog": "Gaia DR3 1328057905737110144",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328058004515964160",
+      "dx_arcsec": -11.5,
+      "dy_arcsec": 66.6,
+      "magnitude": 14.92,
+      "b_v": 0.13,
+      "katalog": "Gaia DR3 1328058004515964160",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057630853427200",
+      "dx_arcsec": 178.1,
+      "dy_arcsec": -78.9,
+      "magnitude": 14.92,
+      "b_v": 0.81,
+      "katalog": "Gaia DR3 1328057630853427200",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057970156195328",
+      "dx_arcsec": 37.3,
+      "dy_arcsec": 29.9,
+      "magnitude": 14.93,
+      "b_v": 0.79,
+      "katalog": "Gaia DR3 1328057970156195328",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328105734493392640",
+      "dx_arcsec": 377.7,
+      "dy_arcsec": 154.9,
+      "magnitude": 14.93,
+      "b_v": 0.16,
+      "katalog": "Gaia DR3 1328105734493392640",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328105356536215296",
+      "dx_arcsec": 201.7,
+      "dy_arcsec": 193.6,
+      "magnitude": 14.93,
+      "b_v": 0.81,
+      "katalog": "Gaia DR3 1328105356536215296",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057940094340224",
+      "dx_arcsec": -16.3,
+      "dy_arcsec": 32.9,
+      "magnitude": 14.93,
+      "b_v": 0.26,
+      "katalog": "Gaia DR3 1328057940094340224",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328058661644302336",
+      "dx_arcsec": -82.2,
+      "dy_arcsec": 47.1,
+      "magnitude": 14.93,
+      "b_v": 0.19,
+      "katalog": "Gaia DR3 1328058661644302336",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057867076968448",
+      "dx_arcsec": 56.8,
+      "dy_arcsec": -5.8,
+      "magnitude": 14.93,
+      "b_v": 0.76,
+      "katalog": "Gaia DR3 1328057867076968448",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328056703145765376",
+      "dx_arcsec": -88.2,
+      "dy_arcsec": -241.6,
+      "magnitude": 14.94,
+      "b_v": 0.8,
+      "katalog": "Gaia DR3 1328056703145765376",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057802655367296",
+      "dx_arcsec": 22.5,
+      "dy_arcsec": -57.6,
+      "magnitude": 14.94,
+      "b_v": 0.77,
+      "katalog": "Gaia DR3 1328057802655367296",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057905737086848",
+      "dx_arcsec": -2.7,
+      "dy_arcsec": 11.9,
+      "magnitude": 14.95,
+      "b_v": 0.39,
+      "katalog": "Gaia DR3 1328057905737086848",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057149822719488",
+      "dx_arcsec": -11.2,
+      "dy_arcsec": -45.2,
+      "magnitude": 14.95,
+      "b_v": 0.39,
+      "katalog": "Gaia DR3 1328057149822719488",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328058970889601408",
+      "dx_arcsec": -318.7,
+      "dy_arcsec": 121.2,
+      "magnitude": 14.95,
+      "b_v": 0.19,
+      "katalog": "Gaia DR3 1328058970889601408",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057940096672640",
+      "dx_arcsec": -32.4,
+      "dy_arcsec": -2.8,
+      "magnitude": 14.95,
+      "b_v": 0.28,
+      "katalog": "Gaia DR3 1328057940096672640",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328081270359640448",
+      "dx_arcsec": 466.1,
+      "dy_arcsec": -79.7,
+      "magnitude": 14.95,
+      "b_v": 0.8,
+      "katalog": "Gaia DR3 1328081270359640448",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328058008816471552",
+      "dx_arcsec": -7.5,
+      "dy_arcsec": 105.3,
+      "magnitude": 14.96,
+      "b_v": 0.07,
+      "katalog": "Gaia DR3 1328058008816471552",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057871370779392",
+      "dx_arcsec": 39.0,
+      "dy_arcsec": -15.5,
+      "magnitude": 14.96,
+      "b_v": 0.23,
+      "katalog": "Gaia DR3 1328057871370779392",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057837011162496",
+      "dx_arcsec": 83.8,
+      "dy_arcsec": -64.7,
+      "magnitude": 14.96,
+      "b_v": 0.16,
+      "katalog": "Gaia DR3 1328057837011162496",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328113809031906688",
+      "dx_arcsec": -187.7,
+      "dy_arcsec": 855.5,
+      "magnitude": 14.96,
+      "b_v": 0.82,
+      "katalog": "Gaia DR3 1328113809031906688",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328058004515951872",
+      "dx_arcsec": 8.2,
+      "dy_arcsec": 54.0,
+      "magnitude": 14.96,
+      "b_v": 0.25,
+      "katalog": "Gaia DR3 1328058004515951872",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057905737070848",
+      "dx_arcsec": -4.2,
+      "dy_arcsec": -22.8,
+      "magnitude": 14.97,
+      "b_v": 0.26,
+      "katalog": "Gaia DR3 1328057905737070848",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328104634981654528",
+      "dx_arcsec": 244.0,
+      "dy_arcsec": 22.6,
+      "magnitude": 14.97,
+      "b_v": 0.04,
+      "katalog": "Gaia DR3 1328104634981654528",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328066564391252864",
+      "dx_arcsec": -456.8,
+      "dy_arcsec": 567.8,
+      "magnitude": 14.97,
+      "b_v": 0.81,
+      "katalog": "Gaia DR3 1328066564391252864",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057768297931904",
+      "dx_arcsec": 49.7,
+      "dy_arcsec": -66.6,
+      "magnitude": 14.97,
+      "b_v": 0.26,
+      "katalog": "Gaia DR3 1328057768297931904",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328104703701158400",
+      "dx_arcsec": 270.5,
+      "dy_arcsec": 47.8,
+      "magnitude": 14.97,
+      "b_v": 0.8,
+      "katalog": "Gaia DR3 1328104703701158400",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057802651269888",
+      "dx_arcsec": 38.3,
+      "dy_arcsec": -32.7,
+      "magnitude": 14.97,
+      "b_v": 0.18,
+      "katalog": "Gaia DR3 1328057802651269888",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328058386764524032",
+      "dx_arcsec": -153.6,
+      "dy_arcsec": -79.5,
+      "magnitude": 14.98,
+      "b_v": 0.8,
+      "katalog": "Gaia DR3 1328058386764524032",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328105042997695104",
+      "dx_arcsec": 174.9,
+      "dy_arcsec": 74.7,
+      "magnitude": 14.98,
+      "b_v": 0.07,
+      "katalog": "Gaia DR3 1328105042997695104",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057905729808896",
+      "dx_arcsec": 21.6,
+      "dy_arcsec": -9.3,
+      "magnitude": 14.98,
+      "b_v": 0.66,
+      "katalog": "Gaia DR3 1328057905729808896",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057974450177152",
+      "dx_arcsec": 12.6,
+      "dy_arcsec": 35.4,
+      "magnitude": 14.98,
+      "b_v": 0.33,
+      "katalog": "Gaia DR3 1328057974450177152",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057459060687872",
+      "dx_arcsec": 133.6,
+      "dy_arcsec": -81.8,
+      "magnitude": 14.98,
+      "b_v": 0.09,
+      "katalog": "Gaia DR3 1328057459060687872",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328057871370788864",
+      "dx_arcsec": 47.6,
+      "dy_arcsec": 11.3,
+      "magnitude": 14.98,
+      "b_v": 0.2,
+      "katalog": "Gaia DR3 1328057871370788864",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328058180615238912",
+      "dx_arcsec": 55.0,
+      "dy_arcsec": 72.2,
+      "magnitude": 14.98,
+      "b_v": 0.2,
+      "katalog": "Gaia DR3 1328058180615238912",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328034094438742784",
+      "dx_arcsec": 330.0,
+      "dy_arcsec": -152.8,
+      "magnitude": 14.99,
+      "b_v": 0.8,
+      "katalog": "Gaia DR3 1328034094438742784",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328058008809954944",
+      "dx_arcsec": -6.3,
+      "dy_arcsec": 63.5,
+      "magnitude": 14.99,
+      "b_v": 0.79,
+      "katalog": "Gaia DR3 1328058008809954944",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328060379638497536",
+      "dx_arcsec": -189.7,
+      "dy_arcsec": 379.4,
+      "magnitude": 14.99,
+      "b_v": 0.03,
+      "katalog": "Gaia DR3 1328060379638497536",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328105390895986048",
+      "dx_arcsec": 260.8,
+      "dy_arcsec": 210.3,
+      "magnitude": 14.99,
+      "b_v": 0.15,
+      "katalog": "Gaia DR3 1328105390895986048",
+      "quelle_farbe": "GDR3"
+    },
+    {
+      "name": "Gaia DR3 1328059688143260416",
+      "dx_arcsec": -25.9,
+      "dy_arcsec": 163.1,
+      "magnitude": 15.0,
+      "b_v": 0.8,
+      "katalog": "Gaia DR3 1328059688143260416",
+      "quelle_farbe": "GDR3"
+    }
+  ]
+}
