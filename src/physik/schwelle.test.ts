@@ -332,7 +332,7 @@ describe("Stetigkeit in Vergroesserung und Himmelshelligkeit (Bortle)", () => {
       expect(groessterSprung(reihe.map((s) => s.schwelleMagProArcsec2))).toBeLessThan(0.02);
       expect(groessterSprung(reihe.map((s) => s.verhaeltnis))).toBeLessThan(0.005);
     }
-  });
+  }, 20_000); // lokal 1,7 s, auf dem CI-Runner ueber 5 s
 });
 
 describe("deckkraft: Phi((v - 1) / 0,484)", () => {
