@@ -843,3 +843,25 @@ Interpolation der Reserve (Entscheidung Herbert zu PR #121): Mit "keine sichtbar
 Korrektur: wahrnehmung.md 2.3, Fernglas 10x50 bei Bortle 3 mit $F$ = 1,4, von 11,1 auf 11,0 mag (ungerundet 11,05).
 
 Quelle [A&S]: Abramowitz, M., Stegun, I. A.: *Handbook of Mathematical Functions*, NBS Applied Mathematics Series 55, 1964, Formel 7.1.26.
+
+## 20. Auswerten Version 2: gezeigte Deckkraft der Punktquellen (Issue #100)
+
+**Datum:** 2026-10-29. **Kennungen:** A-P11, A-P6, A-P12; `docs/architektur.md` 5.3 und 5.4, ADR-0004. Umsetzung in `src/physik/punktquellen.ts` (`deckkraftPunktquelle`) und `src/physik/auswerten.ts`; alle anderen Formeln von `auswerten` stehen in den Abschnitten 12 bis 19.
+
+**Problem.** Blackwells Wahrscheinlichkeitskurve $P(v) = \Phi\big((v - 1)/0{,}484\big)$ mit $v = 10^{-0{,}4(m - m_\mathrm{lim})}$ (Abschnitt 19, `wahrnehmung.md` 1.3) endet fuer $v \to 0$ nicht bei 0, sondern bei $P_0 = \Phi(-1/0{,}484) = 0{,}0194$: die Kurve beschreibt Treffer im Laborversuch, $P_0$ ist der Anteil "gesehen" ohne Reiz. Als Deckkraft genommen bekaeme jeder noch so schwache Stern 1,9 % Deckkraft, und der Grund `unter_schwelle` (Deckkraft unter $10^{-3}$, `docs/architektur.md` 5.3) traete nie ein (Hinweis aus PR #121).
+
+**Festlegung (Vorschlag, Entscheidung Herbert offen).** Gezeigt wird $P$ ohne diesen Sockel, dieselbe Korrektur, die ADR-0004 (Nachtrag 2026-10-29) fuer die Deep-Sky-Ebene nennt:
+
+$$P'(v) = \frac{P(v) - P_0}{1 - P_0},\qquad P_0 = P(0).$$
+
+$P'$ ist stetig und monoton in $v$ (streng, bis sie 1 erreicht), $P'(0) = 0$, $P'$ = 1 genau wo $P$ = 1 ist (in Gleitkomma ab 1,75 mag ueber der Grenze; alle Trabanten der Testfaelle T1 bis T6, die Simulationsparameter bleiben dort gleich). An der Grenzgroesse ist $P'(1) = 0{,}4901$ statt 0,5, ein Unterschied von 0,01 in der Deckkraft (ber.). Unter $P' < 10^{-3}$ ist die Punktquelle `unter_schwelle` und wird nicht gemalt; das ist bei $v = 0{,}00985$, also 5,02 mag unter der Grenzgroesse (ber., `statistics.NormalDist`). Die Deckkraft steht nur in der Naht, wenn sie unter 1 liegt (fehlt = 1).
+
+| Groesse | Eingabe | Erwartung | Herkunft |
+|---|---|---|---|
+| $P_0$ | $v$ = 0 | 0,0194 | ber. |
+| $P'$ | $m - m_\mathrm{lim}$ = 0 / +1 / -1 | 0,4901 / 0,0891 / 0,9991 | ber. |
+| Schnitt | $P'$ = $10^{-3}$ | $m - m_\mathrm{lim}$ = 5,017 | ber. |
+
+**Verworfen.** (a) Schnitt bei $P < P_0 + 10^{-3}$ ohne Korrektur: Sterne bis 5 mag unter der Grenze blieben mit 1,9 % Deckkraft gemalt und sprangen dann auf 0; bei vielen Katalogsternen (M13, M45) ein Schleier. (b) Schnitt an einem festen Abstand zur Grenzgroesse: eine zweite Konstante neben $10^{-3}$, gleiche Wirkung wie die Korrektur ohne deren Stetigkeit.
+
+**Weitere Festlegungen in `auswerten` (Vorschlaege im PR zu Issue #100, keine neue Formel).** Grenzgroesse mit der Seeing-FWHM am Objekt (`Atmosphaere.seeingFwhmArcsec`, Zenitwert mal $X^{0{,}6}$, Abschnitt 2.1), wie im Kern. Die Schwelle gilt auch fuer Trabanten (ADR-0004: "die Schwelle wirkt dort nur auf Trabanten"); die Blendungsregel (Abschnitt 13.3) auch fuer Sterne, mit der Objektmitte als Blender nur bei Sonnensystem-Objekten. Warnung `ueberstrahlung` nur bei Doppelsternen (Abschnitt 16). Ohne Quellbild Bezug 0 mag/arcsec$^2$ (`docs/architektur.md` 5.2).

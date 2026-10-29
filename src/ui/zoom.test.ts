@@ -168,6 +168,8 @@ describe("vergleichsparameter", () => {
     const gefaltet = rendere(p, quelle, falter).raster.daten;
     expect(Math.max(...vergleich)).toBeCloseTo(1, 5);
     expect(spanne(vergleich)).toBeGreaterThan(0.95);
-    expect(spanne(gefaltet)).toBeLessThan(0.5 * spanne(vergleich));
+    // In Einheiten von Quellweiss (geteilt durch faktorObjekt): seit dem Anzeigeweiss 9,2 (Issue #100)
+    // ist faktorObjekt hier 1,24 statt 0,21, die absolute Spanne sagt nichts mehr ueber die Faltung.
+    expect(spanne(gefaltet) / p.helligkeit.faktorObjekt).toBeLessThan(0.5 * spanne(vergleich));
   });
 });

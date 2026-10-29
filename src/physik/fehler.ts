@@ -31,12 +31,13 @@ export function pruefePositiv(feld: string, wert: number): void {
 }
 
 /**
- * Quellbild des Zustands; wirft PhysikFehler, wenn es fehlt. Zustaende ohne Quellbild (Doppelstern,
- * M45) rechnet auswerten erst ab Issue #100; bis dahin ist ein solcher Zustand ein Programmierfehler.
+ * Quellbild des Zustands; wirft PhysikFehler, wenn es fehlt. auswerten rechnet seit Issue #100 auch
+ * Zustaende ohne Quellbild (Doppelstern, M45) und braucht quelleVon nicht mehr; fuer Aufrufer, die
+ * ein Quellbild voraussetzen (ui: Vergleichsbild, Zoom), bleibt ein fehlendes ein Programmierfehler.
  */
 export function quelleVon(zustand: Objektzustand): NonNullable<Objektzustand["quelle"]> {
   if (zustand.quelle === undefined) {
-    throw new PhysikFehler(`${zustand.kennung}.quelle`, NaN, "fehlt; Zustaende ohne Quellbild folgen mit Issue #100");
+    throw new PhysikFehler(`${zustand.kennung}.quelle`, NaN, "fehlt; der Zustand hat kein Quellbild");
   }
   return zustand.quelle;
 }
