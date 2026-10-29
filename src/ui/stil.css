@@ -449,6 +449,11 @@ body {
   cursor: pointer;
 }
 
+/* Sterndaten (#103) unter den Bildnachweisen. */
+.fuss-sterndaten {
+  margin-top: 8px;
+}
+
 .fuss-bild h2 {
   margin: 12px 0 4px;
   font-size: 0.85rem;
