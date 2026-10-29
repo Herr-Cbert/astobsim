@@ -179,13 +179,57 @@ export interface SichtbareIsophote {
 }
 
 /**
+ * Reserve d als stetige Funktion des Zeilenindex x in [0, n - 1]: kubische Hermite-Interpolation
+ * mit Catmull-Rom-Steigungen (d_(k+1) - d_(k-1)) / 2, am Rand einseitig. Je Intervall
+ * [k, k + 1] ist d(k + t) = a t^3 + b t^2 + c t + e. Die Knotenwerte haengen stetig von V und
+ * mu_Himmel ab, die Koeffizienten also auch (physik.md, Abschnitt "Wahrnehmungsschwelle (Issue #96)").
+ */
+function reserveKurve(reserve: readonly number[]): { wert: (x: number) => number; kritisch: (k: number) => number[] } {
+  const n = reserve.length;
+  const d = (k: number): number => reserve[Math.min(n - 1, Math.max(0, k))]!;
+  const steigung = (k: number): number => (k === 0 ? d(1) - d(0) : k === n - 1 ? d(n - 1) - d(n - 2) : (d(k + 1) - d(k - 1)) / 2);
+  const koeffizienten = (k: number): [number, number, number, number] => {
+    const m0 = steigung(k);
+    const m1 = steigung(k + 1);
+    return [2 * (d(k) - d(k + 1)) + m0 + m1, 3 * (d(k + 1) - d(k)) - 2 * m0 - m1, m0, d(k)];
+  };
+  const wert = (x: number): number => {
+    if (n === 1) return d(0);
+    const k = Math.min(n - 2, Math.floor(x));
+    const t = x - k;
+    const [a, b, c, e] = koeffizienten(k);
+    return ((a * t + b) * t + c) * t + e;
+  };
+  // Nullstellen von d' = 3 a t^2 + 2 b t + c im Inneren von (0, 1), aufsteigend, als x.
+  const kritisch = (k: number): number[] => {
+    const [a, b, c] = koeffizienten(k);
+    const loesungen: number[] = [];
+    if (Math.abs(a) < 1e-15) {
+      if (Math.abs(b) > 1e-15) loesungen.push(-c / (2 * b));
+    } else {
+      const diskriminante = b * b - 3 * a * c;
+      if (diskriminante >= 0) {
+        const w = Math.sqrt(diskriminante);
+        loesungen.push((-b - w) / (3 * a), (-b + w) / (3 * a));
+      }
+    }
+    return loesungen.filter((t) => t > 0 && t < 1).sort((u, v) => u - v).map((t) => k + t);
+  };
+  return { wert, kritisch };
+}
+
+/**
  * Crumeys Verfahren fuer M31 und M33 (wahrnehmung.md 4.4 Punkt 2, [1, Abschn. 3.1]): die Isophote
  * mu_i mit eingeschlossener Flaeche alpha_i ist sichtbar, wenn mu_i <= mu_lim(alpha_i). Mit der
- * Reserve d_i = mu_lim(alpha_i) - mu_i gilt C / C_th = 10^(0,4 d_i). Gesucht ist der letzte
- * Vorzeichenwechsel von d (die schwaechste sichtbare Isophote), zwischen zwei Zeilen linear in mu
- * und log10 alpha interpoliert; d ist stetig in V und mu_Himmel, also auch die Isophote. Ist keine
- * Zeile sichtbar, gilt die guenstigste (groesste Reserve). isophoten: mu aufsteigend, Flaeche
- * steigend (ADR-0003 Nachtrag V2). Wirft PhysikFehler bei leerer Tabelle oder Flaeche <= 0.
+ * Reserve d_i = mu_lim(alpha_i) - mu_i gilt C / C_th = 10^(0,4 d_i). Zwischen den Zeilen ist d
+ * kubisch ueber dem Zeilenindex x interpoliert (reserveKurve), mu und log10 alpha linear in x.
+ * Gesucht ist die schwaechste sichtbare Stelle, das groesste x mit d(x) >= 0 (letzter
+ * Vorzeichenwechsel). Ist nirgends d >= 0, gilt der Scheitel der Kurve, die guenstigste Stelle,
+ * auch zwischen zwei Zeilen; so springt die Lage nicht, wenn zwei Zeilen gleich guenstig werden,
+ * und der Uebergang zum Vorzeichenwechsel (Scheitel bei d = 0) ist stetig. Am Tabellenrand ist die
+ * Randzeile selbst die Stelle. Alles ist stetig in V und mu_Himmel, solange die Reserve nur einen
+ * Scheitel hat. isophoten: mu aufsteigend, Flaeche steigend (ADR-0003 Nachtrag V2). Wirft
+ * PhysikFehler bei leerer Tabelle oder Flaeche <= 0.
  */
 export function sichtbareIsophote(
   isophoten: readonly Isophote[],
@@ -199,35 +243,43 @@ export function sichtbareIsophote(
     (i) => schwelleAmOkular(optik, atmosphaere, muHimmel, i.flaecheArcsec2, beobachter).grenzMagProArcsec2 - i.magProArcsec2
   );
   const letzte = isophoten.length - 1;
-  const zeile = (k: number, alleSichtbar: boolean): SichtbareIsophote => ({
-    magProArcsec2: isophoten[k]!.magProArcsec2,
-    flaecheArcsec2: isophoten[k]!.flaecheArcsec2,
-    alleSichtbar,
-    verhaeltnis: Math.pow(10, 0.4 * reserve[k]!),
-    schwelleMagProArcsec2: isophoten[k]!.magProArcsec2 + reserve[k]!
-  });
-  if (reserve[letzte]! >= 0) return zeile(letzte, true);
-  // Von hinten: die erste Zeile mit d >= 0 hat einen Nachfolger mit d < 0.
-  for (let k = letzte - 1; k >= 0; k--) {
-    const dK = reserve[k]!;
-    if (dK < 0) continue;
-    const t = dK / (dK - reserve[k + 1]!);
+  const kurve = reserveKurve(reserve);
+  // Stelle x mit Reserve dX: mu und log10 alpha linear zwischen den Nachbarzeilen.
+  const stelle = (x: number, dX: number, alleSichtbar: boolean): SichtbareIsophote => {
+    const k = Math.min(Math.max(letzte - 1, 0), Math.floor(x));
+    const t = x - k;
     const a = isophoten[k]!;
-    const b = isophoten[k + 1]!;
+    const b = isophoten[Math.min(letzte, k + 1)]!;
     const mu = a.magProArcsec2 + t * (b.magProArcsec2 - a.magProArcsec2);
     return {
       magProArcsec2: mu,
       flaecheArcsec2: Math.pow(10, Math.log10(a.flaecheArcsec2) + t * (Math.log10(b.flaecheArcsec2) - Math.log10(a.flaecheArcsec2))),
-      alleSichtbar: false,
-      verhaeltnis: 1,
-      schwelleMagProArcsec2: mu
+      alleSichtbar,
+      verhaeltnis: dX === 0 ? 1 : Math.pow(10, 0.4 * dX),
+      schwelleMagProArcsec2: mu + dX
     };
+  };
+  if (reserve[letzte]! >= 0) return stelle(letzte, reserve[letzte]!, true);
+  // Stuetzstellen: Zeilen und Extrema der Kurve; dazwischen ist d monoton.
+  const stuetzen: number[] = [];
+  for (let k = 0; k < letzte; k++) stuetzen.push(k, ...kurve.kritisch(k));
+  stuetzen.push(letzte);
+  // Von hinten: die letzte Stuetzstelle mit d >= 0; dahinter faellt d monoton unter 0.
+  for (let j = stuetzen.length - 2; j >= 0; j--) {
+    if (kurve.wert(stuetzen[j]!) < 0) continue;
+    let unten = stuetzen[j]!;
+    let oben = stuetzen[j + 1]!;
+    for (let schritt = 0; schritt < 60; schritt++) {
+      const mitte = (unten + oben) / 2;
+      if (kurve.wert(mitte) >= 0) unten = mitte;
+      else oben = mitte;
+    }
+    return stelle(unten, 0, false);
   }
-  let beste = 0;
-  reserve.forEach((d, k) => {
-    if (d > reserve[beste]!) beste = k;
-  });
-  return zeile(beste, false);
+  // Keine Stelle sichtbar: der Scheitel, die Stuetzstelle mit der groessten Reserve.
+  let beste = stuetzen[0]!;
+  for (const x of stuetzen) if (kurve.wert(x) > kurve.wert(beste)) beste = x;
+  return stelle(beste, kurve.wert(beste), false);
 }
 
 /**

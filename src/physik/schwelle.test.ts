@@ -256,13 +256,16 @@ describe("sichtbareIsophote: Vorzeichenwechsel der Reserve, Crumeys Verfahren fu
     expect(s.magProArcsec2).toBe(hell[9]!.magProArcsec2);
     expect(s.verhaeltnis).toBeGreaterThanOrEqual(1);
   });
-  it("keine Zeile sichtbar: die guenstigste mit Verhaeltnis unter 1", () => {
+  it("keine Zeile sichtbar: der Scheitel der Reserve, Verhaeltnis unter 1, nicht unter der besten Zeile", () => {
     const schwach = scheibenTabelle(26, 60, 1);
     const s = sichtbareIsophote(schwach, optik(AUGE), OHNE, 17.0);
     expect(s.alleSichtbar).toBe(false);
     expect(s.verhaeltnis).toBeLessThan(1);
     const reserven = schwach.map((i) => schwelleAmOkular(optik(AUGE), OHNE, 17.0, i.flaecheArcsec2).grenzMagProArcsec2 - i.magProArcsec2);
-    expect(s.verhaeltnis).toBeCloseTo(10 ** (0.4 * Math.max(...reserven)), 12);
+    // Der Scheitel der interpolierten Reserve liegt hoechstens wenig ueber der besten Zeile.
+    const besteZeile = 10 ** (0.4 * Math.max(...reserven));
+    expect(s.verhaeltnis).toBeGreaterThanOrEqual(besteZeile);
+    erwarteRelativ(s.verhaeltnis, besteZeile, 1e-3);
   });
   it("Extinktion: die Isophote verschiebt sich zu helleren Werten", () => {
     const ohne = sichtbareIsophote(SCHEIBE, newton200(50), OHNE, BORTLE_5);
@@ -278,10 +281,10 @@ describe("sichtbareIsophote: Vorzeichenwechsel der Reserve, Crumeys Verfahren fu
     expect(faelle.map((f) => f.verhaeltnis > 1 || f.alleSichtbar)).toEqual([false, true, false]);
     expect(faelle[0]!.schwelleMagProArcsec2).toBe(faelle[0]!.magProArcsec2);
     for (const f of faelle) expect(f.verhaeltnis).toBeCloseTo(10 ** (-0.4 * (f.magProArcsec2 - f.schwelleMagProArcsec2)), 12);
-    // Zeilenfaelle: Schwelle ist mu_lim der Zeilenflaeche.
-    for (const [f, muHimmel] of [[faelle[1]!, 21.9], [faelle[2]!, 17.0]] as const) {
-      expect(f.schwelleMagProArcsec2).toBeCloseTo(schwelleAmOkular(optik(AUGE), OHNE, muHimmel, f.flaecheArcsec2).grenzMagProArcsec2, 12);
-    }
+    // Alle sichtbar: Schwelle ist mu_lim der letzten Zeile; keine sichtbar: mu_lim am Scheitel
+    // zwischen zwei Zeilen, bis auf den Interpolationsrest.
+    expect(faelle[1]!.schwelleMagProArcsec2).toBeCloseTo(schwelleAmOkular(optik(AUGE), OHNE, 21.9, faelle[1]!.flaecheArcsec2).grenzMagProArcsec2, 12);
+    expect(faelle[2]!.schwelleMagProArcsec2).toBeCloseTo(schwelleAmOkular(optik(AUGE), OHNE, 17.0, faelle[2]!.flaecheArcsec2).grenzMagProArcsec2, 2);
   });
   it("eine Zeile: diese Zeile; wirft PhysikFehler bei leerer Tabelle oder Flaeche <= 0", () => {
     const eine = [{ magProArcsec2: 21, flaecheArcsec2: 1e5 }];
@@ -305,24 +308,28 @@ describe("Stetigkeit in Vergroesserung und Himmelshelligkeit (Bortle)", () => {
     expect(groessterSprung(himmel.map((mu) => grenzgroesse(optik(AUGE), OHNE, mu, 2)))).toBeLessThan(0.005);
   });
   // Isophote: am Vorzeichenwechsel waechst die Isophote nach dem Auftauchen wie die Wurzel des
-  // Abstands, darum feiner abgetastet (mu in 0,0005, V in 0,02 %). Ist keine Zeile sichtbar, gilt
-  // die guenstigste Zeile; bei Gleichstand zweier Zeilen springt sie um eine Zeile (0,1 mag), das
-  // Verhaeltnis C / C_th bleibt stetig. Darum Lage nur fuer Paare mit sichtbarer Isophote.
+  // Abstands, darum feiner abgetastet (mu in 0,0005, V in 0,02 %). Alle Faelle samt Uebergaengen:
+  // Vorzeichenwechsel, keine sichtbar (Scheitel der Reserve, auch bei Gleichstand zweier Zeilen),
+  // alle sichtbar (Reihe 5, helle Tabelle).
   const vFein = Array.from({ length: 15001 }, (_, i) => 20 * 1.0002 ** i);
   const muFein = Array.from({ length: 10001 }, (_, i) => 17 + 0.0005 * i);
+  const HELL = scheibenTabelle(17, 900, 0.3).slice(0, 30);
   const reihen = (): SichtbareIsophote[][] => [
     vFein.map((v) => sichtbareIsophote(SCHEIBE, newton200(v), OHNE, BORTLE_5)),
     vFein.map((v) => sichtbareIsophote(SCHEIBE, newton200(v), OHNE, 17.5)),
     muFein.map((mu) => sichtbareIsophote(SCHEIBE, newton200(100), OHNE, mu)),
-    muFein.map((mu) => sichtbareIsophote(SCHEIBE, optik(AUGE), OHNE, mu))
+    muFein.map((mu) => sichtbareIsophote(SCHEIBE, optik(AUGE), OHNE, mu)),
+    muFein.map((mu) => sichtbareIsophote(HELL, optik(AUGE), OHNE, mu))
   ];
 
-  it("sichtbare Isophote ohne Sprung in mu und log Flaeche, Verhaeltnis stetig", () => {
-    for (const reihe of reihen()) {
-      const sichtbar = reihe.slice(1).flatMap((s, i) => (s.verhaeltnis >= 1 && reihe[i]!.verhaeltnis >= 1 ? [[reihe[i]!, s] as const] : []));
-      expect(sichtbar.length).toBeGreaterThan(0);
-      expect(Math.max(...sichtbar.map(([a, b]) => Math.abs(b.magProArcsec2 - a.magProArcsec2)))).toBeLessThan(0.02);
-      expect(Math.max(...sichtbar.map(([a, b]) => Math.abs(Math.log10(b.flaecheArcsec2 / a.flaecheArcsec2))))).toBeLessThan(0.06);
+  it("sichtbare Isophote ohne Sprung in mu, log Flaeche, Schwelle und Verhaeltnis, in allen Faellen", () => {
+    const alle = reihen();
+    const faelle = new Set(alle.flat().map((s) => (s.alleSichtbar ? "alle" : s.verhaeltnis < 1 ? "keine" : "wechsel")));
+    expect([...faelle].sort()).toEqual(["alle", "keine", "wechsel"]);
+    for (const reihe of alle) {
+      expect(groessterSprung(reihe.map((s) => s.magProArcsec2))).toBeLessThan(0.02);
+      expect(groessterSprung(reihe.map((s) => Math.log10(s.flaecheArcsec2)))).toBeLessThan(0.06);
+      expect(groessterSprung(reihe.map((s) => s.schwelleMagProArcsec2))).toBeLessThan(0.02);
       expect(groessterSprung(reihe.map((s) => s.verhaeltnis))).toBeLessThan(0.005);
     }
   });
