@@ -21,9 +21,10 @@ describe("objektzustand", () => {
     expect(z.quelle!.massstabArcsecProPx).toBeCloseTo(0.67621, 5);
     expect(z.quelle!.weissMagProArcsec2).toBe(3.91);
     expect(z.trabanten).toEqual([]);
-    // Vorgaben bis Issue #102: nur Sonnensystem, keine Sterne.
+    // Sonnensystem: Klasse aus typ mond, keine Sterne, keine Isophoten.
     expect(z.klasse).toBe("sonnensystem");
     expect(z.sterne).toEqual([]);
+    expect(z.isophoten).toBeUndefined();
   });
 
   it("ist strukturiert klonbar", () => {

@@ -5,9 +5,12 @@
 // sich darauf verlaesst. Einzelbilder (Planeten, QuelleEinzelbild) haben kein kacheln, dafuer
 // datei_bytes, damit die Grenze von 20 MB je Objekt (A-X6) auch sie erfasst. Dass Masse und
 // Bytes zu den Dateien passen, prueft bilddateien.test.ts (und tools/bildnachweis_pruefen.py).
+// Deep-Sky-Bilder tragen die log-Kennlinie (kennlinie, ADR-0003 Nachtrag Version 2, kennlinie.ts);
+// ohne kennlinie sind die Kodewerte sRGB (Planeten, Mond).
 
 import { DatenFehler } from "./fehler";
-import { alsListe, alsObjekt, ganzzahl, ladeJson, nurBekannteFelder, optional, text, wahrheitswert, zahl, type Ort } from "./pruefe";
+import type { Kennlinie } from "./kennlinie";
+import { alsListe, alsObjekt, ganzzahl, ladeJson, nurBekannteFelder, optional, text, wahl, wahrheitswert, zahl, type Ort } from "./pruefe";
 
 export const BILDER_DATEI = "bilder.json";
 
@@ -64,6 +67,8 @@ export interface Bildnachweis {
   /** Nur Einzelbilder: Groesse der Datei in Byte (A-X6); Kachelpyramiden nennen kacheln.gesamtBytes. */
   dateiBytes?: number;
   kacheln?: Kachelpyramide;
+  /** Nur Deep-Sky-Bilder: 8-Bit-Grauwert mit log-Kennlinie; fehlt = sRGB. */
+  kennlinie?: Kennlinie;
 }
 
 /** Erlaubte relative Abweichung zwischen gespeicherten und abgeleiteten Massstaeben. */
@@ -78,8 +83,14 @@ const FELDER_EINTRAG = [
   "lizenz", "lizenz_url", "namensnennung", "pixel_breite", "pixel_hoehe", "original_pixel", "winkelgroesse_arcsec",
   "ringe_arcsec", "objekt_durchmesser_px", "bogensekunden_pro_pixel", "norden_oben", "sub_erde_breite_grad",
   "sub_erde_laenge_grad", "phase", "kolongitude_grad", "positionswinkel_achse_grad", "datei_bytes", "bearbeitung", "hinweise",
-  "kacheln"
+  "kacheln", "kennlinie"
 ] as const;
+const FELDER_KENNLINIE = ["art", "mag_hell", "mag_dunkel"] as const;
+/** Grenzen der Flaechenhelligkeit in der Kennlinie, mag/arcsec^2. */
+const MAG_KENNLINIE_MIN = -5;
+const MAG_KENNLINIE_MAX = 35;
+/** Groesste Winkelgroesse eines Bilds: M31 rund 11400'' (deep-sky.md 1.1), 5 Grad Gesichtsfeld des Auges. */
+const WINKELGROESSE_MAX_ARCSEC = 18000;
 const FELDER_KACHELN = ["kachel_px", "format", "qualitaet", "muster", "gesamt_bytes", "stufen"] as const;
 const FELDER_STUFE = ["stufe", "breite_px", "hoehe_px", "bogensekunden_pro_pixel", "kacheln_x", "kacheln_y"] as const;
 
@@ -136,7 +147,7 @@ function pruefeEintrag(obj: Record<string, unknown>, id: string, ort: Ort): Bild
     pixelBreite: ganzzahl(obj, "pixel_breite", ort, 1, 100000),
     pixelHoehe: ganzzahl(obj, "pixel_hoehe", ort, 1, 100000),
     originalPixel: text(obj, "original_pixel", ort),
-    winkelgroesseArcsec: zahl(obj, "winkelgroesse_arcsec", ort, 0.1, 4000),
+    winkelgroesseArcsec: zahl(obj, "winkelgroesse_arcsec", ort, 0.1, WINKELGROESSE_MAX_ARCSEC),
     objektDurchmesserPx: ganzzahl(obj, "objekt_durchmesser_px", ort, 1, 100000),
     bogensekundenProPixel: zahl(obj, "bogensekunden_pro_pixel", ort, 0.001, 100),
     nordenOben: wahrheitswert(obj, "norden_oben", ort),
@@ -191,7 +202,24 @@ function pruefeEintrag(obj: Record<string, unknown>, id: string, ort: Ort): Bild
     if (dateiBytes === undefined) throw new DatenFehler(ort.datei, id, "datei_bytes", "Pflicht bei Einzelbildern (A-X6)");
     nachweis.dateiBytes = dateiBytes;
   }
+  const kennlinie = optional(obj, "kennlinie", (o, f) => pruefeKennlinie(alsObjekt(o[f], ort, f), ort));
+  if (kennlinie !== undefined) nachweis.kennlinie = kennlinie;
   return nachweis;
+}
+
+function pruefeKennlinie(obj: Record<string, unknown>, ort: Ort): Kennlinie {
+  const ortK: Ort = { datei: ort.datei, eintrag: `${ort.eintrag}, kennlinie` };
+  nurBekannteFelder(obj, ortK, FELDER_KENNLINIE);
+  const kennlinie: Kennlinie = {
+    art: wahl(obj, "art", ortK, ["log"] as const),
+    magHell: zahl(obj, "mag_hell", ortK, MAG_KENNLINIE_MIN, MAG_KENNLINIE_MAX),
+    magDunkel: zahl(obj, "mag_dunkel", ortK, MAG_KENNLINIE_MIN, MAG_KENNLINIE_MAX)
+  };
+  // Kode 255 ist heller als Kode 1; gleiche Werte gaeben eine Kennlinie ohne Umfang.
+  if (!(kennlinie.magDunkel > kennlinie.magHell)) {
+    throw new DatenFehler(ortK.datei, ortK.eintrag, "mag_dunkel", `muss groesser als mag_hell (${kennlinie.magHell}) sein`);
+  }
+  return kennlinie;
 }
 
 function pruefeKacheln(obj: Record<string, unknown>, nachweis: Bildnachweis, ort: Ort): Kachelpyramide {

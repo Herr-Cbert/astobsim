@@ -1,5 +1,5 @@
 // Objektzustand fuer die Naht aus den geprueften Listen von objekte.json und bilder.json: der
-// Zustand liefert Winkelgroesse, Magnitude, Weisspegel und Trabanten, der Bildnachweis die
+// Zustand liefert Winkelgroesse, Magnitude, Weisspegel, Trabanten, Sterne und Isophoten, der Bildnachweis die
 // Pixelmasse. Der Massstab bezieht sich auf die Winkelgroesse des Zustands, nicht auf die des
 // Nachweises (wie pyramidengeometrie in kacheln.ts): Winkelgroesse / objekt_durchmesser_px.
 // Gemeinsame Stelle fuer ui (#9) und zustand (#16).
@@ -7,7 +7,7 @@
 import { BILDER_DATEI, type Bildnachweis } from "./bildnachweise";
 import { DatenFehler } from "./fehler";
 import { OBJEKTE_DATEI, type Objekt, type ZustandEintrag } from "./objekte";
-import type { Objektzustand } from "../naht/konfiguration";
+import type { Objektzustand, Stern } from "../naht/konfiguration";
 
 /** Zustand mit seinem Objekt, gesucht ueber die global eindeutige Zustands-id. */
 export function findeZustand(objekte: readonly Objekt[], zustandId: string): { objekt: Objekt; zustand: ZustandEintrag } | undefined {
@@ -21,31 +21,49 @@ export function findeZustand(objekte: readonly Objekt[], zustandId: string): { o
 /**
  * Objektzustand zur Zustands-id; undefined, wenn es den Zustand nicht gibt (zustand faellt dann
  * auf die Voreinstellung zurueck). Ein fehlender Bildnachweis ist ein DatenFehler, weil
- * pruefeVerweise ihn beim Laden schon ausschliesst.
+ * pruefeVerweise ihn beim Laden schon ausschliesst. klasse kommt vom Objekt; quelle nur mit Bild,
+ * isophoten nur bei Deep-Sky mit Bild, trabanten nur bei Sonnensystem, sterne bei Doppelstern und
+ * Deep-Sky (docs/architektur.md 5.3). Beim Doppelstern ist durchmesserArcsec der groesste
+ * Sternabstand (nur Anzeige).
  */
 export function objektzustand(objekte: readonly Objekt[], nachweise: readonly Bildnachweis[], zustandId: string): Objektzustand | undefined {
   const fund = findeZustand(objekte, zustandId);
   if (fund === undefined) return undefined;
-  const { zustand } = fund;
-  const nachweis = nachweise.find((n) => n.id === zustand.bild);
-  if (nachweis === undefined) {
-    throw new DatenFehler(OBJEKTE_DATEI, zustand.id, "bild", `kein Bildnachweis "${zustand.bild}" in ${BILDER_DATEI}`);
-  }
-  return {
+  const { objekt, zustand } = fund;
+  const sterne: Stern[] = zustand.sterne.map((s) => ({ name: s.name, dxArcsec: s.dxArcsec, dyArcsec: s.dyArcsec, magnitude: s.magnitude, bv: s.bv }));
+  const ergebnis: Objektzustand = {
     kennung: zustand.id,
-    // Vorgaben bis Issue #102: objekte.json kennt nur mond und planet, beide sonnensystem.
-    klasse: "sonnensystem",
-    durchmesserArcsec: zustand.winkelgroesseArcsec,
+    klasse: objekt.klasse,
+    durchmesserArcsec: objekt.klasse === "doppelstern" ? groessterAbstand(sterne) : zustand.winkelgroesseArcsec!,
     magnitude: zustand.magnitude,
-    quelle: {
+    trabanten: zustand.trabanten.map((t) => ({ ...t })),
+    sterne
+  };
+  if (zustand.bild !== undefined) {
+    const nachweis = nachweise.find((n) => n.id === zustand.bild);
+    if (nachweis === undefined) {
+      throw new DatenFehler(OBJEKTE_DATEI, zustand.id, "bild", `kein Bildnachweis "${zustand.bild}" in ${BILDER_DATEI}`);
+    }
+    ergebnis.quelle = {
       breitePx: nachweis.pixelBreite,
       hoehePx: nachweis.pixelHoehe,
-      massstabArcsecProPx: zustand.winkelgroesseArcsec / nachweis.objektDurchmesserPx,
-      weissMagProArcsec2: zustand.weissMagProArcsec2
-    },
-    trabanten: zustand.trabanten.map((t) => ({ ...t })),
-    sterne: []
-  };
+      massstabArcsecProPx: zustand.winkelgroesseArcsec! / nachweis.objektDurchmesserPx,
+      weissMagProArcsec2: zustand.weissMagProArcsec2!
+    };
+    if (zustand.isophoten !== undefined) ergebnis.isophoten = zustand.isophoten.map((i) => ({ ...i }));
+  }
+  return ergebnis;
+}
+
+/** Groesster Abstand zweier Sterne in Bogensekunden; 0 bei weniger als zwei Sternen. */
+function groessterAbstand(sterne: readonly Stern[]): number {
+  let groesster = 0;
+  for (let i = 0; i < sterne.length; i++) {
+    for (let j = i + 1; j < sterne.length; j++) {
+      groesster = Math.max(groesster, Math.hypot(sterne[j]!.dxArcsec - sterne[i]!.dxArcsec, sterne[j]!.dyArcsec - sterne[i]!.dyArcsec));
+    }
+  }
+  return groesster;
 }
 
 /** Bildnachweis zum Zustand mit der id kennung (fuer Namensnennung und Bildquelle); undefined, wenn es keinen gibt. */
