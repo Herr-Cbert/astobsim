@@ -374,7 +374,7 @@ Passend zu ADR-0003 und `objekte.md` 6.2: Einheiten im Feldnamen, Dezimalpunkt, 
 - `profil.art`: `"king"` (M13), `"sersic_exp"` (M31: `n`, `re_arcsec`, `mue_mag_arcsec2`, `rd_arcsec`, `mu0_mag_arcsec2`, `q_bulge`, `q_scheibe`), `"keins"` (M42, M57, M45). Das Profil dient `tools/` zur Eichung, der Anwendung nur dann, wenn ohne Quellbild gerendert wird (M13-Ausweichloesung).
 - `weiss_mag_arcsec2`: wie bisher Quellweiss, geeicht nach 7.2; bei M45 ohne Bild entfaellt das Feld (oder `bild` fehlt). Der Wert 16,4 im Beispiel ist ein Platzhalter.
 - `sterne[]`: `name`, `dx_arcsec`, `dy_arcsec`, `magnitude` (V), `bv`; optional `katalog` ("HIP 17702", "Gaia DR3 ...") fuer die Herkunft. Grenzen pruefen wie bei Trabanten ($|dx|, |dy| \le 7200$, das reicht fuer M45 bis 4600'').
-- Fuer M45 nur `sterne[]` und `magnitude` = 1,6 (informativ, Summe der Sterne ber. pruefen), kein `bild`, kein `profil`.
+- Fuer M45 nur `sterne[]` und `magnitude` = 1,6 (informativ, Summe der Sterne ber. pruefen), kein `bild`, kein `profil`. Nachtrag 2026-10-29 (Entscheidung Herbert zu PR #123): `magnitude` = 1,4, die Summe der 44 Mitglieder bis V 8,5 (ber. 1,38) ist heller als die Literaturangabe 1,6 (4.1, Sekundaerquelle).
 - Begrenzung der Liste: M45 bis V 8,5 (44 Sterne), M13 bis V 15 (531, als eigene Datei `daten/sterne_m13.json`, wenn objekte.json sonst unuebersichtlich wird), Trapez 7 Sterne, M57 ein Stern.
 
 ---
