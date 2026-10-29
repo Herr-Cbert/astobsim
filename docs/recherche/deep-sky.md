@@ -2,9 +2,11 @@
 
 **Datum:** 2026-10-29. **Phase:** 2 (Recherche) fuer Version 2. **Kennungen:** A-Z10, A-X9, A-X11, A-P10, A-P11, A-P12, A-B2, A-Q5; Fragen 7 und 9 aus `docs/anforderungen.md` Abschnitt 10 (Objektdaten; die Quellbilder stehen in `bilder-v2.md`, die Wahrnehmungsschwelle in `wahrnehmung.md`).
 
-Alle Flaechenhelligkeiten sind Himmelswerte im Johnson-V-Band in mag/arcsec$^2$, ohne Extinktion und ohne Fernrohr. Die Umrechnung ans Okular folgt `physik.md` 5.1 und 6.2. Koordinaten: $dx$ positiv nach Osten, $dy$ positiv nach Norden, in Bogensekunden relativ zur Objektmitte (wie die Trabanten, `objekte.md` 3.3):
+Alle Flaechenhelligkeiten sind Himmelswerte im Johnson-V-Band in mag/arcsec$^2$, ohne Extinktion und ohne Fernrohr. Die Umrechnung ans Okular folgt `physik.md` 5.1 und 6.2. Koordinaten: $dx$ positiv nach Westen (Norden oben, Osten links, wie im Bild und in der Naht: +x rechts, +y Norden, `src/naht/konfiguration.ts`, `architektur.md` 5.3), $dy$ positiv nach Norden, in Bogensekunden relativ zur Objektmitte:
 
-$$dx = (\alpha - \alpha_0)\cos\delta_0 \cdot 3600, \qquad dy = (\delta - \delta_0)\cdot 3600 \quad (\alpha, \delta \text{ in Grad})$$
+$$dx = -(\alpha - \alpha_0)\cos\delta_0 \cdot 3600, \qquad dy = (\delta - \delta_0)\cdot 3600 \quad (\alpha, \delta \text{ in Grad})$$
+
+Nachtrag 2026-10-29 (Review PR #123): Bis dahin stand hier "$dx$ positiv nach Osten" ohne Minuszeichen; das widersprach der Naht, M45 stand spiegelverkehrt. Die Tabelle in 4.2 ist umgerechnet. Die $dx$-Spalte der Tabelle in 2.2 (Trapez) hat noch das alte Vorzeichen (Osten positiv).
 
 Gerechnet habe ich mit Python-Skripten im Scratchpad (nicht im Repo). Die Kataloge kamen ueber den VizieR-Spiegel `vizier.idia.ac.za`; die Abfragen stehen in Abschnitt 6.
 
@@ -177,41 +179,41 @@ Abfrage: Hipparcos (I/239, V und B-V) und Hipparcos-Neureduktion (I/311, Paralla
 
 Mitglieder (ber.): Eigenbewegung in Gaia innerhalb $(20 \pm 4{,}5;\ -45{,}5 \pm 5{,}5)$ mas/a und Parallaxe 6,4 bis 8,5 mas, **oder** Hipparcos-2-Parallaxe 7,3 bis 9,9 mas. Das Oder ist noetig, weil Gaia fuer Sterne heller als etwa 5 mag gestoerte Astrometrie hat (Merope: Eigenbewegung 13 statt 20, Taygeta: Parallaxe 9,5; Alkyone: keine Astrometrie). Damit fallen drei helle Feldsterne heraus: HD 23712 (V 6,44, K5, Parallaxe 4,4 mas, Hintergrund), HD 23822 (V 6,47, F0, 13,4 mas, Vordergrund), HD 23609 (V 6,98, F8, 16,1 mas, Vordergrund). Sie sind Feldsterne und damit Nicht-Ziel (A-X9).
 
-V und B-V: aus Hipparcos, wo es den Stern gibt; sonst aus Gaia (6.3, ber.). Offset zur Mitte 03 47 00, +24 07 00.
+V und B-V: aus Hipparcos, wo es den Stern gibt; sonst aus Gaia (6.3, ber.). Offset zur Mitte 03 47 00, +24 07 00; $dx$ positiv nach Westen (Kopf, Vorzeichen am 2026-10-29 umgedreht). Nachtrag 2026-10-29 (Issue #104): Die B-V-Werte (ber.) der Gaia-Sterne in der Tabelle sind ueberholt; `daten/sterne/m45.json` nimmt die Umkehrung von Tabelle 5.9 der Gaia-DR3-Dokumentation (`physik.md` 22), z. B. 24 Tau -0,03 statt -0,01, Gaia DR3 65207709611941376 -0,01 statt 0,01, Gaia DR3 65007083101413888 0,10 statt 0,14. V und Lagen bleiben.
 
 | Nr. | Stern | $dx$ [''] | $dy$ [''] | V | B-V | Katalog |
 |---|---|---|---|---|---|---|
-| 1 | Alkyone (eta Tau, HIP 17702) | 398 | -42 | 2,85 | -0,09 | HIP |
-| 2 | Atlas (27 Tau, HIP 17847) | 1777 | -229 | 3,62 | -0,07 | HIP |
-| 3 | Elektra (17 Tau, HIP 17499) | -1745 | -13 | 3,72 | -0,10 | HIP |
-| 4 | Maia (20 Tau, HIP 17573) | -963 | 903 | 3,87 | -0,06 | HIP |
-| 5 | Merope (23 Tau, HIP 17608) | -553 | -607 | 4,14 | -0,05 | HIP |
-| 6 | Taygeta (19 Tau, HIP 17531) | -1471 | 1261 | 4,30 | -0,11 | HIP |
-| 7 | Pleione (28 Tau, HIP 17851) | 1797 | 71 | 5,05 | -0,08 | HIP, veraenderlich |
-| 8 | HD 23753 (HIP 17776) | 1107 | -2504 | 5,44 | -0,07 | HIP |
-| 9 | Kelaeno (16 Tau, HIP 17489) | -1804 | 621 | 5,45 | -0,03 | HIP |
-| 10 | 18 Tau (HIP 17527) | -1509 | 2600 | 5,66 | -0,06 | HIP |
-| 11 | Asterope (21 Tau, HIP 17579) | -897 | 1575 | 5,76 | -0,04 | HIP |
-| 12 | HD 23923 (HIP 17900) | 2239 | -1458 | 6,17 | -0,05 | HIP |
-| 13 | 24 Tau (Gaia DR3 66715105696289024) | 288 | -2 | 6,33 (ber.) | -0,01 (ber.) | Gaia |
-| 14 | 22 Tau (HIP 17588) | -781 | 1480 | 6,43 | -0,02 | HIP |
-| 15 | HD 23873 (HIP 17862) | 1941 | 951 | 6,62 | -0,03 | HIP |
-| 16 | HIP 17923 | 2438 | -966 | 6,73 | 0,06 | HIP |
-| 17 | HIP 17664 | -8 | 1452 | 6,83 | 0,02 | HIP |
-| 18 | HIP 17704 | 404 | 617 | 6,83 | 0,07 | HIP |
-| 19 | HIP 17572 | -974 | -3491 | 6,85 | 0,06 | HIP |
-| 20 | HIP 17999 | 3182 | -560 | 6,95 | 0,08 | HIP |
-| 21 | HIP 17791 | 1234 | 823 | 6,96 | 0,13 | HIP |
-| 22 | HIP 17692 | 287 | -1129 | 6,99 | 0,03 | HIP |
-| 23 | Gaia DR3 65207709611941376 | 335 | -728 | 7,31 (ber.) | 0,01 (ber.) | Gaia |
-| 24 | Gaia DR3 65231486552803328 | -448 | 497 | 7,38 (ber.) | 0,08 (ber.) | Gaia |
-| 25 | HIP 17403 | -2694 | 3470 | 7,52 | 0,14 | HIP |
-| 26 | Gaia DR3 66746441777612416 | 1873 | 1005 | 7,55 (ber.) | 0,08 (ber.) | Gaia |
-| 27 | Gaia DR3 66558249192653952 | 2418 | 836 | 7,57 (ber.) | 0,05 (ber.) | Gaia |
-| 28 | Gaia DR3 65007083101413888 | 368 | -1579 | 7,78 (ber.) | 0,14 (ber.) | Gaia |
-| 29 | Gaia DR3 65221487868870784 | -936 | -281 | 7,87 (ber.) | 0,18 (ber.) | Gaia |
-| 30 | HIP 17401 | -2717 | -1684 | 7,93 | 0,35 | HIP |
-| 31 | Gaia DR3 66555985749157760 | 1999 | 471 | 7,99 (ber.) | 0,16 (ber.) | Gaia |
+| 1 | Alkyone (eta Tau, HIP 17702) | -398 | -42 | 2,85 | -0,09 | HIP |
+| 2 | Atlas (27 Tau, HIP 17847) | -1777 | -229 | 3,62 | -0,07 | HIP |
+| 3 | Elektra (17 Tau, HIP 17499) | 1745 | -13 | 3,72 | -0,10 | HIP |
+| 4 | Maia (20 Tau, HIP 17573) | 963 | 903 | 3,87 | -0,06 | HIP |
+| 5 | Merope (23 Tau, HIP 17608) | 553 | -607 | 4,14 | -0,05 | HIP |
+| 6 | Taygeta (19 Tau, HIP 17531) | 1471 | 1261 | 4,30 | -0,11 | HIP |
+| 7 | Pleione (28 Tau, HIP 17851) | -1797 | 71 | 5,05 | -0,08 | HIP, veraenderlich |
+| 8 | HD 23753 (HIP 17776) | -1107 | -2504 | 5,44 | -0,07 | HIP |
+| 9 | Kelaeno (16 Tau, HIP 17489) | 1804 | 621 | 5,45 | -0,03 | HIP |
+| 10 | 18 Tau (HIP 17527) | 1509 | 2600 | 5,66 | -0,06 | HIP |
+| 11 | Asterope (21 Tau, HIP 17579) | 897 | 1575 | 5,76 | -0,04 | HIP |
+| 12 | HD 23923 (HIP 17900) | -2239 | -1458 | 6,17 | -0,05 | HIP |
+| 13 | 24 Tau (Gaia DR3 66715105696289024) | -288 | -2 | 6,33 (ber.) | -0,01 (ber.) | Gaia |
+| 14 | 22 Tau (HIP 17588) | 781 | 1480 | 6,43 | -0,02 | HIP |
+| 15 | HD 23873 (HIP 17862) | -1941 | 951 | 6,62 | -0,03 | HIP |
+| 16 | HIP 17923 | -2438 | -966 | 6,73 | 0,06 | HIP |
+| 17 | HIP 17664 | 8 | 1452 | 6,83 | 0,02 | HIP |
+| 18 | HIP 17704 | -404 | 617 | 6,83 | 0,07 | HIP |
+| 19 | HIP 17572 | 974 | -3491 | 6,85 | 0,06 | HIP |
+| 20 | HIP 17999 | -3182 | -560 | 6,95 | 0,08 | HIP |
+| 21 | HIP 17791 | -1234 | 823 | 6,96 | 0,13 | HIP |
+| 22 | HIP 17692 | -287 | -1129 | 6,99 | 0,03 | HIP |
+| 23 | Gaia DR3 65207709611941376 | -335 | -728 | 7,31 (ber.) | 0,01 (ber.) | Gaia |
+| 24 | Gaia DR3 65231486552803328 | 448 | 497 | 7,38 (ber.) | 0,08 (ber.) | Gaia |
+| 25 | HIP 17403 | 2694 | 3470 | 7,52 | 0,14 | HIP |
+| 26 | Gaia DR3 66746441777612416 | -1873 | 1005 | 7,55 (ber.) | 0,08 (ber.) | Gaia |
+| 27 | Gaia DR3 66558249192653952 | -2418 | 836 | 7,57 (ber.) | 0,05 (ber.) | Gaia |
+| 28 | Gaia DR3 65007083101413888 | -368 | -1579 | 7,78 (ber.) | 0,14 (ber.) | Gaia |
+| 29 | Gaia DR3 65221487868870784 | 936 | -281 | 7,87 (ber.) | 0,18 (ber.) | Gaia |
+| 30 | HIP 17401 | 2717 | -1684 | 7,93 | 0,35 | HIP |
+| 31 | Gaia DR3 66555985749157760 | -1999 | 471 | 7,99 (ber.) | 0,16 (ber.) | Gaia |
 
 Bis V = 8,5 sind es 44 Mitglieder im Kegel 1,3 Grad; die Sterne 32 bis 44 (V 8,06 bis 8,39) erzeugt `tools/` mit derselben Abfrage. Der groesste Abstand von der Mitte ist 4568'' (HIP 17729, V 8,32), innerhalb der Pruefgrenze 7200'' fuer $dx$, $dy$ in `src/daten/objekte.ts`.
 
@@ -299,6 +301,8 @@ $$B - V = -0{,}022 + 0{,}763\,(G_{BP} - G_{RP}), \qquad \text{Streuung } 0{,}042
 
 Fuer rote Sterne (M13-Riesen, $x$ = 1,6 bis 1,8; Trapez E) ist die Gerade eine Extrapolation; dort geben gaengige Tabellen B-V etwa 1,2 bis 1,4 (nicht belegt). Fuer A-P12 reicht das, weil die Farbe nur oberhalb einer Leuchtdichteschwelle gezeigt wird.
 
+> Nachtrag 2026-10-29 (Issue #104): Die Gaia-DR3-Dokumentation, Kapitel 5.5.1, Tabelle 5.9, gibt $G_{BP}-G_{RP} = f(B-V)$ (Streuung 0,066). `tools/m45_sterne.py` nimmt deren Umkehrung statt der Geraden; Formeln und Probe in `physik.md` 22. Die Zuordnung Gaia zu Hipparcos laeuft ueber die Lage, weil `gaiadr3.hipparcos2_best_neighbour` Merope, Taygeta, HIP 17791, HIP 17401 und HIP 17694 nicht fuehrt. Zaehlung wie in 4.2 (B-V der Gaia-Sterne dagegen anders, siehe 4.2): 44 Mitglieder, 6 / 6 / 9 / 11 / 14 / 22 / 24 / 31 / 44.
+
 ### 6.4 Lizenzen und Folge fuer das Repo
 
 - **Gaia:** "Gaia data are distributed under the CC BY-NC 3.0 IGO license" (ESA Gaia-Lizenzseite [6]). Nicht CC BY-SA. Namensnennung "ESA/Gaia/DPAC"; fuer kommerzielle Nutzung ist eine Genehmigung bei ESA noetig (data.licences@esa.int) [7]. CC BY-SA 3.0 IGO gilt bei ESA fuer Bilder und Videos, nicht fuer Archivdaten [7].
@@ -370,7 +374,7 @@ Passend zu ADR-0003 und `objekte.md` 6.2: Einheiten im Feldnamen, Dezimalpunkt, 
 - `profil.art`: `"king"` (M13), `"sersic_exp"` (M31: `n`, `re_arcsec`, `mue_mag_arcsec2`, `rd_arcsec`, `mu0_mag_arcsec2`, `q_bulge`, `q_scheibe`), `"keins"` (M42, M57, M45). Das Profil dient `tools/` zur Eichung, der Anwendung nur dann, wenn ohne Quellbild gerendert wird (M13-Ausweichloesung).
 - `weiss_mag_arcsec2`: wie bisher Quellweiss, geeicht nach 7.2; bei M45 ohne Bild entfaellt das Feld (oder `bild` fehlt). Der Wert 16,4 im Beispiel ist ein Platzhalter.
 - `sterne[]`: `name`, `dx_arcsec`, `dy_arcsec`, `magnitude` (V), `bv`; optional `katalog` ("HIP 17702", "Gaia DR3 ...") fuer die Herkunft. Grenzen pruefen wie bei Trabanten ($|dx|, |dy| \le 7200$, das reicht fuer M45 bis 4600'').
-- Fuer M45 nur `sterne[]` und `magnitude` = 1,6 (informativ, Summe der Sterne ber. pruefen), kein `bild`, kein `profil`.
+- Fuer M45 nur `sterne[]` und `magnitude` = 1,6 (informativ, Summe der Sterne ber. pruefen), kein `bild`, kein `profil`. Nachtrag 2026-10-29 (Entscheidung Herbert zu PR #123): `magnitude` = 1,4, die Summe der 44 Mitglieder bis V 8,5 (ber. 1,38) ist heller als die Literaturangabe 1,6 (4.1, Sekundaerquelle).
 - Begrenzung der Liste: M45 bis V 8,5 (44 Sterne), M13 bis V 15 (531, als eigene Datei `daten/sterne_m13.json`, wenn objekte.json sonst unuebersichtlich wird), Trapez 7 Sterne, M57 ein Stern.
 
 ---

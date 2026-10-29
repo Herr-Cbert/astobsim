@@ -957,5 +957,23 @@
         "kommentar": "B-V von A ist der Hipparcos-Wert des Systems (HIP 11767, Credit: ESA; Ab mit 0,2\" eingeschlossen). Polaris B mit V 8,60 und B-V 0,42 nach Usenko und Klochkova 2007 (arXiv:0708.0333, doi:10.1111/j.1745-3933.2008.00426.x), die B-V von Turner 2005 uebernehmen; WDS nennt 9,1, SIMBAD 8,2 (Lee 2008). Entscheidung Herbert 2026-10-29 (docs/recherche/README.md, Entscheidung 7). Trennung und Positionswinkel aus dem WDS, Abruf 2026-10-29. Lage nach A-Z9: Mitte im Ursprung, A bei -rho/2 (links, bei Norden oben Osten), B bei +rho/2 (rechts, Westen), dy = 0."
       }
     ]
+  },
+  {
+    "id": "m45",
+    "name": "M45 (Plejaden)",
+    "typ": "deep_sky",
+    "quelle_physik": "docs/recherche/deep-sky.md",
+    "zustaende": [
+      {
+        "id": "m45",
+        "name": "M45",
+        "winkelgroesse_arcsec": 7200,
+        "polar_arcsec": 7200,
+        "positionswinkel_grad": 0,
+        "magnitude": 1.4,
+        "sterne_datei": "m45.json",
+        "kommentar": "Offener Sternhaufen ohne Quellbild und ohne Profil (A-Z10: kein Reflexionsnebel; A-X9: keine Feldsterne). Ausdehnung etwa 2 Grad (deep-sky.md 4.1) als Kreis, positionswinkel_grad ohne Bedeutung. Sterne: 44 Mitglieder bis V 8,5 im Kegel 1,3 Grad, erzeugt von tools/m45_sterne.py aus Gaia DR3 und Hipparcos (deep-sky.md 4.2, physik.md 22), Lizenz CC BY-NC 3.0 IGO (daten/sterne/m45.json). magnitude 1,4 ist die Summe dieser Sterne (1,38), Entscheidung Herbert 2026-10-29 (PR #123, docs/recherche/README.md): die Literatur nennt 1,6 (deep-sky.md 4.1, Sekundaerquelle), die Mitglieder allein sind aber schon heller."
+      }
+    ]
   }
 ]

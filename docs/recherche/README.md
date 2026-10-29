@@ -123,6 +123,7 @@ Reserve, falls Herbert tauschen will: M13 am 200 mm gegen 80 mm (Rand aufgeloest
 - Feldfaktor $F$ = 2 (wahrnehmung.md 7). **Geaendert in Phase 3 Version 2 (2026-10-29): $F$ = 1,4** nach dem Prototyp (M31 mit blossem Auge, ADR-0004); Tabellen und Testwerte mit $F$ = 2 in wahrnehmung.md werden in Phase 4 umgerechnet (Grenzgroesse plus 0,39 mag); erledigt am 2026-10-29.
 - Entscheidungen 1 bis 7 unten: 1 ja (Sterndaten mit eigener Lizenz), 2 ja (lineare Archivdaten fuer M42, M57, M13; M31 per Tonkurve gegen das Profil), 3 Testfaelle mit Seeing 0,5'', A-B6 bleibt Kann, der Hilfetext nennt das Langzeitmittel, 4 Begriff "Mehrfachstern" fuer Systeme mit mehr als zwei Sternen (GLOSSARY), 5 ja, 6 Nachtseite auf Schwarz, 7 ja (Polaris B 8,6 mag).
 - Albireo B (PR #125, Issue #103, 2026-10-29): 5,1 mag statt WDS 4,68 (= $V_T$ des TDSC), wie Polaris B eine begruendete Abweichung vom WDS: Hipparcos Vmag 5,12, Tycho-Hauptkatalog $B_T$ 5,01 und $V_T$ 5,082 ergeben $V$ 5,09. B-V bleibt der Hipparcos-Wert $-0{,}095$ (doppelsterne.md 2.2).
+- M45 Gesamthelligkeit (PR #123, Issue #104): `magnitude` 1,4 = Summe der 44 Mitglieder bis V 8,5 (gerechnet 1,38) statt 1,6 aus der Literatur (Wikipedia, deep-sky.md 4.1, Sekundaerquelle); die Mitglieder allein sind schon heller als 1,6.
 
 ## Entscheidungen vor Phase 3 (alle entschieden, siehe oben)
 

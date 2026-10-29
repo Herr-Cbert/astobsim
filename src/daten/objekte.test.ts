@@ -160,12 +160,21 @@ describe("pruefeVerweise", () => {
 describe("ladeObjekte und ladeBildnachweise", () => {
   afterEach(() => vi.unstubAllGlobals());
 
+  /** Sternlisten unter daten/sterne/, nach Dateiname. */
+  const sternlisten = new Map(
+    Object.entries(import.meta.glob("../../daten/sterne/*.json", { import: "default", eager: true })).map(([pfad, inhalt]) => [
+      pfad.replace("../../daten/", ""),
+      inhalt
+    ])
+  );
+
   /** fetch-Ersatz, der daten/<datei> aus den importierten JSON-Dateien beantwortet. */
   function stubFetch(objekte: unknown): string[] {
     const urls: string[] = [];
     vi.stubGlobal("fetch", async (url: string) => {
       urls.push(url);
-      const inhalt = url.endsWith("objekte.json") ? objekte : url.endsWith("bilder.json") ? bilderJson : undefined;
+      const datei = url.slice((import.meta.env.BASE_URL + "daten/").length);
+      const inhalt = datei === "objekte.json" ? objekte : datei === "bilder.json" ? bilderJson : sternlisten.get(datei);
       return inhalt === undefined ? new Response("", { status: 404 }) : new Response(JSON.stringify(inhalt));
     });
     return urls;
@@ -176,7 +185,11 @@ describe("ladeObjekte und ladeBildnachweise", () => {
     const geladen = await ladeBildnachweise();
     const objekte = await ladeObjekte(geladen);
     expect(objekte[0]?.zustaende[0]?.bild).toBe("mond_svs5587_6285");
-    expect(urls).toEqual([import.meta.env.BASE_URL + "daten/bilder.json", import.meta.env.BASE_URL + "daten/objekte.json"]);
+    const sterneUrls = [...sternlisten.keys()].map((datei) => import.meta.env.BASE_URL + "daten/" + datei);
+    expect(urls.slice(0, 2)).toEqual([import.meta.env.BASE_URL + "daten/bilder.json", import.meta.env.BASE_URL + "daten/objekte.json"]);
+    // Danach die Sternlisten der Zustaende mit sterne_datei (M45), in der Reihenfolge der Objekte.
+    expect(new Set(urls.slice(2))).toEqual(new Set(sterneUrls));
+    expect(objekte.find((o) => o.id === "m45")?.zustaende[0]?.sterne).toHaveLength(44);
   });
 
   it("melden einen kaputten Verweis beim Laden", async () => {

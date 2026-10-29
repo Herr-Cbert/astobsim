@@ -855,3 +855,21 @@ Quelle: ESA 1997 [ESA97], Bd. 1, Abschn. 1.3 Anhang 4, Gl. 1.3.20 (im PDF nachge
 Testwert (A-Q1, ber.): Zeta Her B, $B_T$ 6,31, $V_T$ 5,40: $0{,}850 \cdot 0{,}91 = 0{,}774$, gerundet 0,77 (`src/daten/doppelsterne.test.ts`).
 
 Quellen: [TDSC] Fabricius, C. et al.: "The Tycho double star catalogue", A&A 384, 180 (2002), abgefragt als `tycho2.tdsc_catalogue` im Hipparcos and Tycho Legacy Archive der ESA (TAP https://esaskylegacy.esac.esa.int/esasky-legacy-sl-tap/tap). [ESA97] ESA: *The Hipparcos and Tycho Catalogues*, ESA SP-1200 (1997), Bd. 1, https://www.cosmos.esa.int/documents/532822/552851/vol1_all.pdf
+## 22. Gaia nach Johnson V und B-V (Issue #104)
+
+Fuer Sterne, die nur in Gaia DR3 stehen (M45 ab V etwa 7,3, deep-sky.md 4.2), rechnet `tools/m45_sterne.py` Johnson V und B-V aus $G$ und $x = G_{BP} - G_{RP}$. Beide Beziehungen stammen aus der Gaia-DR3-Dokumentation, Kapitel 5.5.1 (Carrasco, Bellazzini), Tabelle 5.9 "Johnson-Cousins relationships", Gueltigkeit aus Tabelle 5.10 [GDR3-5.5.1]; die Koeffizienten fuer $G - V$ sind dieselben wie bei Riello et al. 2021, Tabelle C2 (deep-sky.md [3], dort zitiert als Tabelle 8).
+
+| Groesse | Formel | Gueltig | Streuung |
+|---|---|---|---|
+| V | $G - V = -0{,}02704 + 0{,}01424\,x - 0{,}2156\,x^2 + 0{,}01426\,x^3$ | $-0{,}5 < x < 5{,}0$ | 0,030 mag |
+| B-V | $x = 0{,}06483 + 1{,}575\,y - 0{,}7815\,y^2 + 0{,}5707\,y^3 - 0{,}176\,y^4 + 0{,}01916\,y^5$, $y = B - V$, nach $y$ aufgeloest (Bisektion) | $-0{,}5 < y < 3{,}5$ | 0,066 mag (in $x$) |
+
+Die Umkehrung ist eindeutig: das Polynom steigt im ganzen Gueltigkeitsbereich (eig. Rechnung, Bisektion auf 60 Schritte, Probe im Python-Test auf $10^{-9}$). Testwerte: $x$ = 0 gibt $V = G + 0{,}02704$, $x$ = 1 gibt $V = G + 0{,}21414$; $B-V$ = 0 gehoert zu $x$ = 0,06483.
+
+**Probe an den Plejaden (ber., `tools/m45_sterne.py --bericht`):** 25 Mitglieder haben V und B-V aus Hipparcos. Gaia minus Hipparcos: V im Mittel +0,030, Streuung 0,041, groesste Abweichung +0,18 (Pleione, veraenderlich); ohne Pleione und Alkyone (Gaia ohne Astrometrie, $G$ = 2,9 gesaettigt) +0,021, Streuung 0,025, groesste +0,10. B-V im Mittel -0,022, Streuung 0,044, groesste +0,14 (Alkyone); ohne die beiden -0,031, Streuung 0,028. Beides liegt innerhalb der Streuung der Beziehungen.
+
+**Abweichung von deep-sky.md 6.3:** Dort steht, die Dokumentation gebe fuer B-V keine direkte Beziehung zu $G_{BP}-G_{RP}$, und B-V kam aus einer an die Plejaden angepassten Geraden $B-V = -0{,}022 + 0{,}763\,x$. Tabelle 5.9 der DR3-Dokumentation enthaelt aber $x = f(B-V)$; deren Umkehrung hat eine Quelle und ist fuer blaue Sterne eindeutig ($dx/dy \approx 1{,}6$ bei $y$ = 0). Sie liefert B-V im Mittel 0,03 mag blauer als Hipparcos, die Gerade trifft das Mittel per Konstruktion. Fuer die Sternfarbe (Abschnitt 18) ist der Unterschied unerheblich: B-V -0,01 statt +0,01 aendert die Farbtemperatur bei 10 000 K um etwa 2,5 Prozent (eig. Rechnung mit Ballesteros, Abschnitt 18).
+
+V und B-V aus Hipparcos (ESA 1997) gelten, wo der Stern dort steht; Gaia nur, wo nicht. Die Herkunft steht je Stern in `katalog` (V) und `quelle_farbe` (B-V) in `daten/sterne/m45.json`.
+
+Quelle [GDR3-5.5.1]: Carrasco, J. M., Bellazzini, M.: Photometric relationships with other photometric systems. In: Gaia Data Release 3 Documentation, release 1.3, Kapitel 5.5.1, https://gea.esac.esa.int/archive/documentation/GDR3/Data_processing/chap_cu5pho/cu5pho_sec_photSystem/cu5pho_ssec_photRelations.html (gelesen 2026-10-29, Tabellen 5.9 und 5.10).
