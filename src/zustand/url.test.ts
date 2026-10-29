@@ -140,7 +140,8 @@ describe("ausUrl(inUrl(k)) ist k", () => {
 
   it("fuer alle vier Objekte und alle Zustaende (synthetischer Katalog)", () => {
     const ids = SYNTHETISCH.objekte.flatMap((o) => o.zustaende.map((z) => z.id));
-    expect(ids).toEqual(["mond_ev", "mars_6", "mars_14", "mars_25", "jup_35", "jup_47", "sat_16", "sat_20"]);
+    // Mondphasen aus Issue #36: drei Zustaende hinter mond_ev, alte Links mit z=mond_ev bleiben gueltig.
+    expect(ids).toEqual(["mond_ev", "mond_sichel", "mond_voll", "mond_lv", "mars_6", "mars_14", "mars_25", "jup_35", "jup_47", "sat_16", "sat_20"]);
     for (const id of ids) {
       const k = aus(`?z=${id}`, SYNTHETISCH);
       expect(k.objekt.kennung).toBe(id);

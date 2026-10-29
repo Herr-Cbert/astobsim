@@ -14,17 +14,46 @@ describe("objektzustand", () => {
     const z = objektzustand(objekte, nachweise, "mond_ev")!;
     expect(z.kennung).toBe("mond_ev");
     expect(z.durchmesserArcsec).toBe(1865);
-    expect(z.magnitude).toBe(-10.2);
+    expect(z.magnitude).toBe(-10.51);
     expect(z.quelle!.breitePx).toBe(3072);
     expect(z.quelle!.hoehePx).toBe(3072);
     // 1865'' / 2758 px, Faktor 1,051 gegen den Nachweis (0,643''/px)
     expect(z.quelle!.massstabArcsecProPx).toBeCloseTo(0.67621, 5);
-    expect(z.quelle!.weissMagProArcsec2).toBe(3.91);
+    expect(z.quelle!.weissMagProArcsec2).toBe(3.6);
     expect(z.trabanten).toEqual([]);
     // Sonnensystem: Klasse aus typ mond, keine Sterne, keine Isophoten.
     expect(z.klasse).toBe("sonnensystem");
     expect(z.sterne).toEqual([]);
     expect(z.isophoten).toBeUndefined();
+  });
+
+  it("baut alle Mondzustaende nach Issue #36 (Bild, Massstab, Quellweiss, Magnitude)", () => {
+    // [Zustand, Bildnachweis, Scheibe px, Quellweiss, Magnitude]; Quellweiss geeicht mit
+    // tools/quellweiss_eichen.py, die Probe am Bild prueft tools/test_mond_kacheln.py.
+    const faelle: [string, string, number, number, number][] = [
+      ["mond_ev", "mond_svs5587_6285", 2758, 3.6, -10.51],
+      ["mond_sichel", "mond_svs5587_6173", 2817, 3.99, -8.15],
+      ["mond_voll", "mond_svs5587_6449", 2930, 2.29, -12.66],
+      ["mond_lv", "mond_svs5587_6615", 3004, 3.48, -10.12]
+    ];
+    const ids = objekte.find((o) => o.id === "mond")!.zustaende.map((z) => z.id);
+    expect(ids).toEqual(["mond_ev", "mond_sichel", "mond_voll", "mond_lv"]);
+    for (const [id, bild, scheibePx, weiss, magnitude] of faelle) {
+      const z = objektzustand(objekte, nachweise, id)!;
+      expect(nachweisZu(objekte, nachweise, id)?.id).toBe(bild);
+      expect(z.durchmesserArcsec).toBe(1865);
+      expect(z.quelle!.breitePx).toBe(3072);
+      expect(z.quelle!.massstabArcsecProPx).toBeCloseTo(1865 / scheibePx, 9);
+      expect(z.quelle!.weissMagProArcsec2).toBe(weiss);
+      expect(z.magnitude).toBe(magnitude);
+      expect(z.klasse).toBe("sonnensystem");
+      // Magnitude nach Krisciunas und Schaefer 1991, Gl. 9 (physik.md 23) beim Phasenwinkel des
+      // Zustands, auf 0,01 mag; Phase und Phasenwinkel passen ueber k = (1 + cos i) / 2 zusammen.
+      const eintrag = findeZustand(objekte, id)!.zustand;
+      const a = eintrag.phasenwinkelGrad!;
+      expect(Math.abs(-12.73 + 0.026 * a + 4e-9 * a ** 4 - magnitude)).toBeLessThanOrEqual(0.01);
+      expect(Math.abs((1 + Math.cos((a * Math.PI) / 180)) / 2 - eintrag.phase!)).toBeLessThanOrEqual(0.002);
+    }
   });
 
   it("ist strukturiert klonbar", () => {

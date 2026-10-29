@@ -128,7 +128,7 @@ Als Issues angelegt am 2026-10-27, Milestone M3 (Herbert, 2026-10-27):
 ## 5. Pruefpunkte aus Welle 4a
 
 - **Trabantenhelligkeit haengt am Arbeitsmassstab** (physik.md 14.7 Punkt 1, Anzeige proportional s^(-2/3)): im 10x50 sind die vier Monde deutlich sichtbar (49 bis 59 gegen 16), in T1 (70 mm) 58 bis 69 gegen 5. Plausibel; die Monde liegen in keinem der Zoomausschnitte, der Unterschied Zoom gegen Uebersicht ist hier nicht zu sehen. Kein Issue.
-- **Mondmagnitude** (objekte.md 7.16): mond_ev hat -10,2 mag, Krisciunas und Schaefer geben fuer den Phasenwinkel 78,5 Grad -10,54. Der Unterschied ist Leuchtdichte 1,37-fach, im Anzeigewert 1,11-fach. In T3 und T6a wirkt der Mond weder zu hell noch zu dunkel; das Bild entscheidet die 0,34 mag nicht. Kein Issue, die Werte bleiben.
+- **Mondmagnitude** (objekte.md 7.16): mond_ev hat -10,2 mag, Krisciunas und Schaefer geben fuer den Phasenwinkel 78,5 Grad -10,54. Der Unterschied ist Leuchtdichte 1,37-fach, im Anzeigewert 1,11-fach. In T3 und T6a wirkt der Mond weder zu hell noch zu dunkel; das Bild entscheidet die 0,34 mag nicht. Kein Issue, die Werte bleiben. Nachtrag #36 (Entscheidung Herbert 2026-10-29): `mond_ev` hat jetzt -10,51 nach Gl. 9 bei 79,3 Grad, Quellweiss 3,60.
 - **Exponent 1/3 fuer Punktquellen** statt Stevens 0,5 (physik.md 14.7 Punkt 2): die Galileischen Monde sind im 70 mm und im 10x50 leicht zu sehen, wie in der Beobachtungserfahrung; mit 0,5 waeren sie dunkler, aber noch sichtbar. Kein Anlass zu aendern. Kein Issue.
 
 - **Anzeigeweiss und Kompressionsexponent** (physik.md 12.5 Punkte 3 und 5, ADR-0002): der Mond ist mit blossem Auge heller (sRGB etwa 99) als im 80 mm bei 100-fach (etwa 46, Austrittspupille 0,8 mm), wie es A-P4 verlangt; kein Bild ist ausgebrannt oder unlesbar dunkel. Beibehalten, kein Issue.
@@ -145,6 +145,8 @@ Als Issues angelegt am 2026-10-27, Milestone M3 (Herbert, 2026-10-27):
 | Claude | 2026-10-28 | #77: Detail in der Zoomansicht, T3 erfuellt |
 | Claude | 2026-10-28 | #78: Quellbild Mars 1995 mit Nordkappe, T5 erfuellt |
 | Herbert | 2026-10-28 | A-T3: Firefox funktioniert |
+| Claude | 2026-10-29 | #36: Mondphasen P1 bis P3 (Abschnitt 9); `mond_ev` vereinheitlicht, T3 und T6a geaendert, uebrige T-Bilder byte-gleich mit main 15da6ee |
+| Herbert | 2026-10-29 | #36: Kriterium Maria des Vollmonds mit blossem Auge aufgegeben (Grenze des Modells) |
 
 ## 7. Sicherheit (Issue #22)
 
@@ -225,3 +227,27 @@ Stand 2026-10-28. Je Muss-Anforderung aus `docs/anforderungen.md` das Issue mit 
 **Firefox (A-T3):** Firefox 158 auf `sam` startet headless und zeigt Layout und Ladestatus (Screenshot beim Laden); `--screenshot` wartet nicht auf die Rechnung, ein voller Durchlauf ist so nicht pruefbar. Pruefpunkt von Hand (Herbert): https://herr-cbert.github.io/astobsim/ in Firefox oeffnen, Objekt und Geraet wechseln, Seeing-Regler ziehen, Zoom, beim Mond Detail und Verschieben, Bildnachweise aufklappen; Konsole ohne Fehler. Ergebnis in Abschnitt 6 eintragen. **Erledigt 2026-10-28:** Herbert, Firefox funktioniert.
 
 **Kann-Punkte:** alle als Issues im Milestone "Nach Version 1": A-Z8 #24, A-Z9 #25, A-Z10 #26, A-F9 #27, A-B5 #28, A-B6 #29, A-P8 #30, A-D12 #31, A-D13 #32, A-D14 #33, A-D15 #34, A-D16 #35, A-X7 #36, A-X8 #37, eigenes Mond-Rendering (ADR-0002) #38.
+
+## 9. Mondphasen (Issue #36)
+
+Drei weitere Mondzustaende aus NASA SVS 5587 (`mond_sichel`, `mond_voll`, `mond_lv`, `docs/recherche/bilder-v2.md` 8.5). Bilder mit `node scripts/validierung-bilder.mjs P1a P1b P2a P2b P3a P3b` am 2026-10-29 (SwiftShader, Stand main 15da6ee plus #36). Die Faelle sind Sichtpruefungen der Daten, keine Testfaelle nach A-Q2. T1 bis T6 waren mit den drei neuen Zustaenden allein byte-gleich mit main 15da6ee (27 Dateien); seit der Vereinheitlichung von `mond_ev` aendern sich T3 und T6a (Nachtrag unten). Die eingecheckten T-Bilder sind aelter (vor #100) und bleiben unveraendert.
+
+| Fall | Suchteil | Bild |
+|---|---|---|
+| P1a | `?v=1&g=auge&z=mond_sichel&s=2&B` | [Uebersicht](validierung/P1a-uebersicht.png), [Zoom](validierung/P1a-zoom.png) |
+| P1b | `?v=1&g=fernglas-10x50&z=mond_sichel&s=2&B` | [Uebersicht](validierung/P1b-uebersicht.png), [Zoom](validierung/P1b-zoom.png), [Detail](validierung/P1b-detail.png) |
+| P2a | `?v=1&g=auge&z=mond_voll&s=2&B` | [Uebersicht](validierung/P2a-uebersicht.png), [Zoom](validierung/P2a-zoom.png) |
+| P2b | `?v=1&R(80,800,8)&z=mond_voll&s=2&B` | [Uebersicht](validierung/P2b-uebersicht.png), [Zoom](validierung/P2b-zoom.png), [Detail](validierung/P2b-detail.png) |
+| P3a | `?v=1&g=auge&z=mond_lv&s=2&B` | [Uebersicht](validierung/P3a-uebersicht.png), [Zoom](validierung/P3a-zoom.png) |
+| P3b | `?v=1&R(80,800,8)&z=mond_lv&s=2&B` | [Uebersicht](validierung/P3b-uebersicht.png), [Zoom](validierung/P3b-zoom.png), [Detail](validierung/P3b-detail.png) |
+
+Grauwerte unten: Mittel der drei sRGB-Kanaele im Anblick des Zooms (linke Haelfte), gemessen an den PNG.
+
+- **Sichel (P1a, P1b):** schmale Sichel rechts, Hoerner nach links, die konvexe Seite zur Sonne (westlich, bei Norden oben rechts). Mare Crisium als dunkles Oval nahe dem rechten Rand oberhalb der Mitte, im 10x50 mit Kratern am Terminator (P1b), mit blossem Auge als Fleck angedeutet (P1a, 16 % der Mondpixel ueber 250). Die Nachtseite ist so hell wie der Himmel (P1b: 49 gegen 49 in der Ecke); kein Erdlicht, wie im Hilfetext vermerkt. Das Detail liegt in der Scheibenmitte, also auf der Nachtseite, und zeigt nur Himmelsgrau.
+- **Vollmond (P2a, P2b):** im 80 mm bei 100-fach (P2b) Maria, Tycho und Kopernikus mit Strahlen deutlich; das Hochland im Sueden und um die Mitte ist weiss abgeschnitten (51 % der Pixel ueber 250, Detail in der Mitte ganz 255). Mit blossem Auge (P2a) ist die Scheibe zu 84 % weiss abgeschnitten, die Maria sind hoechstens als schwacher Schatten oben links zu ahnen. **Das Kriterium "Vollmond mit blossem Auge zeigt die Maria als Flecken" ist aufgegeben (Entscheidung Herbert 2026-10-29), als bekannte Grenze des Modells.** Gerechnet im Review von PR #128: T12 verlangt Anzeigeweiss etwa 9,1 mag/arcsec$^2$ (`mond_ev` am 80 mm bei 1 mm Austrittspupille, hellstes Perzentil weiss). Die Maria des Vollmonds blieben mit blossem Auge erst bei Anzeigeweiss 6 oder weniger unter Weiss; Anteil weiss bei 9,2 / 8 / 7 / 6: 95 / 83 / 65 / 44 %. Grund: Komprimiert wird mit $n$ = 1/3 nur das Niveau, die Skala innerhalb des Bilds bleibt linear (`src/physik/helligkeit.ts`, Zeilen 99 bis 104). Die Maria des Vollmonds liegen bei etwa 4 mag/arcsec$^2$ (Quellweiss 2,29, Pixelwert um 0,2) und damit heller als das Hochland von `mond_ev` (etwa 4,4 seit #36).
+- **Letztes Viertel (P3a, P3b):** linke Haelfte beleuchtet, Terminator nahe der Mitte, Norden oben (Mare Imbrium oben links, Kopernikus mit Strahlen links der Mitte, grosse Krater am Terminator, nach Lage vermutlich Ptolemaeus, Alphonsus und Arzachel). Nachtseite gleich Himmel (P3b-Zoom 24, Tagseite 120). Im Detail (P3b) stehen beleuchtete Gipfel und Kraterraender hinter dem Terminator als helle Punkte im Dunkel, wie im Quellbild; die Maske hat sie nicht geschwaerzt. Mit blossem Auge (P3a) 43 % abgeschnitten, Maria als Flecken erkennbar.
+
+**Urteil:** Orientierung, Phase und schwarze Nachtseite erfuellt; Maria des Vollmonds mit blossem Auge als Kriterium aufgegeben (Grenze des Modells, siehe oben).
+
+**Nachtrag `mond_ev` (Entscheidung Herbert 2026-10-29):** `mond_ev` hat jetzt -10,51 mag (Krisciunas und Schaefer bei 79,3 Grad), Quellweiss 3,60 und eine geschwaerzte Nachtseite (neue Kacheln). Damit aendern sich T3 und T6a; T1, T2, T4, T5, T6b und T6c bleiben byte-gleich mit main 15da6ee (Bilder am 2026-10-29 verglichen, die T-Bilder werden bei der Zusammenfuehrung neu erzeugt und hier nicht eingecheckt). T6a: die aschgraue Nachtseite (vorher 61 gegen Himmel 54 im Zoom) ist weg, sie hat jetzt Himmelsgrau 54; die Tagseite ist durch den um 0,31 mag helleren Quellweiss etwas staerker abgeschnitten (55 statt 51 % der Mondpixel ueber 250), Mare Crisium und die Maria am Terminator bleiben als Flecken sichtbar. T3: Nachtseite gleich Himmel (24), Tagseite im Median 118 statt 114.
+

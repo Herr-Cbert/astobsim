@@ -158,6 +158,13 @@ Begruendung der Wahl:
 
 Wie `mond_ev` mit `tools/mond_kacheln.py`: Scheibenmitte und Durchmesser aus dem Alphakanal, quadratischer Ausschnitt 3072 px, Hintergrund schwarz, Kacheln 512 px in drei Stufen, WebP Qualitaet 95, Mittelung in linearem Licht. Das Skript nimmt derzeit Frame 6285 fest an (Mitte 2877/1622); fuer die neuen Frames muessen Mitte und Durchmesser je Bild gemessen werden. Rohdateien je etwa 9 bis 15 MB TIFF (Schaetzung nach Frame 6285 mit 10,37 MB).
 
+### 8.5 Nachtrag Umsetzung (Issue #36, 2026-10-29)
+
+- Frames 6173, 6449, 6615 wie vorgeschlagen, Zustaende `mond_sichel`, `mond_voll`, `mond_lv`, Ordner `daten/bilder/<zustand>/`, Bildnachweise `mond_svs5587_<frame>` (Herkunft und Pruefsummen in `data/roh/LIESMICH.md`).
+- Massstab (Punkt 5 unten): konstant. Durchmesser der Tabelle durch gemessenen Flaechendurchmesser des Alphakanals ergibt 0,6443 (6173, 6285), 0,6445 (6449) und 0,6446"/px (6615). Gemessen 2817, 2930 und 3004 px statt 2821, 2935 und 3010 (ber. mit 0,643); die Vorgabe 2758 px bei `mond_ev` liegt 4 px ueber ihrer Flaechenmessung und bleibt fuer Ausschnitt und Massstab; die Nachtmaske nimmt dort die gemessene Scheibe.
+- Nachtseite (8.3, Punkt 6 unten): an Frame 6173 gemessen liegt die Aufhellung im Median bei linear 0,0036 (bis 0,024) gegen 0,21 im Median der Tagseite (Sonnenhoehe ueber 10 Grad), also etwa 1:60, zum Terminator hin abnehmend. Entschieden (ADR-0003 Nachtrag V2): geschwaerzt ueber die Sonnenhoehe aus der Ephemeride, beleuchtete Gipfel bleiben (physik.md 23.1). Sie trug bei der Sichel 10,4 Prozent des Flusses. Seit der Entscheidung von Herbert (2026-10-29) auch bei `mond_ev` geschwaerzt (0,55 Prozent).
+- Magnituden (8.2) im Original von Krisciunas und Schaefer geprueft (physik.md 23): -8,15, -12,66, -10,12; Quellweiss 3,99, 2,29, 3,48 (objekte.md 5.3). `mond_ev` vereinheitlicht: -10,51, Quellweiss 3,60.
+
 ## 9. Vorschlag fuer den Bildnachweis (A-X4)
 
 Format wie `daten/bilder.json`. Werte mit "(ber.)" in `bilder.md`-Konvention sind Vorschlaege; `pixel_*`, `objekt_durchmesser_px`, `datei_bytes`, `kacheln` und die Pruefsummen schreibt das Werkzeug. Bei Deep-Sky-Objekten gibt es keine Scheibe: Vorschlag, `objekt_durchmesser_px` durch das neue Feld `bogensekunden_pro_pixel` allein zu ersetzen (Massstab direkt), Entscheidung in Phase 3.

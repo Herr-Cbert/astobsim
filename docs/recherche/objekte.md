@@ -299,6 +299,9 @@ Werte fuer die Zustaende (ber. mit den Formeln oben):
 | Saturn 16", B = 19 | 9,4 / 10,39 | 6 | +0,6 | Nachtrag 2026-10-27 (#13): in objekte.json verwendet |
 | Mond voll | - | 0 | -12,74 | Fact Sheet [1] |
 | Mond erstes Viertel | - | 78 bis 84 | ca. -10,0 bis -10,4 | nicht primaer belegt, siehe "Unsicher" |
+| Mond zunehmende Sichel (mond_sichel) | - | 130,9 | -8,15 | Nachtrag #36: Krisciunas und Schaefer [68, Gl. 9], physik.md 23 |
+| Vollmond (mond_voll) | - | 2,8 | -12,66 | Nachtrag #36: [68, Gl. 9] ohne Oppositionseffekt (bis 0,33 mag heller, physik.md 23) |
+| Mond letztes Viertel (mond_lv) | - | 90,2 | -10,12 | Nachtrag #36: [68, Gl. 9] |
 
 ### 5.2 Flaechenhelligkeit (mag pro Quadratbogensekunde, ber.: S = V + 2,5 log10(Flaeche in Quadratbogensekunden))
 
@@ -344,14 +347,29 @@ Nachtrag Issue #79 (2026-10-28): Das Jupiterbild ist seit #79 im Kontrast an Ort
 
 Nachtrag Issue #78 (2026-10-28): mars_6 und mars_14 nutzen statt mars_hst_20160512 das Bild mars_hst_19950225 (Hubble 25.02.1995, 620 px Scheibe, mit grosser Nordpolkappe). Neu geeicht: mars_6 Massstab 0,009677, Fluss 8,37, Quellweiss 3,31; mars_14 Massstab 0,022581, Fluss 45,57, Quellweiss 2,75 (je +0,21 mag gegen die Tabelle: das Bild ist im Mittel heller, Fluss je Scheibenflaeche 1,21-fach). Probe auf 0,005 mag.
 
+Nachtrag Issue #36 (2026-10-29): drei Mondphasen aus SVS 5587 mit eigener Kachelpyramide, Nachtseite geschwaerzt (bilder.json, `bearbeitung`). Magnitude nach Krisciunas und Schaefer [68, Gl. 9] beim Phasenwinkel des Bilds (physik.md 23), Winkelgroesse 1865'' wie `mond_ev`, Stufe 0 wie oben; Probe mit `tools/quellweiss_eichen.py` auf 0,005 mag, Test in `tools/test_mond_kacheln.py` (Probe auf 0,01 mag) und `src/daten/objektzustand.test.ts`.
+
+| Zustand | Bild | $s$ ["/px] | $F$ ["^2] | $m$ | Quellweiss | Scheibenmittel $Y$ |
+|---|---|---|---|---|---|---|
+| mond_sichel | mond_svs5587_6173 (2817 px) | 0,662052 | 71 592 | -8,15 | 3,99 | 0,026 |
+| mond_voll | mond_svs5587_6449 (2930 px) | 0,636519 | 956 207 | -12,66 | 2,29 | 0,350 |
+| mond_lv | mond_svs5587_6615 (3004 px) | 0,620839 | 275 410 | -10,12 | 3,48 | 0,101 |
+| mond_ev (seit #36 neu) | mond_svs5587_6285 (2758 px) | 0,676215 | 439 937 | -10,51 | 3,60 | 0,161 |
+
+Quellweiss streut ueber 1,7 mag, weil das Rendering die Phasenkurve nicht nachbildet: Vollmond gegen letztes Viertel hat im Bild bei gleicher Winkelgroesse den 3,5-fachen Fluss, am Himmel den 10,4-fachen ($10^{0{,}4 \cdot 2{,}54}$, ber.). Die Eichung je Zustand gleicht das aus; innerhalb eines Bilds bleibt die Verteilung (Terminator, Maria) die des Renderings. Kontrolle Vollmond: mittlere Flaechenhelligkeit $2{,}29 + 2{,}5\log_{10}(1/0{,}350)$ = 3,43 mag/"^2, gegen 3,35 aus 5.2 (dort mit -12,74). Die geschwaerzte Nachtseite trug im Rendering bei der Sichel 10,4 Prozent des Flusses, beim letzten Viertel 1,6 Prozent, bei `mond_ev` 0,55 Prozent.
+
+Entscheidungen Herbert (2026-10-29, Review PR #128):
+- `mond_ev` wird vereinheitlicht: Magnitude nach [68, Gl. 9] beim Phasenwinkel aus der Phase der SVS-Tabelle ($k$ = 0,5927, 79,3 Grad): -10,51 statt -10,2; `phase` 0,593 und `phasenwinkel_grad` 79,3 gehoeren zum Bild (vorher 0,60 und 78,5 als Zielwert). Nachtseite mit derselben Maske geschwaerzt (Fluss -0,55 Prozent). Quellweiss neu 3,60 statt 3,91 (Fluss 439 937 statt 442 399 "^2).
+- Oppositionseffekt beim Vollmond bleibt weg, und alle Mondzustaende behalten den mittleren Durchmesser 1865''. Begruendung: Gl. 9 gilt nach [68] ohnehin nur auf $\pm 0{,}12$ mag (Perigaeum bis Apogaeum); der Abstandsfehler durch 1865'' statt der Bilddurchmesser liegt bei +0,06 bis -0,08 mag (physik.md 23).
+
 Lesart: Das Scheibenmittel im Quellbild ist $10^{-0{,}4\,(S - \mu_\mathrm{weiss})}$ mit $S$ aus 5.2: Mars 25" etwa 0,14, Mars 14" 0,24, Jupiter 47" 0,39. Die Planetenbilder sind also deutlich dunkler als Weiss, Mars 2003 am staerksten. Bei Mars, Jupiter und Saturn wird Quellweiss um 1,0 bis 2,1 mag heller, die Planetenflaeche im Arbeitsraster entsprechend heller; beim Mond wird er 0,56 mag dunkler.
 
 Anmerkungen:
 
 - **Kanalmittel statt Leuchtdichte:** Das Issue hatte mit dem Mittel der drei Kanaele gerechnet (Jupiter 594, Saturn 148 "^2 bei den Massstaeben von jup_47 und sat_20). Mit $Y$ sind es 624 und 150; Quellweiss liegt dadurch bei Jupiter 0,05 mag, bei allen anderen Zustaenden hoechstens 0,03 mag dunkler.
 - **Mars 6" (Vollscheibe statt gibbos):** Gerechnet ist nach dem Kriterium von #71: Der Fluss der vollen Bildscheibe bei 6" ergibt die Magnitude des gibbosen Mars (+1,0). Die Flaechenhelligkeit der Scheibe liegt damit um $2{,}5\log_{10}(1/0{,}9)$ = 0,11 mag unter der des beleuchteten Teils am Himmel. Mit dem Bezug "beleuchteter Teil" (wie bis #71 in 5.2 mit k = 0,9) waere Quellweiss 2,99 statt 3,10. Offen fuer Herbert (7, Punkt 16).
-- **Mond, Nachtseite:** Die schwach aufgehellte Nachtseite des Renderings (bilder.json) traegt 0,6 Prozent zum Fluss bei (0,006 mag), vernachlaessigt. Der beleuchtete Teil (Pixel ueber 0,01) bedeckt 57 Prozent der Scheibe (Bild: Phase 0,593) mit einem Mittel von 0,28; seine mittlere Flaechenhelligkeit ist $3{,}91 + 2{,}5\log_{10}(1/0{,}28)$ = 5,3 mag/"^2, am hellen Ende der Spanne 4,9 bis 5,3 aus 5.2.
-- **Mond, Magnitude des Zustands:** Krisciunas und Schaefer [68, Gl. 9] geben $m = -12{,}73 + 0{,}026\,\alpha + 4\cdot10^{-9}\,\alpha^4$; beim Phasenwinkel des Zustands $\alpha$ = 78,5 Grad sind das -10,54 mag, 0,34 mag heller als -10,2 (6.1, nicht primaer belegt, 7 Punkt 7). Mit -10,54 waere Quellweiss 3,58 statt 3,91. `objekte.json` behaelt -10,2 und 3,91, bis Herbert entscheidet (7, Punkt 7).
+- **Mond, Nachtseite:** Die schwach aufgehellte Nachtseite des Renderings (bilder.json) traegt 0,6 Prozent zum Fluss bei (0,006 mag), vernachlaessigt. Der beleuchtete Teil (Pixel ueber 0,01) bedeckt 57 Prozent der Scheibe (Bild: Phase 0,593) mit einem Mittel von 0,28; seine mittlere Flaechenhelligkeit ist $3{,}91 + 2{,}5\log_{10}(1/0{,}28)$ = 5,3 mag/"^2, am hellen Ende der Spanne 4,9 bis 5,3 aus 5.2. Nachtrag #36: seit #36 auch bei `mond_ev` geschwaerzt (0,55 Prozent des Flusses).
+- **Mond, Magnitude des Zustands:** Krisciunas und Schaefer [68, Gl. 9] geben $m = -12{,}73 + 0{,}026\,\alpha + 4\cdot10^{-9}\,\alpha^4$; beim Phasenwinkel des Zustands $\alpha$ = 78,5 Grad sind das -10,54 mag, 0,34 mag heller als -10,2 (6.1, nicht primaer belegt, 7 Punkt 7). Mit -10,54 waere Quellweiss 3,58 statt 3,91. `objekte.json` behaelt -10,2 und 3,91, bis Herbert entscheidet (7, Punkt 7). Nachtrag #36: entschieden, `mond_ev` hat jetzt -10,51 bei 79,3 Grad und Quellweiss 3,60 (Nachtrag #36 oben).
 - **Vollmond und Anzeigeweiss:** Die bisherige Begruendung fuer 3,35 ("die Tagseite zeigt im Bild volle Vollmondhelligkeit") traegt nicht: mit 3,35 ergaebe das Bild -10,77 mag, heller als beide Phasenmagnituden. 3,35 bleibt die mittlere Flaechenhelligkeit des Vollmonds (5.2) und ist so in `ANZEIGE_WEISS_MAG_PRO_ARCSEC2` verwendet (physik.md 12.3), ist aber nicht mehr Quellweiss des Mondzustands.
 
 ## 6. Empfehlung fuer astobsim
@@ -360,7 +378,10 @@ Anmerkungen:
 
 | Objekt | Zustand-ID | Name (UI) | Aequatorial " | Polar " | Phase k | Ringneigung Grad | V mag | Entfernung AE | Bemerkung |
 |---|---|---|---|---|---|---|---|---|---|
-| mond | mond_ev | Mond, 1 Tag nach erstem Viertel | 1865 | 1865 | 0,60 | - | -10,2 | 0,00257 (384 400 km) | Kolongitude 10 bis 12 Grad |
+| mond | mond_ev | Mond, 1 Tag nach erstem Viertel | 1865 | 1865 | 0,60 (seit #36 0,593) | - | -10,2 (seit #36 -10,51) | 0,00257 (384 400 km) | Kolongitude 10 bis 12 Grad |
+| mond | mond_sichel | Mond, zunehmende Sichel (4 Tage) | 1865 | 1865 | 0,173 | - | -8,15 | 0,00257 | Nachtrag #36, Kolongitude 314,3 Grad |
+| mond | mond_voll | Vollmond | 1865 | 1865 | 0,999 | - | -12,66 | 0,00257 | Nachtrag #36, Kolongitude 94,4 Grad |
+| mond | mond_lv | Mond, letztes Viertel | 1865 | 1865 | 0,499 | - | -10,12 | 0,00257 | Nachtrag #36, Kolongitude 178,6 Grad |
 | mars | mars_6 | Mars klein (6") | 6,0 | 5,96 | 0,90 | - | +1,0 | 1,56 | gibbos, Nordkappe klein |
 | mars | mars_14 | Mars Aphel-Opposition (14") | 14,0 | 13,9 | 1,00 | - | -1,4 | 0,669 | Nordfruehling, Nordkappe gross |
 | mars | mars_25 | Mars Perihel-Opposition (25") | 25,0 | 24,9 | 1,00 | - | -3,0 | 0,375 | Suedsommer, Suedkappe klein |
@@ -422,7 +443,7 @@ Fuer Saturn kommen `ringneigung_grad: 15` (umgesetzt: 19, Nachtrag in 3.3) und `
 4. **Mond mittlerer Durchmesser**: Fact Sheet nennt 1896", Rechnung 1865". Die 1865" sind der uebliche Jahrbuchwert; bitte bestaetigen, dass astobsim 1865" verwendet.
 5. **Kolongitude des Mondbilds**: Zielwert C = 10 bis 12 Grad ist aus der 55-bis-60-%-Vorgabe abgeleitet. Die Sonnenaufgangs-Kolongituden in 2.2 sind aus den Gazetteer-Laengen ohne Libration gerechnet; Libration verschiebt sie um bis zu +-8 Grad. Clavius ist bei C < 14 noch dunkel; wer Clavius im Bild will, braucht C >= 16 (k >= 0,64).
 6. **Krater-Koordinaten** fuer Apenninen, Ptolemaeus, Arzachel, Archimedes, Plato, Eratosthenes, Clavius, Copernicus wurden nicht einzeln im Gazetteer abgerufen (Durchmesser schon). Mare Nectaris fehlt in der Tabelle.
-7. **Mond-Magnitude am ersten Viertel** (-10,0 bis -10,4) stammt aus dem allgemeinen Wissen ueber die Mondphasenkurve (Viertelmond etwa ein Zehntel der Vollmondhelligkeit), nicht aus einer abgerufenen Primaerquelle. Fuer A-P4 ist der Wert nur ein Plausibilitaetsrahmen; Herbert bitte gegen Jahrbuch oder Allen pruefen. Nachtrag 2026-10-27 (Issue #71): Krisciunas und Schaefer [68, Gl. 9] ergeben beim Phasenwinkel des Zustands (78,5 Grad) -10,54 mag. Seit #71 haengt Quellweiss des Mondes an diesem Wert (5.3): mit -10,2 ist er 3,91, mit -10,54 waere er 3,58. Entscheidung offen; `objekte.json` behaelt -10,2.
+7. **Mond-Magnitude am ersten Viertel** (-10,0 bis -10,4) stammt aus dem allgemeinen Wissen ueber die Mondphasenkurve (Viertelmond etwa ein Zehntel der Vollmondhelligkeit), nicht aus einer abgerufenen Primaerquelle. Fuer A-P4 ist der Wert nur ein Plausibilitaetsrahmen; Herbert bitte gegen Jahrbuch oder Allen pruefen. Nachtrag 2026-10-27 (Issue #71): Krisciunas und Schaefer [68, Gl. 9] ergeben beim Phasenwinkel des Zustands (78,5 Grad) -10,54 mag. Seit #71 haengt Quellweiss des Mondes an diesem Wert (5.3): mit -10,2 ist er 3,91, mit -10,54 waere er 3,58. Entscheidung offen; `objekte.json` behaelt -10,2. Nachtrag 2026-10-29 (Issue #36): Gl. 9 im Original geprueft (physik.md 23); die neuen Mondzustaende nutzen sie, `mond_ev` bleibt bei -10,2 bis zur Entscheidung. Mit -10,54 waeren alle vier Mondzustaende einheitlich nach derselben Quelle. **Entschieden von Herbert am 2026-10-29:** `mond_ev` nach Gl. 9 mit dem Phasenwinkel aus der Phase der SVS-Tabelle (79,3 Grad statt 78,5): -10,51, Quellweiss 3,60 (5.3, Nachtrag #36). Der bisherige Wert -10,2 ist berichtigt.
 8. **Albedowerte** von Mare/Hochland und Mars-Dunkelgebieten sind Groessenordnungen aus dem Gedaechtnis und nicht belegt. Da die Albedoverteilung aus dem Quellbild kommt, braucht astobsim sie nur zur Plausibilitaet der Bildhelligkeit.
 9. **Jupiter-Bandkontrast** 0,82 (Band/Zone) beruht auf Orton 1975 (Breitband, Sekundaerzitat in einer Suchzusammenfassung); aktuelle I/F-Werte aus OPAL habe ich nicht gefunden. Visuell wirkt der Kontrast staerker als 10 %, weil das Auge Kanten sieht; fuer das Modell ist der Kontrast ohnehin eine Bildeigenschaft.
 10. **GRF-Groesse** 14 000 x 10 000 km ist der Hubble-Wert 2024 (rote Ellipse); der Fleck schrumpft weiter (ca. 0,17 Grad Laenge pro Jahr), ein Bild von 2014 bis 2016 zeigt ihn 15 bis 20 % laenger. Simon et al. 2018 selbst konnte ich nicht lesen (nur Zitate).
@@ -502,6 +523,6 @@ Fuer Saturn kommen `ringneigung_grad: 15` (umgesetzt: 19, Nachtrag in 3.3) und `
 65. Tanga, P., Bardelli, S. (UAI, 2008): La regressione della calotta polare sud di Marte 2003 (Rueckzugskurve aus Amateur-CCD, Uebereinstimmung mit Mars Express innerhalb 1 bis 2 Grad). https://pianeti.uai.it/images/Calotta_Marte_2003_3-2008.pdf
 66. = [9] (Mallama und Hilton 2018), hier fuer Jupiter-Magnitude -2,70 bei mittlerer Opposition.
 67. Universe Today / EarthSky zur Ringkantenstellung 2025-03-23 und zum 29,5-Jahre-Zyklus (nur Einstieg; Zahlen aus [14]).
-68. Krisciunas, K., Schaefer, B. E. (1991): A Model of the Brightness of Moonlight. PASP 103, 1033-1039, doi:10.1086/132921; Gl. 9 (V-Magnitude des Mondes ueber den Phasenwinkel). Formel geprueft an der Umsetzung in specsim (`krisciunas_schaefer`, Kommentar "eqn. 9"), https://github.com/desihub/specsim/blob/main/specsim/atmosphere.py (abgerufen 2026-10-27); das Original habe ich nicht gelesen.
+68. Krisciunas, K., Schaefer, B. E. (1991): A Model of the Brightness of Moonlight. PASP 103, 1033-1039, doi:10.1086/132921; Gl. 9 (V-Magnitude des Mondes ueber den Phasenwinkel). Formel geprueft an der Umsetzung in specsim (`krisciunas_schaefer`, Kommentar "eqn. 9"), https://github.com/desihub/specsim/blob/main/specsim/atmosphere.py (abgerufen 2026-10-27); Nachtrag 2026-10-29 (Issue #36): Original gelesen ueber ADS, https://ui.adsabs.harvard.edu/link_gateway/1991PASP..103.1033K/ADS_PDF , Gl. 9 auf S. 1035 mit Verweis auf Allen 1976, S. 144, und dem Hinweis auf den Oppositionseffekt unter 7 Grad (Wortlaut in physik.md 23).
 69. Salo, H., French, R. G. (2010): The opposition and tilt effects of Saturn's rings from HST observations. Icarus 210, 785-816; arXiv:1007.0349, https://arxiv.org/abs/1007.0349 . Verwendet: Tabellen 1 bis 3 (S. 62 bis 67 im arXiv-PDF), Abb. 2 (S. 40), Abb. 16 (S. 54). Daten aus Cuzzi et al. 2002 und French et al. 2007 (nur ueber dieses Zitat bekannt). Gelesen 2026-10-28 (Recherche-Agent, Werte aus Abb. 2 digitalisiert und an den Tabellen geprueft).
 70. Schmid, H. M., Joos, F., Buenzli, E., Gisler, D. (2011): Long slit spectropolarimetry of Jupiter and Saturn. Icarus; arXiv:1101.5000, Tabelle 3 (abgeleitete Reflektivitaet, nicht als Ziel verwendet).
