@@ -177,7 +177,7 @@ Abfrage: Hipparcos (I/239, V und B-V) und Hipparcos-Neureduktion (I/311, Paralla
 
 Mitglieder (ber.): Eigenbewegung in Gaia innerhalb $(20 \pm 4{,}5;\ -45{,}5 \pm 5{,}5)$ mas/a und Parallaxe 6,4 bis 8,5 mas, **oder** Hipparcos-2-Parallaxe 7,3 bis 9,9 mas. Das Oder ist noetig, weil Gaia fuer Sterne heller als etwa 5 mag gestoerte Astrometrie hat (Merope: Eigenbewegung 13 statt 20, Taygeta: Parallaxe 9,5; Alkyone: keine Astrometrie). Damit fallen drei helle Feldsterne heraus: HD 23712 (V 6,44, K5, Parallaxe 4,4 mas, Hintergrund), HD 23822 (V 6,47, F0, 13,4 mas, Vordergrund), HD 23609 (V 6,98, F8, 16,1 mas, Vordergrund). Sie sind Feldsterne und damit Nicht-Ziel (A-X9).
 
-V und B-V: aus Hipparcos, wo es den Stern gibt; sonst aus Gaia (6.3, ber.). Offset zur Mitte 03 47 00, +24 07 00.
+V und B-V: aus Hipparcos, wo es den Stern gibt; sonst aus Gaia (6.3, ber.). Offset zur Mitte 03 47 00, +24 07 00. Nachtrag 2026-10-29 (Issue #104): Die B-V-Werte (ber.) der Gaia-Sterne in der Tabelle sind ueberholt; `daten/sterne/m45.json` nimmt die Umkehrung von Tabelle 5.9 der Gaia-DR3-Dokumentation (`physik.md` 22), z. B. 24 Tau -0,03 statt -0,01, Gaia DR3 65207709611941376 -0,01 statt 0,01, Gaia DR3 65007083101413888 0,10 statt 0,14. V und Lagen bleiben.
 
 | Nr. | Stern | $dx$ [''] | $dy$ [''] | V | B-V | Katalog |
 |---|---|---|---|---|---|---|
@@ -299,7 +299,7 @@ $$B - V = -0{,}022 + 0{,}763\,(G_{BP} - G_{RP}), \qquad \text{Streuung } 0{,}042
 
 Fuer rote Sterne (M13-Riesen, $x$ = 1,6 bis 1,8; Trapez E) ist die Gerade eine Extrapolation; dort geben gaengige Tabellen B-V etwa 1,2 bis 1,4 (nicht belegt). Fuer A-P12 reicht das, weil die Farbe nur oberhalb einer Leuchtdichteschwelle gezeigt wird.
 
-> Nachtrag 2026-10-29 (Issue #104): Die Gaia-DR3-Dokumentation, Kapitel 5.5.1, Tabelle 5.9, gibt $G_{BP}-G_{RP} = f(B-V)$ (Streuung 0,066). `tools/m45_sterne.py` nimmt deren Umkehrung statt der Geraden; Formeln und Probe in `physik.md` 22. Die Zuordnung Gaia zu Hipparcos laeuft ueber die Lage, weil `gaiadr3.hipparcos2_best_neighbour` Merope, Taygeta, HIP 17791, HIP 17401 und HIP 17694 nicht fuehrt. Ergebnis wie in 4.2: 44 Mitglieder, Zaehlung 6 / 6 / 9 / 11 / 14 / 22 / 24 / 31 / 44.
+> Nachtrag 2026-10-29 (Issue #104): Die Gaia-DR3-Dokumentation, Kapitel 5.5.1, Tabelle 5.9, gibt $G_{BP}-G_{RP} = f(B-V)$ (Streuung 0,066). `tools/m45_sterne.py` nimmt deren Umkehrung statt der Geraden; Formeln und Probe in `physik.md` 22. Die Zuordnung Gaia zu Hipparcos laeuft ueber die Lage, weil `gaiadr3.hipparcos2_best_neighbour` Merope, Taygeta, HIP 17791, HIP 17401 und HIP 17694 nicht fuehrt. Zaehlung wie in 4.2 (B-V der Gaia-Sterne dagegen anders, siehe 4.2): 44 Mitglieder, 6 / 6 / 9 / 11 / 14 / 22 / 24 / 31 / 44.
 
 ### 6.4 Lizenzen und Folge fuer das Repo
 

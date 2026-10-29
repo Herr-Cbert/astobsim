@@ -1,6 +1,6 @@
 # tools
 
-Python-Skripte zur Bild- und Datenaufbereitung (nur numpy und Pillow, kein pip noetig). Sie laufen offline aus dem Repo-Root und sind die einzigen Erzeuger von Bildern unter `daten/` und der Eintraege in `daten/bilder.json` (ADR-0003). Rohbilder liegen in `data/roh/` (gitignored, Herkunft in `data/roh/LIESMICH.md`).
+Python-Skripte zur Bild- und Datenaufbereitung (nur numpy und Pillow, kein pip noetig; `m45_sterne.py` braucht nur die Standardbibliothek). Sie laufen offline aus dem Repo-Root (Ausnahme: `m45_sterne.py --abrufen` holt die Rohdaten aus dem Netz) und sind die einzigen Erzeuger von Bildern unter `daten/` und der Eintraege in `daten/bilder.json` (ADR-0003). Rohbilder liegen in `data/roh/` (gitignored, Herkunft in `data/roh/LIESMICH.md`).
 
 | Skript | Zweck | Aufruf |
 |---|---|---|

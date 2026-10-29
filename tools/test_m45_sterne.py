@@ -59,6 +59,13 @@ class Mitgliedschaft(unittest.TestCase):
         self.assertFalse(sterne[1]["mitglied"])
         self.assertEqual(sterne[1]["epoche"], 1991.25)
 
+    def test_gaia_nachbar_mit_falscher_helligkeit_bricht_ab(self):
+        gaia = [gaia_zeile(11, 56.8, 24.2, 6.5, 0.0)]
+        hip2 = [{"hip": 5.0, "ra": 56.8001, "dec": 24.2001, "plx": 8.0, "e_plx": 0.3, "pm_ra": 20.0, "pm_de": -45.0,
+                 "hp_mag": 4.2}]
+        with self.assertRaises(SystemExit):
+            list(m.kandidaten(gaia, [], hip2))
+
     def test_lage_nach_osten_und_norden(self):
         dx, dy = m.lage_arcsec(m.MITTE_RA_GRAD + 0.1, m.MITTE_DEC_GRAD - 0.1)
         self.assertGreater(dx, 0)

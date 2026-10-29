@@ -13,8 +13,9 @@ Mitglied ist ein Stern, wenn seine Gaia-Eigenbewegung innerhalb (20 +- 4,5; -45,
 mas/a und seine Gaia-Parallaxe 6,4 bis 8,5 mas betragen, oder seine Hipparcos-2-Parallaxe
 7,3 bis 9,9 mas (deep-sky.md 4.2: Gaia-Astrometrie ist fuer Sterne heller als etwa 5 mag
 gestoert). Hipparcos und Gaia werden ueber die Lage zugeordnet (Abstand unter 5'' und
-|G - Hp| unter 1 mag); die Tabelle gaiadr3.hipparcos2_best_neighbour fuehrt Merope, Taygeta
-und HIP 17791 nicht. V und B-V kommen aus Hipparcos, wo es den Stern gibt, sonst aus Gaia
+|G - Hp| unter 1 mag); die Tabelle gaiadr3.hipparcos2_best_neighbour fuehrt Merope, Taygeta,
+HIP 17791, HIP 17401 und HIP 17694 nicht. Hat ein Hipparcos-Stern ohne Zuordnung eine Gaia-Quelle
+unter 5'' (Helligkeitsschnitt verfehlt), bricht das Skript ab, statt zwei Eintraege zu erzeugen. V und B-V kommen aus Hipparcos, wo es den Stern gibt, sonst aus Gaia
 (physik.md 22). Lage: Gaia-Position (Epoche 2016,0), ohne Gaia-Gegenstueck die
 Hipparcos-Position (1991,25); bei 50 mas/a ist der Unterschied hoechstens 1,3''.
 
@@ -108,7 +109,7 @@ LIZENZ = ("CC BY-NC 3.0 IGO (https://creativecommons.org/licenses/by-nc/3.0/igo/
           "(data.licences@esa.int, https://www.cosmos.esa.int/web/esdc/terms-and-conditions)")
 
 
-def de(x):
+def mit_komma(x):
     """Zahl mit Dezimalkomma fuer deutsche Texte."""
     return f"{x:g}".replace(".", ",")
 
@@ -191,6 +192,10 @@ def kandidaten(gaia, hip, hip2):
         yield stern_aus(g, hip_nach.get(g.get("hip")), hip2_nach.get(g.get("hip")))
     for nr, h2 in hip2_nach.items():
         if nr not in zugeordnet:
+            nah = [g for g in gaia if abstand_arcsec(h2["ra"], h2["dec"], g["ra"], g["dec"]) < ZUORDNUNG_ARCSEC]
+            if nah:
+                raise SystemExit(f"HIP {int(nr)}: Gaia DR3 {int(nah[0]['source_id'])} unter {ZUORDNUNG_ARCSEC:g}'', "
+                                 f"aber |G - Hp| nicht unter {ZUORDNUNG_MAG:g} mag (doppelter Eintrag?)")
             yield stern_aus(None, hip_nach.get(nr), h2)
 
 
@@ -273,10 +278,10 @@ def sternliste(gaia, hip, hip2):
     abrufe = ", ".join(sorted({r["abruf"] for r in ROHDATEN.values()}))
     kommentar = (
         f"Erzeugt von tools/m45_sterne.py aus drei Abfragen im Gaia-Archiv (Abruf {abrufe}, ADQL und "
-        f"SHA-256 in data/roh/LIESMICH.md): Kegel {de(KEGEL_GRAD)} Grad um RA {de(MITTE_RA_GRAD)}, Dec +{de(MITTE_DEC_GRAD)} Grad, "
-        f"Mitglieder nach deep-sky.md 4.2 (Gaia-Eigenbewegung ({de(PM_RA_MITTE)} +- {de(PM_RA_HALB)}; "
-        f"{de(PM_DE_MITTE)} +- {de(PM_DE_HALB)}) mas/a und Gaia-Parallaxe {de(PLX_GAIA[0])} bis {de(PLX_GAIA[1])} mas, "
-        f"oder Hipparcos-2-Parallaxe {de(PLX_HIP2[0])} bis {de(PLX_HIP2[1])} mas), bis V {de(V_GRENZE)}: "
+        f"SHA-256 in data/roh/LIESMICH.md): Kegel {mit_komma(KEGEL_GRAD)} Grad um RA {mit_komma(MITTE_RA_GRAD)}, Dec +{mit_komma(MITTE_DEC_GRAD)} Grad, "
+        f"Mitglieder nach deep-sky.md 4.2 (Gaia-Eigenbewegung ({mit_komma(PM_RA_MITTE)} +- {mit_komma(PM_RA_HALB)}; "
+        f"{mit_komma(PM_DE_MITTE)} +- {mit_komma(PM_DE_HALB)}) mas/a und Gaia-Parallaxe {mit_komma(PLX_GAIA[0])} bis {mit_komma(PLX_GAIA[1])} mas, "
+        f"oder Hipparcos-2-Parallaxe {mit_komma(PLX_HIP2[0])} bis {mit_komma(PLX_HIP2[1])} mas), bis V {mit_komma(V_GRENZE)}: "
         f"{len(sterne)} Sterne. katalog nennt die Herkunft von V: HIP = Hipparcos (ESA 1997, {n_hip} Sterne), "
         f"Gaia DR3 = V aus G und BP-RP nach Gaia DR3 Dokumentation 5.5.1 Tabelle 5.9 ({len(sterne) - n_hip} Sterne, "
         "physik.md 22). quelle_farbe nennt die Herkunft von B-V: HIP oder GDR3 (BP-RP = f(B-V) aus "
