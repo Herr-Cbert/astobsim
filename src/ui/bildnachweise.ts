@@ -74,7 +74,7 @@ function link(d: Document, text: string, href: string): HTMLAnchorElement {
 }
 
 /** Aufklappbarer Block mit einer Ueberschrift je Eintrag und den Zeilen als Definitionsliste. */
-function aufklappbar(d: Document, kopfText: string, klasse: string, eintraege: readonly NachweisImFuss[]): HTMLDetailsElement {
+function aufklappbar(d: Document, kopfText: string, klasse: string, klasseEintrag: string, eintraege: readonly NachweisImFuss[]): HTMLDetailsElement {
   const details = d.createElement("details");
   details.className = klasse;
   const kopf = d.createElement("summary");
@@ -82,7 +82,7 @@ function aufklappbar(d: Document, kopfText: string, klasse: string, eintraege: r
   details.append(kopf);
   for (const e of eintraege) {
     const abschnitt = d.createElement("section");
-    abschnitt.className = "fuss-bild";
+    abschnitt.className = klasseEintrag;
     const titel = d.createElement("h2");
     titel.textContent = e.titel;
     const liste = d.createElement("dl");
@@ -111,7 +111,7 @@ export function baueFuss(fuss: HTMLElement, kataloge: Pick<Kataloge, "objekte" |
   const sterne = sterndatenImFuss();
   fuss.replaceChildren(
     lizenz,
-    aufklappbar(d, T.bildnachweise(bilder.length), "fuss-nachweise", bilder),
-    aufklappbar(d, T.sterndaten.titel(sterne.length), "fuss-nachweise fuss-sterndaten", sterne)
+    aufklappbar(d, T.bildnachweise(bilder.length), "fuss-nachweise", "fuss-bild", bilder),
+    aufklappbar(d, T.sterndaten.titel(sterne.length), "fuss-nachweise fuss-sterndaten", "fuss-eintrag", sterne)
   );
 }

@@ -1,6 +1,7 @@
 // Die Doppelsterne der festen Katalogliste (Issue #103) in der echten daten/objekte.json:
 // Liste aus docs/recherche/doppelsterne.md 2 (14 Objekte, 16 Paare), Lage nach A-Z9 bzw. als
 // Mehrfachstern mit Norden oben (Epsilon Lyrae, Entscheidung 4), Nachweis je Paar (ADR-0003 Nachtrag V2).
+// Richtung wie die Naht (src/naht/konfiguration.ts): dx positiv = rechts = Westen bei Norden oben, dy positiv = Norden.
 import { afterEach, describe, expect, it, vi } from "vitest";
 import bilderJson from "../../daten/bilder.json";
 import objekteJson from "../../daten/objekte.json";
@@ -59,7 +60,7 @@ describe("Doppelsterne in daten/objekte.json (#103)", () => {
       expect(Math.abs(b.dxArcsec - a.dxArcsec), o.id).toBeCloseTo(trennung, 9);
       expect(a.dxArcsec + b.dxArcsec, o.id).toBeCloseTo(0, 9);
       expect([a.dyArcsec, b.dyArcsec], o.id).toEqual([0, 0]);
-      // A (Hauptstern nach WDS) im Westen bei -rho/2.
+      // A (Hauptstern nach WDS) links bei -rho/2, bei Norden oben also im Osten.
       expect(a.dxArcsec, o.id).toBeLessThan(0);
     }
   });
@@ -74,8 +75,8 @@ describe("Doppelsterne in daten/objekte.json (#103)", () => {
       const dx = p2!.x - p1!.x;
       const dy = p2!.y - p1!.y;
       expect(Math.abs(Math.hypot(dx, dy) - p.trennungArcsec), p.komponenten).toBeLessThan(0.002);
-      // Positionswinkel von Norden (dy positiv) ueber Osten (dx positiv).
-      const pa = ((Math.atan2(dx, dy) * 180) / Math.PI + 360) % 360;
+      // Positionswinkel von Norden (dy positiv) ueber Osten; Osten liegt links (dx negativ, Naht: +x rechts).
+      const pa = ((Math.atan2(-dx, dy) * 180) / Math.PI + 360) % 360;
       expect(Math.abs(pa - p.positionswinkelGrad), p.komponenten).toBeLessThan(0.05);
     }
     // Mitte des Systems im Ursprung, eps1 noerdlich von eps2.
@@ -102,10 +103,12 @@ describe("Doppelsterne in daten/objekte.json (#103)", () => {
     }
   });
 
-  it("uebernimmt Katalogwerte aus doppelsterne.md 2.2 und Entscheidung 7 (Stichproben)", () => {
+  it("uebernimmt Katalogwerte aus doppelsterne.md 2.2 und die Entscheidungen zu Polaris B und Albireo B (Stichproben)", () => {
     const stern = (id: string, name: string) => doppelsterne.find((o) => o.id === id)!.zustaende[0]!.sterne.find((s) => s.name === name)!;
     expect(stern("albireo", "A").bv).toBe(1.088);
     expect(stern("albireo", "B").bv).toBe(-0.095);
+    // Albireo B 5,1 statt WDS 4,68 (Entscheidung Herbert 2026-10-29), wie Polaris B 8,6 statt 9,1.
+    expect(stern("albireo", "B").magnitude).toBe(5.1);
     expect(stern("antares", "B").bv).toBe(-0.2);
     expect(stern("polaris", "B").magnitude).toBe(8.6);
     expect(stern("zeta_her", "B").bv).toBe(0.77);

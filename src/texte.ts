@@ -47,8 +47,8 @@ export const TEXTE = {
       quellen: [
         {
           titel: "Washington Double Star Catalog (WDS), U.S. Naval Observatory",
-          verwendet: "Abstand, Positionswinkel und Helligkeit aller Doppelsterne (Mason et al. 2001, AJ 122, 3466)",
-          lizenz: "U.S. Government Works (data.gov: „License: https://www.usa.gov/government-works“, „Access Level: public“)",
+          verwendet: "Abstand, Positionswinkel und Helligkeit der Doppelsterne außer Albireo B und Polaris B (Mason et al. 2001, AJ 122, 3466)",
+          lizenz: "Laut data.gov (Eintrag der HEASARC): U.S. Government Works („License: https://www.usa.gov/government-works“, „Access Level: public“); an der Quelle selbst keine Lizenzangabe.",
           lizenzUrl: "https://catalog.data.gov/dataset/washington-double-star-catalog",
           danksagung: "This research has made use of the Washington Double Star Catalog maintained at the U.S. Naval Observatory.",
           url: "https://www.astro.gsu.edu/wds/"
@@ -62,7 +62,7 @@ export const TEXTE = {
         {
           titel: "Hipparcos- und Tycho-Kataloge, ESA",
           verwendet:
-            "B-V aus dem Hipparcos-Hauptkatalog (ESA 1997) und dem Tycho Double Star Catalogue (Fabricius et al. 2002, A&A 384, 180), " +
+            "B-V und V von Albireo B aus dem Hipparcos-Hauptkatalog (ESA 1997) und dem Tycho Double Star Catalogue (Fabricius et al. 2002, A&A 384, 180), " +
             "abgefragt im Hipparcos and Tycho Legacy Archive der ESA",
           lizenz:
             "„The Hipparcos and Tycho Catalogues are distributed under the CC BY-NC 3.0 IGO licence and the Terms and Conditions " +

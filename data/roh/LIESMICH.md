@@ -27,7 +27,7 @@ Nur diese Datei liegt im Repo (`.gitignore`: `data/roh/*`, `!data/roh/LIESMICH.m
 
 ## Doppelsterne (Issue #103)
 
-Katalogauszuege und Quellseiten zu den Doppelsternen in `daten/objekte.json`, abgerufen 2026-10-29, im Unterordner `doppelsterne/` (im Worktree ein Symlink auf `data/roh/doppelsterne/` des Hauptrepos). Der VizieR-Server in Strassburg und die Spiegel (u. a. `vizier.idia.ac.za`, `vizier.cfa.harvard.edu`) antworteten an diesem Tag nicht; die Werte stammen deshalb direkt von USNO (WDS, ORB6), ESA (Hipparcos, TDSC), HEASARC (BSC) und dem SIMBAD-Spiegel in Harvard. Die Eintraege in `daten/objekte.json` hat ein Python-Skript aus diesen Dateien erzeugt (nicht im Repo, siehe PR zu #103).
+Katalogauszuege und Quellseiten zu den Doppelsternen in `daten/objekte.json`, abgerufen 2026-10-29, im Unterordner `doppelsterne/` (im Worktree ein Symlink auf `data/roh/doppelsterne/` des Hauptrepos). Der VizieR-Server in Strassburg und die Spiegel (u. a. `vizier.idia.ac.za`, `vizier.cfa.harvard.edu`) antworteten an diesem Tag nicht; die Werte stammen deshalb direkt von USNO (WDS, ORB6), ESA (Hipparcos, TDSC), HEASARC (BSC) und dem SIMBAD-Spiegel in Harvard. Die Eintraege in `daten/objekte.json` erzeugt `tools/doppelsterne.py` aus diesen Dateien (`--pruefen` vergleicht nur).
 
 - `doppelsterne/wdsweb_summ2.txt`: WDS, Zusammenfassung aller Systeme (Stand der Webseite 13.10.2026). https://www.astro.gsu.edu/wds/Webtextfiles/wdsweb_summ2.txt , 20696960 Byte, SHA-256 `7085c7b201dfd3a058af8cb1c8df22ebcca5ff464df19a0bf5cba8df2e974125`.
 - `doppelsterne/wdsweb_format.txt`: Spaltenformat dazu. https://www.astro.gsu.edu/wds/Webtextfiles/wdsweb_format.txt , 12309 Byte, SHA-256 `2a68bcc1ffea255c446e5d2806ca5f0360d57a37cb505e17fa531028cb6894b4`.

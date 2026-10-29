@@ -454,25 +454,29 @@ body {
   margin-top: 8px;
 }
 
-.fuss-bild h2 {
+.fuss-bild h2,
+.fuss-eintrag h2 {
   margin: 12px 0 4px;
   font-size: 0.85rem;
   color: var(--text);
 }
 
-.fuss-bild dl {
+.fuss-bild dl,
+.fuss-eintrag dl {
   display: grid;
   grid-template-columns: max-content minmax(0, 1fr);
   gap: 2px 12px;
   margin: 0;
 }
 
-.fuss-bild dd {
+.fuss-bild dd,
+.fuss-eintrag dd {
   margin: 0;
 }
 
 @media (max-width: 560px) {
-  .fuss-bild dl {
+  .fuss-bild dl,
+  .fuss-eintrag dl {
     grid-template-columns: minmax(0, 1fr);
   }
 }

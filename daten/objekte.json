@@ -244,8 +244,8 @@
     "zustaende": [
       {
         "id": "albireo_2025",
-        "name": "Albireo (34,3\", 3,19 und 4,68 mag)",
-        "magnitude": 2.94,
+        "name": "Albireo (34,3\", 3,19 und 5,10 mag)",
+        "magnitude": 3.02,
         "katalog": [
           {
             "wds": "19307+2758",
@@ -274,13 +274,13 @@
             "name": "B",
             "dx_arcsec": 17.15,
             "dy_arcsec": 0,
-            "magnitude": 4.68,
+            "magnitude": 5.1,
             "b_v": -0.095,
             "katalog": "HIP 95951",
             "quelle_farbe": "Hipparcos"
           }
         ],
-        "kommentar": "A ist selbst eng doppelt (Aa,Ac 0,4\"), fuer astobsim ein Stern; Magnitude und B-V von A gelten fuer A gesamt. B-V aus dem Hipparcos-Hauptkatalog (ESA 1997, Johnson B-V; Credit: ESA). Trennung, Positionswinkel und Magnituden aus dem WDS (USNO), Abruf 2026-10-29. Lage nach A-Z9: Mitte im Ursprung, A bei -rho/2 (Westen), B bei +rho/2 (Osten), dy = 0."
+        "kommentar": "A ist selbst eng doppelt (Aa,Ac 0,4\"), fuer astobsim ein Stern; Magnitude und B-V von A gelten fuer A gesamt. B-V aus dem Hipparcos-Hauptkatalog (ESA 1997, Johnson B-V; Credit: ESA). Magnitude von B 5,1 statt WDS 4,68 (= VT des TDSC): Hipparcos Vmag 5,12 (HIP 95951), Tycho-Hauptkatalog BT 5,01 und VT 5,082 ergeben V 5,09 (Entscheidung Herbert 2026-10-29, docs/recherche/README.md). Trennung und Positionswinkel aus dem WDS (USNO), Magnitude von A aus dem WDS, Abruf 2026-10-29. Lage nach A-Z9: Mitte im Ursprung, A bei -rho/2 (links, bei Norden oben Osten), B bei +rho/2 (rechts, Westen), dy = 0."
       }
     ]
   },
@@ -328,7 +328,7 @@
             "quelle_farbe": "BSC"
           }
         ],
-        "kommentar": "B-V aus dem Bright Star Catalogue, 5. Aufl. (Hoffleit und Warren 1991), HR 5054 und 5055. Trennung, Positionswinkel und Magnituden aus dem WDS (USNO), Abruf 2026-10-29. Lage nach A-Z9: Mitte im Ursprung, A bei -rho/2 (Westen), B bei +rho/2 (Osten), dy = 0."
+        "kommentar": "B-V aus dem Bright Star Catalogue, 5. Aufl. (Hoffleit und Warren 1991), HR 5054 und 5055. Trennung, Positionswinkel und Magnituden aus dem WDS (USNO), Abruf 2026-10-29. Lage nach A-Z9: Mitte im Ursprung, A bei -rho/2 (links, bei Norden oben Osten), B bei +rho/2 (rechts, Westen), dy = 0."
       }
     ]
   },
@@ -376,7 +376,7 @@
             "quelle_farbe": "BSC"
           }
         ],
-        "kommentar": "BC ist eng doppelt (STT 38, 0,37\" fuer 2027,0 nach ORB6), fuer astobsim ein Stern. B-V aus dem Bright Star Catalogue (HR 603, 604). Magnitude von BC nach WDS 5,02 (BSC 4,84). Trennung, Positionswinkel und Magnituden aus dem WDS (USNO), Abruf 2026-10-29. Lage nach A-Z9: Mitte im Ursprung, A bei -rho/2 (Westen), B bei +rho/2 (Osten), dy = 0."
+        "kommentar": "BC ist eng doppelt (STT 38, 0,37\" fuer 2027,0 nach ORB6), fuer astobsim ein Stern. B-V aus dem Bright Star Catalogue (HR 603, 604). Magnitude von BC nach WDS 5,02 (BSC 4,84). Trennung, Positionswinkel und Magnituden aus dem WDS (USNO), Abruf 2026-10-29. Lage nach A-Z9: Mitte im Ursprung, A bei -rho/2 (links, bei Norden oben Osten), B bei +rho/2 (rechts, Westen), dy = 0."
       }
     ]
   },
@@ -424,7 +424,7 @@
             "quelle_farbe": "BSC"
           }
         ],
-        "kommentar": "C (YY Gem, 70\") entfaellt (doppelsterne.md 2.2). B-V aus dem Bright Star Catalogue (HR 2891 fuer A, HR 2890 fuer B). Trennung und Positionswinkel aus der ORB6-Ephemeride 2027,0 (USNO), Magnituden aus dem WDS, Abruf 2026-10-29. Lage nach A-Z9: Mitte im Ursprung, A bei -rho/2 (Westen), B bei +rho/2 (Osten), dy = 0."
+        "kommentar": "C (YY Gem, 70\") entfaellt (doppelsterne.md 2.2). B-V aus dem Bright Star Catalogue (HR 2891 fuer A, HR 2890 fuer B). Trennung und Positionswinkel aus der ORB6-Ephemeride 2027,0 (USNO), Magnituden aus dem WDS, Abruf 2026-10-29. Lage nach A-Z9: Mitte im Ursprung, A bei -rho/2 (links, bei Norden oben Osten), B bei +rho/2 (rechts, Westen), dy = 0."
       }
     ]
   },
@@ -473,7 +473,7 @@
           }
         ],
         "hinweis_hilfe": "Die beiden Sterne von Porrima umlaufen einander in rund 169 Jahren; 2005 standen sie nur 0,4 Bogensekunden auseinander, gezeigt ist der Abstand fuer 2027.",
-        "kommentar": "B-V aus dem TDSC (Fabricius et al. 2002) umgerechnet mit B-V = 0,850 (BT - VT), ESA 1997 Bd. 1 Gl. 1.3.20 (physik.md 21). Credit: ESA. Trennung und Positionswinkel aus der ORB6-Ephemeride 2027,0 (USNO), Magnituden aus dem WDS, Abruf 2026-10-29. Lage nach A-Z9: Mitte im Ursprung, A bei -rho/2 (Westen), B bei +rho/2 (Osten), dy = 0."
+        "kommentar": "B-V aus dem TDSC (Fabricius et al. 2002) umgerechnet mit B-V = 0,850 (BT - VT), ESA 1997 Bd. 1 Gl. 1.3.20 (physik.md 21). Credit: ESA. Trennung und Positionswinkel aus der ORB6-Ephemeride 2027,0 (USNO), Magnituden aus dem WDS, Abruf 2026-10-29. Lage nach A-Z9: Mitte im Ursprung, A bei -rho/2 (links, bei Norden oben Osten), B bei +rho/2 (rechts, Westen), dy = 0."
       }
     ]
   },
@@ -521,7 +521,7 @@
             "quelle_farbe": "TDSC"
           }
         ],
-        "kommentar": "B-V aus dem TDSC (Fabricius et al. 2002) umgerechnet mit B-V = 0,850 (BT - VT), ESA 1997 Bd. 1 Gl. 1.3.20 (physik.md 21). Credit: ESA. Trennung und Positionswinkel aus der ORB6-Ephemeride 2027,0 (USNO), Magnituden aus dem WDS, Abruf 2026-10-29. Lage nach A-Z9: Mitte im Ursprung, A bei -rho/2 (Westen), B bei +rho/2 (Osten), dy = 0."
+        "kommentar": "B-V aus dem TDSC (Fabricius et al. 2002) umgerechnet mit B-V = 0,850 (BT - VT), ESA 1997 Bd. 1 Gl. 1.3.20 (physik.md 21). Credit: ESA. Trennung und Positionswinkel aus der ORB6-Ephemeride 2027,0 (USNO), Magnituden aus dem WDS, Abruf 2026-10-29. Lage nach A-Z9: Mitte im Ursprung, A bei -rho/2 (links, bei Norden oben Osten), B bei +rho/2 (rechts, Westen), dy = 0."
       }
     ]
   },
@@ -582,7 +582,7 @@
         "sterne": [
           {
             "name": "eps1 A",
-            "dx_arcsec": -14.251,
+            "dx_arcsec": 14.251,
             "dy_arcsec": 102.728,
             "magnitude": 5.15,
             "b_v": 0.12,
@@ -591,7 +591,7 @@
           },
           {
             "name": "eps1 B",
-            "dx_arcsec": -14.892,
+            "dx_arcsec": 14.892,
             "dy_arcsec": 104.634,
             "magnitude": 6.1,
             "b_v": 0.28,
@@ -600,7 +600,7 @@
           },
           {
             "name": "eps2 C",
-            "dx_arcsec": 13.425,
+            "dx_arcsec": -13.425,
             "dy_arcsec": -104.069,
             "magnitude": 5.25,
             "b_v": 0.16,
@@ -609,7 +609,7 @@
           },
           {
             "name": "eps2 D",
-            "dx_arcsec": 15.718,
+            "dx_arcsec": -15.718,
             "dy_arcsec": -103.293,
             "magnitude": 5.38,
             "b_v": 0.21,
@@ -618,7 +618,7 @@
           }
         ],
         "hinweis_hilfe": "Epsilon Lyrae ist ein Mehrfachstern aus zwei Paaren in 209 Bogensekunden Abstand; er ist in seiner echten Lage mit Norden oben gezeigt, die Doppelsterne aus zwei Sternen dagegen fest in Ost-West-Richtung.",
-        "kommentar": "Mehrfachstern in echter Lage, Norden oben (Entscheidung Herbert 2026-10-29, docs/recherche/README.md Entscheidung 4): dx positiv = Osten, dy positiv = Norden, Ursprung in der Mitte zwischen den Mittelpunkten der Paare; eps1 (AB) noerdlich, eps2 (CD) suedlich nach WDS STFA 37 (172 Grad, 209,4\"); eps1 nach ORB6 Doc2020e (die neuere der beiden Bahnen, doppelsterne.md 1.2), eps2 ebenso. Lagen auf 0,001\" gerundet. B-V aus dem TDSC (Fabricius et al. 2002) umgerechnet mit B-V = 0,850 (BT - VT), ESA 1997 Bd. 1 Gl. 1.3.20 (physik.md 21). Credit: ESA."
+        "kommentar": "Mehrfachstern in echter Lage, Norden oben (Entscheidung Herbert 2026-10-29, docs/recherche/README.md Entscheidung 4): dx positiv = rechts (Westen), dy positiv = Norden, Osten links; Ursprung in der Mitte zwischen den Mittelpunkten der Paare; eps1 (AB) noerdlich, eps2 (CD) suedlich nach WDS STFA 37 (172 Grad, 209,4\"); eps1 nach ORB6 Doc2020e (die neuere der beiden Bahnen, doppelsterne.md 1.2), eps2 ebenso. Lagen auf 0,001\" gerundet. B-V aus dem TDSC (Fabricius et al. 2002) umgerechnet mit B-V = 0,850 (BT - VT), ESA 1997 Bd. 1 Gl. 1.3.20 (physik.md 21). Credit: ESA."
       }
     ]
   },
@@ -666,7 +666,7 @@
             "quelle_farbe": "TDSC"
           }
         ],
-        "kommentar": "Keine Bahn in ORB6. B-V aus dem TDSC (Fabricius et al. 2002) umgerechnet mit B-V = 0,850 (BT - VT), ESA 1997 Bd. 1 Gl. 1.3.20 (physik.md 21). Credit: ESA. Trennung, Positionswinkel und Magnituden aus dem WDS (USNO), Abruf 2026-10-29. Lage nach A-Z9: Mitte im Ursprung, A bei -rho/2 (Westen), B bei +rho/2 (Osten), dy = 0."
+        "kommentar": "Keine Bahn in ORB6. B-V aus dem TDSC (Fabricius et al. 2002) umgerechnet mit B-V = 0,850 (BT - VT), ESA 1997 Bd. 1 Gl. 1.3.20 (physik.md 21). Credit: ESA. Trennung, Positionswinkel und Magnituden aus dem WDS (USNO), Abruf 2026-10-29. Lage nach A-Z9: Mitte im Ursprung, A bei -rho/2 (links, bei Norden oben Osten), B bei +rho/2 (rechts, Westen), dy = 0."
       }
     ]
   },
@@ -714,7 +714,7 @@
             "quelle_farbe": "TDSC"
           }
         ],
-        "kommentar": "B-V aus dem TDSC (Fabricius et al. 2002) umgerechnet mit B-V = 0,850 (BT - VT), ESA 1997 Bd. 1 Gl. 1.3.20 (physik.md 21). Credit: ESA. Trennung und Positionswinkel aus der ORB6-Ephemeride 2027,0 (USNO), Magnituden aus dem WDS, Abruf 2026-10-29. Lage nach A-Z9: Mitte im Ursprung, A bei -rho/2 (Westen), B bei +rho/2 (Osten), dy = 0."
+        "kommentar": "B-V aus dem TDSC (Fabricius et al. 2002) umgerechnet mit B-V = 0,850 (BT - VT), ESA 1997 Bd. 1 Gl. 1.3.20 (physik.md 21). Credit: ESA. Trennung und Positionswinkel aus der ORB6-Ephemeride 2027,0 (USNO), Magnituden aus dem WDS, Abruf 2026-10-29. Lage nach A-Z9: Mitte im Ursprung, A bei -rho/2 (links, bei Norden oben Osten), B bei +rho/2 (rechts, Westen), dy = 0."
       }
     ]
   },
@@ -762,7 +762,7 @@
             "quelle_farbe": "TDSC"
           }
         ],
-        "kommentar": "B-V aus dem TDSC (Fabricius et al. 2002) umgerechnet mit B-V = 0,850 (BT - VT), ESA 1997 Bd. 1 Gl. 1.3.20 (physik.md 21). Credit: ESA. Trennung und Positionswinkel aus der ORB6-Ephemeride 2027,0 (USNO), Magnituden aus dem WDS, Abruf 2026-10-29. Lage nach A-Z9: Mitte im Ursprung, A bei -rho/2 (Westen), B bei +rho/2 (Osten), dy = 0."
+        "kommentar": "B-V aus dem TDSC (Fabricius et al. 2002) umgerechnet mit B-V = 0,850 (BT - VT), ESA 1997 Bd. 1 Gl. 1.3.20 (physik.md 21). Credit: ESA. Trennung und Positionswinkel aus der ORB6-Ephemeride 2027,0 (USNO), Magnituden aus dem WDS, Abruf 2026-10-29. Lage nach A-Z9: Mitte im Ursprung, A bei -rho/2 (links, bei Norden oben Osten), B bei +rho/2 (rechts, Westen), dy = 0."
       }
     ]
   },
@@ -810,7 +810,7 @@
             "quelle_farbe": "TDSC"
           }
         ],
-        "kommentar": "Im TDSC nicht aufgeloest: B-V des Systems fuer beide Sterne (beide B7V; Hipparcos -0,031). Bahn von 1981 (Note 3), die Ephemeride ist unsicher (WDS 2024: 0,5\"). B-V aus dem TDSC (Fabricius et al. 2002) umgerechnet mit B-V = 0,850 (BT - VT), ESA 1997 Bd. 1 Gl. 1.3.20 (physik.md 21). Credit: ESA. Trennung und Positionswinkel aus der ORB6-Ephemeride 2027,0 (USNO), Magnituden aus dem WDS, Abruf 2026-10-29. Lage nach A-Z9: Mitte im Ursprung, A bei -rho/2 (Westen), B bei +rho/2 (Osten), dy = 0."
+        "kommentar": "Im TDSC nicht aufgeloest: B-V des Systems fuer beide Sterne (beide B7V; Hipparcos -0,031). Bahn von 1981 (Note 3), die Ephemeride ist unsicher (WDS 2024: 0,5\"). B-V aus dem TDSC (Fabricius et al. 2002) umgerechnet mit B-V = 0,850 (BT - VT), ESA 1997 Bd. 1 Gl. 1.3.20 (physik.md 21). Credit: ESA. Trennung und Positionswinkel aus der ORB6-Ephemeride 2027,0 (USNO), Magnituden aus dem WDS, Abruf 2026-10-29. Lage nach A-Z9: Mitte im Ursprung, A bei -rho/2 (links, bei Norden oben Osten), B bei +rho/2 (rechts, Westen), dy = 0."
       }
     ]
   },
@@ -858,7 +858,7 @@
             "quelle_farbe": "TDSC"
           }
         ],
-        "kommentar": "Bahn mit 34,5 Jahren Umlauf (Note 1). B-V aus dem TDSC (Fabricius et al. 2002) umgerechnet mit B-V = 0,850 (BT - VT), ESA 1997 Bd. 1 Gl. 1.3.20 (physik.md 21). Credit: ESA. Trennung und Positionswinkel aus der ORB6-Ephemeride 2027,0 (USNO), Magnituden aus dem WDS, Abruf 2026-10-29. Lage nach A-Z9: Mitte im Ursprung, A bei -rho/2 (Westen), B bei +rho/2 (Osten), dy = 0."
+        "kommentar": "Bahn mit 34,5 Jahren Umlauf (Note 1). B-V aus dem TDSC (Fabricius et al. 2002) umgerechnet mit B-V = 0,850 (BT - VT), ESA 1997 Bd. 1 Gl. 1.3.20 (physik.md 21). Credit: ESA. Trennung und Positionswinkel aus der ORB6-Ephemeride 2027,0 (USNO), Magnituden aus dem WDS, Abruf 2026-10-29. Lage nach A-Z9: Mitte im Ursprung, A bei -rho/2 (links, bei Norden oben Osten), B bei +rho/2 (rechts, Westen), dy = 0."
       }
     ]
   },
@@ -906,7 +906,7 @@
             "quelle_farbe": "SIMBAD"
           }
         ],
-        "kommentar": "B-V von A ist der Hipparcos-Wert des Systems (HIP 80763, Credit: ESA); B traegt weniger als 2 % zum Fluss bei. B-V von B aus SIMBAD B 5,0 und V 5,2 (Qualitaet E, ohne Bibcode). Bahn Note 5. Trennung und Positionswinkel aus der ORB6-Ephemeride 2027,0 (USNO), Magnituden aus dem WDS, Abruf 2026-10-29. Lage nach A-Z9: Mitte im Ursprung, A bei -rho/2 (Westen), B bei +rho/2 (Osten), dy = 0."
+        "kommentar": "B-V von A ist der Hipparcos-Wert des Systems (HIP 80763, Credit: ESA); B traegt weniger als 2 % zum Fluss bei. B-V von B aus SIMBAD B 5,0 und V 5,2 (Qualitaet E, ohne Bibcode). Bahn Note 5. Trennung und Positionswinkel aus der ORB6-Ephemeride 2027,0 (USNO), Magnituden aus dem WDS, Abruf 2026-10-29. Lage nach A-Z9: Mitte im Ursprung, A bei -rho/2 (links, bei Norden oben Osten), B bei +rho/2 (rechts, Westen), dy = 0."
       }
     ]
   },
@@ -950,11 +950,11 @@
             "dy_arcsec": 0,
             "magnitude": 8.6,
             "b_v": 0.42,
-            "katalog": "Polaris B",
+            "katalog": "arXiv:0708.0333",
             "quelle_farbe": "Usenko und Klochkova 2007 nach Turner 2005"
           }
         ],
-        "kommentar": "B-V von A ist der Hipparcos-Wert des Systems (HIP 11767, Credit: ESA; Ab mit 0,2\" eingeschlossen). Polaris B mit V 8,60 und B-V 0,42 nach Usenko und Klochkova 2007 (arXiv:0708.0333, doi:10.1111/j.1745-3933.2008.00426.x), die B-V von Turner 2005 uebernehmen; WDS nennt 9,1, SIMBAD 8,2 (Lee 2008). Entscheidung Herbert 2026-10-29 (docs/recherche/README.md, Entscheidung 7). Trennung und Positionswinkel aus dem WDS, Abruf 2026-10-29. Lage nach A-Z9: Mitte im Ursprung, A bei -rho/2 (Westen), B bei +rho/2 (Osten), dy = 0."
+        "kommentar": "B-V von A ist der Hipparcos-Wert des Systems (HIP 11767, Credit: ESA; Ab mit 0,2\" eingeschlossen). Polaris B mit V 8,60 und B-V 0,42 nach Usenko und Klochkova 2007 (arXiv:0708.0333, doi:10.1111/j.1745-3933.2008.00426.x), die B-V von Turner 2005 uebernehmen; WDS nennt 9,1, SIMBAD 8,2 (Lee 2008). Entscheidung Herbert 2026-10-29 (docs/recherche/README.md, Entscheidung 7). Trennung und Positionswinkel aus dem WDS, Abruf 2026-10-29. Lage nach A-Z9: Mitte im Ursprung, A bei -rho/2 (links, bei Norden oben Osten), B bei +rho/2 (rechts, Westen), dy = 0."
       }
     ]
   }

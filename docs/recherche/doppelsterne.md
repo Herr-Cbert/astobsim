@@ -41,6 +41,8 @@ Plausibilitaetspruefung: Die mit den Helligkeitsanteilen gewichtete Mischung der
 | VizieR, SIMBAD (CDS) | Datensaetze aus oeffentlichen Daten unter offener Lizenz (ODbL bzw. CC BY), sonst die Lizenz des Autors; gewuenschte Danksagung mit DOI 10.26093/cds/vizier bzw. Wenger et al. 2000 [13] (Seite nicht erreichbar, Wortlaut sekundaer aus der Suchzusammenfassung). | Danksagung an CDS; Lizenz richtet sich nach dem Ursprungskatalog (WDS, ESA, BSC). |
 | BSC (Yale, 5. Aufl.) | ueber VizieR, keine eigene Lizenz gefunden. | Zitat Hoffleit & Warren [9]. |
 
+Nachtrag #103 (an den Quellen gelesen am 2026-10-29): WDS und ORB6 nennen auf ihren Seiten keine Lizenz; der WDS erbittet nur die Danksagung, ORB6 nicht einmal das. "U.S. Government Works" steht im data.gov-Eintrag zum WDS, eingestellt von der HEASARC (NASA), nicht vom USNO. Die ESA-Lizenz fuer Hipparcos und Tycho ist woertlich wie oben bestaetigt; fuer Gaia lautet die Credit-Zeile laut den Nutzungsbedingungen der ESA-Archive "ESA, Gaia DPAC". SIMBAD: "Use of SIMBAD service is free without any registration under ODbL licence." (Startseite des Spiegels in Harvard). Wortlaute in `README.md`, Abschnitt Sterndaten.
+
 Ergebnis: Eine Lizenz, die die Aufnahme der Werte in `daten/objekte.json` verbietet, gibt es nicht. Pflicht ist die Quellenangabe; Vorschlag: ein Abschnitt "Sterndaten" neben den Bildnachweisen im Fuss der Seite (WDS/USNO, ORB6, ESA Hipparcos/Tycho, CDS).
 
 ---
@@ -91,7 +93,7 @@ Abfrage 2026-10-29. Spalten: $\rho$, $\theta$ mit Epoche (ORB6-Ephemeride "E2027
 | Polaris ($\alpha$ UMi) | 02318+8916 | STF 93 AB | 18,4 | 236 | M2016 | 2,04 | 9,10 | 0,64 / 0,42 | H / [19] |
 
 Anmerkungen zu einzelnen Zeilen:
-- **Albireo:** A ist selbst eng doppelt (Aa,Ac 0,3'' [3]); $V_\mathrm{A}$ 3,19 und $B-V$ 1,09 gelten fuer A gesamt (HIP 95947, im TDSC aufgeloest in 3,37 und 5,16 [6]). Fuer astobsim ist A ein Stern.
+- **Albireo:** A ist selbst eng doppelt (Aa,Ac 0,3'' [3]); $V_\mathrm{A}$ 3,19 und $B-V$ 1,09 gelten fuer A gesamt (HIP 95947, im TDSC aufgeloest in 3,37 und 5,16 [6]). Fuer astobsim ist A ein Stern. Nachtrag #103 (Entscheidung Herbert 2026-10-29): $V_\mathrm{B}$ 4,68 im WDS ist $V_T$ des TDSC; Hipparcos misst Vmag 5,12 (HIP 95951, bodengebunden), der Tycho-Hauptkatalog $B_T$ 5,01 und $V_T$ 5,082, also $V$ = 5,09 (ber., ESA 1997 Gl. 1.3.20). `daten/objekte.json` nimmt **5,1**.
 - **$\gamma$ And:** BC ist eng doppelt (STT 38, 0,37'' fuer 2027,0 [4]), fuer die Liste ein Stern. BSC gibt fuer $\gamma^2$ V = 4,84 [9], der WDS 5,02; die Liste nimmt den WDS-Wert (einheitliche Quelle), der Unterschied ist fuer die Darstellung belanglos.
 - **Castor:** Bahn Note 3, CIA2022d [4]; C (YY Gem, 9 mag, 70'') gehoert zum System, entfaellt aber: zwei Sterne genuegen (A-Z9), und bei hoher Vergroesserung liegt C ausserhalb des Zoomfensters.
 - **Porrima:** Bahn Note 2, Periode rund 169 Jahre, Periastron 2005 mit 0,4''; 2027 3,66'' und wachsend [4]. Zeigt, dass Paare ihre Trennung aendern (Hilfetext).
@@ -145,8 +147,8 @@ Doppelsterne folgen dem Muster der Trabanten (`monde[]` in `objekte.md` 6.2): ei
 - Objekt: `typ: "doppelstern"`; die Objektklasse (A-D18) folgt aus `typ` (mond, planet: Sonnensystem; doppelstern; deepsky).
 - Zustand: `sterne[]` statt `monde[]`; keine `winkelgroesse_arcsec`, kein `bild`. `katalog[]` je Paar als Nachweis: `wds`, `komponenten`, `trennung_arcsec`, `positionswinkel_grad`, `epoche`, `quelle` (Text, z. B. "ORB6 Doc2020e, Ephemeride 2027,0").
 - Stern: `name`, `dx_arcsec`, `dy_arcsec`, `magnitude` (V), `b_v`, `quelle_farbe` (Kuerzel wie in 2.2).
-- Lage: Mitte des Paars im Ursprung, A bei $-\rho/2$, B bei $+\rho/2$ auf der x-Achse (Ost-West, A-Z9); `dy_arcsec` = 0. Der Positionswinkel steht nur im Nachweis (A-D12 ist Kann). `dx_arcsec` wiederholt die Trennung; das ist eine bewusste Ausnahme von "nichts doppelt speichern", denn `katalog` ist der Nachweis, `sterne` das Modell. Ein Unit-Test prueft $|dx_\mathrm{B} - dx_\mathrm{A}| = \rho$.
-- Fuer $\varepsilon$ Lyr vier Sterne: die Paare in 209'' Abstand, $\varepsilon^1$ bei $x = -104{,}7''$, $\varepsilon^2$ bei $+104{,}7''$, jedes Unterpaar ebenfalls Ost-West (Abweichung von der Wirklichkeit: dort stehen die Paare fast Nord-Sued und die Unterpaare senkrecht zueinander).
+- Lage: Mitte des Paars im Ursprung, A bei $-\rho/2$, B bei $+\rho/2$ auf der x-Achse (Ost-West, A-Z9); `dy_arcsec` = 0. Richtung wie die Naht: `dx_arcsec` positiv = rechts, bei Norden oben also Westen, `dy_arcsec` positiv = Norden; ein Stern im Positionswinkel $\theta$ (Nord ueber Ost) und Abstand $\rho$ liegt bei $dx = -\rho\sin\theta$, $dy = \rho\cos\theta$ (Nachtrag #103). A liegt damit links (Osten). Der Positionswinkel steht nur im Nachweis (A-D12 ist Kann). `dx_arcsec` wiederholt die Trennung; das ist eine bewusste Ausnahme von "nichts doppelt speichern", denn `katalog` ist der Nachweis, `sterne` das Modell. Ein Unit-Test prueft $|dx_\mathrm{B} - dx_\mathrm{A}| = \rho$.
+- (Ueberholt durch Entscheidung 4, `docs/recherche/README.md`: $\varepsilon$ Lyr steht als Mehrfachstern in echter Lage mit Norden oben, Umsetzung #103.) Fuer $\varepsilon$ Lyr vier Sterne: die Paare in 209'' Abstand, $\varepsilon^1$ bei $x = -104{,}7''$, $\varepsilon^2$ bei $+104{,}7''$, jedes Unterpaar ebenfalls Ost-West (Abweichung von der Wirklichkeit: dort stehen die Paare fast Nord-Sued und die Unterpaare senkrecht zueinander).
 
 Beispiel (Zahlen mit Punkt wie in der Datei):
 
@@ -236,7 +238,7 @@ Liste fuer `daten/objekte.json` (14 Objekte, 16 Paare). Spalte "Hinweis": $|\Del
 
 | id | Name | $\rho$ [''] | $\theta$ | Epoche | $V_\mathrm{A}$ | $V_\mathrm{B}$ | $B-V$ A | $B-V$ B | $D_\mathrm{D}$ / $D_\mathrm{R}$ [mm] | Hinweis |
 |---|---|---|---|---|---|---|---|---|---|---|
-| albireo | Albireo | 34,3 | 54 | 2025 | 3,19 | 4,68 | 1,09 | $-0$,10 | 3 / 4 | |
+| albireo | Albireo | 34,3 | 54 | 2025 | 3,19 | 5,1 (WDS 4,68, siehe 2.2) | 1,09 | $-0$,10 | 3 / 4 | |
 | mizar | Mizar | 14,4 | 153 | 2022 | 2,23 | 3,88 | 0,02 | 0,13 | 8 / 10 | |
 | gamma_and | Gamma Andromedae | 9,5 | 63 | 2024 | 2,31 | 5,02 | 1,37 | 0,03 | 12 / 15 | |
 | castor | Castor | 5,772 | 48,9 | 2027,0 | 1,93 | 2,97 | 0,03 | 0,04 | 20 / 24 | |
@@ -256,6 +258,7 @@ Liste fuer `daten/objekte.json` (14 Objekte, 16 Paare). Spalte "Hinweis": $|\Del
 - Die id `52_ori` und `52_ari` beginnen mit einer Ziffer; falls ids als Bezeichner dienen, `ori_52` und `ari_52`.
 - Namen im UI aus `src/texte.ts` mit echten Umlauten und griechischen Buchstaben ("ε Lyrae"); die Datei bleibt ASCII.
 - Polaris B mit 8,60 [19] statt WDS 9,10 (2.2).
+- Albireo B mit 5,1 (Hipparcos und Tycho-Hauptkatalog) statt WDS 4,68 (2.2, Entscheidung Herbert 2026-10-29, #103).
 - Danksagung im Fuss: WDS/USNO [1, 2], ORB6 [4], "Credit: ESA" fuer Hipparcos/Tycho [7, 12], CDS VizieR/SIMBAD [13], BSC [9].
 
 ---
