@@ -14,12 +14,12 @@ describe("objektzustand", () => {
     const z = objektzustand(objekte, nachweise, "mond_ev")!;
     expect(z.kennung).toBe("mond_ev");
     expect(z.durchmesserArcsec).toBe(1865);
-    expect(z.magnitude).toBe(-10.2);
+    expect(z.magnitude).toBe(-10.51);
     expect(z.quelle!.breitePx).toBe(3072);
     expect(z.quelle!.hoehePx).toBe(3072);
     // 1865'' / 2758 px, Faktor 1,051 gegen den Nachweis (0,643''/px)
     expect(z.quelle!.massstabArcsecProPx).toBeCloseTo(0.67621, 5);
-    expect(z.quelle!.weissMagProArcsec2).toBe(3.91);
+    expect(z.quelle!.weissMagProArcsec2).toBe(3.6);
     expect(z.trabanten).toEqual([]);
     // Sonnensystem: Klasse aus typ mond, keine Sterne, keine Isophoten.
     expect(z.klasse).toBe("sonnensystem");
@@ -27,10 +27,11 @@ describe("objektzustand", () => {
     expect(z.isophoten).toBeUndefined();
   });
 
-  it("baut die Mondphasen aus Issue #36 (Bild, Massstab, Quellweiss, Magnitude)", () => {
+  it("baut alle Mondzustaende nach Issue #36 (Bild, Massstab, Quellweiss, Magnitude)", () => {
     // [Zustand, Bildnachweis, Scheibe px, Quellweiss, Magnitude]; Quellweiss geeicht mit
     // tools/quellweiss_eichen.py, die Probe am Bild prueft tools/test_mond_kacheln.py.
     const faelle: [string, string, number, number, number][] = [
+      ["mond_ev", "mond_svs5587_6285", 2758, 3.6, -10.51],
       ["mond_sichel", "mond_svs5587_6173", 2817, 3.99, -8.15],
       ["mond_voll", "mond_svs5587_6449", 2930, 2.29, -12.66],
       ["mond_lv", "mond_svs5587_6615", 3004, 3.48, -10.12]

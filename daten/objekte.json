@@ -10,15 +10,15 @@
         "name": "Mond, 1 Tag nach erstem Viertel",
         "winkelgroesse_arcsec": 1865,
         "polar_arcsec": 1865,
-        "phase": 0.60,
-        "phasenwinkel_grad": 78.5,
+        "phase": 0.593,
+        "phasenwinkel_grad": 79.3,
         "kolongitude_grad": 11,
-        "magnitude": -10.2,
-        "weiss_mag_arcsec2": 3.91,
+        "magnitude": -10.51,
+        "weiss_mag_arcsec2": 3.60,
         "entfernung_au": 0.00257,
         "bild": "mond_svs5587_6285",
         "hinweis_hilfe": "Ab etwa 200 mm Objektivdurchmesser begrenzt die Bildvorlage (0,64 Bogensekunden pro Pixel) die Detailtiefe, nicht mehr das Fernrohr.",
-        "kommentar": "Winkelgroesse ist der Jahrbuch-Mittelwert (objekte.md 6.1). Das Quellbild zeigt 1774,4 Bogensekunden (bilder.json, winkelgroesse_arcsec); die Anwendung skaliert die Scheibe von objekt_durchmesser_px auf die Winkelgroesse des Zustands. weiss_mag_arcsec2 ist auf den Pixelwert 1,0 des Quellbilds geeicht (objekte.md 5.3, tools/quellweiss_eichen.py): Gesamtfluss der Stufe 0 bei 1865\" ergibt die Magnitude -10,2 (bis #71: 3,35 als Vollmond-Flaechenhelligkeit)."
+        "kommentar": "Winkelgroesse ist der Jahrbuch-Mittelwert (objekte.md 6.1). Das Quellbild zeigt 1774,4 Bogensekunden (bilder.json, winkelgroesse_arcsec); die Anwendung skaliert die Scheibe von objekt_durchmesser_px auf die Winkelgroesse des Zustands. weiss_mag_arcsec2 ist auf den Pixelwert 1,0 des Quellbilds geeicht (objekte.md 5.3, tools/quellweiss_eichen.py): Gesamtfluss der Stufe 0 bei 1865\" ergibt die Magnitude -10,51 (bis #71: 3,35 als Vollmond-Flaechenhelligkeit; bis #36: -10,2 und 3,91). Seit #36 (Entscheidung Herbert 2026-10-29) wie die anderen Mondzustaende: magnitude nach Krisciunas und Schaefer 1991, Gl. 9 (physik.md 23) beim Phasenwinkel aus der Phase der SVS-Tabelle (k = 0,5927, 79,3 Grad), Nachtseite des Bilds geschwaerzt. phase und phasenwinkel_grad gehoeren zum Bild (bis #36: 0,60 und 78,5 als Zielwert)."
       },
       {
         "id": "mond_sichel",

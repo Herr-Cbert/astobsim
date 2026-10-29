@@ -128,10 +128,8 @@ class EichungTest(unittest.TestCase):
                 self.assertLessEqual(abs(m_bild - z["magnitude"]), 0.01)
 
     def test_magnitude_nach_krisciunas_schaefer(self):
-        # mond_ev behaelt -10,2 bis zur Entscheidung (objekte.md 7, Punkt 7).
+        # Seit #36 alle vier Mondzustaende, auch mond_ev (Entscheidung Herbert 2026-10-29).
         for z in self.mond["zustaende"]:
-            if z["id"] == "mond_ev":
-                continue
             with self.subTest(zustand=z["id"]):
                 self.assertLessEqual(abs(qe.mond_magnitude_ks(z["phasenwinkel_grad"]) - z["magnitude"]), 0.01)
 

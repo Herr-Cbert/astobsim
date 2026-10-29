@@ -22,13 +22,14 @@ N-1 = Frame N; docs/recherche/bilder-v2.md 8):
     6173  mond_sichel  15.09.2026 04:00 UT, 17,3 %  -> daten/bilder/mond_sichel/
     6449  mond_voll    26.09.2026 16:00 UT, 99,9 %  -> daten/bilder/mond_voll/
     6615  mond_lv      03.10.2026 14:00 UT, 49,9 %  -> daten/bilder/mond_lv/
-Frame 6285 (Issue #7) nutzt die festen Vorgaben (Mitte 2877/1622, 2758 px,
-0,643"/px) und behaelt die Nachtseite des Renderings; so bleiben Kacheln und
-Bildnachweis von mond_ev byte-gleich. Fuer die anderen Frames (Issue #36)
-werden Mitte und Durchmesser am Alphakanal gemessen (Schwerpunkt und
-Flaechendurchmesser, Durchmesser auf ganze Pixel gerundet), der Massstab ist
-winkelgroesse / Durchmesser, und die Nachtseite wird geschwaerzt (siehe
-schwaerze_nachtseite; ADR-0003 Nachtrag V2, bilder-v2.md 8.3).
+Frame 6285 (Issue #7) nutzt fuer Ausschnitt und Massstab die festen Vorgaben
+(Mitte 2877/1622, 2758 px, 0,643"/px), damit Geometrie und Kachelraster von
+mond_ev gleich bleiben; die Nachtseitenmaske nimmt dort die gemessene Scheibe.
+Fuer die anderen Frames (Issue #36) werden Mitte und Durchmesser am Alphakanal
+gemessen (Schwerpunkt und Flaechendurchmesser, Durchmesser auf ganze Pixel
+gerundet), der Massstab ist winkelgroesse / Durchmesser. Bei allen Frames wird
+die Nachtseite geschwaerzt (siehe schwaerze_nachtseite; ADR-0003 Nachtrag V2,
+bilder-v2.md 8.3; bei mond_ev seit der Entscheidung von Herbert vom 2026-10-29).
 
 Verwendung (aus dem Repo-Root, nur numpy und Pillow noetig):
     python3 tools/mond_kacheln.py                       # Frame 6285 (mond_ev)
@@ -61,7 +62,7 @@ und 18,2 Grad (echt, bleibt). Das Skript prueft das am Bild:
       oben 105, unten 100), dort reicht die Spiegelprobe (0,86 gegen 0,39).
 Es wird nicht gedreht oder gespiegelt.
 
-Nachtseite (Frames ausser 6285): Das Rendering hellt die Nachtseite kuenstlich
+Nachtseite (alle Frames): Das Rendering hellt die Nachtseite kuenstlich
 auf (lineare Leuchtdichte im Median 0,0036, bis 0,04, gegen 0,2 bis 0,3 der
 Tagseite), zum Terminator hin abnehmend; echtes Erdlicht ist um eine
 Groessenordnung dunkler (bilder-v2.md 8.3) und wird nicht simuliert (#94).
@@ -145,9 +146,9 @@ FRAMES = {
         "roh_sha256": "d0d586f67118288e2e9552fb45a26f07d4fb45697ad05b0a7cfc02a5cb42f99d",
         "roh_bytes": 10370890,
         "roh_abruf": "2026-10-23",
-        # Feste Vorgabe aus Issue #7 (Pixelmitte, Durchmesser, Massstab); mond_ev bleibt byte-gleich.
+        # Feste Vorgabe aus Issue #7 (Pixelmitte, Durchmesser, Massstab) fuer Ausschnitt und Massstab.
         "vorgabe": {"mitte_x": 2877, "mitte_y": 1622, "durchmesser_px": 2758, "bogensekunden_pro_pixel": 0.643},
-        "nachtseite_schwarz": False,
+        "nachtseite_schwarz": True,
         "norden_dunkler": True,
     },
     6173: {
@@ -272,8 +273,10 @@ def scheibe(alpha, f):
         if abs(d - v["durchmesser_px"]) > TOLERANZ_DURCHMESSER_PX:
             raise SystemExit("Scheibendurchmesser weicht von der Vorgabe ab; Konstanten pruefen")
         x0, y0 = v["mitte_x"] - halb, v["mitte_y"] - halb
+        # Nachtmaske an der gemessenen Scheibe (die Vorgabe liegt bis 2 px daneben, Issue #36)
         geo = {"x0": x0, "y0": y0, "kx": float(halb), "ky": float(halb),
-               "durchmesser_px": v["durchmesser_px"], "bogensekunden_pro_pixel": v["bogensekunden_pro_pixel"]}
+               "durchmesser_px": v["durchmesser_px"], "bogensekunden_pro_pixel": v["bogensekunden_pro_pixel"],
+               "nacht_kx": cx - x0, "nacht_ky": cy - y0, "nacht_r": d / 2.0}
     else:
         x0 = int(round(cx - (halb - 0.5)))
         y0 = int(round(cy - (halb - 0.5)))
@@ -384,7 +387,8 @@ def erweitere(maske, px):
 
 def schwaerze_nachtseite(bild, geo, f):
     """Nachtseite auf Schwarz (siehe Kopfkommentar). Aendert bild, gibt Kennzahlen zurueck."""
-    hoehe = sonnenhoehe(LEINWAND_PX, geo["kx"], geo["ky"], geo["durchmesser_px"] / 2.0, f)
+    hoehe = sonnenhoehe(LEINWAND_PX, geo.get("nacht_kx", geo["kx"]), geo.get("nacht_ky", geo["ky"]),
+                        geo.get("nacht_r", geo["durchmesser_px"] / 2.0), f)
     y = srgb_zu_linear(bild) @ GEWICHTE_Y
     gipfel = erweitere((y >= NACHT_SCHWELLE_Y) & (hoehe > -NACHT_GIPFEL_GRAD), NACHT_SAUM_PX)
     nacht = (hoehe < 0) & ~gipfel & (bild.max(axis=2) > 0)
@@ -575,37 +579,47 @@ def bildnachweis(frame, geo, stufenliste, qualitaet, gesamt_bytes, nacht):
     )
     rohtext = (f"Rohdatei moon.{frame}.tif: {f['roh_bytes']} Byte, SHA-256 {f['roh_sha256']}, "
                f"abgerufen {f['roh_abruf']}. ")
+    komma = lambda x, n=1: f"{x:.{n}f}".replace(".", ",")
+    nachttext = (
+        f"Nachtseite auf Schwarz gesetzt (Erdlicht wird nicht simuliert, "
+        f"ADR-0003 Nachtrag V2): jedes Pixel mit Sonnenhoehe unter 0 Grad nach der Ephemeride "
+        f"(Kugel, Sub-Sonne {komma(f['sub_sonne_breite_grad'], 3)}/{komma(f['sub_sonne_laenge_grad'], 3)} "
+        f"Grad), ausser beleuchteten Gipfeln (lineare Leuchtdichte ab {komma(NACHT_SCHWELLE_Y, 2)}, "
+        f"hoechstens {komma(NACHT_GIPFEL_GRAD, 0)} Grad hinter dem Terminator, mit {NACHT_SAUM_PX} px "
+        f"Saum); das sind {komma(100 * nacht['anteil_scheibe'])} Prozent der Scheibe und "
+        f"{komma(100 * nacht['anteil_fluss'], 2)} Prozent ihres Flusses im Rendering. "
+    )
+    nachthinweis = (
+        "Das Rendering hellt die Nachtseite kuenstlich auf (gemessen an Frame 6173: Median der "
+        "linearen Leuchtdichte 0,0036 fern vom Terminator gegen 0,21 auf der Tagseite, etwa 1,7 Prozent; "
+        "um eine Groessenordnung heller als Erdlicht, docs/recherche/bilder-v2.md 8.3); sie ist hier "
+        "geschwaerzt. "
+    )
     if f["vorgabe"] is not None:
         v = f["vorgabe"]
         bearbeitung = (
             f"Quadratischer Ausschnitt {LEINWAND_PX} px um die Scheibenmitte (Pixel {v['mitte_x']}/{v['mitte_y']} "
             f"des Rohbilds), Alphakanal auf Schwarz gelegt, ausserhalb der Scheibe plus {RAND_PX} px Rand "
-            f"auf Schwarz gesetzt, nicht gedreht oder gespiegelt (Himmelsnorden oben laut SVS, "
-            f"Positionswinkel der Achse {pa} Grad), keine Farb- oder "
+            f"auf Schwarz gesetzt. " + nachttext +
+            f"Nicht gedreht oder gespiegelt (Himmelsnorden oben laut SVS, "
+            f"Positionswinkel der Achse {pa} Grad), Tagseite ohne Farb- oder "
             f"Kontrastaenderung, " + kacheltext
         )
         hinweise = (
             "Rendering, zugelassen als Ausnahme A-X9 (ADR-0002). Winkelgroesse 1774,4\" ist die des "
             "Rendering-Zeitpunkts; der Zustand mond_ev zeigt 1865\". Scheibendurchmesser gemessen: "
             "Flaechendurchmesser aus dem Alphakanal 2753,8 px, Bounding-Box 2753x2757 px (Alpha >= 128); "
-            "verwendet wird die SVS-Vorgabe 2758 px. Nachtseite ist im Rendering "
-            "schwach aufgehellt (etwa 5 Prozent der Tagseite), unveraendert uebernommen. "
-            + rohtext +
+            "verwendet wird die SVS-Vorgabe 2758 px; die Nachtseitenmaske nutzt die gemessene Scheibe. "
+            + nachthinweis + rohtext +
             "Die SVS-Seite hat keine einzelne Credit-Zeile; Namensnennung aus dem Abschnitt Credits."
         )
     else:
-        komma = lambda x, n=1: f"{x:.{n}f}".replace(".", ",")
         bearbeitung = (
             f"Quadratischer Ausschnitt {LEINWAND_PX} px um die gemessene Scheibenmitte (Schwerpunkt des "
             f"Alphakanals, Pixel {komma(geo['mess_x'])}/{komma(geo['mess_y'])} des Rohbilds, auf 0,5 px "
             f"in der Leinwandmitte), Alphakanal auf Schwarz gelegt, ausserhalb der Scheibe plus {RAND_PX} px "
-            f"Rand auf Schwarz gesetzt. Nachtseite auf Schwarz gesetzt (Erdlicht wird nicht simuliert, "
-            f"ADR-0003 Nachtrag V2): jedes Pixel mit Sonnenhoehe unter 0 Grad nach der Ephemeride "
-            f"(Kugel, Sub-Sonne {komma(f['sub_sonne_breite_grad'], 3)}/{komma(f['sub_sonne_laenge_grad'], 3)} "
-            f"Grad), ausser beleuchteten Gipfeln (lineare Leuchtdichte ab {komma(NACHT_SCHWELLE_Y, 2)}, "
-            f"hoechstens {komma(NACHT_GIPFEL_GRAD, 0)} Grad hinter dem Terminator, mit {NACHT_SAUM_PX} px "
-            f"Saum); das sind {komma(100 * nacht['anteil_scheibe'])} Prozent der Scheibe und "
-            f"{komma(100 * nacht['anteil_fluss'], 2)} Prozent ihres Flusses im Rendering. Nicht gedreht "
+            f"Rand auf Schwarz gesetzt. " + nachttext +
+            f"Nicht gedreht "
             f"oder gespiegelt (Himmelsnorden oben laut SVS, Positionswinkel der Achse {pa} Grad), "
             f"Tagseite ohne Farb- oder Kontrastaenderung, " + kacheltext
         )
@@ -614,11 +628,8 @@ def bildnachweis(frame, geo, stufenliste, qualitaet, gesamt_bytes, nacht):
             f"{komma(f['winkelgroesse_arcsec'])}\" ist die des Rendering-Zeitpunkts; der Zustand "
             f"{f['zustand']} zeigt den Mittelwert 1865\". Scheibe gemessen: Flaechendurchmesser aus dem "
             f"Alphakanal {komma(geo['mess_durchmesser'])} px, Bounding-Box {geo['mess_box'][0]}x"
-            f"{geo['mess_box'][1]} px (Alpha >= 128); verwendet {geo['durchmesser_px']} px. Das Rendering "
-            f"hellt die Nachtseite kuenstlich auf (etwa 1 Prozent der Tagseite, um eine Groessenordnung "
-            f"heller als Erdlicht, docs/recherche/bilder-v2.md 8.3); sie ist hier geschwaerzt, "
-            f"anders als bei mond_svs5587_6285. "
-            + rohtext +
+            f"{geo['mess_box'][1]} px (Alpha >= 128); verwendet {geo['durchmesser_px']} px. "
+            + nachthinweis + rohtext +
             "Die SVS-Seite hat keine einzelne Credit-Zeile; Namensnennung aus dem Abschnitt Credits."
         )
     return {
