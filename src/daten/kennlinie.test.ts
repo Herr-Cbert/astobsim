@@ -56,7 +56,7 @@ describe("log-Kennlinie", () => {
   });
 
   it("eine Stufe ist (dunkel - hell) / 254 mag, das Verhaeltnis benachbarter Kodes konstant", () => {
-    // 12,7 / 254 = 0,05 mag je Stufe, Faktor 10^(0,02) = 1,047128548 (ber., ADR-0003: 4,5 %)
+    // 12,7 / 254 = 0,05 mag je Stufe, Faktor 10^(0,02) = 1,047128548, also 4,7 % (ber.; ADR-0003 nennt 4,5 % fuer etwa 12 mag Umfang)
     for (const v of [1, 50, 200, 254]) expect(logZuLinear(v + 1, KENNLINIE) / logZuLinear(v, KENNLINIE)).toBeCloseTo(1.047128548, 8);
   });
 

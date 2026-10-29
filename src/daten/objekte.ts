@@ -41,6 +41,12 @@ const LAGE_MAX_ARCSEC = 7200;
 /** Winkelgroesse: Sonnensystem bis 4000'' (Mond), Deep-Sky bis 5 Grad (M31 rund 11400''). */
 const WINKELGROESSE_MAX_ARCSEC = 4000;
 const WINKELGROESSE_DEEP_SKY_MAX_ARCSEC = 18000;
+/** Grenzen der Magnitude je Klasse: Sonnensystem wie Version 1, Sterne und Deep-Sky bis 25. */
+const MAGNITUDE_GRENZEN: Record<Objektklasse, readonly [number, number]> = {
+  sonnensystem: [-15, 10],
+  doppelstern: [-15, 25],
+  deep_sky: [-15, 25]
+};
 /** Toleranz der Paarpruefung abs(dx_B - dx_A) = Trennung: zwei auf 0,001'' gerundete Lagen. */
 const TOLERANZ_TRENNUNG_ARCSEC = 0.002;
 
@@ -217,7 +223,7 @@ function pruefeZustand(wert: unknown, typ: Objekttyp, klasse: Objektklasse, ortI
   const zustand: ZustandEintrag = {
     id,
     name: text(obj, "name", ort),
-    magnitude: zahl(obj, "magnitude", ort, -15, 25),
+    magnitude: zahl(obj, "magnitude", ort, ...MAGNITUDE_GRENZEN[klasse]),
     trabanten: [],
     sterne: []
   };
@@ -234,7 +240,6 @@ function pruefeZustand(wert: unknown, typ: Objekttyp, klasse: Objektklasse, ortI
 function pruefeSonnensystem(obj: Record<string, unknown>, typ: Objekttyp, zustand: ZustandEintrag, ort: Ort): void {
   const id = zustand.id;
   const optZahl = (feld: string, min: number, max: number) => optional(obj, feld, (o, f) => zahl(o, f, ort, min, max));
-  if (zustand.magnitude > 10) throw new DatenFehler(OBJEKTE_DATEI, id, "magnitude", `${zustand.magnitude} liegt nicht in -15 bis 10`);
   zustand.winkelgroesseArcsec = zahl(obj, "winkelgroesse_arcsec", ort, 0.1, WINKELGROESSE_MAX_ARCSEC);
   zustand.polarArcsec = zahl(obj, "polar_arcsec", ort, 0.1, WINKELGROESSE_MAX_ARCSEC);
   zustand.phase = zahl(obj, "phase", ort, 0, 1);
@@ -285,6 +290,9 @@ function pruefeDoppelstern(obj: Record<string, unknown>, zustand: ZustandEintrag
   if (zustand.magnitude > hellster) {
     throw new DatenFehler(OBJEKTE_DATEI, id, "magnitude", `${zustand.magnitude} schwaecher als der hellste Stern (${hellster})`);
   }
+  // Bei mehr als zwei Sternen (Epsilon Lyrae: vier Sterne, drei Paarnachweise, einer davon zwischen
+  // den Systemmitten) ist aus den Daten nicht ablesbar, welcher Nachweis zu welchen Sternen gehoert;
+  // Lage und Trennung bleiben dort vorerst ungeprueft (Entscheidung Herbert offen, PR #122).
   if (zustand.sterne.length === 2) {
     const [a, b] = zustand.sterne as [SternEintrag, SternEintrag];
     if (zustand.katalog.length !== 1) throw new DatenFehler(OBJEKTE_DATEI, id, "katalog", "genau ein Paarnachweis fuer zwei Sterne erwartet");
@@ -307,7 +315,7 @@ function pruefeDeepSky(obj: Record<string, unknown>, zustand: ZustandEintrag, or
   if (zustand.polarArcsec > zustand.winkelgroesseArcsec) {
     throw new DatenFehler(OBJEKTE_DATEI, id, "polar_arcsec", "groesser als winkelgroesse_arcsec (grosse Achse)");
   }
-  zustand.positionswinkelGrad = zahl(obj, "positionswinkel_grad", ort, 0, 360);
+  zustand.positionswinkelGrad = positionswinkel(obj, ort);
   const profil = optional(obj, "profil", (o, f) => pruefeProfil(alsObjekt(o[f], ort, f), { datei: OBJEKTE_DATEI, eintrag: `${id}, profil` }));
   if (profil !== undefined) zustand.profil = profil;
 
@@ -336,6 +344,13 @@ function pruefeDeepSky(obj: Record<string, unknown>, zustand: ZustandEintrag, or
       throw new DatenFehler(OBJEKTE_DATEI, id, "sterne", "ohne bild mindestens ein Stern oder sterne_datei erwartet");
     }
   }
+}
+
+/** Positionswinkel in Grad, halboffen [0, 360): 360 ist 0 und soll so eingetragen werden. */
+function positionswinkel(obj: Record<string, unknown>, ort: Ort): number {
+  const wert = zahl(obj, "positionswinkel_grad", ort, 0, 360);
+  if (wert === 360) throw new DatenFehler(ort.datei, ort.eintrag, "positionswinkel_grad", "360 liegt nicht in [0, 360); 0 eintragen");
+  return wert;
 }
 
 /** Prueft eine Liste roher Sterne; ort nennt den Zustand oder die Sternliste. */
@@ -370,7 +385,7 @@ function pruefePaarnachweis(wert: unknown, ort: Ort): Paarnachweis {
     wds,
     komponenten: text(obj, "komponenten", ort),
     trennungArcsec: zahl(obj, "trennung_arcsec", ort, 0.001, 2 * LAGE_MAX_ARCSEC),
-    positionswinkelGrad: zahl(obj, "positionswinkel_grad", ort, 0, 360),
+    positionswinkelGrad: positionswinkel(obj, ort),
     epoche: zahl(obj, "epoche", ort, 1700, 2200),
     quelle: text(obj, "quelle", ort)
   };

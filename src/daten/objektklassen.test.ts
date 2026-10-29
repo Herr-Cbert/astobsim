@@ -215,6 +215,35 @@ describe("pruefeObjekte Doppelstern", () => {
     expect(() => katalog(weit)).not.toThrow();
   });
 
+  it("begrenzt positionswinkel_grad auf [0, 360)", () => {
+    const paar360 = paar();
+    (zustandVon(paar360)["katalog"] as Roh[])[0]!["positionswinkel_grad"] = 360;
+    const f = fehlerVon(() => katalog(paar360));
+    expect([f.eintrag, f.feld]).toEqual(["testpaar_1, katalog[0]", "positionswinkel_grad"]);
+    const nebel360 = nebel();
+    zustandVon(nebel360)["positionswinkel_grad"] = 360;
+    expect(fehlerVon(() => katalog(nebel360)).feld).toBe("positionswinkel_grad");
+    zustandVon(nebel360)["positionswinkel_grad"] = 359.9;
+    expect(() => katalog(nebel360)).not.toThrow();
+  });
+
+  it("noch nicht geprueft: Lage und Trennung bei mehr als zwei Sternen (Epsilon Lyrae, Entscheidung offen)", () => {
+    // Vier Sterne mit drei Paarnachweisen; die Trennungen passen absichtlich zu keinem Sternabstand.
+    // Wird die Paarpruefung fuer Mehrfachsterne eingefuehrt, muss dieser Test einen DatenFehler erwarten.
+    const roh = paar();
+    const z = zustandVon(roh);
+    z["sterne"] = [
+      { name: "A", dx_arcsec: -105, dy_arcsec: 0, magnitude: 5, b_v: 0.1 },
+      { name: "B", dx_arcsec: -103, dy_arcsec: 1, magnitude: 6, b_v: 0.3 },
+      { name: "C", dx_arcsec: 103, dy_arcsec: 0, magnitude: 5.2, b_v: 0.2 },
+      { name: "D", dx_arcsec: 106, dy_arcsec: 0, magnitude: 5.4, b_v: 0.2 }
+    ];
+    const p = (z["katalog"] as Roh[])[0]!;
+    z["katalog"] = [p, { ...p, trennung_arcsec: 7 }, { ...p, trennung_arcsec: 500 }];
+    z["magnitude"] = 4;
+    expect(() => katalog(roh)).not.toThrow();
+  });
+
   it("reserviert die Kennung frei fuer das freie Paar", () => {
     const roh = paar();
     zustandVon(roh)["id"] = "frei";
@@ -323,6 +352,28 @@ describe("pruefeObjekte Deep-Sky", () => {
       zustandVon(roh)[feld] = [];
       expect(fehlerVon(() => katalog(roh)).feld).toBe(feld);
     }
+  });
+});
+
+describe("pruefeObjekte Magnitude je Klasse", () => {
+  it("meldet beim Sonnensystem die Grenze -15 bis 10, bei Deep-Sky -15 bis 25", () => {
+    const planet = {
+      id: "testplanet", name: "Testplanet", typ: "planet",
+      zustaende: [
+        {
+          id: "testplanet_1", name: "Testplanet", winkelgroesse_arcsec: 10, polar_arcsec: 10, phase: 1, phasenwinkel_grad: 0,
+          magnitude: 30, weiss_mag_arcsec2: 3, entfernung_au: 1, bild: "testplanet_bild"
+        }
+      ]
+    };
+    const f = fehlerVon(() => katalog(planet));
+    expect(f.feld).toBe("magnitude");
+    expect(f.message).toContain("-15 bis 10");
+    const tief = nebel();
+    zustandVon(tief)["magnitude"] = 24;
+    expect(() => katalog(tief)).not.toThrow();
+    zustandVon(tief)["magnitude"] = 30;
+    expect(fehlerVon(() => katalog(tief)).message).toContain("-15 bis 25");
   });
 });
 
