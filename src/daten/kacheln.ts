@@ -14,6 +14,8 @@
 // Cache: LRU mit maxKacheln. Kacheln aus dem Browser liegen als 8-Bit-sRGB im Cache (KachelSrgb,
 // Issue #66: 3 statt 12 Bytes je Pixel, die Mond-Pyramide etwa 37 statt 149 MB) und werden erst
 // in ausschnitt ueber dieselbe Tabelle wie rgbaZuRaster linearisiert, das Ergebnis ist bitgleich.
+// Deep-Sky-Pyramiden (log-Kennlinie, kennlinie.ts) liegen ebenso als 8-Bit-Kodewerte mit einem Kanal
+// im Cache; die Quelle bekommt dann die Tabelle der Kennlinie statt der sRGB-Tabelle.
 // Lader in Tests liefern weiter lineare Raster (Float32). Nie verdraengt werden die Kacheln laufender lade-Aufrufe, der
 // zuletzt abgeschlossenen Anfrage und der zuletzt gestarteten abgeschlossenen Anfrage. So gilt
 // "lade, dann ausschnitt" auch, wenn ein aelterer lade-Aufruf erst nach einem neueren fertig wird.
@@ -39,10 +41,15 @@ export interface Pyramidengeometrie {
   stufen: Stufengeometrie[];
 }
 
-/** Kachel als 8-Bit-sRGB-Kodewerte, drei Kanaele zeilenweise, Zeile 0 Norden (Issue #66). */
+/**
+ * Kachel als 8-Bit-Kodewerte, zeilenweise, Zeile 0 Norden (Issue #66). Der Name stammt aus der Zeit
+ * nur mit sRGB; welche Kennlinie die Kodes haben, legt die Tabelle der Quelle fest (kennlinie.ts).
+ */
 export interface KachelSrgb {
   breite: number;
   hoehe: number;
+  /** Fehlt = 3 (sRGB-Farbbild); 1 bei Grauwertbildern mit log-Kennlinie. */
+  kanaele?: Kanaele;
   srgb: Uint8Array;
 }
 
@@ -82,7 +89,9 @@ export class QuelleKacheln implements Quelle {
   constructor(
     readonly geometrie: Pyramidengeometrie,
     private readonly lader: KachelLader,
-    readonly maxKacheln = MAX_KACHELN_STANDARD
+    readonly maxKacheln = MAX_KACHELN_STANDARD,
+    /** Dekodiertabelle fuer 8-Bit-Kacheln: sRGB (Mond) oder log-Kennlinie (Deep-Sky, kodetabelle). */
+    private readonly tabelle: Float32Array = LINEAR_8BIT
   ) {
     const { kachelPx, stufen } = geometrie;
     if (!Number.isInteger(kachelPx) || kachelPx < 1) throw new DatenFehler("-", "Kachelpyramide", "kachelPx", `${kachelPx} ist keine positive ganze Zahl`);
@@ -96,6 +105,7 @@ export class QuelleKacheln implements Quelle {
       }
     });
     if (!(maxKacheln >= 1)) throw new DatenFehler("-", "Kachelpyramide", "maxKacheln", "mindestens 1");
+    if (tabelle.length !== 256) throw new DatenFehler("-", "Kachelpyramide", "tabelle", `256 Werte erwartet, ${tabelle.length} geliefert`);
   }
 
   /** Anzahl der Kacheln im Cache (fuer Tests). */
@@ -184,7 +194,7 @@ export class QuelleKacheln implements Quelle {
         const von = ((y - ky0) * kachel.breite + (sx0 - kx0)) * kanaele;
         const nach = ((y - y0) * raster.breite + (sx0 - x0)) * kanaele;
         if (srgb === undefined) raster.daten.set((kachel as Raster).daten.subarray(von, von + zeilenLaenge), nach);
-        else linearisiere(srgb, von, raster.daten, nach, zeilenLaenge);
+        else linearisiere(srgb, von, raster.daten, nach, zeilenLaenge, this.tabelle);
       }
     }
     return { raster, massstabArcsecProPx: ms, linksXArcsec: links + x0 * ms, obenYArcsec: oben - y0 * ms };
@@ -221,8 +231,8 @@ export class QuelleKacheln implements Quelle {
     const breite = Math.min(k, geo.breitePx - adresse.x * k);
     const hoehe = Math.min(k, geo.hoehePx - adresse.y * k);
     const kanaele = this.geometrie.kanaele;
-    // Eine sRGB-Kachel hat immer drei Kanaele.
-    const [kKanaele, laenge] = "srgb" in kachel ? [3, kachel.srgb.length] : [kachel.kanaele, kachel.daten.length];
+    // Eine 8-Bit-Kachel ohne Angabe hat drei Kanaele (sRGB).
+    const [kKanaele, laenge] = "srgb" in kachel ? [kachel.kanaele ?? 3, kachel.srgb.length] : [kachel.kanaele, kachel.daten.length];
     if (kachel.breite !== breite || kachel.hoehe !== hoehe || kKanaele !== kanaele || laenge !== breite * hoehe * kanaele) {
       throw new DatenFehler(
         "Kachel",
@@ -281,9 +291,8 @@ export function kachelPfad(nachweis: Bildnachweis, adresse: Kacheladresse): stri
   );
 }
 
-/** n sRGB-Kodewerte ab von in lineare Werte ab nach; eigene Funktion, damit die Schleife monomorph bleibt. */
-function linearisiere(srgb: Uint8Array, von: number, ziel: Float32Array, nach: number, n: number): void {
-  const tabelle = LINEAR_8BIT;
+/** n 8-Bit-Kodewerte ab von ueber die Tabelle in lineare Werte ab nach; eigene Funktion, damit die Schleife monomorph bleibt. */
+export function linearisiere(srgb: Uint8Array, von: number, ziel: Float32Array, nach: number, n: number, tabelle: Float32Array): void {
   for (let i = 0; i < n; i++) ziel[nach + i] = tabelle[srgb[von + i]!]!;
 }
 

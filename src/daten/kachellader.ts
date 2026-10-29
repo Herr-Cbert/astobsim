@@ -8,11 +8,16 @@
 // (IEC 61966-2-1) linearisiert, 255 = Quellweiss = 1,0. Einzelbilder werden beim Laden linearisiert
 // (rgbaZuRaster), Kacheln bleiben 8-Bit-sRGB (rgbaZuSrgb) und werden erst in QuelleKacheln.ausschnitt
 // linearisiert (Issue #66: ein Viertel des Speichers). Beide Funktionen sind rein und in Node getestet.
+//
+// Deep-Sky-Bilder sind 8-Bit-Grauwert-WebP mit log-Kennlinie (bilder.json kennlinie, kennlinie.ts):
+// Einzelbild und Kacheln bleiben als Kodewerte mit einem Kanal (rgbaZuKodes, Rot-Kanal des
+// Grauwerts) und werden im Ausschnitt ueber die Tabelle der Kennlinie dekodiert.
 
-import type { Raster } from "../naht/raster";
+import type { Kanaele, Raster } from "../naht/raster";
 import type { Bildnachweis } from "./bildnachweise";
 import { DatenFehler } from "./fehler";
 import { kachelPfad, type KachelLader, type KachelSrgb, pyramidengeometrie, QuelleKacheln } from "./kacheln";
+import { kodetabelle } from "./kennlinie";
 import { holeDaten } from "./pruefe";
 import { quelleEinzelbild, type QuelleEinzelbild } from "./quelle_einzelbild";
 
@@ -54,6 +59,25 @@ export function rgbaZuSrgb(rgba: Uint8ClampedArray | Uint8Array, breite: number,
   return { breite, hoehe, srgb };
 }
 
+/**
+ * RGBA-Bytes in 8-Bit-Kodewerte mit kanaele Kanaelen: 3 wie rgbaZuSrgb, 1 fuer Grauwertbilder
+ * (log-Kennlinie; der Canvas liefert R = G = B, genommen wird Rot).
+ */
+export function rgbaZuKodes(rgba: Uint8ClampedArray | Uint8Array, breite: number, hoehe: number, kanaele: Kanaele): KachelSrgb {
+  if (kanaele === 3) return rgbaZuSrgb(rgba, breite, hoehe);
+  if (rgba.length !== breite * hoehe * 4) {
+    throw new DatenFehler("Kachel", "-", "Pixel", `${breite * hoehe * 4} Bytes RGBA erwartet, ${rgba.length} geliefert`);
+  }
+  const kodes = new Uint8Array(breite * hoehe);
+  for (let i = 0, j = 0; i < rgba.length; i += 4, j++) kodes[j] = rgba[i]!;
+  return { breite, hoehe, kanaele: 1, srgb: kodes };
+}
+
+/** Kanaele der Kodewerte eines Bilds: 1 bei log-Kennlinie (Grauwert), sonst 3 (sRGB). */
+function kanaeleFuer(nachweis: Bildnachweis): Kanaele {
+  return nachweis.kennlinie === undefined ? 3 : 1;
+}
+
 /** Laedt daten/bilder/<pfad> (nur im Browser) und liefert es als lineares Raster mit drei Kanaelen. */
 async function ladeRasterBrowser(pfad: string, nachweisId: string): Promise<Raster> {
   const { rgba, breite, hoehe } = await ladeRgbaBrowser(pfad, nachweisId);
@@ -85,21 +109,26 @@ function kachelLaderBrowser(nachweis: Bildnachweis): KachelLader {
   // async, damit auch ein Fehler in kachelPfad als abgelehntes Promise ankommt (Vertrag KachelLader).
   return async (stufe, x, y) => {
     const { rgba, breite, hoehe } = await ladeRgbaBrowser(kachelPfad(nachweis, { stufe, x, y }), nachweis.id);
-    return rgbaZuSrgb(rgba, breite, hoehe);
+    return rgbaZuKodes(rgba, breite, hoehe, kanaeleFuer(nachweis));
   };
 }
 
 /** QuelleKacheln fuer einen Zustand im Browser: Geometrie skaliert auf winkelgroesseArcsec. */
 export function quelleKachelnBrowser(nachweis: Bildnachweis, winkelgroesseArcsec: number): QuelleKacheln {
-  return new QuelleKacheln(pyramidengeometrie(nachweis, winkelgroesseArcsec), kachelLaderBrowser(nachweis));
+  const geometrie = pyramidengeometrie(nachweis, winkelgroesseArcsec, kanaeleFuer(nachweis));
+  return new QuelleKacheln(geometrie, kachelLaderBrowser(nachweis), undefined, kodetabelle(nachweis));
 }
 
 /**
- * QuelleEinzelbild fuer einen Zustand im Browser: laedt das Bild einmal und linearisiert es;
- * ausschnitt ist danach synchron.
+ * QuelleEinzelbild fuer einen Zustand im Browser: laedt das Bild einmal und linearisiert es (sRGB)
+ * oder behaelt die Kodewerte (log-Kennlinie); ausschnitt ist danach synchron.
  */
 export async function quelleEinzelbildBrowser(nachweis: Bildnachweis, winkelgroesseArcsec: number): Promise<QuelleEinzelbild> {
-  return quelleEinzelbild(nachweis, winkelgroesseArcsec, await ladeRasterBrowser(nachweis.datei, nachweis.id));
+  if (nachweis.kennlinie === undefined) {
+    return quelleEinzelbild(nachweis, winkelgroesseArcsec, await ladeRasterBrowser(nachweis.datei, nachweis.id));
+  }
+  const { rgba, breite, hoehe } = await ladeRgbaBrowser(nachweis.datei, nachweis.id);
+  return quelleEinzelbild(nachweis, winkelgroesseArcsec, rgbaZuKodes(rgba, breite, hoehe, 1));
 }
 
 /** 2D-Kontext zum Auslesen der Pixel: OffscreenCanvas (auch im Worker), sonst ein DOM-Canvas. */

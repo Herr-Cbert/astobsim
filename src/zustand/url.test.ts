@@ -24,7 +24,7 @@ function zustand(id: string, winkel: number, mag: number, trabanten: ZustandEint
 }
 
 function planet(id: string, zustaende: ZustandEintrag[]): Objekt {
-  return { id, name: id, typ: "planet", zustaende };
+  return { id, name: id, typ: "planet", klasse: "sonnensystem", zustaende };
 }
 
 const PLANETEN: Objekt[] = [
@@ -48,7 +48,7 @@ const SYNTHETISCH: Kataloge = {
   nachweise: [
     ...nachweiseEcht.filter((n) => n.objekt === "mond"),
     ...PLANETEN.flatMap((o) =>
-      o.zustaende.map((z): Bildnachweis => ({ ...mondNachweis, id: z.bild, objekt: o.id, zustand: z.id, kacheln: undefined, pixelBreite: 1000, pixelHoehe: 800, objektDurchmesserPx: 500 }))
+      o.zustaende.map((z): Bildnachweis => ({ ...mondNachweis, id: z.bild!, objekt: o.id, zustand: z.id, kacheln: undefined, pixelBreite: 1000, pixelHoehe: 800, objektDurchmesserPx: 500 }))
     )
   ]
 };
