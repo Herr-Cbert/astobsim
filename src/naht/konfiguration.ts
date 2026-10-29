@@ -75,24 +75,68 @@ export interface Trabant {
   magnitude: number;
 }
 
+/** Objektklassen (A-D18); objekte.json "typ" mond und planet gehoeren zu sonnensystem. */
+export const OBJEKTKLASSEN = ["sonnensystem", "doppelstern", "deep_sky"] as const;
+export type Objektklasse = (typeof OBJEKTKLASSEN)[number];
+
+/**
+ * Stern eines Doppel-, Mehrfachsterns oder Deep-Sky-Objekts: Lage wie Trabant (relativ zur
+ * Objektmitte, +x rechts, +y Norden), kein Durchmesser, Farbindex B-V (A-P12).
+ */
+export interface Stern {
+  name: string;
+  dxArcsec: number;
+  dyArcsec: number;
+  magnitude: number;
+  bv: number;
+}
+
+/** Zeile der Flaechentabelle: Isophote am Himmel (mag/arcsec^2, V) und eingeschlossene Flaeche (arcsec^2). */
+export interface Isophote {
+  magProArcsec2: number;
+  flaecheArcsec2: number;
+}
+
+/** Eingaben des freien Paars (A-Z9); Quelle der Wahrheit fuer URL und begrenze. Trennung in Bogensekunden. */
+export interface Paareingaben {
+  trennungArcsec: number;
+  magnitudeA: number;
+  magnitudeB: number;
+  bvA: number;
+  bvB: number;
+}
+
 /**
  * Zustand eines Objekts: Winkelgroesse in Bogensekunden, Magnitude (fuer die Blendungsregel
- * A-P6), Quellbild mit Pixelmassstab und Trabanten. weissMagProArcsec2 ist die
+ * A-P6), Quellbild mit Pixelmassstab, Trabanten und Sterne. weissMagProArcsec2 ist die
  * Flaechenhelligkeit in mag je Quadratbogensekunde, die Weiss (1,0) im Quellbild bedeutet;
- * alle Helligkeiten an der Naht sind relativ dazu.
+ * alle Helligkeiten an der Naht sind relativ dazu (ohne Quellbild relativ zu 0 mag/arcsec^2).
+ * Welche Felder belegt sind, haengt an klasse (docs/architektur.md 5.3): trabanten nur bei
+ * sonnensystem, sterne bei doppelstern und deep_sky, isophoten nur bei deep_sky mit Quellbild.
  */
 export interface Objektzustand {
   /** Kennung des Zustands (id aus daten/objekte.json), z. B. "jup_47", "mond_ev"; ui waehlt danach die Bildquelle. */
   kennung: string;
+  klasse: Objektklasse;
+  /** Doppelstern: groesster Sternabstand (nur Anzeige). */
   durchmesserArcsec: number;
+  /** Doppelstern: Gesamthelligkeit. */
   magnitude: number;
-  quelle: {
+  /** Fehlt bei Zustaenden ohne Quellbild (Doppelstern, M45). */
+  quelle?: {
     breitePx: number;
     hoehePx: number;
     massstabArcsecProPx: number;
     weissMagProArcsec2: number;
   };
+  /** Nur sonnensystem. */
   trabanten: Trabant[];
+  /** doppelstern und deep_sky; sonst leer. */
+  sterne: Stern[];
+  /** Nur deep_sky mit Quellbild: mag aufsteigend, Flaeche steigend. */
+  isophoten?: Isophote[];
+  /** Nur das freie Paar (kennung "frei"). */
+  paar?: Paareingaben;
 }
 
 /** Alles, was der Nutzer einstellt; vollstaendig in der URL abbildbar (A-F7). */

@@ -78,7 +78,7 @@ describe("detailbreiteArcsec (Issue #77)", () => {
       geraet: { ...k0.geraet, brennweiteMm: 800, okular: { ...k0.geraet.okular, brennweiteMm: 8 } },
       bedingungen: { ...k0.bedingungen, seeingFwhmArcsec: 2 }
     };
-    const arbeitspixel = arbeitsmassstabOhneFenster(aufloesung(optik(k.geraet), atmosphaere(k.bedingungen)), k.objekt.quelle);
+    const arbeitspixel = arbeitsmassstabOhneFenster(aufloesung(optik(k.geraet), atmosphaere(k.bedingungen)), k.objekt.quelle!);
     const breite = detailbreiteArcsec(k);
     expect(breite).toBeCloseTo(arbeitspixel * DETAIL_ARBEITSPIXEL, 9);
     // Etwa 1" je Arbeitspixel: ein Krater von 4 km (2,15") ueberdeckt rund zwei Arbeitspixel.
@@ -124,7 +124,7 @@ describe("zoomfenster", () => {
 describe("vergleichsparameter", () => {
   const k = mit("jup_47");
   const anblick = auswerten(k, { fenster: zoomfenster(k, { xArcsec: 3, yArcsec: -2 }, 400) }).parameter;
-  const v = vergleichsparameter(anblick, k.objekt.quelle.massstabArcsecProPx);
+  const v = vergleichsparameter(anblick, k.objekt.quelle!.massstabArcsecProPx);
 
   it("1x1-Delta-Kern im Massstab des Vergleichsrasters, neutrale Helligkeit", () => {
     expect(v.kern).toMatchObject({ groesse: 1, radius: 0, massstabArcsecProPx: v.quellbild.massstabArcsecProPx });
@@ -137,7 +137,7 @@ describe("vergleichsparameter", () => {
   it("gleiches Fenster, Gesichtsfeld und Punktquellen, eigener Schluessel", () => {
     expect(v.fenster).toBe(anblick.fenster);
     expect(v.gesichtsfeld).toBe(anblick.gesichtsfeld);
-    expect(v.quellbild.punktquellen).toBe(anblick.quellbild.punktquellen);
+    expect(v.quellbild.punkte).toBe(anblick.quellbild.punkte);
     expect(v.quellbild.schluessel).not.toBe(anblick.quellbild.schluessel);
     expect(v.quellbild.mitteXArcsec).toBe(3);
     expect(v.quellbild.mitteYArcsec).toBe(-2);
@@ -159,7 +159,7 @@ describe("vergleichsparameter", () => {
     const raster = neuesRaster(n, n, 1, 0);
     for (let j = 0; j < n; j++) for (let i = 0; i < n; i++) raster.daten[j * n + i] = (Math.floor(i / 8) + Math.floor(j / 8)) % 2;
     const quelle = new QuelleAusRaster(raster, 1 / 8);
-    const kk: Konfiguration = { ...k, objekt: { ...k.objekt, durchmesserArcsec: 12, quelle: { ...k.objekt.quelle, breitePx: n, hoehePx: n, massstabArcsecProPx: 1 / 8 } } };
+    const kk: Konfiguration = { ...k, objekt: { ...k.objekt, durchmesserArcsec: 12, quelle: { ...k.objekt.quelle!, breitePx: n, hoehePx: n, massstabArcsecProPx: 1 / 8 } } };
     const p = auswerten(kk, { fenster: zoomfenster(kk, { xArcsec: 0, yArcsec: 0 }, 128) }).parameter;
     const vp = vergleichsparameter(p, 1 / 8);
     const falter = new FalterJs();

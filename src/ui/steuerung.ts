@@ -19,7 +19,7 @@ import { type Anblick, type Falter, FalterJs, rendere, type Zwischenspeicher } f
 import type { Objektzustand } from "../naht/konfiguration";
 import type { Quelle } from "../naht/quelle";
 import type { Simulationsparameter } from "../naht/simulationsparameter";
-import { type Auswertung, auswerten, begrenze, type Hinweis, type Konfiguration, optik } from "../physik";
+import { type Auswertung, auswerten, begrenze, type Hinweis, type Konfiguration, optik, quelleVon } from "../physik";
 import { inUrl, type Kataloge } from "../zustand";
 import { type Ausschnittsanfrage, ausschnittsanfrage } from "./fenster";
 import { sollMitte } from "./verschieben";
@@ -329,7 +329,7 @@ export class Steuerung {
         : { breiteArcsec: optik(k.geraet).gesichtsfeld.breiteArcsec, mitteXArcsec: mitte.xArcsec, mitteYArcsec: mitte.yArcsec, px };
       // Der Kern der letzten Auswertung wird bei gleichem Schluessel wiederverwendet (auswerten, vorher).
       auswertung = auswerten(k, { fenster, vorher: this.zustand.auswertung?.parameter });
-      if (zoom) vergleich = vergleichsparameter(auswertung.parameter, k.objekt.quelle.massstabArcsecProPx);
+      if (zoom) vergleich = vergleichsparameter(auswertung.parameter, quelleVon(k.objekt).massstabArcsecProPx);
     } catch (e) {
       this.setze({ phase: "fehler", fehler: { art: "rechnen", ursache: e } });
       return;

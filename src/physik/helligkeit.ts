@@ -6,7 +6,7 @@
 
 import type { Helligkeit } from "../naht/simulationsparameter";
 import { type Atmosphaere, extinktionFaktor } from "./atmosphaere";
-import { PhysikFehler } from "./fehler";
+import { PhysikFehler, quelleVon } from "./fehler";
 import type { Objektzustand } from "../naht/konfiguration";
 import { ANZEIGE_WEISS_MAG_PRO_ARCSEC2, BORTLE_MAG_PRO_ARCSEC2, KOMPRESSIONSEXPONENT } from "./konstanten";
 import { flaechenhelligkeitsfaktor, type Optik } from "./optik";
@@ -39,7 +39,7 @@ export interface Okularhelligkeit {
 export function okularhelligkeit(optik: Optik, atmosphaere: Atmosphaere, bortle: number, zustand: Objektzustand): Okularhelligkeit {
   const okularFaktor = optik.transmission * (1 - optik.obstruktion ** 2) * flaechenhelligkeitsfaktor(optik.austrittspupilleMm);
   const faktorObjekt = Math.min(1, okularFaktor * atmosphaere.transmission);
-  const weiss = zustand.quelle.weissMagProArcsec2;
+  const weiss = quelleVon(zustand).weissMagProArcsec2;
   const hintergrundMagProArcsec2 = bortleMagProArcsec2(bortle) - 2.5 * Math.log10(okularFaktor);
   return {
     faktorObjekt,
@@ -96,6 +96,8 @@ export function helligkeit(optik: Optik, atmosphaere: Atmosphaere, bortle: numbe
     hintergrundRelativ,
     hintergrundMagProArcsec2: ok.hintergrundMagProArcsec2,
     punktFaktor,
-    punktExponent
+    punktExponent,
+    // Vorgabe bis Issue #100 (mischung.ts aus #97): 0 heisst Flaeche wie Version 1, darum nicht im Schluessel.
+    mischgewicht: 0
   };
 }

@@ -87,10 +87,10 @@ describe("QuelleEinzelbild mit Mars aus daten/", () => {
     for (const id of ["mars_25", "mars_14", "mars_6"]) {
       const zustand = objektzustand(objekte, nachweise, id)!;
       const nachweis = nachweise.find((n) => n.id === objekte.find((o) => o.id === "mars")!.zustaende.find((z) => z.id === id)!.bild)!;
-      expect(einzelbildMassstab(nachweis, zustand.durchmesserArcsec)).toBeCloseTo(zustand.quelle.massstabArcsecProPx, 12);
+      expect(einzelbildMassstab(nachweis, zustand.durchmesserArcsec)).toBeCloseTo(zustand.quelle!.massstabArcsecProPx, 12);
     }
     // mars_6 und mars_14 teilen das Bild von 1995 mit 620 px Scheibe.
-    expect(objektzustand(objekte, nachweise, "mars_6")!.quelle.massstabArcsecProPx).toBeCloseTo(6 / 620, 12);
-    expect(objektzustand(objekte, nachweise, "mars_14")!.quelle.breitePx).toBe(664);
+    expect(objektzustand(objekte, nachweise, "mars_6")!.quelle!.massstabArcsecProPx).toBeCloseTo(6 / 620, 12);
+    expect(objektzustand(objekte, nachweise, "mars_14")!.quelle!.breitePx).toBe(664);
   });
 });

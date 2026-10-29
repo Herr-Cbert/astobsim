@@ -4,7 +4,7 @@
 
 import type { Objektzustand, Trabant } from "../naht/konfiguration";
 import type { Punktquelle } from "../naht/simulationsparameter";
-import { PhysikFehler, pruefePositiv } from "./fehler";
+import { PhysikFehler, pruefePositiv, quelleVon } from "./fehler";
 import { BLENDUNG_ABSTAND_SCHEINBAR_ARCSEC, BLENDUNG_DELTA_MAG } from "./konstanten";
 import type { Optik } from "./optik";
 
@@ -63,6 +63,7 @@ export function punktquellen(objekt: Objektzustand, o: Optik): Punktquelle[] {
     { xArcsec: 0, yArcsec: 0, magnitude: objekt.magnitude },
     ...objekt.trabanten.map((t) => ({ xArcsec: t.dxArcsec, yArcsec: t.dyArcsec, magnitude: t.magnitude }))
   ];
+  const weissMagProArcsec2 = quelleVon(objekt).weissMagProArcsec2;
   return objekt.trabanten.map((t) => {
     if (!Number.isFinite(t.dxArcsec)) throw new PhysikFehler(`${t.name}.dxArcsec`, t.dxArcsec, "ist nicht endlich");
     if (!Number.isFinite(t.dyArcsec)) throw new PhysikFehler(`${t.name}.dyArcsec`, t.dyArcsec, "ist nicht endlich");
@@ -71,7 +72,7 @@ export function punktquellen(objekt: Objektzustand, o: Optik): Punktquelle[] {
       xArcsec: t.dxArcsec,
       yArcsec: t.dyArcsec,
       durchmesserArcsec: t.durchmesserArcsec,
-      helligkeitRelativ: helligkeitRelativ(t.magnitude, t.durchmesserArcsec, objekt.quelle.weissMagProArcsec2),
+      helligkeitRelativ: helligkeitRelativ(t.magnitude, t.durchmesserArcsec, weissMagProArcsec2),
       sichtbar: true
     };
     if (geblendet(t, blender, o.vergroesserung)) {

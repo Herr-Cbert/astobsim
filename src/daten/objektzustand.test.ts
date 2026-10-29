@@ -15,12 +15,15 @@ describe("objektzustand", () => {
     expect(z.kennung).toBe("mond_ev");
     expect(z.durchmesserArcsec).toBe(1865);
     expect(z.magnitude).toBe(-10.2);
-    expect(z.quelle.breitePx).toBe(3072);
-    expect(z.quelle.hoehePx).toBe(3072);
+    expect(z.quelle!.breitePx).toBe(3072);
+    expect(z.quelle!.hoehePx).toBe(3072);
     // 1865'' / 2758 px, Faktor 1,051 gegen den Nachweis (0,643''/px)
-    expect(z.quelle.massstabArcsecProPx).toBeCloseTo(0.67621, 5);
-    expect(z.quelle.weissMagProArcsec2).toBe(3.91);
+    expect(z.quelle!.massstabArcsecProPx).toBeCloseTo(0.67621, 5);
+    expect(z.quelle!.weissMagProArcsec2).toBe(3.91);
     expect(z.trabanten).toEqual([]);
+    // Vorgaben bis Issue #102: nur Sonnensystem, keine Sterne.
+    expect(z.klasse).toBe("sonnensystem");
+    expect(z.sterne).toEqual([]);
   });
 
   it("ist strukturiert klonbar", () => {

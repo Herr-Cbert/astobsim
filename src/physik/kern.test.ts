@@ -20,7 +20,7 @@ function beschreibung(oeffnungMm: number, obstruktion: number, seeingFwhmArcsec:
 }
 
 /** Kernbeschreibung ueber die Stufe 1 aus #3: optik, atmosphaere, aufloesung, arbeitsmassstab. */
-function ausKonfiguration(geraet: Geraet, bedingungen: Bedingungen, quelle: Objektzustand["quelle"], f: ReturnType<typeof fenster>): Kernbeschreibung {
+function ausKonfiguration(geraet: Geraet, bedingungen: Bedingungen, quelle: NonNullable<Objektzustand["quelle"]>, f: ReturnType<typeof fenster>): Kernbeschreibung {
   const o = optik(geraet);
   const a = atmosphaere(bedingungen);
   const aufl = aufloesung(o, a);

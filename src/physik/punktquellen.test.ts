@@ -105,12 +105,12 @@ describe("punktquellen", () => {
 
 describe("T6: Jupiter mit blossem Auge und im 10x50 (A-P6, Testfall T6)", () => {
   it("blosses Auge: alle vier Trabanten sichtbar false, Grund blendung", () => {
-    const p = auswerten(konfiguration(JUPITER_47, AUGE)).parameter.quellbild.punktquellen;
+    const p = auswerten(konfiguration(JUPITER_47, AUGE)).parameter.quellbild.punkte.punktquellen;
     expect(p).toHaveLength(4);
     for (const q of p) expect(q).toMatchObject({ sichtbar: false, grund: "blendung" });
   });
   it("Fernglas 10x50: alle vier sichtbar, ohne Grund", () => {
-    const p = auswerten(konfiguration(JUPITER_47, FERNGLAS_10X50)).parameter.quellbild.punktquellen;
+    const p = auswerten(konfiguration(JUPITER_47, FERNGLAS_10X50)).parameter.quellbild.punkte.punktquellen;
     expect(p).toHaveLength(4);
     for (const q of p) {
       expect(q.sichtbar).toBe(true);
@@ -123,7 +123,7 @@ describe("Saturn 20'' an 80 mm (Issue #14, Ergaenzung zu T6)", () => {
   // Rhea steht 63,47'' vom Planeten und ist 9,6 mag schwaecher: geblendet unter V = 9,45.
   // Die Blendungsregel haengt an der Vergroesserung, nicht an der Oeffnung (Abschnitt 13.3).
   const sichtbar = (v: number): Record<string, boolean> =>
-    Object.fromEntries(auswerten(konfiguration(SATURN_20, refraktorMitVergroesserung(80, v))).parameter.quellbild.punktquellen.map((q) => [q.name, q.sichtbar]));
+    Object.fromEntries(auswerten(konfiguration(SATURN_20, refraktorMitVergroesserung(80, v))).parameter.quellbild.punkte.punktquellen.map((q) => [q.name, q.sichtbar]));
   it("bei V = 60 (A-D9-Okular) sind Titan und Rhea sichtbar", () => {
     expect(sichtbar(60)).toEqual({ Titan: true, Rhea: true });
   });
@@ -135,7 +135,7 @@ describe("Saturn 20'' an 80 mm (Issue #14, Ergaenzung zu T6)", () => {
   });
   it("Oeffnung aendert bei gleicher Vergroesserung nichts an der Sichtbarkeit", () => {
     const p = (d: number): boolean[] =>
-      auswerten(konfiguration(SATURN_20, refraktorMitVergroesserung(d, 8))).parameter.quellbild.punktquellen.map((q) => q.sichtbar);
+      auswerten(konfiguration(SATURN_20, refraktorMitVergroesserung(d, 8))).parameter.quellbild.punkte.punktquellen.map((q) => q.sichtbar);
     expect(p(300)).toEqual(p(80));
   });
 });

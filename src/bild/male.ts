@@ -40,7 +40,7 @@ export interface Scheibchen {
  * Durchmesser <= 0 oder negativer oder nicht endlicher Helligkeit.
  */
 export function malePunktquellen(quellbild: Quellbild): Scheibchen[] {
-  const sichtbare = quellbild.punktquellen.filter((p) => p.sichtbar);
+  const sichtbare = quellbild.punkte.punktquellen.filter((p) => p.sichtbar);
   if (sichtbare.length === 0) return [];
   const m = quellbild.massstabArcsecProPx;
   if (!(m > 0) || !Number.isFinite(m)) throw new BildFehler(`Arbeitsmassstab muss positiv sein, nicht ${m}`);
