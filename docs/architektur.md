@@ -242,7 +242,7 @@ Schluessel: Stufe 1 Objekt ohne Punktquellen (Bortle, Transparenz und Seeing aen
 ### 5.7 Offen fuer Phase 4 und 5
 
 - Vergleichsbild der Zoomansicht bei Deep-Sky: linear mit Quellweiss = Bildschirmweiss zeigt den schwachen Halo kaum; Vorschlag beim ui-Issue.
-- M13: Quellbild plus Katalogsterne zaehlt doppelt; Bild maskieren oder Sterne plus Restlicht (deep-sky.md 3.4), Entscheidung beim Daten-Issue.
+- M13: Quellbild plus Katalogsterne zaehlt doppelt; Bild maskieren oder Sterne plus Restlicht (deep-sky.md 3.4), Entscheidung beim Daten-Issue. Entschieden (Herbert 2026-10-29, Issue #108): Sterne plus Restlicht, Umsetzung in physik.md 27.
 - Deckkraft auf das gefaltete q mit einer Tabelle aus dem ungefalteten Bild ist eine Naeherung; bei M57 am 80 mm (T10) pruefen.
 - Faerbung mischt ueberlappende Sterne flussgewichtet (Antares B im Halo von A bekommt eine Mischfarbe); hinnehmen oder beim Doppelstern-Issue pruefen.
 - Punktebene mit weichem Kernrand (Issue #109, physik.md Abschnitt 24): bild faltet Punktquellen und Faerbung mit dem Kern mal einem cos²-Fenster ueber das aeussere Drittel des Radius, neu normiert. Grund: Unter der Kubikwurzel des Tonwerts wurde der harte, quadratische Kernrand als Quadrat bzw. Farbkante sichtbar. Die Naht bleibt unveraendert.

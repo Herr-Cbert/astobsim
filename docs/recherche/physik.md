@@ -979,3 +979,73 @@ Dabei ist $\rho$ der Abstand zur Kernmitte in Arbeitspixeln und $r$ der Kernradi
 **Warum ein cos²-Fenster.** Ein groesserer Radius allein verschiebt die Kante nur, weil die Kubikwurzel jeden Randwert sichtbar macht. Die Alternative $k' = \max(0, k - k_\text{Rand})$ geht nur linear gegen 0, unter der Kubikwurzel also wie $d^{1/3}$ (bei 10 % der Strecke noch 46 % des Werts). Das cos²-Fenster geht quadratisch gegen 0, also wie $d^{2/3}$ (bei 10 % noch 21 %). Der Halo laeuft damit sichtbar weich aus.
 
 **Grenzen.** Die Punktquellen verlieren Licht jenseits von etwa 2 Gesamt-FWHM an den Kern innen. Das ist dieselbe Groessenordnung, die der harte Schnitt bei 3 FWHM ohnehin abschneidet. Das Fenster ist ein Darstellungsfenster, keine Physik. Die Flaeche (Falter JS und WebGL2) faltet weiter mit dem unveraenderten Kern. Trabanten gehen ebenfalls durch die Punktebene; ihre Werte aendern sich deshalb in T1, T2, T4 und T6 geringfuegig (siehe PR #127).
+
+## 27. M13: Katalogsterne plus Restlicht (Issue #108)
+
+Entscheidung Herbert (2026-10-29, `docs/architektur.md` 5.7): die 531 Gaia-Mitglieder bis V 15 sind Punktquellen (`daten/sterne/m13.json`, V und B-V nach Abschnitt 22), das Quellbild traegt nur das Restlicht. Werkzeug `tools/m13_aufbereiten.py`; Grunddaten `deep-sky.md` 3.1 bis 3.4.
+
+### 27.1 Umkehrung der Log-Streckung des Pressebilds (vorlaeufig linear)
+
+Der AVM-Kopf des NOIRLab-TIFF (noao-m13kpno4m) nennt die Streckung von FITS Liberator: `FL.StretchFunction` Log(x), `FL.BackgroundLevel` 1468,5, `FL.PeakLevel` 199018, `FL.ScaledPeakLevel` 1000, `FL.WhiteLevel` 3,00043 = $\log_{10}(1001)$, `FL.BlackLevel` 0. Daraus geschlossen (Kodewert $v$ von 0 bis 255 als gestreckter Wert $v/255$ zwischen Black- und WhiteLevel):
+
+$$L = 10^{\log_{10}(1001)\,v/255} - 1 \quad (\text{proportional zu } x - \text{BackgroundLevel})$$
+
+Die Form "$\log_{10}(1 + s)$ mit $s$ von 0 bis ScaledPeakLevel" ist aus den Kopfwerten erschlossen, nicht in einer Dokumentation von FITS Liberator nachgelesen (vermutet). **Probe (gerechnet):** Aperturfluss in $L$ (Radius 3,9") von 277 freistehenden Gaia-Sternen ausserhalb 5' gegen V aus Abschnitt 22: Steigung $\mathrm{d}m_\mathrm{inst}/\mathrm{d}V$ = 0,54 statt 1 (Streuung 0,08 mag); erst mit $10^{12\,v/255}$ waere sie 1, dann aber mit 0,25 mag Streuung. Das Bild ist also nach FITS Liberator weiter bearbeitet (Photoshop, Kopf: "Adobe Photoshop CS6"). $L$ dient deshalb nur als monotone Zwischenstufe vor der Tonkurve 27.2; Median und Maskierung beim Entfernen der Sterne haengen nicht von der monotonen Umrechnung ab.
+
+### 27.2 Restlicht: Soll je Ring, Tonkurve und Modell
+
+**King-Profil auf $V_t$ normiert.** Mit $I/I_0$ nach `deep-sky.md` 3.2 ($r_c$ = 37,2", $r_t$ = 1260", Harris 2010):
+
+$$I_0 = \frac{10^{-0{,}4\,V_t}}{\int_0^{r_t} \frac{I(r)}{I_0}\,2\pi r\,\mathrm{d}r}, \qquad V_t = 5{,}78$$
+
+ergibt $\mu_0$ = 16,49 statt Harris' 16,59 (dessen $\mu_0$ integriert zu 5,88, `deep-sky.md` 3.2). Fluss hier in Einheiten von $10^{-0{,}4\,m}$ je arcsec$^2$.
+
+**Soll je Ring.** 29 Ringe (Aussenradien 8" bis 850", der letzte erfasst die Leinwandecken). Soll des Restlichts im Ring $i$:
+
+$$R_i = \max\!\left(\langle I_\mathrm{King}\rangle_i - \frac{\sum_{j=i-1}^{i+1} F_{\mathrm{Sterne},j}}{\sum_{j=i-1}^{i+1} A_j},\ 0{,}05\,\langle I_\mathrm{King}\rangle_i\right), \qquad F_\mathrm{Sterne} = \sum 10^{-0{,}4\,V}$$
+
+nach aussen nicht steigend gemacht ($R_i \leftarrow \min(R_i, R_{i-1})$). Der Sternfluss ist ueber drei Ringe gemittelt, damit einzelne helle Riesen das Soll nicht springen lassen; $A_j$ ist die Ringflaeche auf der Leinwand. Das ist der Vorschlag aus `deep-sky.md` 3.4 Punkt 2 ("je Ring Sollfluss aus King minus Fluss der Katalogsterne, mindestens null").
+
+**Tonkurve.** Stuetzstellen $(x_k, y_k)$: $x_k$ = Mittel des sternbereinigten, geglaetteten Bilds $L$ im Ring $k$, $y_k$ = Restlicht. Abbildung stueckweise linear in $\log_{10} L$ gegen $\log_{10} y$, aussen Geraden mit der Endsteigung (begrenzt auf 1 bis 3). Start $y_k = R_k$, dann zwoelfmal
+
+$$y_k \leftarrow y_k \cdot \frac{R_k}{\langle f(L)\rangle_k}, \qquad y \text{ monoton steigend in } x \text{ gehalten},$$
+
+weil das Mittel der abgebildeten Pixel nicht die Abbildung des Mittels ist. Ringe, deren Bildmittel nach aussen nicht fallen, werden zusammengelegt (Pool Adjacent Violators). Angepasst wird nur bis 270" (17 Ringe).
+
+**Modell und Ueberblendung.** Restlicht $= w(r)\,f(L) + (1 - w(r))\,M(r)$ mit $w$ = 1 bis 180", linear auf 0 bei 270", und dem glatten Modell
+
+$$M(r) = I_\mathrm{King}(r)\cdot\operatorname{interp}_{r}\!\left(\frac{R_i}{\langle I_\mathrm{King}\rangle_i}\right) \quad (\text{ueber die Ringmitten, aussen konstant}).$$
+
+Begruendung (gemessen am sternbereinigten $L$): Himmelsrest des Pressebilds etwa 2,5 (Einheit von $L$ je arcsec$^2$), zwischen acht Sektoren bis $\pm$25 %; der Haufen liegt im Ring 180" bis 240" bei 11, im Ring 240" bis 300" nur noch bei 4,5. Ohne Modell machte die Tonkurve aus einem Himmelsgradienten (Kode 11 links oben gegen 4 rechts unten) und dem Rauschen von 8 Bit einen einseitigen Halo bis zum Rand. Vorher abgezogen: eine Ebene aus Blockmedianen ausserhalb 6' nach Abzug der Ringmittel; geglaettet mit einem Kasten von 3 px (1,5") innen, 15 px (7,5") ab 270", dazwischen linear gemischt.
+
+**Eichung.** Quellweiss so, dass der Gesamtfluss des dekodierten Bilds die Restmagnitude trifft:
+
+$$m_\mathrm{Rest} = -2{,}5\log_{10}\!\left(10^{-0{,}4\,V_t} - \sum_\mathrm{Sterne} 10^{-0{,}4\,V}\right) = 6{,}223$$
+
+(Eichung "gesamt" wie bei M57, `eiche_mag_hell` in `tools/deep_sky_aufbereiten.py`). `tools/quellweiss_eichen.py` prueft Flaeche plus Sterne gegen `magnitude` (0,05 mag).
+
+### 27.3 Testwerte (gerechnet, Lauf vom 2026-10-29)
+
+| Groesse | Wert |
+|---|---|
+| Sterne bis V 15 | 531, Summe V 6,968 (33,5 % von $V_t$; `deep-sky.md` 3.3: 33,5 %) |
+| Zaehlung bis V 12,5 / 13 / 13,5 / 14 / 14,5 / 15 | 22 / 62 / 115 / 188 / 301 / 531 (wie `deep-sky.md` 3.3) |
+| Flaeche (dekodiert) | V 6,220 (Soll 6,223) |
+| Flaeche plus Sterne | V 5,778 gegen $V_t$ 5,78 (-0,002 mag) |
+| Kennlinie | `mag_hell` 15,74, `mag_dunkel` 26,74 (Umfang 11 mag) |
+
+Ringmittel (mag/arcsec$^2$), Flaeche plus Sterne gegen King auf $V_t$ normiert:
+
+| Ring | 0-8" | 32-40" | 60-75" | 75-90" | 140-160" | 240-270" | 420-470" | 760-850" |
+|---|---|---|---|---|---|---|---|---|
+| King | 16,51 | 17,24 | 18,14 | 18,52 | 19,80 | 21,12 | 22,77 | 25,19 |
+| Flaeche + Sterne | 16,51 | 17,23 | 18,14 | 18,45 | 19,71 | 21,13 | 22,76 | 25,08 |
+
+Die Abweichungen bei 75-90" und 140-160" (0,07 und 0,09 mag heller) kommen von der Mittelung des Sternflusses ueber drei Ringe: dort stehen weniger helle Sterne als im Mittel der Nachbarn. In den Leinwandecken (760-850", 0,11 mag heller) ist das Modell ueber die Ringmitten interpoliert, das Soll des letzten Rings dagegen durch "nach aussen nicht steigend" gekappt.
+
+### 27.4 Grenzen und Unsicherheiten
+
+- Das Ringmittel des Restlichts folgt per Konstruktion King minus Sterne. Das Bild bestimmt nur die Verteilung innerhalb der Ringe (Textur, schwache Sterne, Abweichungen von der Kreisform) bis 3', ausserhalb 4,5' gar nichts mehr. Ein lineares Archivbild (V-Band, Mosaic I) wuerde die Tonkurve ersetzen; es liegt im NOIRLab-Archiv ohne Lizenzangabe (`bilder-v2.md` 4) und wurde nicht verwendet.
+- Harris' King-Parameter geben 5,88 statt 5,78 (0,10 mag); die Normierung legt die Differenz gleichmaessig auf alle Radien.
+- Im Kern fehlen Gaia-Sterne (Unvollstaendigkeit, 79 Mitglieder ohne BP-RP); ihr Licht steckt im Restlicht. Sterne heller als V 15, die Gaia im Kern nicht fuehrt, bleiben als Textur in der Flaeche.
+- Die schwachen Sterne (ab V 15) sind aus dem Bild entfernt und kommen als glattes Licht zurueck; am Fernrohr wuerde ein Teil davon bei 300 mm einzeln erscheinen (Grenzgroesse 15,5 bis 17,5, `deep-sky.md` 3.4).

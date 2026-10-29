@@ -165,6 +165,8 @@ Anteil der Sterne am Gesamtlicht ($V_t$ = 5,78), ber.: Sterne bis V 13 tragen 12
 2. **Restlicht:** ein glattes King-Profil (3.2) mit demselben $r_c$ und $r_t$, aber mit dem Rest des Flusses: $I_\mathrm{rest}(r) = I_\mathrm{King}(r) - \sum_\mathrm{Sterne}$ (geglaettet). Einfacher: King-Profil mit $\mu_V(0)$ = 16,59 + 2,5 log10(1/(1-0,335)) = 17,03 (ber., 33,5 % Licht in den Katalogsternen). Das ist nur dann richtig, wenn die Sterne radial wie das Licht verteilt sind. Sie sind es nicht (im Kern fehlen sie). Besser ist es, das Restlicht in Ringen zu eichen: je Ring Sollfluss aus King minus Fluss der Katalogsterne, mindestens null. Das kann `tools/` einmal rechnen und als Tabelle oder Bild ablegen.
 3. **Farbe:** Restlicht grau (A-P12, Deep-Sky-Flaeche), Sterne mit B-V.
 
+> Nachtrag 2026-10-29 (Issue #108): umgesetzt mit dem Quellbild fuer das Restlicht (Ringe wie Punkt 2, Tonkurve, ab 3' Modell), Rechenweg und Testwerte in `physik.md` 27, Werkzeug `tools/m13_aufbereiten.py`. Zaehlung und Lichtanteil oben (531 Sterne, 33,5 %) mit der eigenen Abfrage bestaetigt. Die Tabelle in 3.3 hat kein $dx$; Lagen in `daten/sterne/m13.json` mit $dx$ positiv nach Westen.
+
 ---
 
 ## 4. M45 (Plejaden)

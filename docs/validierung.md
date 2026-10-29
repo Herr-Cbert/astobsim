@@ -251,3 +251,18 @@ Grauwerte unten: Mittel der drei sRGB-Kanaele im Anblick des Zooms (linke Haelft
 
 **Nachtrag `mond_ev` (Entscheidung Herbert 2026-10-29):** `mond_ev` hat jetzt -10,51 mag (Krisciunas und Schaefer bei 79,3 Grad), Quellweiss 3,60 und eine geschwaerzte Nachtseite (neue Kacheln). Damit aendern sich T3 und T6a; T1, T2, T4, T5, T6b und T6c bleiben byte-gleich mit main 15da6ee (Bilder am 2026-10-29 verglichen, die T-Bilder werden bei der Zusammenfuehrung neu erzeugt und hier nicht eingecheckt). T6a: die aschgraue Nachtseite (vorher 61 gegen Himmel 54 im Zoom) ist weg, sie hat jetzt Himmelsgrau 54; die Tagseite ist durch den um 0,31 mag helleren Quellweiss etwas staerker abgeschnitten (55 statt 51 % der Mondpixel ueber 250), Mare Crisium und die Maria am Terminator bleiben als Flecken sichtbar. T3: Nachtseite gleich Himmel (24), Tagseite im Median 118 statt 114.
 
+
+## 12. M13 (Issue #108)
+
+Sterne plus Restlicht (`docs/recherche/physik.md` 27): 531 Gaia-Mitglieder bis V 15 als Punktquellen, das Quellbild (NOIRLab, Mayall 4 m, V-Kanal) traegt nur das Restlicht. Sichtpruefung am 2026-10-29 mit einer Kopie von `scripts/validierung-bilder.mjs` (gleiche Mechanik, SwiftShader, eigene Faelle, Bortle 4 wie der Vorschlag 4 in `deep-sky.md` 8, M6 Bortle 8). Die Bilder sind nicht eingecheckt; T1 bis T6 und P1 bis P3 liefen mit demselben Bau ohne Konsolen- oder CSP-Fehler; alle T- und P-Bilder waren byte-gleich mit den eingecheckten ausser T4b-zoom (Jupiter, von M13 nicht beruehrt, nicht untersucht).
+
+| Fall | Suchteil (dazu `&t=klar&h=90`) | Befund |
+|---|---|---|
+| M1 | `?v=1&g=fernglas-10x50&z=m13&s=2&b=4` | kleiner, weicher Fleck mit hellerer Mitte im 5-Grad-Feld, keine Einzelsterne (Mitte 51 gegen Himmel 41) |
+| M2 | `?v=1&R(80,600,8)&z=m13&s=2&b=4` (75-fach) | schwacher runder Schimmer etwa 5' gross, darin vor allem am Rand einzelne Sterne; etwa 70 Spitzen mindestens 8 Grauwerte ueber der Umgebung |
+| M3 | `?v=1&g=newton-200-1200&ok=8&z=m13&s=1.5&b=4` (150-fach) | koerniger Haufen, Sterne bis in den Kern aufgeloest, aeussere Sterne bis an den Rand des Felds; etwa 350 Spitzen (8 Grauwerte) |
+| M4 | `?v=1&g=newton-300-1500&ok=7&z=m13&s=1.5&b=4` (214-fach) | dicht aufgeloest, etwa 700 Spitzen; der Kern bleibt ein Gewimmel auf hellerem Grund |
+| M5 | `?v=1&g=auge&z=m13&s=2&b=4` | an der Grenze: ein sehr schwacher Punkt mit Hof (Mitte 47 gegen Himmel 45) |
+| M6 | `?v=1&g=newton-200-1200&ok=8&z=m13&s=1.5&b=8` | wie M3, aber nur noch etwa 70 Spitzen; der Schimmer hebt sich kaum vom hellen Himmel ab |
+
+Die Spitzen sind grob gezaehlt (lokale Maxima im Gesichtsfeld, mindestens 8 Grauwerte ueber dem Median im 15-px-Fenster) und zaehlen auch Sterne knapp ueber der Schwelle; sie sind kein Vergleich mit Beobachtungen. Vorschlag 4 in `deep-sky.md` 8 erwartet am 200 mm "einige Dutzend bis gut hundert" Sterne und am 80 mm "hoechstens eine Handvoll"; die Simulation zeigt in beiden Faellen mehr. Ob das an der Grenzgroesse des Modells (Abschnitt 19) oder an der Erwartung liegt, ist offen; die Daten (Lage, V) folgen `deep-sky.md` 3.3. Im Zoom ist das Quellbild (Vergleichsbild, linear) fast schwarz, weil es nur das Restlicht traegt; dort stehen die Katalogsterne als Punkte (`architektur.md` 5.7, Vergleichsbild bei Deep-Sky offen). Doppelte Sterne (Bildstern neben Katalogstern) sind in keinem Fall zu sehen.
