@@ -57,6 +57,17 @@ Schritte:
        erreicht. Zeilen ohne Flaechenzuwachs entfallen (Flaeche streng
        steigend).
 
+Pressebild mit Tonkurve (rohformat "tiff_tonkurve", Issue #106, M31; Entscheidung 2 in
+docs/recherche/README.md): statt Schritt 1 ein 8-Bit-RGB-TIFF, ein Kanal (tiff_kanal) als Kode
+0 bis 255. Die Tonkurve Kode -> mu wird gegen das profil des Zustands in daten/objekte.json
+angepasst (tonkurve_aus_profil: Ringe auf der grossen Achse, Median des Kodes gegen Median des
+Modells, isoton); Pixel ausserhalb des Mosaiks (alle Kanaele 0 in einer Flaeche) werden NaN.
+Lage ueber roh_massstab_arcsec und roh_nordwinkel_rechts_grad (AVM "North is ... right of
+vertical"); das Bild wird senkrecht gespiegelt und mit einer daraus gebauten CD-Matrix durch
+Schritt 2 geschickt. eichung.art "tonkurve": mag_hell ist das hellste Pixel in den absoluten
+Werten der Tonkurve. Die Flaechentabelle endet dann auch an der Mosaikkante. Rechenweg und
+Restfehler: docs/recherche/physik.md 25. FITS-Bilder (M57) laufen unveraendert.
+
 WebP verlustfrei (VP8L): ein Grauwert-WebP wird intern als RGB mit R = G = B
 gespeichert; verlustbehaftet (VP8) laeuft der Grauwert ueber YUV mit
 eingeschraenktem Bereich (Y 16 bis 235) und verliert Kodes, die hier
@@ -397,7 +408,8 @@ def eiche_mag_hell(kodes, umfang, massstab, eichung):
     raise SystemExit(f"eichung.art {eichung['art']!r} unbekannt (gesamt oder flaeche)")
 
 
-def flaechentabelle(mu, massstab, mag_hell, mag_dunkel, schritt=ISOPHOTEN_SCHRITT_MAG, rand_anteil=RAND_ANTEIL):
+def flaechentabelle(mu, massstab, mag_hell, mag_dunkel, schritt=ISOPHOTEN_SCHRITT_MAG, rand_anteil=RAND_ANTEIL,
+                    rand_maske=None):
     """Isophoten in Schritten von schritt mag zwischen mag_hell und mag_dunkel: [(mu_i, Flaeche mu <= mu_i in arcsec^2)].
 
     mu: Flaechenhelligkeit je Pixel (inf fuer kein Licht). Die Isophoten liegen auf dem Raster
@@ -405,10 +417,14 @@ def flaechentabelle(mu, massstab, mag_hell, mag_dunkel, schritt=ISOPHOTEN_SCHRIT
     Tabelle endet vor der ersten Isophote, die mehr als rand_anteil der Randpixel erreicht: deren
     Flaeche ist nicht mehr vom Bild eingeschlossen, sondern vom Bildausschnitt begrenzt. Der
     Anteil statt eines einzelnen Pixels, damit Rauschen und Reste von Sternen am Rand die Tabelle
-    nicht abschneiden.
+    nicht abschneiden. rand_maske (optional, Issue #106): statt des Bildrahmens gelten diese Pixel als
+    Rand, etwa die Kante eines Mosaiks, das nicht die ganze Leinwand fuellt.
     """
     sortiert = np.sort(mu[np.isfinite(mu)].ravel())
-    randpixel = np.sort(np.concatenate([mu[0], mu[-1], mu[1:-1, 0], mu[1:-1, -1]]))
+    if rand_maske is None:
+        randpixel = np.sort(np.concatenate([mu[0], mu[-1], mu[1:-1, 0], mu[1:-1, -1]]))
+    else:
+        randpixel = np.sort(mu[rand_maske])
     rand = float(randpixel[int(rand_anteil * len(randpixel))])
     k0 = math.ceil(round(mag_hell / schritt, 6))
     k1 = math.floor(round(mag_dunkel / schritt, 6))
@@ -426,12 +442,247 @@ def flaechentabelle(mu, massstab, mag_hell, mag_dunkel, schritt=ISOPHOTEN_SCHRIT
 
 
 # ---------------------------------------------------------------------------
+# Pressebild (TIFF) mit Tonkurve gegen ein Profil (Issue #106, M31)
+
+def sersic_exp_mu(u, v, profil):
+    """Flaechenhelligkeit des Modells Sersic-Bulge plus exponentielle Scheibe (deep-sky.md 1.2).
+
+    u, v: Abstand auf grosser und kleiner Achse in Bogensekunden; Bulge und Scheibe haben eigene
+    Achsenverhaeltnisse (q_bulge, q_scheibe). Auf der grossen Achse (v = 0) ist das die Formel aus
+    deep-sky.md 1.2 mit b_n = 1,9992 n - 0,3271. Werte wie in daten/objekte.json (profil).
+    """
+    n = profil["n"]
+    bn = 1.9992 * n - 0.3271
+    rb = np.hypot(u, v / profil["q_bulge"])
+    rd = np.hypot(u, v / profil["q_scheibe"])
+    bulge = 10.0 ** (-0.4 * profil["mue_mag_arcsec2"]) * np.exp(-bn * ((rb / profil["re_arcsec"]) ** (1.0 / n) - 1.0))
+    scheibe = 10.0 ** (-0.4 * profil["mu0_mag_arcsec2"]) * np.exp(-rd / profil["rd_arcsec"])
+    return -2.5 * np.log10(bulge + scheibe)
+
+
+def tiff_achsen(form, mitte_px, massstab, nordwinkel_rechts_grad):
+    """Ost- und Nordabstand in Bogensekunden je Pixel eines Bilds mit Zeile 0 oben (TIFF).
+
+    nordwinkel_rechts_grad: Himmelsnorden so viele Grad im Uhrzeigersinn von der Senkrechten (AVM
+    "North is ... right of vertical"), Osten 90 Grad gegen den Uhrzeigersinn davon (Osten links bei
+    Norden oben, nicht gespiegelt). mitte_px: Pixelindex (Spalte, Zeile) der Objektmitte.
+    """
+    t = math.radians(nordwinkel_rechts_grad)
+    # Bildschirmrichtungen mit y nach unten: Norden (sin t, -cos t), Osten (-cos t, -sin t).
+    yy, xx = np.mgrid[0:form[0], 0:form[1]]
+    dx = (xx - mitte_px[0]) * massstab
+    dy = (yy - mitte_px[1]) * massstab
+    osten = -math.cos(t) * dx - math.sin(t) * dy
+    norden = math.sin(t) * dx - math.cos(t) * dy
+    return osten, norden
+
+
+def tiff_cd_matrix(form, massstab, nordwinkel_rechts_grad):
+    """CD-Matrix (Grad je Pixel) fuer das senkrecht gespiegelte TIFF (Zeile 0 unten wie bei FITS).
+
+    Rueckgabe passt zu ausrichten(): erste Zeile Osten, zweite Norden; nicht gespiegelt (det < 0).
+    """
+    t = math.radians(nordwinkel_rechts_grad)
+    s = massstab / 3600.0
+    # Mit y nach oben: Norden (sin t, cos t), Osten (-cos t, sin t) in Pixelrichtungen.
+    return np.array([[-s * math.cos(t), s * math.sin(t)], [s * math.sin(t), s * math.cos(t)]])
+
+
+def ohne_daten_maske(rgb, fenster=5, anteil=0.8):
+    """Pixel ausserhalb des Mosaiks: alle Kanaele 0 und im Fenster ueberwiegend ebenso (einzelne Nullen im Bild bleiben Daten)."""
+    null = (rgb == 0).all(axis=2)
+    r = fenster // 2
+    p = np.pad(null.astype(np.int32), r)
+    zahl = np.zeros(null.shape, np.int32)
+    for oy in range(fenster):
+        for ox in range(fenster):
+            zahl += p[oy:oy + null.shape[0], ox:ox + null.shape[1]]
+    return null & (zahl >= anteil * fenster * fenster)
+
+
+def _pav_steigend(werte, gewichte):
+    """Isotone Regression (Pool Adjacent Violators): nicht fallende Folge mit kleinster gewichteter Abweichung."""
+    bloecke = []  # [wert, gewicht, anzahl]
+    for w, g in zip(werte, gewichte):
+        bloecke.append([float(w), float(g), 1])
+        while len(bloecke) > 1 and bloecke[-2][0] > bloecke[-1][0]:
+            w2, g2, n2 = bloecke.pop()
+            w1, g1, n1 = bloecke.pop()
+            bloecke.append([(w1 * g1 + w2 * g2) / (g1 + g2), g1 + g2, n1 + n2])
+    aus = []
+    for w, _, n in bloecke:
+        aus.extend([w] * n)
+    return aus
+
+
+def tonkurve_anpassen(kodes_bins, mu_bins, gewichte):
+    """Monotone Tonkurve Kode -> mu aus Paaren (Median-Kode, Modell-mu) je Radiusring.
+
+    Gleiche Kodes werden gemittelt (gewichtet mit der Pixelzahl), dann wird mu ueber fallendem Kode
+    isoton steigend gemacht; Kodes mit danach gleichem mu werden zu einem Knoten zusammengefasst.
+    Rueckgabe: Knoten [(kode, mu)] mit steigendem Kode und streng fallendem mu.
+    """
+    gruppen = {}
+    for k, m, g in zip(kodes_bins, mu_bins, gewichte):
+        s = gruppen.setdefault(float(k), [0.0, 0.0])
+        s[0] += m * g
+        s[1] += g
+    absteigend = sorted(gruppen, reverse=True)
+    mu = _pav_steigend([gruppen[k][0] / gruppen[k][1] for k in absteigend], [gruppen[k][1] for k in absteigend])
+    gew = [gruppen[k][1] for k in absteigend]
+    knoten = []  # [kode*gewicht, gewicht, mu]
+    for k, m, g in zip(absteigend, mu, gew):
+        if knoten and abs(knoten[-1][2] - m) < 1e-9:
+            knoten[-1][0] += k * g
+            knoten[-1][1] += g
+        else:
+            knoten.append([k * g, g, m])
+    return sorted(((kg / g, m) for kg, g, m in knoten), key=lambda t: t[0])
+
+
+def tonkurve_anwenden(kodes, knoten, kode_himmel):
+    """Lineare Flaechenhelligkeit 10^(-0,4 mu) je Kode (0 bis 255) als Tabelle mit 256 Werten.
+
+    Zwischen den Knoten linear in mu; ueber dem hellsten Knoten dessen mu (Saettigung); unter dem
+    dunkelsten Knoten linear in der Helligkeit bis 0 bei kode_himmel (Schwarzpunkt des Pressebilds,
+    Himmel), darunter 0.
+    """
+    k = np.array([t[0] for t in knoten])
+    m = np.array([t[1] for t in knoten])
+    alle = np.arange(256, dtype=np.float64)
+    mu = np.interp(alle, k, m)
+    tabelle = 10.0 ** (-0.4 * mu)
+    unten = alle < k[0]
+    tabelle[unten] = 10.0 ** (-0.4 * m[0]) * np.clip((alle[unten] - kode_himmel) / (k[0] - kode_himmel), 0.0, 1.0)
+    return tabelle[kodes] if kodes is not None else tabelle
+
+
+def _ringkanten(tk):
+    innen = [float(r) for r in tk["kanten_innen_arcsec"]]
+    aussen = np.geomspace(innen[-1], tk["radius_max_arcsec"], tk["kanten_aussen_anzahl"] + 1)[1:]
+    return np.concatenate([innen, aussen])
+
+
+def tonkurve_aus_profil(kanal, ohne, osten, norden, profil, tk):
+    """Tonkurve gegen das Profil auf der grossen Achse anpassen und den Restfehler je Radius messen.
+
+    Streifen entlang der grossen Achse (Positionswinkel tk["positionswinkel_grad"], halbe Breite
+    max(streifen_min_arcsec, streifen_anteil * r)), beide Seiten zusammen, ohne Masken
+    (tk["masken_arcsec"]: Kreise [Ost, Nord, Radius], z. B. M32). Je Ring: Median des Kodes und
+    Median des Modell-mu; daraus die Knoten (tonkurve_anpassen). Rueckgabe (knoten, tabelle, zeilen)
+    mit zeilen = [(r0, r1, mu_modell, mu_bild, mu_bild_no, mu_bild_sw, mu_klein_modell, mu_klein_bild, n)]:
+    mu_bild ist der Median der zurueckgerechneten Flaechenhelligkeit im Ring (grosse Achse, beide
+    Seiten, und je Seite NO und SW), mu_klein_* dasselbe auf der kleinen Achse im Ring
+    |v| in [r0 q, r1 q] mit q = q_scheibe gegen das Modell an denselben Pixeln.
+    """
+    pa = math.radians(tk["positionswinkel_grad"])
+    u = osten * math.sin(pa) + norden * math.cos(pa)
+    v = osten * math.cos(pa) - norden * math.sin(pa)
+    frei = ~ohne
+    for ost, nord, radius in tk.get("masken_arcsec", []):
+        frei &= np.hypot(osten - ost, norden - nord) > radius
+    kanten = _ringkanten(tk)
+    rohe = []
+    for r0, r1 in zip(kanten[:-1], kanten[1:]):
+        breite = max(tk["streifen_min_arcsec"], tk["streifen_anteil"] * r1)
+        im_ring = frei & (np.abs(v) < breite) & (np.abs(u) >= r0) & (np.abs(u) < r1)
+        rohe.append(im_ring)
+    kodes_bins, mu_bins, gewichte = [], [], []
+    for m in rohe:
+        if m.sum() < 5:
+            raise SystemExit("Tonkurve: Ring mit weniger als 5 Pixeln, Kanten anpassen")
+        kodes_bins.append(float(np.median(kanal[m])))
+        mu_bins.append(float(np.median(sersic_exp_mu(u[m], 0.0 * u[m], profil))))
+        gewichte.append(1.0)
+    knoten = tonkurve_anpassen(kodes_bins, mu_bins, gewichte)
+    tabelle = tonkurve_anwenden(None, knoten, tk["kode_himmel"])
+    with np.errstate(divide="ignore"):
+        mu_tabelle = np.where(tabelle > 0, -2.5 * np.log10(np.where(tabelle > 0, tabelle, 1.0)), np.inf)
+
+    def median_mu(maske):
+        return float(np.median(mu_tabelle[kanal[maske]])) if maske.sum() >= 5 else float("nan")
+
+    zeilen = []
+    q = profil["q_scheibe"]
+    for (r0, r1), m, mu_mod in zip(zip(kanten[:-1], kanten[1:]), rohe, mu_bins):
+        breite = max(tk["streifen_min_arcsec"], tk["streifen_anteil"] * r1)
+        klein = frei & (np.abs(u) < breite) & (np.abs(v) >= r0 * q) & (np.abs(v) < r1 * q)
+        mu_klein = float(np.median(sersic_exp_mu(u[klein], v[klein], profil))) if klein.sum() >= 5 else float("nan")
+        zeilen.append((float(r0), float(r1), mu_mod, median_mu(m), median_mu(m & (u > 0)), median_mu(m & (u < 0)),
+                       mu_klein, median_mu(klein), int(m.sum())))
+    return knoten, tabelle, zeilen
+
+
+def lade_profil(objekte_pfad, objekt, zustand):
+    """profil des Zustands aus daten/objekte.json (eine Quelle fuer Modell und Daten)."""
+    with open(objekte_pfad, encoding="utf-8") as f:
+        objekte = json.load(f)
+    for o in objekte:
+        if o["id"] == objekt:
+            for z in o["zustaende"]:
+                if z["id"] == zustand:
+                    profil = z.get("profil", {})
+                    if profil.get("art") != "sersic_exp":
+                        raise SystemExit(f"{objekt}/{zustand}: Tonkurve braucht profil.art sersic_exp")
+                    return profil
+    raise SystemExit(f"{objekte_pfad}: Zustand {objekt}/{zustand} nicht gefunden")
+
+
+def lies_tiff_tonkurve(p, objekte_pfad):
+    """Pressebild lesen, Kanal waehlen, gegen das Profil zuruecklinearisieren.
+
+    Rueckgabe (kopf, daten, info): daten senkrecht gespiegelt (Zeile 0 unten) mit dem Wert je
+    Rohpixel (Flaechenhelligkeit 10^(-0,4 mu) mal Pixelflaeche, wie ein FITS-Bild in Zaehlwerten),
+    Pixel ausserhalb des Mosaiks NaN; kopf mit CD-Matrix, Mitte gespiegelt in info["mitte_px"].
+    """
+    Image.MAX_IMAGE_PIXELS = None
+    with Image.open(p["rohbild"]) as im:
+        if im.mode != "RGB":
+            raise SystemExit(f"{p['rohbild']}: Modus {im.mode}, erwartet RGB")
+        rgb = np.asarray(im)
+    kanal_nr = "RGB".index(p["tiff_kanal"])
+    kanal = rgb[..., kanal_nr]
+    ohne = ohne_daten_maske(rgb)
+    s = p["roh_massstab_arcsec"]
+    osten, norden = tiff_achsen(kanal.shape, p["roh_mitte_px"], s, p["roh_nordwinkel_rechts_grad"])
+    profil = lade_profil(objekte_pfad, p["objekt"], p["zustand"])
+    tk = p["tonkurve"]
+    knoten, tabelle, zeilen = tonkurve_aus_profil(kanal, ohne, osten, norden, profil, tk)
+    del osten, norden
+    linear = tabelle[kanal] * s ** 2
+    linear[ohne] = np.nan
+    h = kanal.shape[0]
+    mitte = [p["roh_mitte_px"][0], h - 1 - p["roh_mitte_px"][1]]
+    kopf = {"BUNIT": "10^(-0,4 mu) je Pixel aus der Tonkurve"}
+    cd = tiff_cd_matrix(kanal.shape, s, p["roh_nordwinkel_rechts_grad"])
+    kopf.update({"CD1_1": cd[0, 0], "CD1_2": cd[0, 1], "CD2_1": cd[1, 0], "CD2_2": cd[1, 1]})
+    info = {"knoten": knoten, "zeilen": zeilen, "mitte_px": mitte, "ohne_roh": int(ohne.sum()),
+            "gesaettigt": int((kanal == KODE_MAX).sum())}
+    return kopf, np.flipud(linear), info
+
+
+def drucke_tonkurve(info, profil_text):
+    print(f"Tonkurve gegen das Profil ({profil_text}): {len(info['knoten'])} Knoten")
+    print("  Knoten Kode -> mu: " + ", ".join(f"{k:.1f}->{m:.2f}" for k, m in info["knoten"]))
+    print("  Restfehler je Ring (mu Bild - mu Modell, Median im Ring):")
+    print("     r0     r1  Modell  Bild   Abw.  NO-Abw  SW-Abw | klein Modell  Bild   Abw.  Pixel")
+    for r0, r1, mm, mb, mno, msw, mkm, mkb, n in info["zeilen"]:
+        print(f"  {r0:5.0f} {r1:6.0f}  {mm:6.2f} {mb:6.2f} {mb - mm:+6.2f} {mno - mm:+6.2f} {msw - mm:+6.2f} | "
+              f"{mkm:6.2f} {mkb:6.2f} {mkb - mkm:+6.2f}  {n}")
+
+
+# ---------------------------------------------------------------------------
 # Ablauf
+
+PFLICHT_TIFF = [k for k in PFLICHT if k != "fits_erweiterung"] + [
+    "tiff_kanal", "roh_massstab_arcsec", "roh_nordwinkel_rechts_grad", "tonkurve"]
+
 
 def lade_parameter(pfad):
     with open(pfad, encoding="utf-8") as f:
         p = json.load(f)
-    fehlt = [k for k in PFLICHT if k not in p]
+    tiff = p.get("rohformat") == "tiff_tonkurve"
+    fehlt = [k for k in (PFLICHT_TIFF if tiff else PFLICHT) if k not in p]
     if fehlt:
         raise SystemExit(f"{pfad}: Pflichtfelder fehlen: {', '.join(fehlt)}")
     if p["leinwand_px"] % 2:
@@ -440,8 +691,10 @@ def lade_parameter(pfad):
     if abs(d - round(d)) > 1e-6 or round(d) > p["leinwand_px"]:
         raise SystemExit(f"{pfad}: winkelgroesse_arcsec / bogensekunden_pro_pixel = {d} ist keine ganze Pixelzahl "
                          "bis leinwand_px (objekt_durchmesser_px)")
-    if p["eichung"].get("art") not in ("gesamt", "flaeche"):
-        raise SystemExit(f"{pfad}: eichung.art muss gesamt oder flaeche sein")
+    if p["eichung"].get("art") not in ("gesamt", "flaeche") + (("tonkurve",) if tiff else ()):
+        raise SystemExit(f"{pfad}: eichung.art muss gesamt oder flaeche sein (bei rohformat tiff_tonkurve auch tonkurve)")
+    if tiff and p["tiff_kanal"] not in ("R", "G", "B"):
+        raise SystemExit(f"{pfad}: tiff_kanal muss R, G oder B sein")
     umfang = p["kennlinie"].get("umfang_mag")
     if not (isinstance(umfang, (int, float)) and 1 <= umfang <= 20):
         raise SystemExit(f"{pfad}: kennlinie.umfang_mag muss zwischen 1 und 20 liegen")
@@ -479,7 +732,7 @@ def webp_kodes(daten):
         return np.asarray(im.convert("RGB"))[..., 0].copy()
 
 
-def bildnachweis(p, kopf, mag_hell, mag_dunkel, datei_bytes, sterne, ohne_daten, nordwinkel):
+def bildnachweis(p, kopf, mag_hell, mag_dunkel, datei_bytes, sterne, ohne_daten, nordwinkel, tonkurve=None):
     s = p["bogensekunden_pro_pixel"]
     n = p["leinwand_px"]
     native = math.sqrt(abs(np.linalg.det(cd_matrix(kopf)))) * 3600.0
@@ -496,16 +749,36 @@ def bildnachweis(p, kopf, mag_hell, mag_dunkel, datei_bytes, sterne, ohne_daten,
     if eichung["art"] == "gesamt":
         eich_text = (f"Quellweiss mag_hell so geeicht, dass der Gesamtfluss des dekodierten Bilds V = "
                      f"{eichung['magnitude']} ergibt ({eichung['quelle']})")
+    elif eichung["art"] == "tonkurve":
+        eich_text = f"Quellweiss mag_hell aus der Tonkurve (absolute Flaechenhelligkeit des hellsten Pixels; {eichung['quelle']})"
     else:
         eich_text = (f"Quellweiss mag_hell so geeicht, dass das Mittel im Kreis {eichung['radius_arcsec']}\" um die Mitte "
                      f"{eichung['mag_arcsec2']} mag/arcsec^2 ergibt ({eichung['quelle']})")
+    if tonkurve is not None:
+        tk = p["tonkurve"]
+        herkunft = (
+            f"{p['bearbeitung_kanal']} Pressebild nichtlinear gestreckt; zurueckgerechnet mit einer monotonen "
+            f"Tonkurve Kode -> mag/arcsec^2 gegen das Profil des Zustands (daten/objekte.json, profil): je Ring auf "
+            f"der grossen Achse (Positionswinkel {tk['positionswinkel_grad']} Grad, {len(tonkurve['zeilen'])} Ringe "
+            f"bis {tk['radius_max_arcsec']}\") Median des Kodes gegen Median des Modells, isoton geglaettet, "
+            f"{len(tonkurve['knoten'])} Knoten, dazwischen linear in mag; unter dem dunkelsten Knoten linear in der "
+            f"Helligkeit bis 0 bei Kode {tk['kode_himmel']} ({tk['kode_himmel_beleg']}). {tk.get('grenzen', '')} "
+            f"Himmel: {p.get('hintergrund', 'kein Abzug')}. "
+            f"Ausgerichtet ueber Massstab {p['roh_massstab_arcsec']}\"/px und Nordrichtung "
+            f"{p['roh_nordwinkel_rechts_grad']} Grad im Uhrzeigersinn von der Senkrechten des Rohbilds "
+            f"(nicht gespiegelt), Objektmitte (Pixel {p['roh_mitte_px'][0]}/{p['roh_mitte_px'][1]} im Rohbild, "
+            f"Zeile 0 oben, {p.get('mitte_beleg', '')}) "
+        )
+    else:
+        herkunft = (
+            f"{p['bearbeitung_kanal']} Lineare Werte ({kopf.get('BUNIT', 'Einheit unbekannt')}) aus der FITS-Erweiterung "
+            f"{p['fits_erweiterung']} ohne Tonkurve; Himmel nicht abgezogen ({p.get('hintergrund', 'kein Abzug')}). "
+            f"Ausgerichtet ueber die CD-Matrix des FITS-Kopfs (Himmelsnorden {abs(nordwinkel):.2f} Grad "
+            f"{'gegen den' if nordwinkel > 0 else 'im'} Uhrzeigersinn von oben im Rohbild, nicht gespiegelt), "
+            f"Objektmitte (Pixel {p['roh_mitte_px'][0]}/{p['roh_mitte_px'][1]} im Rohbild, {p.get('mitte_beleg', '')}) "
+        )
     bearbeitung = (
-        f"{p['bearbeitung_kanal']} Lineare Werte ({kopf.get('BUNIT', 'Einheit unbekannt')}) aus der FITS-Erweiterung "
-        f"{p['fits_erweiterung']} ohne Tonkurve; Himmel nicht abgezogen ({p.get('hintergrund', 'kein Abzug')}). "
-        f"Ausgerichtet ueber die CD-Matrix des FITS-Kopfs (Himmelsnorden {abs(nordwinkel):.2f} Grad "
-        f"{'gegen den' if nordwinkel > 0 else 'im'} Uhrzeigersinn von oben im Rohbild, nicht gespiegelt), "
-        f"Objektmitte (Pixel {p['roh_mitte_px'][0]}/{p['roh_mitte_px'][1]} im Rohbild, {p.get('mitte_beleg', '')}) "
-        f"auf die Mitte einer Leinwand von {n}x{n} px, von {native:.4f} auf {s}\"/px bilinear auf einem "
+        f"{herkunft}auf die Mitte einer Leinwand von {n}x{n} px, von {native:.4f} auf {s}\"/px bilinear auf einem "
         f"{p.get('ueberabtastung', 3)}-fach feineren Gitter abgetastet und blockweise gemittelt (flusserhaltend); "
         f"{int(ohne_daten.sum())} Pixel ohne Daten auf 0. {sterne_text}. {eich_text}. "
         f"Kodiert als 8-Bit-Grauwert mit log-Kennlinie (ADR-0003 Nachtrag Version 2): Kode 255 = mag_hell "
@@ -558,7 +831,15 @@ def verarbeite(pfad, args):
     p = lade_parameter(pfad)
     print(f"== {p['id']} ({pfad}), Rohbild {p['rohbild']}")
     pruefe_rohbild(p)
-    kopf, daten = lies_fits(p["rohbild"], p["fits_erweiterung"])
+    tiff = p.get("rohformat") == "tiff_tonkurve"
+    if tiff:
+        kopf, daten, tonkurve = lies_tiff_tonkurve(p, args.objekte)
+        mitte_px = tonkurve["mitte_px"]
+        drucke_tonkurve(tonkurve, f"{p['objekt']}/{p['zustand']} aus {args.objekte}")
+    else:
+        kopf, daten = lies_fits(p["rohbild"], p["fits_erweiterung"])
+        mitte_px = p["roh_mitte_px"]
+        tonkurve = None
     if f"{daten.shape[1]}x{daten.shape[0]}" != p["original_pixel"]:
         raise SystemExit(f"Rohbild hat {daten.shape[1]}x{daten.shape[0]}, erwartet {p['original_pixel']}")
     if p.get("fits_filter") and kopf.get("FILTER") != p["fits_filter"]:
@@ -568,7 +849,7 @@ def verarbeite(pfad, args):
     print(f"Massstab {math.sqrt(abs(np.linalg.det(cd))) * 3600:.5f}\"/px, Norden {nordwinkel:.3f} Grad gegen den "
           f"Uhrzeigersinn von +y, Einheit {kopf.get('BUNIT')}")
     s = p["bogensekunden_pro_pixel"]
-    bild, ohne_daten = ausrichten(daten, cd, p["roh_mitte_px"], s, p["leinwand_px"], p.get("ueberabtastung", 3))
+    bild, ohne_daten = ausrichten(daten, cd, mitte_px, s, p["leinwand_px"], p.get("ueberabtastung", 3))
     print(f"Leinwand {bild.shape[1]}x{bild.shape[0]} px bei {s}\"/px, {int(ohne_daten.sum())} Pixel ohne Daten")
 
     st = p["sterne"]
@@ -584,7 +865,15 @@ def verarbeite(pfad, args):
 
     umfang = float(p["kennlinie"]["umfang_mag"])
     kodes = kodiere_relativ(linear_zu_mu_rel(im_bild), umfang)
-    mag_hell = round(eiche_mag_hell(kodes, umfang, s, p["eichung"]), 2)
+    if p["eichung"]["art"] == "tonkurve":
+        # Die Tonkurve gibt schon absolute Flaechenhelligkeiten; Kode 255 ist das hellste Pixel.
+        mag_hell = round(-2.5 * math.log10(float(im_bild.max())), 2)
+    else:
+        mag_hell = round(eiche_mag_hell(kodes, umfang, s, p["eichung"]), 2)
+    if tiff:
+        print(f"Gesamthelligkeit vor dem Kodieren (Tonkurve, sternbereinigt wie im Bild): "
+              f"{-2.5 * math.log10(float(im_bild.sum()) * s ** 2):.3f} mag; mag_hell aus der Tonkurve "
+              f"{-2.5 * math.log10(float(im_bild.max())):.3f}")
     mag_dunkel = round(mag_hell + umfang, 2)
     daten_webp = webp_bytes(kodes)
     dekodiert = webp_kodes(daten_webp)
@@ -606,7 +895,14 @@ def verarbeite(pfad, args):
         lin, _, _ = sterne_entfernen(lin, zusaetzlich=zusaetzlich, **stern_param)
     with np.errstate(divide="ignore"):
         mu = np.where(lin > 0, mag_hell - 2.5 * np.log10(np.where(lin > 0, lin, 1.0)), np.inf)
-    tabelle = flaechentabelle(mu, s, mag_hell, mag_dunkel)
+    if tiff:
+        # Rand des Mosaiks: Datenpixel neben Pixeln ohne Daten, dazu der Leinwandrahmen.
+        rahmen = np.zeros(ohne_daten.shape, bool)
+        rahmen[0, :] = rahmen[-1, :] = rahmen[:, 0] = rahmen[:, -1] = True
+        rand = (_dehnen(ohne_daten) | rahmen) & ~ohne_daten
+        tabelle = flaechentabelle(mu, s, mag_hell, mag_dunkel, rand_maske=rand)
+    else:
+        tabelle = flaechentabelle(mu, s, mag_hell, mag_dunkel)
     isophoten = [{"mag_arcsec2": round(m, 1), "flaeche_arcsec2": round(a, 2)} for m, a in tabelle]
     print(f"Flaechentabelle: {len(isophoten)} Zeilen von {isophoten[0]['mag_arcsec2']} bis "
           f"{isophoten[-1]['mag_arcsec2']} mag/arcsec^2 (Flaeche {isophoten[0]['flaeche_arcsec2']} bis "
@@ -629,7 +925,7 @@ def verarbeite(pfad, args):
         f.write(daten_webp)
     print(f"{ziel}: {kodes.shape[1]}x{kodes.shape[0]} px, {len(daten_webp)} Byte")
     schreibe_bildnachweis(args.bildnachweis, bildnachweis(p, kopf, mag_hell, mag_dunkel, len(daten_webp), sterne,
-                                                          ohne_daten, nordwinkel))
+                                                          ohne_daten, nordwinkel, tonkurve))
     print(f"Bildnachweis {p['id']} in {args.bildnachweis} geschrieben")
 
 
@@ -642,6 +938,8 @@ def main(argv=None):
     a.add_argument("--tabelle", help="Flaechentabelle zusaetzlich als JSON in diese Datei")
     a.add_argument("--sterne-liste", type=int, default=10, help="so viele hellste Sterne ausgeben")
     a.add_argument("--messen", action="store_true", help="alles rechnen und ausgeben, nichts schreiben")
+    a.add_argument("--objekte", default="daten/objekte.json",
+                   help="objekte.json mit dem profil des Zustands (nur rohformat tiff_tonkurve)")
     args = a.parse_args(argv)
     for pfad in args.parameter:
         verarbeite(pfad, args)

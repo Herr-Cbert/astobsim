@@ -3,7 +3,9 @@
 Geprueft: log-Kennlinie hin und zurueck auf 0,05 mag und gleich der Dekodierung in
 src/daten/kennlinie.ts, FITS-Leser an einer selbst geschriebenen Datei, Flaechentabelle an einem
 synthetischen Ring, Sternentfernung an einem Stern auf glattem Nebel, Eichung auf die
-Gesamthelligkeit.
+Gesamthelligkeit; dazu (Issue #106) das M31-Modell gegen deep-sky.md 1.2, Tonkurve (Mitteln,
+Isotonie, Saettigung, Schwarzpunkt), Achsen des TIFF gegen die CD-Matrix, Rueckrechnung eines
+synthetisch gestreckten Bilds und die Flaechentabelle an einer Mosaikkante.
 """
 
 import math
@@ -166,6 +168,99 @@ class EichungTest(unittest.TestCase):
         kodes = ds.kodiere_relativ(ds.linear_zu_mu_rel(linear), 9.0)
         hell = round(ds.eiche_mag_hell(kodes, 9.0, s, {"art": "gesamt", "magnitude": 8.8}), 2)
         self.assertAlmostEqual(ds.gesamtmagnitude(kodes, hell, hell + 9.0, s), 8.8, delta=0.006)
+
+
+M31_PROFIL = {"n": 2.0, "re_arcsec": 263.0, "mue_mag_arcsec2": 19.4, "rd_arcsec": 1474.0, "mu0_mag_arcsec2": 20.2,
+              "q_bulge": 0.8, "q_scheibe": 0.27}
+
+
+class TonkurveTest(unittest.TestCase):
+    """Pressebild mit Tonkurve gegen das Profil (Issue #106)."""
+
+    def test_modell_wie_deep_sky_tabelle(self):
+        # deep-sky.md 1.2, Tabelle mu_V auf der grossen Achse (auf 0,1 gerundet).
+        for r_arcmin, soll in ((0, 15.4), (1, 17.3), (5, 19.2), (10, 20.2), (20, 21.0), (45, 22.2), (60, 22.9), (95, 24.4)):
+            ist = float(ds.sersic_exp_mu(np.array(r_arcmin * 60.0), 0.0, M31_PROFIL))
+            self.assertAlmostEqual(ist, soll, delta=0.06)
+
+    def test_anpassen_gleiche_kodes_gemittelt_und_isoton(self):
+        # Kode 200 zweimal (mu 18 und 18,2 -> 18,1); 150 mit 19,5 und 140 mit 19,3 verletzen die
+        # Monotonie und werden zu einem Knoten (Kode 145, mu 19,4) zusammengefasst.
+        knoten = ds.tonkurve_anpassen([255, 200, 200, 150, 140, 50], [16.0, 18.0, 18.2, 19.5, 19.3, 22.0], [1] * 6)
+        self.assertEqual([k for k, _ in knoten], [50.0, 145.0, 200.0, 255.0])
+        for (_, m), soll in zip(knoten, [22.0, 19.4, 18.1, 16.0]):
+            self.assertAlmostEqual(m, soll, places=9)
+
+    def test_anwenden_saettigung_und_schwarzpunkt(self):
+        knoten = [(20.0, 24.0), (100.0, 20.0), (250.0, 16.0)]
+        tabelle = ds.tonkurve_anwenden(None, knoten, kode_himmel=10)
+
+        def mu(k):
+            return -2.5 * math.log10(tabelle[k])
+
+        self.assertAlmostEqual(mu(60), 22.0, places=9)  # linear in mag zwischen den Knoten
+        self.assertAlmostEqual(mu(255), 16.0, places=9)  # ueber dem hellsten Knoten gesaettigt
+        self.assertAlmostEqual(tabelle[15] / tabelle[20], 0.5)  # linear in der Helligkeit zum Schwarzpunkt
+        self.assertEqual(float(tabelle[10]), 0.0)
+        self.assertEqual(float(tabelle[3]), 0.0)
+        self.assertTrue(np.all(np.diff(tabelle) >= 0))
+
+    def test_achsen_und_cd_matrix_passen_zusammen(self):
+        # Ein Pixel mit bekanntem Ost/Nord-Abstand: tiff_achsen (Zeile 0 oben) und die CD-Matrix des
+        # gespiegelten Bilds muessen denselben Himmelsabstand liefern; Norden 125,8 Grad rechts.
+        form, s, w = (300, 400), 1.3, 125.8
+        mitte = (210.0, 140.0)
+        osten, norden = ds.tiff_achsen(form, mitte, s, w)
+        cd = ds.tiff_cd_matrix(form, s, w)
+        self.assertLess(np.linalg.det(cd), 0)  # wie ein FITS-Bild mit Osten links
+        self.assertAlmostEqual(ds.nordwinkel_grad(cd), -w, places=9)
+        x, y = 50, 230
+        xi, eta = cd @ np.array([x - mitte[0], (form[0] - 1 - y) - (form[0] - 1 - mitte[1])]) * 3600
+        self.assertAlmostEqual(xi, osten[y, x], places=6)
+        self.assertAlmostEqual(eta, norden[y, x], places=6)
+        # Norden zeigt im Bild nach rechts unten (125,8 Grad im Uhrzeigersinn von oben).
+        t = math.radians(w)
+        px, py = int(round(mitte[0] + 50 * math.sin(t))), int(round(mitte[1] - 50 * math.cos(t)))
+        self.assertGreater(norden[py, px], 60)
+        self.assertLess(abs(osten[py, px]), 2)
+
+    def test_profil_zurueckgerechnet(self):
+        # Synthetisches Pressebild: Modell mit q 0,27 / 0,8, gestreckt mit asinh (Kode hoechstens 250),
+        # Himmel bei Kode 7. Die Tonkurve muss das Profil auf der grossen Achse bis 0,05 mag treffen
+        # (ausser innen, wo 20"-Ringe zu wenig Pixel haben, und nahe dem Schwarzpunkt) und auf der kleinen Achse bis 0,1 mag.
+        s, n = 20.0, 700
+        mitte = (n / 2, n / 2)
+        osten, norden = ds.tiff_achsen((n, n), mitte, s, 125.8)
+        pa = math.radians(37.5)
+        u = osten * math.sin(pa) + norden * math.cos(pa)
+        v = osten * math.cos(pa) - norden * math.sin(pa)
+        mu = ds.sersic_exp_mu(u, v, M31_PROFIL)
+        lin = 10 ** (-0.4 * (mu - 23.0))
+        kanal = np.clip(np.rint(7 + 30 * np.arcsinh(lin)), 0, 250).astype(np.uint8)
+        ohne = np.zeros(kanal.shape, bool)
+        tk = {"positionswinkel_grad": 37.5, "kanten_innen_arcsec": [0, 40, 80, 160, 240], "radius_max_arcsec": 6000,
+              "kanten_aussen_anzahl": 18, "streifen_min_arcsec": 30, "streifen_anteil": 0.03, "kode_himmel": 7}
+        knoten, _, zeilen = ds.tonkurve_aus_profil(kanal, ohne, osten, norden, M31_PROFIL, tk)
+        self.assertTrue(all(b[1] < a[1] for a, b in zip(knoten, knoten[1:])))
+        geprueft = 0
+        for r0, r1, mm, mb, _, _, mkm, mkb, _ in zeilen:
+            if r0 >= 240 and mm < 23.5:
+                self.assertLess(abs(mb - mm), 0.05, (r0, r1))
+                geprueft += 1
+            if r0 >= 1000 and mkm < 23.0:
+                self.assertLess(abs(mkb - mkm), 0.1, (r0, r1))
+        self.assertGreater(geprueft, 10)
+
+    def test_flaechentabelle_mit_mosaikrand(self):
+        # Flaeche 21 mag reicht bis an die Mosaikkante (Rest der Leinwand ohne Daten): ohne rand_maske
+        # sieht flaechentabelle nur den schwarzen Rahmen, mit ihr endet die Tabelle vor 21.
+        mu = np.full((200, 200), np.inf)
+        mu[50:150, 50:150] = 21.0
+        mu[90:110, 90:110] = 18.0
+        ohne = ~np.isfinite(mu)
+        rand = ds._dehnen(ohne) & ~ohne
+        self.assertEqual([m for m, _ in ds.flaechentabelle(mu, 1.0, 16.0, 25.0)], [18.0, 21.0])
+        self.assertEqual([m for m, _ in ds.flaechentabelle(mu, 1.0, 16.0, 25.0, rand_maske=rand)], [18.0])
 
 
 if __name__ == "__main__":
