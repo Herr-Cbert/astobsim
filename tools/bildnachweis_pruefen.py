@@ -4,7 +4,8 @@
 Prueft, ohne etwas zu schreiben (A-X3, A-X4, A-X6, ADR-0003):
     - Pflichtfelder je Eintrag (wie FELDER_EINTRAG und pruefeEintrag in
       src/daten/bildnachweise.ts), keine unbekannten Felder, ids eindeutig,
-      norden_oben true, URLs mit http(s)://,
+      norden_oben true, URLs mit http(s)://, kennlinie (Deep-Sky) mit art log,
+      mag_hell und mag_dunkel > mag_hell,
     - Massstab: bogensekunden_pro_pixel passt auf 1 Prozent zu
       winkelgroesse_arcsec / objekt_durchmesser_px,
     - Einzelbild (ohne kacheln): Datei vorhanden, Masse laut Datei gleich
@@ -40,7 +41,7 @@ PFLICHT = [
 ]
 ERLAUBT = set(PFLICHT) | {
     "quelle_datei", "ringe_arcsec", "sub_erde_breite_grad", "sub_erde_laenge_grad", "phase", "kolongitude_grad",
-    "positionswinkel_achse_grad", "datei_bytes", "hinweise", "kacheln",
+    "positionswinkel_achse_grad", "datei_bytes", "hinweise", "kacheln", "kennlinie",
 }
 
 
@@ -69,6 +70,13 @@ def pruefe(bildnachweis, bilder):
         if any(e.get(f) is None for f in ("datei", "pixel_breite", "pixel_hoehe", "winkelgroesse_arcsec",
                                           "objekt_durchmesser_px", "bogensekunden_pro_pixel")):
             continue
+        kennlinie = e.get("kennlinie")
+        if kennlinie is not None:
+            # Deep-Sky: log-Kennlinie (ADR-0003 Nachtrag V2, src/daten/bildnachweise.ts pruefeKennlinie).
+            if set(kennlinie) != {"art", "mag_hell", "mag_dunkel"} or kennlinie.get("art") != "log":
+                fehler.append(f"{ort}: kennlinie braucht genau art = log, mag_hell, mag_dunkel")
+            elif not kennlinie["mag_dunkel"] > kennlinie["mag_hell"]:
+                fehler.append(f"{ort}: kennlinie.mag_dunkel muss groesser als mag_hell sein")
         if e.get("norden_oben") is not True:
             fehler.append(f"{ort}: norden_oben muss true sein")
         for feld in ("quelle_url", "lizenz_url"):

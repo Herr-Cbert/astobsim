@@ -18,3 +18,26 @@ Weitere optionale Felder (Issue #13): `spiegeln` (true: links-rechts) und `drehu
 Kontrast (Issue #79, bilder.md 9 Punkt 6): `kontrast_exponent` (0 < g <= 1, jeder Kanal in linearem Licht hoch g) oder `kontrast_kurve` (Stuetzstellen einer streng steigenden Tonkurve auf die Leuchtdichte, Kanaele im Verhaeltnis skaliert), jeweils mit Pflichtfeld `kontrast_begruendung` (Ziel und Quelle der Photometrie, geht ins Feld `bearbeitung`). Nach einer Aenderung `tools/quellweiss_eichen.py` laufen lassen und `weiss_mag_arcsec2` nachtragen.
 
 Alle Skripte sind idempotent: ein zweiter Lauf erzeugt dieselben Dateien und ersetzt den eigenen Eintrag in `bilder.json`, andere Eintraege bleiben erhalten.
+
+## Deep-Sky-Bilder (Issue #105)
+
+| Skript | Zweck | Aufruf |
+|---|---|---|
+| `deep_sky_aufbereiten.py` | Lineares Archivbild (FITS, ohne astropy gelesen) zu 8-Bit-Grauwert-WebP mit log-Kennlinie (ADR-0003 Nachtrag V2): ueber die CD-Matrix auf Norden oben ausrichten und auf den Zielmassstab bringen (bilinear auf feinerem Gitter, blockweise gemittelt), Sterne entfernen, Quellweiss `mag_hell` aus der Gesamthelligkeit oder einer mittleren Flaechenhelligkeit um die Mitte eichen, `mag_dunkel` = `mag_hell` + Umfang, WebP verlustfrei nach `daten/bilder/<datei>`, Eintrag mit `kennlinie` in `daten/bilder.json`; misst die Flaechentabelle am dekodierten, sternbereinigten Bild (0,1-mag-Schritte) und gibt sie als JSON aus (von Hand als `isophoten` in `daten/objekte.json` uebernehmen) | `python3 tools/deep_sky_aufbereiten.py tools/parameter/m57_hst_20110919.json`; `--messen` rechnet alles und schreibt nichts, `--vorschau <ordner>` schreibt die Kodes und die Sternmaske als PNG (nicht ins Repo), `--tabelle <datei>` die Flaechentabelle als JSON, `--ziel` und `--bildnachweis` wie bei `bild_aufbereiten.py` |
+
+Parameterdatei je Objekt (Beispiel `tools/parameter/m57_hst_20110919.json`): Felder wie bei `bild_aufbereiten.py` (`id`, `objekt`, `zustand`, `datei`, `rohbild` mit `roh_url`, `roh_sha256`, `roh_bytes`, `roh_abruf`, `original_pixel`, `quelle_url`, `mission`, `instrument`, `aufnahmedatum`, `lizenz`, `lizenz_url`, `namensnennung`, bei CC-Lizenzen `aenderungsvermerk`, `orientierung`), dazu
+- `fits_erweiterung` (EXTNAME, z. B. `SCI`; `PRIMARY` fuer die erste HDU), optional `fits_filter` (Abgleich mit FILTER im Kopf),
+- `roh_mitte_px` (Objektmitte im Rohbild, Pixelindex, Zentrum von Pixel 0 bei 0) mit `mitte_beleg`,
+- `bogensekunden_pro_pixel` (Zielmassstab), `leinwand_px` (gerade), optional `ueberabtastung` (Standard 3), `winkelgroesse_arcsec` (grosse Achse; `winkelgroesse_arcsec / bogensekunden_pro_pixel` ganzzahlig, wird `objekt_durchmesser_px`),
+- `eichung`: `{"art": "gesamt", "magnitude", "quelle"}` (Gesamtfluss des dekodierten Bilds) oder `{"art": "flaeche", "mag_arcsec2", "radius_arcsec", "quelle"}` (Mittel im Kreis um die Mitte, Profilanker),
+- `kennlinie`: `{"umfang_mag"}` (1 bis 20; Stufe = Umfang / 254, unter 12,7 mag hoechstens 0,05 mag),
+- `sterne`: `im_bild_entfernen` (false: Sterne bleiben im Bild, nur die Flaechentabelle wird bereinigt, etwa fuer M13), `punktquellen` (Text fuer `bearbeitung`), optional `fenster_px`, `schwelle_sigma`, `kontrast`, `wachsen_sigma`, `max_radius_px`, `rand_px`, `ersatz_px`, `streuung_px` (siehe `sterne_entfernen`), `zusaetzlich_px` (Kreise `[x, y, r]` in Leinwandpixeln, Randkoordinaten) mit `zusaetzlich_beleg`,
+- `bearbeitung_kanal` (Wahl des Filters oder Kanals, Anfang von `bearbeitung`), `hintergrund` (Text: ob und wie der Himmel abgezogen ist), optional `hinweise`, `kommentar`.
+
+Ein weiteres Objekt aus einem FITS-Bild ist nur eine Parameterdatei. Noch nicht umgesetzt (fuer #106 bis #108 bei Bedarf): Rohbilder als TIFF mit Tonkurve gegen ein Profil (M31), Himmelsabzug, gespiegelte CD-Matrix, Kachelpyramiden mit log-Kennlinie.
+
+WebP verlustfrei: Ein verlustbehaftetes Grauwert-WebP laeuft ueber YUV mit Y 16 bis 235 und verliert Kodes, hier also Flaechenhelligkeiten; verlustfrei bleibt jeder Kode erhalten (M57: 686 KB fuer 1200 x 1200 px). Die Flaechentabelle zaehlt die Pixel mit mu <= Isophote (wie der Prototyp auf `prototyp-deep-sky`): ein schwaecheres Loch zaehlt erst mit, wenn die Isophote es erreicht. Sie endet vor der ersten Isophote, die mehr als 1 Prozent der Randpixel erreicht (die Flaeche waere dann vom Bildausschnitt begrenzt).
+
+`quellweiss_eichen.py` prueft Deep-Sky-Bilder mit (Gesamthelligkeit aus dem dekodierten Bild gegen `magnitude`, Quellweiss `kennlinie.mag_hell`) und uebergeht Zustaende ohne Bild; `bildnachweis_pruefen.py` kennt das Feld `kennlinie`.
+
+Tests (nur numpy und Pillow): im Ordner `tools/` `python3 -m unittest` (findet `test_*.py`): Kennlinie hin und zurueck auf 0,05 mag und gleich `src/daten/kennlinie.ts`, FITS-Leser, Ausrichtung, Flaechentabelle an einem synthetischen Ring, Sternentfernung, Eichung. Nicht Teil von `npm test` und CI; nach Aenderungen an `tools/` von Hand laufen lassen. Die Gleichheit der Dekodierung prueft zusaetzlich `src/daten/kennlinie.test.ts` mit Werten aus `log_tabelle`.
