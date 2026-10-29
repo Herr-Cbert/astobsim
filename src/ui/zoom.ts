@@ -10,6 +10,12 @@ import { arbeitsmassstabOhneFenster, atmosphaere, aufloesung, type Konfiguration
 import type { Mitte } from "./verschieben";
 import { verschiebbar } from "./verschieben";
 
+/**
+ * Rand um Sterne im Zoom je Seite in Gesamt-FWHM: der Kernradius aus physik (KERN_RADIUS_PRO_FWHM,
+ * physik.md Abschnitt 9, dort nicht exportiert). Weiter reicht das Scheibchen eines Sterns nicht.
+ */
+export const STERN_RAND_PRO_FWHM = 3;
+
 /** Rand um das Objekt im Zoom als Anteil seiner Ausdehnung, je Seite. */
 export const ZOOM_RAND = 0.05;
 /**
@@ -38,11 +44,15 @@ const DETAIL_ANTEIL_ZOOM_MAX = 0.75;
  * Ausdehnung des Objekts in Bogensekunden: der groessere Wert aus Durchmesser und Quellbild
  * (Breite und Hoehe mal Massstab). Das Quellbild umfasst auch die Ringe des Saturn, die im
  * Durchmesser nicht stecken, und liegt sonst knapp um die Scheibe. Ohne Quellbild (Doppelstern:
- * groesster Sternabstand, M45) zaehlt nur der Durchmesser.
+ * groesster Sternabstand, M45) der Durchmesser plus je Seite den Kernradius (STERN_RAND_PRO_FWHM
+ * Gesamt-FWHM), damit die Sternscheibchen samt Halo ganz im Zoom liegen. Wirft wie optik.
  */
 export function objektausdehnungArcsec(k: Konfiguration): number {
   const { durchmesserArcsec, quelle } = k.objekt;
-  if (quelle === undefined) return durchmesserArcsec;
+  if (quelle === undefined) {
+    const gesamtFwhm = aufloesung(optik(k.geraet), atmosphaere(k.bedingungen)).gesamtFwhmArcsec;
+    return durchmesserArcsec + 2 * STERN_RAND_PRO_FWHM * gesamtFwhm;
+  }
   return Math.max(durchmesserArcsec, quelle.breitePx * quelle.massstabArcsecProPx, quelle.hoehePx * quelle.massstabArcsecProPx);
 }
 

@@ -7,12 +7,15 @@ import { rendere } from "../bild/rendere";
 import { objektzustand, pruefeBildnachweise, pruefeGeraete, pruefeObjekte, pruefeVerweise } from "../daten";
 import type { Konfiguration } from "../naht/konfiguration";
 import { atmosphaere, aufloesung, auswerten, optik } from "../physik";
+import { TEXTE } from "../texte";
 import { type Kataloge, voreinstellung } from "../zustand";
+import { quellbildHilfe } from "./zoomansicht";
 import { arbeitsmassstabOhneFenster } from "../physik";
 import {
   DETAIL_ARBEITSPIXEL,
   detailbreiteArcsec,
   objektausdehnungArcsec,
+  STERN_RAND_PRO_FWHM,
   vergleichsparameter,
   verschiebelage,
   ZOOM_ARBEITSPIXEL_MIN,
@@ -175,11 +178,16 @@ describe("vergleichsparameter", () => {
 });
 
 describe("Zoom ohne Quellbild (Doppelsterne, M45, Issue #109)", () => {
-  it("Ausdehnung ist der Durchmesser, die Zoombreite der Sternabstand mit Rand oder das halbe Feld", () => {
+  it("Ausdehnung ist der Sternabstand plus je Seite der Kernradius, die Zoombreite das mit Rand oder das halbe Feld", () => {
     const albireo = mit("albireo_2025");
     expect(albireo.objekt.quelle).toBeUndefined();
-    expect(objektausdehnungArcsec(albireo)).toBe(albireo.objekt.durchmesserArcsec);
-    expect(zoombreiteArcsec(albireo)).toBeCloseTo(albireo.objekt.durchmesserArcsec * (1 + 2 * ZOOM_RAND), 9);
+    const fwhm = aufloesung(optik(albireo.geraet), atmosphaere(albireo.bedingungen)).gesamtFwhmArcsec;
+    const ausdehnung = albireo.objekt.durchmesserArcsec + 2 * STERN_RAND_PRO_FWHM * fwhm;
+    expect(STERN_RAND_PRO_FWHM).toBe(3);
+    expect(objektausdehnungArcsec(albireo)).toBeCloseTo(ausdehnung, 9);
+    expect(zoombreiteArcsec(albireo)).toBeCloseTo(ausdehnung * (1 + 2 * ZOOM_RAND), 9);
+    // Albireo am 80/600 bei 60x: Gesamt-FWHM rund 2,7'', also knapp 12'' Rand je Seite statt 1,7''.
+    expect((zoombreiteArcsec(albireo) - albireo.objekt.durchmesserArcsec) / 2).toBeGreaterThan(10);
     // M45 ist groesser als das Feld: hoechstens die Haelfte des Felds.
     const m45 = mit("m45");
     expect(zoombreiteArcsec(m45)).toBeCloseTo(feld(m45) / 2, 9);
@@ -193,5 +201,14 @@ describe("Zoom ohne Quellbild (Doppelsterne, M45, Issue #109)", () => {
     const v = vergleichsparameter(anblick, 0);
     expect(v.quellbild.rasterPx).toBe(300);
     expect(v.quellbild.massstabArcsecProPx).toBeCloseTo(fenster.breiteArcsec / 300, 12);
+  });
+});
+
+describe("Hilfetext zum Vergleichsbild (Issue #109)", () => {
+  it("ohne Aufnahme der Text zu den berechneten Sternpunkten, sonst der zum Quellbild", () => {
+    expect(quellbildHilfe(mit("albireo_2025").objekt)).toBe(TEXTE.hilfe.quellbildOhneAufnahme);
+    expect(quellbildHilfe(mit("m45").objekt)).toBe(TEXTE.hilfe.quellbildOhneAufnahme);
+    expect(quellbildHilfe(mit("jup_47").objekt)).toBe(TEXTE.hilfe.quellbild);
+    expect(quellbildHilfe(mit("m57").objekt)).toBe(TEXTE.hilfe.quellbild);
   });
 });
