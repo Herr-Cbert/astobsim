@@ -18,6 +18,8 @@ const DURCHMESSER_MIN_PX = 1;
  * Eine gemalte Punktquelle: breite x hoehe Werte (zeilenweise, relativ zu Quellweiss, ein Kanal),
  * linke obere Ecke bei Spalte spalte und Zeile zeile des Arbeitsrasters. Das Feld darf ganz oder
  * teilweise ausserhalb des Rasters liegen; erst punktebene.ts schneidet nach der Faltung ab.
+ * deckkraft und farbe (Version 2, docs/architektur.md 5.3) gehen nicht in daten ein, sondern in die
+ * Faerbung, die punktebene.ts bei Bedarf mitfaltet: Fluss mal Deckkraft mal Farbe je Kanal.
  */
 export interface Scheibchen {
   spalte: number;
@@ -25,6 +27,10 @@ export interface Scheibchen {
   breite: number;
   hoehe: number;
   daten: Float32Array;
+  /** (0, 1], aus Punktquelle.deckkraft; 1, wenn sie fehlt. */
+  deckkraft: number;
+  /** Linear sRGB (D65), Y = 1, aus Punktquelle.farbe; undefined = grau. */
+  farbe: readonly [number, number, number] | undefined;
 }
 
 /**
@@ -36,8 +42,11 @@ export interface Scheibchen {
  * am Rand des Arbeitsrasters abgeschnitten: auch ein Trabant knapp ausserhalb des Fensters liefert
  * ein Feld, dessen gefaltete Fluegel ins Fenster reichen koennen.
  *
+ * Je Scheibchen kommen Deckkraft und Farbe der Punktquelle mit (fehlt: 1 und grau).
+ *
  * Ohne sichtbare Punktquelle eine leere Liste. Wirft BildFehler bei nicht endlicher Position,
- * Durchmesser <= 0 oder negativer oder nicht endlicher Helligkeit.
+ * Durchmesser <= 0, negativer oder nicht endlicher Helligkeit, Deckkraft ausserhalb (0, 1] oder
+ * negativer oder nicht endlicher Farbe.
  */
 export function malePunktquellen(quellbild: Quellbild): Scheibchen[] {
   const sichtbare = quellbild.punkte.punktquellen.filter((p) => p.sichtbar);
@@ -55,7 +64,7 @@ export function malePunktquellen(quellbild: Quellbild): Scheibchen[] {
     const durchmesserPx = p.durchmesserArcsec / m;
     const fluss = p.helligkeitRelativ * Math.PI * (durchmesserPx / 2) ** 2;
     const s = maleScheibchen(spalte, zeile, Math.max(durchmesserPx, DURCHMESSER_MIN_PX) / 2, fluss);
-    if (s !== undefined) ergebnis.push(s);
+    if (s !== undefined) ergebnis.push({ ...s, deckkraft: p.deckkraft ?? 1, farbe: p.farbe });
   }
   return ergebnis;
 }
@@ -70,13 +79,19 @@ function pruefePunktquelle(p: Punktquelle): void {
   if (!(p.helligkeitRelativ >= 0) || !Number.isFinite(p.helligkeitRelativ)) {
     throw new BildFehler(`Punktquelle ${p.name}: helligkeitRelativ muss >= 0 sein, nicht ${p.helligkeitRelativ}`);
   }
+  if (p.deckkraft !== undefined && !(p.deckkraft > 0 && p.deckkraft <= 1)) {
+    throw new BildFehler(`Punktquelle ${p.name}: deckkraft muss in (0, 1] liegen, nicht ${p.deckkraft}`);
+  }
+  if (p.farbe !== undefined && (p.farbe.length !== 3 || !p.farbe.every((k) => k >= 0 && Number.isFinite(k)))) {
+    throw new BildFehler(`Punktquelle ${p.name}: farbe muss drei endliche Werte >= 0 haben, nicht ${String(p.farbe)}`);
+  }
 }
 
 /**
  * Verteilt fluss auf die Pixel nach ihrem Flaechenanteil am Kreis um (spalte, zeile) mit radiusPx,
  * gezaehlt an UNTERABTASTUNG^2 Punkten je Pixel, normiert ueber alle Pixel des Felds.
  */
-function maleScheibchen(spalte: number, zeile: number, radiusPx: number, fluss: number): Scheibchen | undefined {
+function maleScheibchen(spalte: number, zeile: number, radiusPx: number, fluss: number): Omit<Scheibchen, "deckkraft" | "farbe"> | undefined {
   const i0 = Math.floor(spalte - radiusPx);
   const i1 = Math.ceil(spalte + radiusPx);
   const j0 = Math.floor(zeile - radiusPx);
