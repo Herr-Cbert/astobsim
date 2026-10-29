@@ -32,7 +32,18 @@ Architektur: Stack ([ADR-0001](docs/adr/0001-stack.md)), Simulationsmodell ([ADR
 
 ## Lizenz
 
-Der Code steht unter der MIT-Lizenz ([LICENSE](LICENSE)). Die Bilder unter `daten/bilder/` behalten ihre eigene Lizenz (NASA gemeinfrei bzw. ESA/Hubble CC BY 4.0); Quelle, Credit und Bearbeitung stehen je Bild in [daten/bilder.json](daten/bilder.json) und auf der Seite im Fuss unter "Bildnachweise".
+Der Code steht unter der MIT-Lizenz ([LICENSE](LICENSE)). Die Bilder unter `daten/bilder/` behalten ihre eigene Lizenz (NASA gemeinfrei bzw. ESA/Hubble CC BY 4.0); Quelle, Credit und Bearbeitung stehen je Bild in [daten/bilder.json](daten/bilder.json) und auf der Seite im Fuss unter "Bildnachweise". Auch die Sterndaten in [daten/objekte.json](daten/objekte.json) behalten die Lizenz ihrer Quelle, siehe den folgenden Abschnitt.
+
+## Sterndaten
+
+Abstand, Positionswinkel, Helligkeit und Farbindex B-V der Sterne stammen aus den folgenden Katalogen; je Stern und Paar steht die Herkunft in `daten/objekte.json` (`katalog`, `quelle_farbe`, `kommentar`), auf der Seite im Fuss unter "Sterndaten". Lizenz und Danksagung stehen so, wie die Quelle sie nennt (gelesen am 2026-10-29).
+
+- **Washington Double Star Catalog (WDS)**, U.S. Naval Observatory (Mason et al. 2001, AJ 122, 3466), <https://www.astro.gsu.edu/wds/>: Abstand, Positionswinkel und Helligkeit der Doppelsterne (ausser Albireo B und Polaris B). Lizenz laut [data.gov](https://catalog.data.gov/dataset/washington-double-star-catalog) (Eintrag der HEASARC): U.S. Government Works ("License: https://www.usa.gov/government-works", "Access Level: public"); an der Quelle selbst keine Lizenzangabe. Danksagung: "This research has made use of the Washington Double Star Catalog maintained at the U.S. Naval Observatory."
+- **Sixth Catalog of Orbits of Visual Binary Stars (ORB6)**, U.S. Naval Observatory (Matson, Williams, Hartkopf und Mason), <https://www.astro.gsu.edu/wds/orb6.html>: Abstand und Positionswinkel der Bahnpaare, Ephemeride 2027,0. An der Quelle keine Lizenzangabe; Katalog des USNO wie der WDS.
+- **Hipparcos- und Tycho-Kataloge**, ESA (Hipparcos-Hauptkatalog, ESA 1997; Tycho Double Star Catalogue, Fabricius et al. 2002, A&A 384, 180), abgefragt im Hipparcos and Tycho Legacy Archive, <https://www.cosmos.esa.int/web/hipparcos/catalogues>: B-V, dazu V von Albireo B. "The Hipparcos and Tycho Catalogues are distributed under the [CC BY-NC 3.0 IGO](https://creativecommons.org/licenses/by-nc/3.0/igo/deed.en) licence and the Terms and Conditions for the use of these data require users to acknowledge ESA using “Credit: ESA”." Credit: ESA.
+- **Bright Star Catalogue**, 5. Ausgabe (Hoffleit und Warren 1991), abgefragt bei der HEASARC, <https://heasarc.gsfc.nasa.gov/W3Browse/star-catalog/bsc5p.html>: B-V von Mizar, Castor und Gamma Andromedae. An der Quelle keine Lizenzangabe.
+- **SIMBAD**, CDS Strassburg (Wenger et al. 2000, A&AS 143, 9), Spiegel <https://simbad.cfa.harvard.edu/simbad/>: B und V von Antares B. "Use of SIMBAD service is free without any registration under ODbL licence. We request that users cite the original paper reference." Danksagung: "This research has made use of the SIMBAD database, operated at CDS, Strasbourg, France".
+- **Usenko und Klochkova**, Polaris B, <https://arxiv.org/abs/0708.0333>: V 8,60 und B-V 0,42 (nach Turner 2005) von Polaris B (Entscheidung 7 in [docs/recherche/README.md](docs/recherche/README.md)).
 
 ## Entwicklung
 

@@ -1,7 +1,9 @@
 // Bildnachweise im Seitenfuss (A-X4, A-T5, Issue #23): Lizenz des Codes und je Bild aus
 // daten/bilder.json Quelle, Lizenz, Credit und Bearbeitung, aufklappbar. Die Credit-Zeile steht
-// woertlich wie in bilder.json (Lizenzbedingung, bilder.md 9 Schritt 8). nachweiseImFuss ist rein
-// und in Vitest geprueft; baueFuss setzt nur textContent und href (kein innerHTML, CSP aus #22).
+// woertlich wie in bilder.json (Lizenzbedingung, bilder.md 9 Schritt 8). Darunter die Sterndaten
+// (Issue #103): je Katalog aus TEXTE.fuss.sterndaten.quellen Verwendung, Lizenz und Danksagung woertlich;
+// ein weiterer Katalog ist ein weiterer Listeneintrag dort. nachweiseImFuss und sterndatenImFuss sind
+// rein und in Vitest geprueft; baueFuss setzt nur textContent und href (kein innerHTML, CSP aus #22).
 
 import type { Bildnachweis } from "../daten";
 import { TEXTE } from "../texte";
@@ -50,6 +52,18 @@ export function nachweiseImFuss(kataloge: Pick<Kataloge, "objekte" | "nachweise"
   });
 }
 
+/** Alle Quellen der Sterndaten in der Reihenfolge von TEXTE.fuss.sterndaten.quellen. */
+export function sterndatenImFuss(): NachweisImFuss[] {
+  const T = TEXTE.fuss;
+  return T.sterndaten.quellen.map((q, i) => {
+    const zeilen: Nachweiszeile[] = [{ beschriftung: T.verwendet, text: q.verwendet }];
+    zeilen.push(q.lizenzUrl === undefined ? { beschriftung: T.lizenz, text: q.lizenz } : { beschriftung: T.lizenz, text: q.lizenz, href: q.lizenzUrl });
+    if (q.danksagung !== undefined) zeilen.push({ beschriftung: T.danksagung, text: q.danksagung });
+    zeilen.push({ beschriftung: T.quelle, text: q.url, href: q.url });
+    return { id: `sterndaten-${i}`, titel: q.titel, zeilen };
+  });
+}
+
 /** Link mit rel gegen Opener und Referrer; geoeffnet im selben Tab. */
 function link(d: Document, text: string, href: string): HTMLAnchorElement {
   const a = d.createElement("a");
@@ -59,23 +73,16 @@ function link(d: Document, text: string, href: string): HTMLAnchorElement {
   return a;
 }
 
-/** Fuellt den Seitenfuss: Lizenzzeile, darunter die Bildnachweise zum Aufklappen. */
-export function baueFuss(fuss: HTMLElement, kataloge: Pick<Kataloge, "objekte" | "nachweise">): void {
-  const d = fuss.ownerDocument;
-  const T = TEXTE.fuss;
-  const lizenz = d.createElement("p");
-  lizenz.className = "fuss-lizenz";
-  lizenz.append(d.createTextNode(T.codeVor), link(d, T.codeLizenz, LIZENZ_URL), d.createTextNode(T.codeMitte), link(d, T.codeQuelle, REPO_URL), d.createTextNode("."));
-
-  const eintraege = nachweiseImFuss(kataloge);
+/** Aufklappbarer Block mit einer Ueberschrift je Eintrag und den Zeilen als Definitionsliste. */
+function aufklappbar(d: Document, kopfText: string, klasse: string, klasseEintrag: string, eintraege: readonly NachweisImFuss[]): HTMLDetailsElement {
   const details = d.createElement("details");
-  details.className = "fuss-nachweise";
+  details.className = klasse;
   const kopf = d.createElement("summary");
-  kopf.textContent = T.bildnachweise(eintraege.length);
+  kopf.textContent = kopfText;
   details.append(kopf);
   for (const e of eintraege) {
     const abschnitt = d.createElement("section");
-    abschnitt.className = "fuss-bild";
+    abschnitt.className = klasseEintrag;
     const titel = d.createElement("h2");
     titel.textContent = e.titel;
     const liste = d.createElement("dl");
@@ -90,5 +97,21 @@ export function baueFuss(fuss: HTMLElement, kataloge: Pick<Kataloge, "objekte" |
     abschnitt.append(titel, liste);
     details.append(abschnitt);
   }
-  fuss.replaceChildren(lizenz, details);
+  return details;
+}
+
+/** Fuellt den Seitenfuss: Lizenzzeile, darunter Bildnachweise und Sterndaten zum Aufklappen. */
+export function baueFuss(fuss: HTMLElement, kataloge: Pick<Kataloge, "objekte" | "nachweise">): void {
+  const d = fuss.ownerDocument;
+  const T = TEXTE.fuss;
+  const lizenz = d.createElement("p");
+  lizenz.className = "fuss-lizenz";
+  lizenz.append(d.createTextNode(T.codeVor), link(d, T.codeLizenz, LIZENZ_URL), d.createTextNode(T.codeMitte), link(d, T.codeQuelle, REPO_URL), d.createTextNode("."));
+  const bilder = nachweiseImFuss(kataloge);
+  const sterne = sterndatenImFuss();
+  fuss.replaceChildren(
+    lizenz,
+    aufklappbar(d, T.bildnachweise(bilder.length), "fuss-nachweise", "fuss-bild", bilder),
+    aufklappbar(d, T.sterndaten.titel(sterne.length), "fuss-nachweise fuss-sterndaten", "fuss-eintrag", sterne)
+  );
 }

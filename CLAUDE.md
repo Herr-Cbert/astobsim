@@ -30,7 +30,7 @@ Simulation des Anblicks von Himmelsobjekten durch ein Fernrohr unter gegebenen B
 - `src/ui/`: Formular, Gesichtsfeld-Canvas, Zoomansicht, Infopanel. Alle Texte aus `src/texte.ts`.
 - `daten/`: `geraete.json`, `objekte.json`, `bilder.json` und die aufbereiteten Bilder (ADR-0003).
 - `data/roh/`: Rohbilder, gitignored, mit `LIESMICH.md` zur Herkunft.
-- `tools/`: Python-Skripte (numpy, Pillow) zur Bildaufbereitung. Nur sie erzeugen Bilder unter `daten/` und schreiben den Bildnachweis.
+- `tools/`: Python-Skripte (numpy, Pillow) zur Bildaufbereitung und Sternlisten. Nur sie erzeugen Bilder unter `daten/` und schreiben den Bildnachweis.
 - `scripts/`: Node-Skripte ohne Pakete fuer Build und Tests: `build-abschluss.mjs` (Groessenpruefung A-X6, Kopie `daten/` nach `dist/daten/`), `browser-test.mjs` (Browsertest, siehe oben), `validierung-bilder.mjs` (Screenshots der Validierung).
 - `test/browser/`: Testseiten fuer den Browsertest, nicht im Produktionsbau.
 - `.github/workflows/`: `ci.yml` (Tests und Build bei Pull Request und Push auf `main`), `pages.yml` (Deploy nach GitHub Pages bei Push auf `main`).

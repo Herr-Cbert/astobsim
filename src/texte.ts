@@ -3,6 +3,16 @@
 // UTF-8 mit echten Umlauten und Sonderzeichen (Grad, Bogenminute, Bogensekunde, Malzeichen).
 // Bezeichner und Kommentare bleiben ASCII.
 
+/** Eine Quelle der Sterndaten im Seitenfuss (src/ui/bildnachweise.ts); lizenzUrl und danksagung nur, wo die Quelle sie nennt. */
+export interface Sterndatenquelle {
+  titel: string;
+  verwendet: string;
+  lizenz: string;
+  lizenzUrl?: string;
+  danksagung?: string;
+  url: string;
+}
+
 export const TEXTE = {
   titel: "astobsim",
   untertitel: "Wie sieht ein Himmelsobjekt durch ein Fernrohr aus?",
@@ -24,7 +34,64 @@ export const TEXTE = {
     credit: "Namensnennung",
     lizenz: "Lizenz",
     quelle: "Quelle",
-    bearbeitung: "Bearbeitung"
+    bearbeitung: "Bearbeitung",
+    verwendet: "Verwendet für",
+    danksagung: "Danksagung",
+    /**
+     * Sterndaten (Issue #103, ADR-0003 Nachtrag V2), gleicher Inhalt wie README.md Abschnitt Sterndaten.
+     * Ein Katalog ist ein Listeneintrag; lizenz und danksagung woertlich von der Quelle (englisch),
+     * gelesen am 2026-10-29. Fehlt eine Lizenzangabe an der Quelle, steht das so da.
+     */
+    sterndaten: {
+      titel: (anzahl: number): string => `Sterndaten (${anzahl} Quellen, jede unter ihrer eigenen Lizenz)`,
+      quellen: [
+        {
+          titel: "Washington Double Star Catalog (WDS), U.S. Naval Observatory",
+          verwendet: "Abstand, Positionswinkel und Helligkeit der Doppelsterne außer Albireo B und Polaris B (Mason et al. 2001, AJ 122, 3466)",
+          lizenz: "Laut data.gov (Eintrag der HEASARC): U.S. Government Works („License: https://www.usa.gov/government-works“, „Access Level: public“); an der Quelle selbst keine Lizenzangabe.",
+          lizenzUrl: "https://catalog.data.gov/dataset/washington-double-star-catalog",
+          danksagung: "This research has made use of the Washington Double Star Catalog maintained at the U.S. Naval Observatory.",
+          url: "https://www.astro.gsu.edu/wds/"
+        },
+        {
+          titel: "Sixth Catalog of Orbits of Visual Binary Stars (ORB6), U.S. Naval Observatory",
+          verwendet: "Abstand und Positionswinkel der Bahnpaare, Ephemeride 2027,0 (Matson, Williams, Hartkopf und Mason)",
+          lizenz: "An der Quelle keine Lizenzangabe; Katalog des U.S. Naval Observatory wie der WDS.",
+          url: "https://www.astro.gsu.edu/wds/orb6.html"
+        },
+        {
+          titel: "Hipparcos- und Tycho-Kataloge, ESA",
+          verwendet:
+            "B-V und V von Albireo B aus dem Hipparcos-Hauptkatalog (ESA 1997) und dem Tycho Double Star Catalogue (Fabricius et al. 2002, A&A 384, 180), " +
+            "abgefragt im Hipparcos and Tycho Legacy Archive der ESA",
+          lizenz:
+            "„The Hipparcos and Tycho Catalogues are distributed under the CC BY-NC 3.0 IGO licence and the Terms and Conditions " +
+            "for the use of these data require users to acknowledge ESA using “Credit: ESA”.“",
+          lizenzUrl: "https://creativecommons.org/licenses/by-nc/3.0/igo/deed.en",
+          danksagung: "Credit: ESA",
+          url: "https://www.cosmos.esa.int/web/hipparcos/catalogues"
+        },
+        {
+          titel: "Bright Star Catalogue, 5. Ausgabe (Hoffleit und Warren 1991)",
+          verwendet: "B-V von Mizar, Castor und Gamma Andromedae, abgefragt bei der HEASARC (NASA)",
+          lizenz: "An der Quelle keine Lizenzangabe.",
+          url: "https://heasarc.gsfc.nasa.gov/W3Browse/star-catalog/bsc5p.html"
+        },
+        {
+          titel: "SIMBAD, CDS Straßburg (Wenger et al. 2000, A&AS 143, 9)",
+          verwendet: "B und V von Antares B, abgefragt über den Spiegel in Harvard",
+          lizenz: "„Use of SIMBAD service is free without any registration under ODbL licence. We request that users cite the original paper reference.“",
+          danksagung: "This research has made use of the SIMBAD database, operated at CDS, Strasbourg, France",
+          url: "https://simbad.cfa.harvard.edu/simbad/"
+        },
+        {
+          titel: "Usenko und Klochkova: Polaris B (arXiv:0708.0333)",
+          verwendet: "Helligkeit (V 8,60) und B-V (0,42 nach Turner 2005) von Polaris B",
+          lizenz: "Zahlenwerte aus einer Fachveröffentlichung, mit Zitat übernommen.",
+          url: "https://arxiv.org/abs/0708.0333"
+        }
+      ] as readonly Sterndatenquelle[]
+    }
   },
   /** Platzhalter fuer einen nicht endlichen Zahlenwert. */
   fehlwert: "–",

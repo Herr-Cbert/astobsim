@@ -136,7 +136,7 @@ Bezug zu A-P6: Ganymed (1,7") und Kallisto (1,6") liegen bei 47" ueber der Rayle
 
 ### 3.3 Vorschlag fester typischer Stellungen
 
-Koordinaten: dx positiv = Osten (bei "Norden oben" links im Bild, A-D11), dy positiv = Norden, Angaben in Bogensekunden relativ zur Planetenmitte. Die Bahnebene der Galileischen Monde liegt praktisch im Jupiteraequator; Jupiters Achsneigung von 3,1 Grad [3] laesst die Monde bis zu ca. 3 Grad aus der Linie treten. Gewaehlt: Neigung 2 Grad, Bahnphase so, dass alle vier Monde sichtbar, keiner vor oder hinter der Scheibe, Anordnung unsymmetrisch (zwei westlich, zwei oestlich, Io innen). Die dy-Werte folgen aus dy = sqrt(1 - (dx/E)^2) * E * sin(2 Grad) mit E = maximaler Elongation; Vorzeichen frei gewaehlt (ber.).
+Koordinaten: dx positiv = rechts im Bild, bei "Norden oben" (A-D11) also Westen, dy positiv = Norden (wie die Naht, `src/naht/konfiguration.ts`; korrigiert in #103, vorher stand hier "dx positiv = Osten"), Angaben in Bogensekunden relativ zur Planetenmitte. Die Bahnebene der Galileischen Monde liegt praktisch im Jupiteraequator; Jupiters Achsneigung von 3,1 Grad [3] laesst die Monde bis zu ca. 3 Grad aus der Linie treten. Gewaehlt: Neigung 2 Grad, Bahnphase so, dass alle vier Monde sichtbar, keiner vor oder hinter der Scheibe, Anordnung unsymmetrisch (zwei westlich, zwei oestlich, Io innen). Die dy-Werte folgen aus dy = sqrt(1 - (dx/E)^2) * E * sin(2 Grad) mit E = maximaler Elongation; Vorzeichen frei gewaehlt (ber.).
 
 Jupiter 47":
 
