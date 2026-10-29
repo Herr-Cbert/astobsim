@@ -183,9 +183,12 @@ export function baueFormularObjekt(platz: HTMLElement, steuerung: Steuerung): vo
   laedt.setAttribute("aria-hidden", "true");
 
   // Eingaben des freien Paars (A-Z9), sichtbar nur, wenn es gewaehlt ist.
-  const paar = d.createElement("div");
+  const paar = d.createElement("fieldset");
   paar.className = "objekt-paar";
   paar.id = "objekt-paar";
+  const legende = d.createElement("legend");
+  legende.textContent = T.paar.ueberschrift;
+  paar.append(legende);
   const startPaar = steuerung.konfiguration.objekt.paar ?? PAAR_VORGABE;
   const paarfelder = new Map<Paarschluessel, { feld: Zahlenfeld; optionen: ZahlOptionen; bekannt: number }>();
   for (const { schluessel } of PAARFELDER) {

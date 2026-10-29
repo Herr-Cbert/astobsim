@@ -196,6 +196,10 @@ export const TEXTE = {
     quellbild:
       "Die Aufnahme, aus der der Anblick entsteht (Raumsonde, Hubble oder beim Mond ein NASA-Rendering), im selben Maßstab und Ausschnitt, aber ohne Verschmierung und ohne Anpassung der Helligkeit: Weiß im Quellbild ist Weiß auf dem Bildschirm. " +
       "Was hier zu sehen ist und im Anblick fehlt, bleibt unter den eingestellten Bedingungen unsichtbar.",
+    /** Statt quellbild bei Objekten ohne Aufnahme (Doppelsterne, freies Paar, M45), Issue #109. */
+    quellbildOhneAufnahme:
+      "Für dieses Objekt gibt es keine Aufnahme. Das Feld zeigt die Sterne als berechnete, ideale Punkte an ihren Katalogpositionen, im selben Maßstab und Ausschnitt wie der Anblick, " +
+      "ohne Beugung, Seeing und Augenauflösung. Liegen hier zwei Punkte getrennt, im Anblick aber nicht, trennen Fernrohr und Bedingungen das Paar nicht.",
 
     /** Hilfetexte zu den Zahlen des Infopanels (A-D6), Schluessel wie in TEXTE.info. */
     anzeige: {

@@ -6,6 +6,7 @@
 // weil beide aus derselben Fenstermitte entstehen. Die Schaltflaeche Detail (Issue #77) schaltet
 // auf das schmalere Detailfenster, wo zoom.ts es anbietet (Mond), sonst ist sie verborgen.
 
+import type { Objektzustand } from "../naht/konfiguration";
 import { TEXTE } from "../texte";
 import { nachweistext } from "./gesichtsfeld";
 import { hilfesymbol } from "./hilfe";
@@ -28,6 +29,14 @@ export interface ZoomPlaetze {
 export interface Zoomansicht {
   anblick: HTMLCanvasElement;
   vergleich: HTMLCanvasElement;
+}
+
+/**
+ * Hilfetext zum Vergleichsbild: bei Objekten ohne Aufnahme (ohne quelle, Issue #109) der Hinweis auf
+ * die berechneten idealen Sternpunkte, sonst der Text zum Quellbild.
+ */
+export function quellbildHilfe(objekt: Objektzustand): string {
+  return objekt.quelle === undefined ? TEXTE.hilfe.quellbildOhneAufnahme : TEXTE.hilfe.quellbild;
 }
 
 /** Ein Bild der Zoomansicht: Beschriftung mit Hilfesymbol ueber dem Canvas. */
@@ -135,6 +144,8 @@ export function baueZoomansicht(plaetze: ZoomPlaetze, steuerung: Steuerung): Zoo
     if (stand.konfiguration.objekt.kennung !== kennung) {
       kennung = stand.konfiguration.objekt.kennung;
       nachweis.textContent = nachweistext(steuerung.kataloge, kennung);
+      const tip = v.huelle.querySelector(".hilfe-text");
+      if (tip !== null) tip.textContent = quellbildHilfe(stand.konfiguration.objekt);
     }
     let angeboten = false;
     try {

@@ -63,6 +63,7 @@ export interface ZahlOptionen extends Feldbasis {
   /**
    * Ab grob.ab ein groeberer Schritt mit weniger Nachkommastellen (Grenze.grob aus physik, die
    * Trennung des freien Paars: 0,05'' unter 10'', 1'' ab 10''). Ohne Angabe gelten schritt und stellen.
+   * Nur fuer zahlenfeld, nicht fuer regler.
    */
   grob?: { ab: number; schritt: number; stellen: number };
   wert: number;
@@ -112,8 +113,8 @@ export interface Auswahl {
 
 /**
  * Schritt und Nachkommastellen eines Felds beim Wert wert: ab grob.ab die groben, sonst die des
- * Felds. Dieselbe Regel wie begrenze (physik), damit das Feld genau den Wert zeigt, mit dem
- * gerechnet wird (34 statt 34,05), und ein Regler nur Werte anbietet, die begrenze nicht verschiebt.
+ * Felds. Dieselbe Regel wie begrenze (physik), damit das Zahlenfeld genau den Wert zeigt, mit dem
+ * gerechnet wird (34 statt 34,05).
  */
 export function rasterBei(o: Pick<ZahlOptionen, "schritt" | "stellen" | "grob">, wert: number): { schritt: number; stellen: number } {
   return o.grob !== undefined && wert >= o.grob.ab ? { schritt: o.grob.schritt, stellen: o.grob.stellen } : { schritt: o.schritt, stellen: o.stellen };
@@ -198,7 +199,8 @@ export function zahlenfeld(d: Document, o: ZahlOptionen): Zahlenfeld {
 }
 
 /**
- * Regler mit Zahlenfeld daneben (z. B. Seeing, A-B1). Der Regler rechnet beim Ziehen live
+ * Regler mit Zahlenfeld daneben (z. B. Seeing, A-B1). grob gilt nur fuer das Zahlenfeld: der
+ * Browser zaehlt die Schritte eines Reglers ab min, ein Wechsel des Schritts passt nicht dazu. Der Regler rechnet beim Ziehen live
  * (input, A-D7), das Zahlenfeld beim Verlassen; beide zeigen immer denselben Wert.
  */
 export function regler(d: Document, o: ZahlOptionen): Regler {
@@ -211,10 +213,7 @@ export function regler(d: Document, o: ZahlOptionen): Regler {
   r.step = String(o.schritt);
   r.setAttribute("aria-label", o.beschriftung);
   zeile.append(r);
-  // Mit grob wechselt der Schritt des Reglers mit dem Wert (rasterBei); der Browser zaehlt die
-  // Schritte ab min, min muss dann ein Vielfaches des groben Schritts sein.
   const feld = zahlteil(d, o, zeile, element, (wert) => {
-    r.step = String(rasterBei(o, wert).schritt);
     r.value = String(wert);
   });
   // Der Regler bleibt in den Grenzen; Hinweise gibt es nur aus dem Zahlenfeld. Eine Aenderung

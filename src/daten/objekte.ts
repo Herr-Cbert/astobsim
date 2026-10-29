@@ -192,6 +192,8 @@ export function pruefeObjekte(roh: unknown): Objekt[] {
     const obj = alsObjekt(wert, ortIndex, "Eintrag");
     const id = text(obj, "id", ortIndex);
     const ort: Ort = { datei: OBJEKTE_DATEI, eintrag: id };
+    // Die Objektauswahl der ui nutzt "frei" als Wert des freien Paars (Issue #109).
+    if (id === KENNUNG_FREIES_PAAR) throw new DatenFehler(OBJEKTE_DATEI, id, "id", '"frei" ist das freie Paar in der Objektauswahl (A-Z9)');
     if (objektIds.has(id)) throw new DatenFehler(OBJEKTE_DATEI, id, "id", "doppelt vergeben");
     objektIds.add(id);
     nurBekannteFelder(obj, ort, FELDER_OBJEKT);
