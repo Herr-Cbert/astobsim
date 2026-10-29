@@ -748,3 +748,38 @@ A-Q2 T2 ist entsprechend angepasst (`docs/anforderungen.md`).
 
 - **Quellbild sat_20 (#79):** Der A-Ring ist im Hubble-Bild 0,50 (innen) und 0,21 (aussen) des aeusseren B-Rings hell (`tools/strukturprofile.py`). Damit zeigt selbst der ruhige Moment die Teilung kaum (0,029). Visuell wirkt der A-Ring heller; vermutlich ist das Pressebild nichtlinear gestreckt wie das Jupiterbild in #79. Photometrische Werte fuer das Verhaeltnis A zu B mit Quelle stehen noch aus. **Nachtrag #79 (2026-10-28):** Werte nach Salo und French 2010 (`objekte.md` 4.2): A innen 0,83, A aussen 0,56, Cassini-Zone 0,15. Das Bild ist mit einer Tonkurve angeglichen (eine Potenzkurve, die die A-Ringe trifft, haette die Teilung drei- bis viermal zu hell gemacht). Mit den neuen Stufen (A 0,82 / 0,54, Cassini 0,17) bleibt die Delle im Langzeitmittel 0,000; im ruhigen Moment ergibt sich am 100 mm 0,131 (Anhalt, Arbeitsmassstab des Langzeitkerns), am 60 mm 0,017.
 - **Ruhiger Moment (#29):** Der Tilt-Abzug aus 2.3 veraendert nicht nur Cassini, sondern auch T4d und T5b (15.2). Eine Umsetzung braucht eigene Erwartungen fuer den ruhigen Moment und darf die Schwelle nicht aus den Langzeit-Urteilen uebernehmen.
+
+## 16. Mischgewicht und Sockel (Issue #97)
+
+Umsetzung der Festlegungen "Unaufgeloest" und "Mindestsichtbarkeit als additiver Sockel" aus ADR-0004 in `src/physik/mischung.ts`; Pixelformel und Bitgleichheit in `docs/architektur.md` 5.3.
+
+### 16.1 Mischgewicht (A-P10)
+
+Uebergangsfunktion nach `wahrnehmung.md` 3.2 (eigene Herleitung aus den Varianzen von Augen-PSF und Scheibe, keine Messung): $g(x) = 1/(1 + \tfrac{\ln 2}{2}\,x^2)$, $x = \theta V / 60''$ mit der Augenaufloesung 60'' (`AUGE_AUFLOESUNG_ARCSEC`, 3.1). Der Faktor steht im Code als $\ln 2/2$ = 0,34657, gerundet 0,3466 wie in ADR-0004. Stetiger Schnitt nach ADR-0004: $g' = \max\big(0, (g - 0{,}005)/0{,}995\big)$; $g' = 0$ genau fuer $x \ge \sqrt{199 \cdot 2/\ln 2} = 23{,}96$ (ber.), also fuer $\theta V \ge 1438''$.
+
+### 16.2 Sockel (Mindestsichtbarkeit)
+
+Deep-Sky-Pixel nach ADR-0004: $h + P\,(w(q) - h + \sigma)$ mit $w(q) = \min(1, (a q + s)^n)$, $h = \min(1, s^n)$. An der Schwelle ist $q = q^*$ und $P$ = 0,5. Gefordert ist, dass dort das Pixel mindestens $\Delta_\mathrm{min}$ sRGB-Kodes ueber dem Himmel liegt: $h + \tfrac12\,(w(q^*) - h + \sigma) \ge L_\mathrm{ziel}$ mit $L_\mathrm{ziel} = \mathrm{lin}\big(\min(255, K(h) + \Delta_\mathrm{min})/255\big)$, $K(h) = 255\,\mathrm{sRGB}(h)$. Der kleinste Sockel ist (ber.)
+
+$$\sigma = \max\big(0,\; 2\,(L_\mathrm{ziel} - h) - (w(q^*) - h)\big).$$
+
+Der Kode des Himmels geht stetig ein, nicht gerundet (wie im Prototyp); weil $\mathrm{round}(K + 3) = \mathrm{round}(K) + 3$, bleibt der Abstand nach dem Runden auf 8 Bit erhalten. sRGB-Kennlinie und Umkehrung nach IEC 61966-2-1 [59] als reine Funktionen in `mischung.ts` (dieselbe Kennlinie wie `src/ui/zeichne.ts` und `src/daten/srgb.ts`; physik importiert diese Module nicht). $\Delta_\mathrm{min}$ = 3 (`SOCKEL_DELTA_KODES`) ist ein Vorschlag ohne Quelle, am Bild festgelegt (`wahrnehmung.md` 9 Punkt 8).
+
+### 16.3 Testwerte (A-Q1)
+
+| Groesse | Eingabe | Erwartung | Herkunft |
+|---|---|---|---|
+| $g$ vor dem Schnitt | $x$ = 0 / 0,783 / 7,83 | 1 / 0,825 / 0,045 | `wahrnehmung.md` 3.2, 6 |
+| $g$ vor dem Schnitt | $x$ = 0,10 / 3,33 / 39,2 | 0,997 / 0,21 / 0,0019 | `wahrnehmung.md` 3.2 |
+| $g'$ | Jupiter 47'' mit $V$ = 1 / 10 | 0,8238 / 0,0401 | ber. ($x$ = 0,7833 / 7,833) |
+| $g'$ | T5b Mars 6'' bei 120x ($x$ = 12) | 0,0147 | ber. |
+| $g'$ | T1, T2a, T2b, T3, T4, T5a ($x$ = 33 bis 3100) | 0 | ADR-0004; ber. |
+| sRGB | linear 0,5 / 0,18; kodiert 0,5 | 0,73536 / 0,46136; 0,21404 | [59]; ber. |
+| $\sigma$ | Prototyp M31 im 10x50, Bortle 5: $a$ = 7,566e-4 (Kern = 1), $s$ = 2,825e-5, $q^*$ = 5,040e-3, $\Delta_\mathrm{min}$ = 3, $n$ = 1/3 | 0,005905; Kern sRGB 86 -> 88 | ADR-0004 Befund 3; `prototyp/deep_sky.py` mit `additiv.py` nachgerechnet (mit $F$ = 1,4: $q^*$ = 3,43e-3, $\sigma$ = 0,00631, Kern ebenfalls 88) |
+| $\sigma$ | $a q^*$ = 10 $s$, $\Delta_\mathrm{min}$ = 3 | 0 (Abstand an der Schwelle etwa 14 Kodes) | ber. |
+
+### 16.4 Unsicher
+
+1. **Uebergangsfunktion:** eigene Herleitung, siehe `wahrnehmung.md` 9 Punkt 2; am Bild bei T6 pruefen.
+2. **Sockel bei hellem Himmel:** liegt $K(h) + \Delta_\mathrm{min}$ ueber 255, wird das Ziel auf Weiss begrenzt; dann ist der Abstand kleiner als $\Delta_\mathrm{min}$. Kommt erst bei einem Himmel nahe Bildschirmweiss vor, also nicht in den Testfaellen.
+3. **Quantisierung beim Zeichnen:** der Sockel rechnet mit der exakten Kennlinie; `src/ui/zeichne.ts` kodiert ueber eine Tabelle. Weicht die Tabelle um Bruchteile eines Kodes ab, kann der Abstand nach dem Runden um einen Kode fehlen; am Bild pruefen.
