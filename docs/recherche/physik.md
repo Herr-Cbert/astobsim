@@ -928,3 +928,39 @@ Die Umkehrung ist eindeutig: das Polynom steigt im ganzen Gueltigkeitsbereich (e
 V und B-V aus Hipparcos (ESA 1997) gelten, wo der Stern dort steht; Gaia nur, wo nicht. Die Herkunft steht je Stern in `katalog` (V) und `quelle_farbe` (B-V) in `daten/sterne/m45.json`.
 
 Quelle [GDR3-5.5.1]: Carrasco, J. M., Bellazzini, M.: Photometric relationships with other photometric systems. In: Gaia Data Release 3 Documentation, release 1.3, Kapitel 5.5.1, https://gea.esac.esa.int/archive/documentation/GDR3/Data_processing/chap_cu5pho/cu5pho_sec_photSystem/cu5pho_ssec_photRelations.html (gelesen 2026-10-29, Tabellen 5.9 und 5.10).
+
+## 23. Mondhelligkeit ueber den Phasenwinkel (Issue #36)
+
+Fuer die Mondzustaende `mond_sichel`, `mond_voll` und `mond_lv` kommt die V-Magnitude aus der Phasenkurve von Krisciunas und Schaefer [KS91], Gl. 9:
+
+$$m(\alpha) = -12{,}73 + 0{,}026\,|\alpha| + 4\cdot10^{-9}\,\alpha^4,\qquad \alpha \text{ in Grad}.$$
+
+Quelle im Original gelesen am 2026-10-29 (S. 1035, ueber ADS): "(see page 144 of Allen 1976) ... Equation (9) gives m = -12.73 for full Moon, in agreement with the results of Lane & Irvine 1973 *extrapolated* to $\alpha$ = 0. However, this ignores the 'opposition effect'. For $|\alpha| < 7°$ the brightness of the Moon deviates from this relation ... When the Moon is exactly full it is about 35% brighter than the extrapolation would predict". S. 1036: die Formel gilt fuer den mittleren Abstand; Perigaeum und Apogaeum aendern die Helligkeit um bis zu $\pm 0{,}12$ mag. Sie ist eine Anpassung an die Tabelle bei Allen 1976, die auf Lane und Irvine 1973 beruht (dort zitiert, nicht eingesehen).
+
+Den Phasenwinkel liefert der beleuchtete Anteil $k$ der Ephemeride ueber $k = (1 + \cos\alpha)/2$ (objekte.md 2.1), also $\alpha = \arccos(2k - 1)$.
+
+| Zustand | $k$ (SVS-Tabelle) | $\alpha$ (ber.) | $m$ (ber.) |
+|---|---|---|---|
+| mond_sichel (Frame 6173) | 0,1729 | 130,86 Grad | -8,155, verwendet -8,15 |
+| mond_voll (Frame 6449) | 0,9994 | 2,81 Grad | -12,657, verwendet -12,66 |
+| mond_lv (Frame 6615) | 0,4985 | 90,17 Grad | -10,121, verwendet -10,12 |
+| Kontrolle: $\alpha$ = 0 | 1 | 0 | -12,73 (Quelle) |
+
+Festlegungen (eigene, Issue #36):
+- Die Zustaende behalten den mittleren Durchmesser 1865'' wie `mond_ev`, passend zum mittleren Abstand der Formel. Die Quellbilder zeigen 1814,9'' bis 1936,4''; mit diesen Groessen aenderte sich die Magnitude um $-5\log_{10}(D/1865'')$, von +0,06 mag (Sichel, dunkler) bis -0,08 mag (letztes Viertel, heller; ber.), innerhalb der $\pm 0{,}12$ mag der Quelle.
+- Beim Vollmond ($\alpha$ = 2,8 Grad) ist der Oppositionseffekt nicht eingerechnet. Die Quelle nennt nur den Faktor 1,35 bei $\alpha$ = 0 und "between 1.00 and 1.35" innerhalb eines Tages um Vollmond, keine Kurve; ein Wert bei 2,8 Grad waere geraten. Schlimmstenfalls ist der Vollmond um $2{,}5\log_{10} 1{,}35$ = 0,33 mag zu dunkel (ber., obere Grenze).
+- `mond_ev` behaelt -10,2 (objekte.md 7, Punkt 7, Entscheidung offen); nach Gl. 9 waeren es -10,54 bei 78,5 Grad.
+
+Testwerte (Unit-Tests in `src/daten/objektzustand.test.ts` und `tools/test_mond_kacheln.py`): $m$(130,9) = -8,15, $m$(2,8) = -12,66, $m$(90,2) = -10,12, jeweils auf 0,01 mag; $k$ aus $\alpha$ auf 0,002 gleich `phase`.
+
+### 23.1 Tag- und Nachtseite im Quellbild (Werkzeug)
+
+`tools/mond_kacheln.py` schwaerzt bei den neuen Frames die Nachtseite (ADR-0003 Nachtrag V2) und prueft die Orientierung. Dafuer die Sonnenhoehe $h$ je Pixel auf einer glatten Kugel in orthografischer Projektion (eigene Herleitung, ohne Relief):
+
+- Selenografische Einheitsvektoren $\vec v(\beta, \lambda) = (\cos\beta\cos\lambda, \cos\beta\sin\lambda, \sin\beta)$; $\vec E$ zum Sub-Erde-Punkt, $\vec S$ zum Sub-Sonne-Punkt (SVS-Tabelle `subearth`, `subsolar`).
+- Bildachsen vor der Drehung: $\vec o$ = Nordpol $(0,0,1)$ senkrecht zu $\vec E$ projiziert und normiert, $\vec r = \vec o \times \vec E$ (Laenge +90 Grad, IAU-Osten, erscheint rechts). Ein Pixel mit normierten Bildkoordinaten $(x, y)$ (rechts, oben; Einheit Scheibenradius) wird um den Positionswinkel $P$ der Achse zurueckgedreht: $u = x\cos P + y\sin P$, $v = -x\sin P + y\cos P$ ($P$ von Himmelsnorden ueber Osten, bei Norden oben gegen den Uhrzeigersinn).
+- Oberflaechenpunkt $\vec p = u\vec r + v\vec o + w\vec E$ mit $w = \sqrt{1 - u^2 - v^2}$, $\sin h = \vec p \cdot \vec S$.
+
+Probe am Bild (gemessen 2026-10-29): der Anteil der Scheibe mit $h > 0$ trifft die Phase der SVS-Tabelle bei allen vier Frames auf 0,001 (6173: 0,1724 gegen 0,1729; 6285: 0,5928 gegen 0,5927; 6449: 0,9998 gegen 0,9994; 6615: 0,4984 gegen 0,4985). Beleuchtete Gipfel reichen im Rendering bis etwa 4 Grad hinter den Terminator (Leuchtdichte bis 0,42); ab 6 Grad liegt bei 6173 und 6615 kein Pixel ueber 0,02. Fuer einen Gipfel der Hoehe $H$ ueber der Umgebung ist der Horizont um $\sqrt{2H/R}$ abgesenkt, bei $H$ = 5 km und $R$ = 1737 km 4,3 Grad (ber.), passend dazu.
+
+Quelle [KS91]: Krisciunas, K., Schaefer, B. E.: "A Model of the Brightness of Moonlight", PASP 103, 1033-1039 (1991), doi:10.1086/132921, https://ui.adsabs.harvard.edu/link_gateway/1991PASP..103.1033K/ADS_PDF (gelesen 2026-10-29, Gl. 9 auf S. 1035, Einschraenkungen auf S. 1035 und 1036).
