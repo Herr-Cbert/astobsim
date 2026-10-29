@@ -9,7 +9,7 @@
 // Punktebene; ohne Quellbild (schwarzer Ausschnitt, etwa QuelleLeer) weder mittele noch falte.
 
 import type { Fenster, Gesichtsfeld, Helligkeit, Simulationsparameter } from "../naht/simulationsparameter";
-import type { Falter } from "./falter";
+import { pruefeKern, type Falter } from "./falter";
 import { BildFehler, pruefePositivGanz } from "./fehler";
 import { malePunktquellen, type Scheibchen } from "./male";
 import { mittele, skaliere } from "./mittele";
@@ -56,6 +56,8 @@ function ungefaehrGleich(a: number, b: number): boolean {
 function pruefeParameter(p: Simulationsparameter): void {
   const { quellbild, kern, helligkeit, fenster } = p;
   pruefePositivGanz("fenster.px", fenster.px);
+  // Hier pruefen: ohne Quellbild und ohne Punktquelle laeuft weder falte noch faltePunkte.
+  pruefeKern(kern);
   if (!(fenster.breiteArcsec > 0)) throw new BildFehler(`fenster.breiteArcsec muss positiv sein, nicht ${fenster.breiteArcsec}`);
   if (!ungefaehrGleich(quellbild.rasterPx * quellbild.massstabArcsecProPx, fenster.breiteArcsec)) {
     throw new BildFehler(`rasterPx * massstab (${quellbild.rasterPx * quellbild.massstabArcsecProPx}) muss fenster.breiteArcsec (${fenster.breiteArcsec}) sein`);
@@ -161,8 +163,10 @@ export function tonwert(raster: Raster | undefined, punktebene: Raster | undefin
 
 /**
  * Flaechenanteil F je Wert des Objektrasters (Faelle siehe tonwert); ohne Objektraster anzahl
- * Werte F(0). Jeder Fall hat seine eigene Schleife, damit der Fall aus
- * Version 1 Zeichen fuer Zeichen derselbe Ausdruck bleibt.
+ * Werte F(0). Jeder Fall hat seine eigene Schleife, damit der Fall aus Version 1 Zeichen fuer
+ * Zeichen derselbe Ausdruck bleibt. In Fall 2 und 3 nimmt q = 0 den vorab gerechneten Wert F(0)
+ * (bitgleich, derselbe Ausdruck; spart pow und exp im leeren Himmel). Die Basis von pow ist mit
+ * max(0, ...) abgesichert: ein leicht negatives q aus der Faltung gaebe sonst NaN.
  */
 function flaechenanteil(raster: Raster | undefined, anzahl: number, helligkeit: Helligkeit): Float32Array {
   const f = helligkeit.faktorObjekt;
@@ -172,7 +176,7 @@ function flaechenanteil(raster: Raster | undefined, anzahl: number, helligkeit: 
   if (raster === undefined) {
     const ergebnis = new Float32Array(anzahl);
     if (ds !== undefined) ergebnis.fill(deepSkyWert(0, h, helligkeit.punktExponent, ds));
-    else if (g > 0) ergebnis.fill((1 - g) * f * 0 + h + g * Math.min(1, Math.pow(helligkeit.punktFaktor * 0, helligkeit.punktExponent)));
+    else if (g > 0) ergebnis.fill(mischWert(0, f, h, g, helligkeit.punktFaktor, helligkeit.punktExponent));
     else ergebnis.fill(f * 0 + h);
     return ergebnis;
   }
@@ -180,13 +184,18 @@ function flaechenanteil(raster: Raster | undefined, anzahl: number, helligkeit: 
   const ergebnis = new Float32Array(d.length);
   if (ds !== undefined) {
     const n = helligkeit.punktExponent;
-    for (let i = 0; i < d.length; i++) ergebnis[i] = deepSkyWert(d[i] as number, h, n, ds);
+    const leer = deepSkyWert(0, h, n, ds);
+    for (let i = 0; i < d.length; i++) {
+      const q = d[i] as number;
+      ergebnis[i] = q === 0 ? leer : deepSkyWert(q, h, n, ds);
+    }
   } else if (g > 0) {
     const a = helligkeit.punktFaktor;
     const n = helligkeit.punktExponent;
+    const leer = mischWert(0, f, h, g, a, n);
     for (let i = 0; i < d.length; i++) {
       const q = d[i] as number;
-      ergebnis[i] = (1 - g) * f * q + h + g * Math.min(1, Math.pow(a * q, n));
+      ergebnis[i] = q === 0 ? leer : mischWert(q, f, h, g, a, n);
     }
   } else {
     for (let i = 0; i < d.length; i++) ergebnis[i] = f * (d[i] as number) + h;
@@ -194,10 +203,15 @@ function flaechenanteil(raster: Raster | undefined, anzahl: number, helligkeit: 
   return ergebnis;
 }
 
+/** Fall unaufgeloest: (1 - g) f q + h + g min(1, (aP q)^n), Basis von pow nicht negativ. */
+function mischWert(q: number, f: number, h: number, g: number, a: number, n: number): number {
+  return (1 - g) * f * q + h + g * Math.min(1, Math.pow(Math.max(0, a * q), n));
+}
+
 /** Fall Deep-Sky: h + P * (min(1, (a q + s)^n) - h + Sockel) mit P = Phi((q / q* - 1) / Breite). */
 function deepSkyWert(q: number, h: number, n: number, ds: NonNullable<Helligkeit["deepSky"]>): number {
   const deckkraft = phi((q / ds.schwelleRelativ - 1) / ds.breite);
-  return h + deckkraft * (Math.min(1, Math.pow(ds.faktor * q + ds.himmel, n)) - h + ds.sockel);
+  return h + deckkraft * (Math.min(1, Math.pow(Math.max(0, ds.faktor * q + ds.himmel), n)) - h + ds.sockel);
 }
 
 /** Einkanalige Werte auf drei gleiche Kanaele. */
@@ -268,9 +282,9 @@ function maskiereAn(raster: Raster, gesichtsfeld: Gesichtsfeld, fenster: Fenster
  * neben dem Bild), gibt es kein Objektraster, weder mittele noch falte laufen, tonwert rechnet mit
  * q = 0 und den Kanaelen des Ausschnitts (docs/architektur.md 5.3; das Ergebnis gleicht dem
  * gefalteten Nullraster). Stufe 1b (Punktquellen malen) unter quellbild.schluessel plus
- * quellbild.punkte.schluessel, weil das Malen auch Massstab, Raster und Mitte braucht. Stufe 2 getrennt: die Faltung des Objekts
- * mit dem Falter unter kern.schluessel plus Objektschluessel, die der Punktebene (lokal in
- * punktebene.ts) unter kern.schluessel plus Punkteschluessel.
+ * quellbild.punkte.schluessel, weil das Malen auch Massstab, Raster und Mitte braucht. Stufe 2
+ * getrennt: die Faltung des Objekts mit dem Falter unter kern.schluessel plus Objektschluessel, die
+ * der Punktebene (lokal in punktebene.ts) unter kern.schluessel plus Punkteschluessel.
  * Wer den Zwischenspeicher weglaesst, rechnet alles neu. Der Zwischenspeicher gehoert zu genau
  * einer Quelle; bei Wechsel der Quelle einen neuen anlegen.
  */

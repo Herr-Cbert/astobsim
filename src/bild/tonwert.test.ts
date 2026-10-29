@@ -177,6 +177,38 @@ describe("tonwert Fall 3: deepSky vorhanden", () => {
   });
 });
 
+describe("tonwert Fall 2 und 3: Absicherung und schneller Weg fuer q = 0", () => {
+  const hRel = 0.0008 ** (1 / 3);
+  const allgemein2 = (q: number, g: number): number => (1 - g) * 0.83 * q + 0.0123 + g * Math.min(1, Math.pow(Math.max(0, 4.9 * q), 1 / 3));
+  const allgemein3 = (q: number, ds: typeof deepSky): number =>
+    hRel + phi((q / ds.schwelleRelativ - 1) / ds.breite) * (Math.min(1, Math.pow(Math.max(0, ds.faktor * q + ds.himmel), 1 / 3)) - hRel + ds.sockel);
+
+  it("leicht negatives q (Faltung) ergibt kein NaN, auch mit himmel = 0", () => {
+    const q = neuesRaster(4, 1);
+    q.daten.set([-1e-6, -0.01, 0, 0.2]);
+    const himmel0 = { ...deepSky, himmel: 0 };
+    for (const h of [helligkeit({ mischgewicht: 0.3 }), helligkeit({ hintergrundRelativ: hRel, deepSky }), helligkeit({ hintergrundRelativ: hRel, deepSky: himmel0 })]) {
+      for (const wert of tonwert(q, undefined, h).daten) expect(Number.isFinite(wert)).toBe(true);
+    }
+    const t = tonwert(q, undefined, helligkeit({ hintergrundRelativ: hRel, deepSky: himmel0 }));
+    expect(t.daten[0]).toBeCloseTo(hRel + phi(-1 / 0.484) * (-hRel + 0.004), 6);
+  });
+
+  it("schneller Weg fuer q = 0 bitgleich zum allgemeinen Ausdruck, gemischt mit q != 0", () => {
+    const q = zufallsRaster(N, 3, 61, 0.5);
+    for (let i = 0; i < q.daten.length; i += 2) q.daten[i] = 0;
+    q.daten[1] = -0;
+    const g = 0.3;
+    const t2 = tonwert(q, undefined, helligkeit({ mischgewicht: g }));
+    const t3 = tonwert(q, undefined, helligkeit({ hintergrundRelativ: hRel, deepSky }));
+    for (let i = 0; i < q.daten.length; i++) {
+      const w = q.daten[i] as number;
+      expect(t2.daten[i]).toBe(Math.fround(allgemein2(w, g)));
+      expect(t3.daten[i]).toBe(Math.fround(allgemein3(w, deepSky)));
+    }
+  });
+});
+
 describe("tonwert Punktanteil mit Faerbung", () => {
   it("Pixel_k = F_k + c_k / p * W, einkanaliges q wird dreikanalig", () => {
     const q = zufallsRaster(4, 1, 31);
@@ -338,6 +370,13 @@ describe("rendere Version 2", () => {
     expect(w).toBeGreaterThan(0.1);
     for (let k = 0; k < 3; k++) expect(r.daten[3 * i + k]).toBeCloseTo(0.02 + 0.5 * (farbe[k] as number) * w, 6);
     expect(r.daten[3 * pixelIndex(grau, 2, 2)]).toBeCloseTo(0.02, 7);
+  });
+
+  it("wirft BildFehler bei unstimmigem Kern auch ohne Quellbild und ohne Punktquelle", () => {
+    const f = new FalterZaehlend();
+    expect(() => rendere({ ...parameter([]), kern: { ...kastenKern(3), radius: 2 } }, new QuelleSchwarz(), f)).toThrow(BildFehler);
+    expect(() => rendere({ ...parameter([]), kern: { ...kastenKern(3), daten: new Float32Array(8) } }, new QuelleSchwarz(), f)).toThrow(BildFehler);
+    expect(f.aufrufe).toBe(0);
   });
 
   it("wirft BildFehler bei mischgewicht ausserhalb [0, 1) und unstimmigem deepSky", () => {
