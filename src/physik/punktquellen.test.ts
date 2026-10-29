@@ -147,7 +147,7 @@ describe("Saturn 20'' an 80 mm (Issue #14, Ergaenzung zu T6)", () => {
 });
 
 // Gezeigte Deckkraft (physik.md Abschnitt 20, Issue #100): Blackwell ohne den Sockel P0 = 0,0194 bei
-// Kontrast 0. Werte eigene Rechnung mit Python statistics.NormalDist (scratchpad deckkraft.py im PR).
+// Kontrast 0. Testwerte und Rechenweg in physik.md Abschnitt 20.
 describe("deckkraftPunktquelle: (P - P0) / (1 - P0)", () => {
   it("an der Grenzgroesse 0,4901, 1 mag darunter 0,0891, 1 mag darueber 0,9991", () => {
     expect(deckkraftPunktquelle(12, 12)).toBeCloseTo(0.4901, 4);

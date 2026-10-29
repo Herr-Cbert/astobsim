@@ -139,8 +139,8 @@ const anzeige = (k: Konfiguration) => auswerten(k, { anzeigePx: 256 }).parameter
 /** sRGB-Kennlinie (IEC 61966-2-1) wie src/ui/zeichne.ts, nur um die Testwerte in 8 Bit zu nennen. */
 const srgb8 = (w: number) => Math.round(255 * (w <= 0.0031308 ? 12.92 * w : 1.055 * w ** (1 / 2.4) - 0.055));
 
-// Version 2 (Anzeigeweiss 9,2): jeder Wert der Tabelle 12.4 mal FAKTOR_V2 (eigene Rechnung,
-// scratchpad werte_v2.py im PR zu Issue #100). Die sRGB-Kodes der Tabelle gelten mit 3,35 und stehen
+// Version 2 (Anzeigeweiss 9,2): jeder Wert der Tabelle 12.4 mal FAKTOR_V2; Werte und Rechenweg in
+// physik.md 12.4, Tabelle "Version 2". Die sRGB-Kodes der Tabelle gelten mit 3,35 und stehen
 // mit ihren Werten in regression_v1.test.ts; Quellweiss liegt jetzt meist ueber Bildschirmweiss, die
 // Scheibe (Pixel 0,14 bis 0,24 von Quellweiss, objekte.md 5.3) wird erst beim Zeichnen begrenzt.
 describe("helligkeit: Akzeptanz Issue #55 (Tabelle 12.4) mit Anzeigeweiss 9,2", () => {

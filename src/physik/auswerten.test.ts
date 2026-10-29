@@ -267,7 +267,7 @@ describe("auswerten: Fehlerfaelle sind Programmierfehler", () => {
 });
 
 // Version 2 (Issue #100): Reihenfolge und Felder nach docs/architektur.md 5.3 und 5.4. Erwartungswerte
-// eigene Rechnung (scratchpad deckkraft.py, werte_v2.py im PR), Formeln aus physik.md 16 bis 20.
+// physik.md Abschnitt 20 (Tabelle "Testwerte auswerten"), Formeln aus physik.md 13 bis 20.
 const VORGABE_PAAR: Paareingaben = { trennungArcsec: 2, magnitudeA: 5, magnitudeB: 6, bvA: 0.6, bvB: 0.6 };
 /** A-D9 (80/600, 60x, Bortle 5, klar, 45 Grad) mit anderem Objekt und optional anderen Bedingungen. */
 function ad9Mit(objekt: Objektzustand, bedingungen: Partial<Konfiguration["bedingungen"]> = {}): Konfiguration {
