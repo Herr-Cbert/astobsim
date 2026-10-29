@@ -944,18 +944,19 @@ Den Phasenwinkel liefert der beleuchtete Anteil $k$ der Ephemeride ueber $k = (1
 | mond_sichel (Frame 6173) | 0,1729 | 130,86 Grad | -8,155, verwendet -8,15 |
 | mond_voll (Frame 6449) | 0,9994 | 2,81 Grad | -12,657, verwendet -12,66 |
 | mond_lv (Frame 6615) | 0,4985 | 90,17 Grad | -10,121, verwendet -10,12 |
+| mond_ev (Frame 6285) | 0,5927 | 79,32 Grad | -10,509, verwendet -10,51 |
 | Kontrolle: $\alpha$ = 0 | 1 | 0 | -12,73 (Quelle) |
 
 Festlegungen (eigene, Issue #36):
 - Die Zustaende behalten den mittleren Durchmesser 1865'' wie `mond_ev`, passend zum mittleren Abstand der Formel. Die Quellbilder zeigen 1814,9'' bis 1936,4''; mit diesen Groessen aenderte sich die Magnitude um $-5\log_{10}(D/1865'')$, von +0,06 mag (Sichel, dunkler) bis -0,08 mag (letztes Viertel, heller; ber.), innerhalb der $\pm 0{,}12$ mag der Quelle.
 - Beim Vollmond ($\alpha$ = 2,8 Grad) ist der Oppositionseffekt nicht eingerechnet. Die Quelle nennt nur den Faktor 1,35 bei $\alpha$ = 0 und "between 1.00 and 1.35" innerhalb eines Tages um Vollmond, keine Kurve; ein Wert bei 2,8 Grad waere geraten. Schlimmstenfalls ist der Vollmond um $2{,}5\log_{10} 1{,}35$ = 0,33 mag zu dunkel (ber., obere Grenze).
-- `mond_ev` behaelt -10,2 (objekte.md 7, Punkt 7, Entscheidung offen); nach Gl. 9 waeren es -10,54 bei 78,5 Grad.
+- `mond_ev` (Frame 6285, $k$ = 0,5927, $\alpha$ = 79,32 Grad) bekommt seit #36 ebenfalls Gl. 9: -10,509, verwendet -10,51 (vorher -10,2; Entscheidung Herbert 2026-10-29, objekte.md 7 Punkt 7). Oppositionseffekt weglassen und 1865'' fuer alle Zustaende sind ebenfalls von Herbert entschieden (objekte.md 5.3).
 
 Testwerte (Unit-Tests in `src/daten/objektzustand.test.ts` und `tools/test_mond_kacheln.py`): $m$(130,9) = -8,15, $m$(2,8) = -12,66, $m$(90,2) = -10,12, jeweils auf 0,01 mag; $k$ aus $\alpha$ auf 0,002 gleich `phase`.
 
 ### 23.1 Tag- und Nachtseite im Quellbild (Werkzeug)
 
-`tools/mond_kacheln.py` schwaerzt bei den neuen Frames die Nachtseite (ADR-0003 Nachtrag V2) und prueft die Orientierung. Dafuer die Sonnenhoehe $h$ je Pixel auf einer glatten Kugel in orthografischer Projektion (eigene Herleitung, ohne Relief):
+`tools/mond_kacheln.py` schwaerzt bei allen vier Frames die Nachtseite (ADR-0003 Nachtrag V2) und prueft die Orientierung. Dafuer die Sonnenhoehe $h$ je Pixel auf einer glatten Kugel in orthografischer Projektion (eigene Herleitung, ohne Relief):
 
 - Selenografische Einheitsvektoren $\vec v(\beta, \lambda) = (\cos\beta\cos\lambda, \cos\beta\sin\lambda, \sin\beta)$; $\vec E$ zum Sub-Erde-Punkt, $\vec S$ zum Sub-Sonne-Punkt (SVS-Tabelle `subearth`, `subsolar`).
 - Bildachsen vor der Drehung: $\vec o$ = Nordpol $(0,0,1)$ senkrecht zu $\vec E$ projiziert und normiert, $\vec r = \vec o \times \vec E$ (Laenge +90 Grad, IAU-Osten, erscheint rechts). Ein Pixel mit normierten Bildkoordinaten $(x, y)$ (rechts, oben; Einheit Scheibenradius) wird um den Positionswinkel $P$ der Achse zurueckgedreht: $u = x\cos P + y\sin P$, $v = -x\sin P + y\cos P$ ($P$ von Himmelsnorden ueber Osten, bei Norden oben gegen den Uhrzeigersinn).
