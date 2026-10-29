@@ -748,3 +748,24 @@ A-Q2 T2 ist entsprechend angepasst (`docs/anforderungen.md`).
 
 - **Quellbild sat_20 (#79):** Der A-Ring ist im Hubble-Bild 0,50 (innen) und 0,21 (aussen) des aeusseren B-Rings hell (`tools/strukturprofile.py`). Damit zeigt selbst der ruhige Moment die Teilung kaum (0,029). Visuell wirkt der A-Ring heller; vermutlich ist das Pressebild nichtlinear gestreckt wie das Jupiterbild in #79. Photometrische Werte fuer das Verhaeltnis A zu B mit Quelle stehen noch aus. **Nachtrag #79 (2026-10-28):** Werte nach Salo und French 2010 (`objekte.md` 4.2): A innen 0,83, A aussen 0,56, Cassini-Zone 0,15. Das Bild ist mit einer Tonkurve angeglichen (eine Potenzkurve, die die A-Ringe trifft, haette die Teilung drei- bis viermal zu hell gemacht). Mit den neuen Stufen (A 0,82 / 0,54, Cassini 0,17) bleibt die Delle im Langzeitmittel 0,000; im ruhigen Moment ergibt sich am 100 mm 0,131 (Anhalt, Arbeitsmassstab des Langzeitkerns), am 60 mm 0,017.
 - **Ruhiger Moment (#29):** Der Tilt-Abzug aus 2.3 veraendert nicht nur Cassini, sondern auch T4d und T5b (15.2). Eine Umsetzung braucht eigene Erwartungen fuer den ruhigen Moment und darf die Schwelle nicht aus den Langzeit-Urteilen uebernehmen.
+
+## 16. Freies Doppelsternpaar (Issue #99)
+
+Das freie Paar (A-Z9, `docs/recherche/doppelsterne.md` 3.2) wird in `src/physik/doppelstern.ts` zum Objektzustand; Lage Ost-West wie in doppelsterne.md 3.1 (A bei $-\rho/2$, B bei $+\rho/2$).
+
+**Gesamthelligkeit.** Die Beleuchtungsstaerken der Sterne am Auge addieren sich; mit $m = -2{,}5\log_{10}(\Delta I / Z)$ (wahrnehmung.md, Konventionen, [1] dort) folgt
+
+$$m_\mathrm{ges} = -2{,}5\log_{10}\sum_i 10^{-0{,}4\,m_i}.$$
+
+Zwei gleiche Sterne: $m - 2{,}5\log_{10}2 = m - 0{,}753$.
+
+**Hinweis Ueberstrahlung.** "Ueberstrahlung nicht simuliert" (Warnung `ueberstrahlung`) fuer jedes Sternpaar mit Abstand am Himmel unter 10'' und $|\Delta m| \ge 4$ (A-Z9, doppelsterne.md 5 und 7 Punkt 4, Entscheidung 5 in `docs/recherche/README.md`).
+
+| Test | Rechenweg | Ergebnis |
+|---|---|---|
+| Zwei gleiche Sterne, 5 mag | $5 - 2{,}5\log_{10}2$ | 4,247 |
+| Vorgabe freies Paar 5 und 6 mag | $-2{,}5\log_{10}(10^{-2} + 10^{-2{,}4})$ | 4,636 |
+| Antares 0,96 und 5,40 mag | $-2{,}5\log_{10}(10^{-0{,}384} + 10^{-2{,}16})$ | 0,942 |
+| Antares 2,579'', $\Delta m$ 4,44 | unter 10'', ab 4 mag | Warnung |
+| Albireo 34,3'', $\Delta m$ 1,49 | | keine Warnung |
+| Polaris 18,4'', $\Delta m$ 6,56 | nicht unter 10'' | keine Warnung |

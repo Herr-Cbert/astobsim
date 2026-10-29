@@ -1,7 +1,8 @@
 import { describe, expect, it } from "vitest";
 import { atmosphaere } from "./atmosphaere";
 import { aufSchritt, begrenze, GRENZEN } from "./begrenze";
-import type { Fernglas, Fernrohr, Konfiguration } from "../naht/konfiguration";
+import type { Fernglas, Fernrohr, Konfiguration, Paareingaben } from "../naht/konfiguration";
+import { freiesPaar } from "./doppelstern";
 import { optik } from "./optik";
 import { KONFIGURATION_A_D9 as START } from "./testdaten";
 
@@ -12,6 +13,12 @@ function mitFernrohr(teil: Partial<Fernrohr>, okular: Partial<Fernrohr["okular"]
 
 function mitBedingungen(teil: Partial<Konfiguration["bedingungen"]>): Konfiguration {
   return { ...START, bedingungen: { ...START.bedingungen, ...teil } };
+}
+
+/** Startkonfiguration mit dem freien Paar; Vorgabe 2'', 5, 6, 0,6, 0,6 (doppelsterne.md 3.2). */
+const PAAR_VORGABE: Paareingaben = { trennungArcsec: 2, magnitudeA: 5, magnitudeB: 6, bvA: 0.6, bvB: 0.6 };
+function mitPaar(teil: Partial<Paareingaben>): Konfiguration {
+  return { ...START, objekt: freiesPaar({ ...PAAR_VORGABE, ...teil }) };
 }
 
 const FERNGLAS: Fernglas = { art: "fernglas", oeffnungMm: 50, vergroesserung: 10, wahresGesichtsfeldGrad: 6.5 };
@@ -155,6 +162,76 @@ describe("begrenze rundet auf den Schritt ohne Hinweis (A-F8, A-B1, A-B2, A-B4)"
       expect(aufSchritt(g.min, g.schritt), g.feld).toBe(g.min);
       expect(aufSchritt(g.max, g.schritt), g.feld).toBe(g.max);
     }
+  });
+});
+
+describe("begrenze: freies Paar (A-Z9, A-F8, doppelsterne.md 3.2)", () => {
+  it("laesst die Vorgabe unveraendert und meldet nichts; Objekte ohne paar bleiben dasselbe Objekt", () => {
+    const eingabe = mitPaar({});
+    const { konfiguration, hinweise } = begrenze(eingabe);
+    expect(hinweise).toEqual([]);
+    expect(konfiguration.objekt).toEqual(eingabe.objekt);
+    expect(begrenze(START).konfiguration.objekt).toBe(START.objekt);
+  });
+
+  it.each([
+    ["Trennung 0,05 wird 0,1", { trennungArcsec: 0.05 }, "objekt.paar.trennungArcsec", 0.05, 0.1],
+    ["Trennung 700 wird 600", { trennungArcsec: 700 }, "objekt.paar.trennungArcsec", 700, 600],
+    ["Magnitude A -2 wird -1,5", { magnitudeA: -2 }, "objekt.paar.magnitudeA", -2, -1.5],
+    ["Magnitude A 13 wird 12", { magnitudeA: 13 }, "objekt.paar.magnitudeA", 13, 12],
+    ["Magnitude B -2 wird -1,5", { magnitudeB: -2 }, "objekt.paar.magnitudeB", -2, -1.5],
+    ["Magnitude B 16 wird 15", { magnitudeB: 16 }, "objekt.paar.magnitudeB", 16, 15],
+    ["B-V A -0,5 wird -0,4", { bvA: -0.5 }, "objekt.paar.bvA", -0.5, -0.4],
+    ["B-V A 2,5 wird 2", { bvA: 2.5 }, "objekt.paar.bvA", 2.5, 2],
+    ["B-V B -0,5 wird -0,4", { bvB: -0.5 }, "objekt.paar.bvB", -0.5, -0.4],
+    ["B-V B 2,5 wird 2", { bvB: 2.5 }, "objekt.paar.bvB", 2.5, 2],
+    ["Trennung NaN wird 0,1", { trennungArcsec: NaN }, "objekt.paar.trennungArcsec", NaN, 0.1],
+    ["Magnitude B Unendlich wird 15", { magnitudeB: Infinity }, "objekt.paar.magnitudeB", Infinity, 15]
+  ])("%s mit genau einem Hinweis, Sterne neu gebildet", (_name, teil, feld, vorher, nachher) => {
+    const { konfiguration, hinweise } = begrenze(mitPaar(teil));
+    expect(hinweise).toEqual([{ feld, eingabe: vorher, wert: nachher }]);
+    const paar = konfiguration.objekt.paar!;
+    expect(konfiguration.objekt).toEqual(freiesPaar(paar));
+  });
+
+  it("schneidet und bildet Sterne, Trennung und Gesamthelligkeit neu", () => {
+    const { konfiguration, hinweise } = begrenze(mitPaar({ trennungArcsec: 0, magnitudeA: -3, magnitudeB: 20 }));
+    expect(hinweise.map((h) => h.feld)).toEqual(["objekt.paar.trennungArcsec", "objekt.paar.magnitudeA", "objekt.paar.magnitudeB"]);
+    const o = konfiguration.objekt;
+    expect(o.paar).toEqual({ trennungArcsec: 0.1, magnitudeA: -1.5, magnitudeB: 15, bvA: 0.6, bvB: 0.6 });
+    expect(o.durchmesserArcsec).toBe(0.1);
+    expect(o.sterne.map((s) => [s.dxArcsec, s.magnitude])).toEqual([[-0.05, -1.5], [0.05, 15]]);
+    expect(o.magnitude).toBe(freiesPaar(o.paar!).magnitude);
+  });
+
+  it("Hinweise in Feldreihenfolge: Geraet, Objekt, Bedingungen", () => {
+    const eingabe: Konfiguration = { ...mitPaar({ bvB: 3 }), geraet: { ...(START.geraet as Fernrohr), oeffnungMm: 400 }, bedingungen: { ...START.bedingungen, bortle: 12 } };
+    expect(begrenze(eingabe).hinweise.map((h) => h.feld)).toEqual(["geraet.oeffnungMm", "objekt.paar.bvB", "bedingungen.bortle"]);
+  });
+
+  it.each([
+    ["Trennung 2,03 wird 2,05", { trennungArcsec: 2.03 }, (p: Paareingaben) => p.trennungArcsec, 2.05],
+    ["Trennung 9,97 wird 9,95", { trennungArcsec: 9.97 }, (p: Paareingaben) => p.trennungArcsec, 9.95],
+    ["Trennung 9,98 wird 10", { trennungArcsec: 9.98 }, (p: Paareingaben) => p.trennungArcsec, 10],
+    ["Trennung 10,4 wird 10 (ab 10'' Schritt 1'')", { trennungArcsec: 10.4 }, (p: Paareingaben) => p.trennungArcsec, 10],
+    ["Trennung 34,3 wird 34", { trennungArcsec: 34.3 }, (p: Paareingaben) => p.trennungArcsec, 34],
+    ["Trennung 599,6 wird 600", { trennungArcsec: 599.6 }, (p: Paareingaben) => p.trennungArcsec, 600],
+    ["Magnitude A 0,96 wird 1", { magnitudeA: 0.96 }, (p: Paareingaben) => p.magnitudeA, 1],
+    ["Magnitude B 5,44 wird 5,4", { magnitudeB: 5.44 }, (p: Paareingaben) => p.magnitudeB, 5.4],
+    ["B-V A 1,87 wird 1,85", { bvA: 1.87 }, (p: Paareingaben) => p.bvA, 1.85],
+    ["B-V B -0,13 wird -0,15", { bvB: -0.13 }, (p: Paareingaben) => p.bvB, -0.15]
+  ])("%s ohne Hinweis", (_name, teil, lies, erwartet) => {
+    const { konfiguration, hinweise } = begrenze(mitPaar(teil));
+    expect(hinweise).toEqual([]);
+    expect(lies(konfiguration.objekt.paar!)).toBe(erwartet);
+    expect(konfiguration.objekt.durchmesserArcsec).toBe(konfiguration.objekt.paar!.trennungArcsec);
+  });
+
+  it("grober Schritt der Trennung: ab und max sind Vielfache davon", () => {
+    const g = GRENZEN.trennungArcsec;
+    expect(aufSchritt(g.grob.ab, g.grob.schritt)).toBe(g.grob.ab);
+    expect(aufSchritt(g.max, g.grob.schritt)).toBe(g.max);
+    expect(aufSchritt(g.grob.ab, g.schritt)).toBe(g.grob.ab);
   });
 });
 
