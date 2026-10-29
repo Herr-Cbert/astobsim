@@ -243,7 +243,7 @@ Zwischen Taygeta (4,30) und Pleione (5,05) liegt eine Luecke von 0,75 mag. Bis G
 | mittlere Flaechenhelligkeit in 88'' x 60'' | 8,8 + 2,5 log10(pi · 44 · 30) = 17,8 (ber.) | |
 | innerer Halo (H-alpha-Verhaeltnis auf V uebertragen) | etwa 17,8 + 6,4 = 24 (ber., grobe Naeherung) | |
 
-Den Kontrast zwischen Ring und Loch habe ich nicht als Zahl aus einer Primaerquelle gefunden. Das Loch ist kein leeres Feld: dort leuchtet He II und [O III] schwaecher. Vorschlag: den Kontrast traegt das Quellbild, geeicht auf V = 8,8 im Hauptring. Den Halo kann astobsim weglassen: mit etwa 24 mag/arcsec$^2$ liegt er unter jedem Himmel ausser Bortle 1 und ist visuell nicht zu sehen. Der Zentralstern (15,75) ist ein Punkt fuer grosse Fernrohre; er gehoert zum Objekt (A-X9, Ausnahme).
+Den Kontrast zwischen Ring und Loch habe ich nicht als Zahl aus einer Primaerquelle gefunden. Das Loch ist kein leeres Feld: dort leuchtet He II und [O III] schwaecher. Vorschlag: den Kontrast traegt das Quellbild, geeicht auf V = 8,8 im Hauptring. Nachtrag 2026-10-29 (Issue #105): `tools/deep_sky_aufbereiten.py` eicht V = 8,8 auf den Gesamtfluss der ganzen Leinwand (120'' x 120'' mit Halo), nicht nur des Hauptrings; der Ring allein (Ellipse 88'' x 60'', 95 Prozent des Flusses) waere etwa 0,056 mag schwaecher, innerhalb der Toleranz von 0,1 mag. Den Halo kann astobsim weglassen: mit etwa 24 mag/arcsec$^2$ liegt er unter jedem Himmel ausser Bortle 1 und ist visuell nicht zu sehen. Der Zentralstern (15,75) ist ein Punkt fuer grosse Fernrohre; er gehoert zum Objekt (A-X9, Ausnahme).
 
 ---
 

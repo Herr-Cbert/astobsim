@@ -312,7 +312,7 @@
           { "mag_arcsec2": 22.5, "flaeche_arcsec2": 6182.54 },
           { "mag_arcsec2": 22.6, "flaeche_arcsec2": 6352.1 }
         ],
-        "kommentar": "Ausdehnung und Positionswinkel des Hauptrings nach O'Dell et al. 2013 (deep-sky.md 5), Gesamthelligkeit V 8,8 (deep-sky.md 5 nach Wikipedia, Sekundaerquelle). Quellbild Hubble WFC3 F502N ([O III]) linear aus MAST, Quellweiss ist kennlinie.mag_hell in bilder.json (tools/deep_sky_aufbereiten.py, Gesamtfluss des dekodierten Bilds = 8,8). isophoten aus demselben Lauf am dekodierten, sternbereinigten Bild: Flaeche der Pixel heller als die Isophote, 0,1-mag-Schritte, Ende vor der ersten Isophote, die mehr als 1 Prozent des Bildrands erreicht (Halo). Zentralstern (V 15,75) im Bild entfernt, noch nicht als Stern eingetragen (B-V fehlt)."
+        "kommentar": "Ausdehnung und Positionswinkel des Hauptrings nach O'Dell et al. 2013 (deep-sky.md 5), Gesamthelligkeit V 8,8 (deep-sky.md 5 nach Wikipedia, Sekundaerquelle). Quellbild Hubble WFC3 F502N ([O III]) linear aus MAST, Quellweiss ist kennlinie.mag_hell in bilder.json (tools/deep_sky_aufbereiten.py, Gesamtfluss des dekodierten Bilds = 8,8). Lesart der Eichung: 8,8 gilt fuer die ganze Leinwand 120\" x 120\" mit Halo, nicht nur fuer den Hauptring; der Ring allein (Ellipse 88\" x 60\") ergaebe etwa 0,056 mag schwaecher, innerhalb der Toleranz von 0,1 mag. isophoten aus demselben Lauf am dekodierten, sternbereinigten Bild: Flaeche der Pixel heller als oder gleich der Isophote, 0,1-mag-Schritte, Ende vor der ersten Isophote, die mehr als 1 Prozent des Bildrands erreicht (Halo). Zentralstern (V 15,75) im Bild entfernt, noch nicht als Stern eingetragen (B-V fehlt)."
       }
     ]
   }
