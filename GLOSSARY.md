@@ -53,8 +53,20 @@ Der Winkel, unter dem das Auge das Okularbild sieht, in Grad; Eigenschaft des Ok
 ### Objekte
 
 **Objekt**:
-Mond, Mars, Jupiter oder Saturn. Hat einen oder mehrere Zustaende.
+Mond, Mars, Jupiter, Saturn, ein Doppelstern oder ein Deep-Sky-Objekt. Hat einen oder mehrere Zustaende und gehoert zu genau einer Objektklasse.
 _Vermeiden_: Himmelskoerper, Ziel, Target
+
+**Objektklasse**:
+Eine der drei Arten von Objekten: Sonnensystem (Mond und Planeten), Doppelstern oder Deep-Sky-Objekt.
+_Vermeiden_: Kategorie, Typ
+
+**Doppelstern**:
+Ein Objekt aus zwei Sternen mit Trennung in Bogensekunden, ohne Quellbild; aus einer festen Katalogliste oder als freies Paar eingestellt.
+_Vermeiden_: Doppel, Paar (allein)
+
+**Deep-Sky-Objekt**:
+Ein Objekt ausserhalb des Sonnensystems mit eigener Flaechenhelligkeit (Nebel, Galaxie, Sternhaufen), z. B. M31, M42, M13, M45, M57. Kann Sterne enthalten.
+_Vermeiden_: DSO, Nebel (fuer alle)
 
 **Zustand**:
 Eine feste, repraesentative Erscheinung eines Objekts mit Winkelgroesse, Phase, Ringoeffnung, Magnitude und zugeordnetem Quellbild, z. B. "Jupiter 47 Bogensekunden".
@@ -69,8 +81,18 @@ Ein Mond eines Planeten (Io, Europa, Ganymed, Kallisto, Titan, Rhea). Wird als P
 _Vermeiden_: Mond, Satellit, Begleiter
 
 **Punktquelle**:
-Ein Objekt, dessen Winkeldurchmesser unter der Aufloesungsgrenze liegt und das durch Magnitude statt Flaechenhelligkeit beschrieben wird. In Version 1 nur Trabanten.
-_Vermeiden_: Stern
+Etwas, dessen Winkeldurchmesser unter der Aufloesungsgrenze liegt und das durch Magnitude statt Flaechenhelligkeit beschrieben wird: ein Trabant, ein Stern oder ein unaufgeloester Zustand.
+_Vermeiden_: Punkt, Lichtpunkt
+
+**Stern**:
+Eine Punktquelle ausserhalb des Sonnensystems mit Magnitude und Farbindex B-V; Teil eines Doppelsterns oder eines Deep-Sky-Objekts.
+
+**Feldstern**:
+Ein Stern im Gesichtsfeld, der nicht zum Objekt gehoert. Wird nicht dargestellt (Nicht-Ziel).
+_Vermeiden_: Hintergrundstern
+
+**Unaufgeloest**:
+Eigenschaft eines Zustands, dessen Winkelgroesse mal Vergroesserung unter der Aufloesung des Auges liegt (z. B. Jupiter mit blossem Auge). Er wird mit gleitendem Uebergang als Punktquelle statt als Flaeche dargestellt.
 
 **Punktebene**:
 Eigene Ebene im Arbeitsraster, in die bild die Punktquellen malt und lokal mit dem Kern faltet, getrennt vom Objektraster (Issue #72). Ihre Pixel werden je Pixel mit `Helligkeit.punktFaktor` und `punktExponent` auf die Anzeigehelligkeit abgebildet (physik.md Abschnitt 14).
@@ -151,6 +173,10 @@ _Vermeiden_: Simulation (ist der Vorgang), Ergebnis, Rendering
 **Anzeigehelligkeit**:
 Linearer Wert, mit dem bild ein Pixel zeichnet: 1 = Bildschirmweiss, vor der sRGB-Kodierung. physik bildet die Flaechenhelligkeit im Okular darauf ab (physik.md Abschnitt 12); `Helligkeit.faktorObjekt` ist die Anzeigehelligkeit von Quellweiss, `hintergrundRelativ` die des Himmels.
 _Vermeiden_: Anzeigewert (der Typ `Anzeigewerte` sind die Zahlen neben dem Bild), Tonwert (ist der Arbeitsschritt in bild)
+
+**Wahrnehmungsschwelle**:
+Der kleinste Kontrast gegen den Himmel im Okular, den der feste, voll dunkeladaptierte Normalbeobachter noch sieht, abhaengig von der Himmelsleuchtdichte und der Ausdehnung des Details; fuer Sterne folgt daraus die Grenzgroesse. Was darunter liegt, zeigt der Anblick als Himmel.
+_Vermeiden_: Sichtbarkeitsgrenze, Kontrastgrenze
 
 **Uebersicht**:
 Die Grundansicht: der Anblick im ganzen wahren Gesichtsfeld (Standardfenster, verschiebbar nach A-D2). Gegenstueck zur Zoomansicht; die Steuerung wechselt mit `zoome` zwischen beiden.

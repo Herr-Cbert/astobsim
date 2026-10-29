@@ -24,7 +24,9 @@ Links ein Fernrohr, Fernglas oder das blosse Auge aus der Liste waehlen oder Oef
 
 ## Stand
 
-**Version 1** (2026-10-28): alle Muss-Anforderungen sind nachgewiesen ([docs/validierung.md](docs/validierung.md) Abschnitt 8), die Beobachtungs-Testfaelle T1 bis T6 erfuellt. Die Phasen 1 bis 7 aus [docs/prozess.md](docs/prozess.md) sind abgeschlossen; Arbeitspakete und Reihenfolge in [docs/plan.md](docs/plan.md), Rueckblick mit Aufwand je Phase in [docs/retrospektive.md](docs/retrospektive.md). Die Kann-Punkte liegen als Issues #24 bis #38 im Milestone "Nach Version 1".
+**Version 1** (2026-10-28): alle Muss-Anforderungen sind nachgewiesen ([docs/validierung.md](docs/validierung.md) Abschnitt 8), die Beobachtungs-Testfaelle T1 bis T6 erfuellt. Die Phasen 1 bis 7 aus [docs/prozess.md](docs/prozess.md) sind abgeschlossen; Arbeitspakete und Reihenfolge in [docs/plan.md](docs/plan.md), Rueckblick mit Aufwand je Phase in [docs/retrospektive.md](docs/retrospektive.md). Die uebrigen Kann-Punkte liegen im Milestone "Spaeter".
+
+**Version 2** (begonnen 2026-10-29): Phase 1 abgeschlossen, Anforderungen der Stufe Muss V2 in [docs/anforderungen.md](docs/anforderungen.md) (offene Fragen in Abschnitt 10). Umfang im Milestone "Version 2": Helligkeitskorrektur (#93), Mondphasen (#36), Doppelsterne (#25), Deep-Sky-Objekte M31, M42, M13, M45, M57 (#26). Naechste Phase: Recherche.
 
 Architektur: Stack ([ADR-0001](docs/adr/0001-stack.md)), Simulationsmodell ([ADR-0002](docs/adr/0002-simulationsmodell.md)), Datenformat ([ADR-0003](docs/adr/0003-datenformat.md)), Modulschnitt in [docs/architektur.md](docs/architektur.md), Begriffe in [GLOSSARY.md](GLOSSARY.md). Anforderungen in [docs/anforderungen.md](docs/anforderungen.md), Recherche mit Formeln und Quellen in [docs/recherche/](docs/recherche/README.md). Der Wegwerf-Prototyp aus Phase 3 liegt auf dem Branch `prototyp-faltung`.
 
