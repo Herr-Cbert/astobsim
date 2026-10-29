@@ -16,7 +16,8 @@ gestoert). Hipparcos und Gaia werden ueber die Lage zugeordnet (Abstand unter 5'
 |G - Hp| unter 1 mag); die Tabelle gaiadr3.hipparcos2_best_neighbour fuehrt Merope, Taygeta,
 HIP 17791, HIP 17401 und HIP 17694 nicht. Hat ein Hipparcos-Stern ohne Zuordnung eine Gaia-Quelle
 unter 5'' (Helligkeitsschnitt verfehlt), bricht das Skript ab, statt zwei Eintraege zu erzeugen. V und B-V kommen aus Hipparcos, wo es den Stern gibt, sonst aus Gaia
-(physik.md 22). Lage: Gaia-Position (Epoche 2016,0), ohne Gaia-Gegenstueck die
+(physik.md 22). Lage: dx positiv nach Westen (Norden oben, Osten links wie im Bild), dy nach
+Norden; Gaia-Position (Epoche 2016,0), ohne Gaia-Gegenstueck die
 Hipparcos-Position (1991,25); bei 50 mas/a ist der Unterschied hoechstens 1,3''.
 
 Aufruf aus dem Repo-Root:
@@ -144,8 +145,8 @@ def zahl(text):
 
 
 def lage_arcsec(ra, dec):
-    """Offset zur Mitte: dx positiv nach Osten, dy nach Norden (deep-sky.md, Kopf)."""
-    dx = (ra - MITTE_RA_GRAD) * math.cos(math.radians(MITTE_DEC_GRAD)) * 3600.0
+    """Offset zur Mitte: dx positiv nach Westen (Osten links, Naht +x rechts), dy nach Norden (deep-sky.md, Kopf)."""
+    dx = -(ra - MITTE_RA_GRAD) * math.cos(math.radians(MITTE_DEC_GRAD)) * 3600.0
     dy = (dec - MITTE_DEC_GRAD) * 3600.0
     return dx, dy
 
@@ -285,7 +286,7 @@ def sternliste(gaia, hip, hip2):
         f"{len(sterne)} Sterne. katalog nennt die Herkunft von V: HIP = Hipparcos (ESA 1997, {n_hip} Sterne), "
         f"Gaia DR3 = V aus G und BP-RP nach Gaia DR3 Dokumentation 5.5.1 Tabelle 5.9 ({len(sterne) - n_hip} Sterne, "
         "physik.md 22). quelle_farbe nennt die Herkunft von B-V: HIP oder GDR3 (BP-RP = f(B-V) aus "
-        "Tabelle 5.9, invertiert). Lage dx nach Osten, dy nach Norden relativ zu 03 47 00, +24 07 00, "
+        "Tabelle 5.9, invertiert). Lage dx nach Westen (Norden oben, Osten links), dy nach Norden relativ zu 03 47 00, +24 07 00, "
         "Gaia-Epoche 2016,0, ohne Gaia-Gegenstueck Hipparcos 1991,25. Pleione (HIP 17851) ist veraenderlich. "
         "Summe der Sterne V " + f"{gesamt:.2f}".replace(".", ",") + "."
     )

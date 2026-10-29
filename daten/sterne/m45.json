@@ -2,11 +2,11 @@
   "objekt": "m45",
   "quelle": "ESA Gaia DR3 (gaiadr3.gaia_source; Gaia Collaboration, Vallenari et al. 2023, A&A 674, A1), Hipparcos (ESA 1997, ESA SP-1200, public.hipparcos) und Hipparcos-Neureduktion (van Leeuwen 2007, A&A 474, 653, public.hipparcos_newreduction), abgefragt im Gaia-Archiv https://gea.esac.esa.int/tap-server/tap/sync. Credit: ESA, Gaia DPAC; Hipparcos: ESA.",
   "lizenz": "CC BY-NC 3.0 IGO (https://creativecommons.org/licenses/by-nc/3.0/igo/), Daten der ESA Space Science Archives; kommerzielle Nutzung nur nach Genehmigung (data.licences@esa.int, https://www.cosmos.esa.int/web/esdc/terms-and-conditions)",
-  "kommentar": "Erzeugt von tools/m45_sterne.py aus drei Abfragen im Gaia-Archiv (Abruf 2026-10-29, ADQL und SHA-256 in data/roh/LIESMICH.md): Kegel 1,3 Grad um RA 56,75, Dec +24,1167 Grad, Mitglieder nach deep-sky.md 4.2 (Gaia-Eigenbewegung (20 +- 4,5; -45,5 +- 5,5) mas/a und Gaia-Parallaxe 6,4 bis 8,5 mas, oder Hipparcos-2-Parallaxe 7,3 bis 9,9 mas), bis V 8,5: 44 Sterne. katalog nennt die Herkunft von V: HIP = Hipparcos (ESA 1997, 25 Sterne), Gaia DR3 = V aus G und BP-RP nach Gaia DR3 Dokumentation 5.5.1 Tabelle 5.9 (19 Sterne, physik.md 22). quelle_farbe nennt die Herkunft von B-V: HIP oder GDR3 (BP-RP = f(B-V) aus Tabelle 5.9, invertiert). Lage dx nach Osten, dy nach Norden relativ zu 03 47 00, +24 07 00, Gaia-Epoche 2016,0, ohne Gaia-Gegenstueck Hipparcos 1991,25. Pleione (HIP 17851) ist veraenderlich. Summe der Sterne V 1,38.",
+  "kommentar": "Erzeugt von tools/m45_sterne.py aus drei Abfragen im Gaia-Archiv (Abruf 2026-10-29, ADQL und SHA-256 in data/roh/LIESMICH.md): Kegel 1,3 Grad um RA 56,75, Dec +24,1167 Grad, Mitglieder nach deep-sky.md 4.2 (Gaia-Eigenbewegung (20 +- 4,5; -45,5 +- 5,5) mas/a und Gaia-Parallaxe 6,4 bis 8,5 mas, oder Hipparcos-2-Parallaxe 7,3 bis 9,9 mas), bis V 8,5: 44 Sterne. katalog nennt die Herkunft von V: HIP = Hipparcos (ESA 1997, 25 Sterne), Gaia DR3 = V aus G und BP-RP nach Gaia DR3 Dokumentation 5.5.1 Tabelle 5.9 (19 Sterne, physik.md 22). quelle_farbe nennt die Herkunft von B-V: HIP oder GDR3 (BP-RP = f(B-V) aus Tabelle 5.9, invertiert). Lage dx nach Westen (Norden oben, Osten links), dy nach Norden relativ zu 03 47 00, +24 07 00, Gaia-Epoche 2016,0, ohne Gaia-Gegenstueck Hipparcos 1991,25. Pleione (HIP 17851) ist veraenderlich. Summe der Sterne V 1,38.",
   "sterne": [
     {
       "name": "Alkyone",
-      "dx_arcsec": 398.4,
+      "dx_arcsec": -398.4,
       "dy_arcsec": -42.4,
       "magnitude": 2.85,
       "b_v": -0.09,
@@ -15,7 +15,7 @@
     },
     {
       "name": "Atlas",
-      "dx_arcsec": 1776.6,
+      "dx_arcsec": -1776.6,
       "dy_arcsec": -228.6,
       "magnitude": 3.62,
       "b_v": -0.07,
@@ -24,7 +24,7 @@
     },
     {
       "name": "Elektra",
-      "dx_arcsec": -1744.7,
+      "dx_arcsec": 1744.7,
       "dy_arcsec": -12.8,
       "magnitude": 3.72,
       "b_v": -0.1,
@@ -33,7 +33,7 @@
     },
     {
       "name": "Maia",
-      "dx_arcsec": -963.4,
+      "dx_arcsec": 963.4,
       "dy_arcsec": 903.0,
       "magnitude": 3.87,
       "b_v": -0.06,
@@ -42,7 +42,7 @@
     },
     {
       "name": "Merope",
-      "dx_arcsec": -553.1,
+      "dx_arcsec": 553.1,
       "dy_arcsec": -606.8,
       "magnitude": 4.14,
       "b_v": -0.05,
@@ -51,7 +51,7 @@
     },
     {
       "name": "Taygeta",
-      "dx_arcsec": -1471.5,
+      "dx_arcsec": 1471.5,
       "dy_arcsec": 1261.3,
       "magnitude": 4.3,
       "b_v": -0.11,
@@ -60,7 +60,7 @@
     },
     {
       "name": "Pleione",
-      "dx_arcsec": 1796.8,
+      "dx_arcsec": -1796.8,
       "dy_arcsec": 71.3,
       "magnitude": 5.05,
       "b_v": -0.08,
@@ -69,7 +69,7 @@
     },
     {
       "name": "HD 23753",
-      "dx_arcsec": 1106.8,
+      "dx_arcsec": -1106.8,
       "dy_arcsec": -2504.4,
       "magnitude": 5.44,
       "b_v": -0.07,
@@ -78,7 +78,7 @@
     },
     {
       "name": "Kelaeno",
-      "dx_arcsec": -1803.9,
+      "dx_arcsec": 1803.9,
       "dy_arcsec": 621.2,
       "magnitude": 5.45,
       "b_v": -0.03,
@@ -87,7 +87,7 @@
     },
     {
       "name": "18 Tau",
-      "dx_arcsec": -1509.2,
+      "dx_arcsec": 1509.2,
       "dy_arcsec": 2600.5,
       "magnitude": 5.66,
       "b_v": -0.06,
@@ -96,7 +96,7 @@
     },
     {
       "name": "Asterope",
-      "dx_arcsec": -896.7,
+      "dx_arcsec": 896.7,
       "dy_arcsec": 1575.4,
       "magnitude": 5.76,
       "b_v": -0.04,
@@ -105,7 +105,7 @@
     },
     {
       "name": "HD 23923",
-      "dx_arcsec": 2239.2,
+      "dx_arcsec": -2239.2,
       "dy_arcsec": -1458.2,
       "magnitude": 6.17,
       "b_v": -0.05,
@@ -114,7 +114,7 @@
     },
     {
       "name": "24 Tau",
-      "dx_arcsec": 288.4,
+      "dx_arcsec": -288.4,
       "dy_arcsec": -2.3,
       "magnitude": 6.33,
       "b_v": -0.03,
@@ -123,7 +123,7 @@
     },
     {
       "name": "22 Tau",
-      "dx_arcsec": -781.4,
+      "dx_arcsec": 781.4,
       "dy_arcsec": 1479.6,
       "magnitude": 6.43,
       "b_v": -0.02,
@@ -132,7 +132,7 @@
     },
     {
       "name": "HD 23873",
-      "dx_arcsec": 1941.0,
+      "dx_arcsec": -1941.0,
       "dy_arcsec": 950.6,
       "magnitude": 6.62,
       "b_v": -0.03,
@@ -141,7 +141,7 @@
     },
     {
       "name": "HIP 17923",
-      "dx_arcsec": 2438.0,
+      "dx_arcsec": -2438.0,
       "dy_arcsec": -965.6,
       "magnitude": 6.73,
       "b_v": 0.06,
@@ -150,7 +150,7 @@
     },
     {
       "name": "HIP 17704",
-      "dx_arcsec": 403.5,
+      "dx_arcsec": -403.5,
       "dy_arcsec": 617.1,
       "magnitude": 6.83,
       "b_v": 0.07,
@@ -159,7 +159,7 @@
     },
     {
       "name": "HIP 17664",
-      "dx_arcsec": -7.9,
+      "dx_arcsec": 7.9,
       "dy_arcsec": 1451.6,
       "magnitude": 6.83,
       "b_v": 0.02,
@@ -168,7 +168,7 @@
     },
     {
       "name": "HIP 17572",
-      "dx_arcsec": -974.2,
+      "dx_arcsec": 974.2,
       "dy_arcsec": -3491.1,
       "magnitude": 6.85,
       "b_v": 0.06,
@@ -177,7 +177,7 @@
     },
     {
       "name": "HIP 17999",
-      "dx_arcsec": 3182.4,
+      "dx_arcsec": -3182.4,
       "dy_arcsec": -559.6,
       "magnitude": 6.95,
       "b_v": 0.08,
@@ -186,7 +186,7 @@
     },
     {
       "name": "HIP 17791",
-      "dx_arcsec": 1233.8,
+      "dx_arcsec": -1233.8,
       "dy_arcsec": 823.0,
       "magnitude": 6.96,
       "b_v": 0.13,
@@ -195,7 +195,7 @@
     },
     {
       "name": "HIP 17692",
-      "dx_arcsec": 287.4,
+      "dx_arcsec": -287.4,
       "dy_arcsec": -1128.8,
       "magnitude": 6.99,
       "b_v": 0.03,
@@ -204,7 +204,7 @@
     },
     {
       "name": "Gaia DR3 65207709611941376",
-      "dx_arcsec": 334.6,
+      "dx_arcsec": -334.6,
       "dy_arcsec": -728.0,
       "magnitude": 7.31,
       "b_v": -0.01,
@@ -213,7 +213,7 @@
     },
     {
       "name": "Gaia DR3 65231486552803328",
-      "dx_arcsec": -447.7,
+      "dx_arcsec": 447.7,
       "dy_arcsec": 497.2,
       "magnitude": 7.38,
       "b_v": 0.05,
@@ -222,7 +222,7 @@
     },
     {
       "name": "HIP 17403",
-      "dx_arcsec": -2694.0,
+      "dx_arcsec": 2694.0,
       "dy_arcsec": 3469.7,
       "magnitude": 7.52,
       "b_v": 0.14,
@@ -231,7 +231,7 @@
     },
     {
       "name": "Gaia DR3 66746441777612416",
-      "dx_arcsec": 1873.2,
+      "dx_arcsec": -1873.2,
       "dy_arcsec": 1005.2,
       "magnitude": 7.55,
       "b_v": 0.04,
@@ -240,7 +240,7 @@
     },
     {
       "name": "Gaia DR3 66558249192653952",
-      "dx_arcsec": 2418.0,
+      "dx_arcsec": -2418.0,
       "dy_arcsec": 835.5,
       "magnitude": 7.57,
       "b_v": 0.02,
@@ -249,7 +249,7 @@
     },
     {
       "name": "Gaia DR3 65007083101413888",
-      "dx_arcsec": 367.6,
+      "dx_arcsec": -367.6,
       "dy_arcsec": -1578.9,
       "magnitude": 7.78,
       "b_v": 0.1,
@@ -258,7 +258,7 @@
     },
     {
       "name": "Gaia DR3 65221487868870784",
-      "dx_arcsec": -935.6,
+      "dx_arcsec": 935.6,
       "dy_arcsec": -280.9,
       "magnitude": 7.87,
       "b_v": 0.14,
@@ -267,7 +267,7 @@
     },
     {
       "name": "HIP 17401",
-      "dx_arcsec": -2716.8,
+      "dx_arcsec": 2716.8,
       "dy_arcsec": -1683.9,
       "magnitude": 7.93,
       "b_v": 0.35,
@@ -276,7 +276,7 @@
     },
     {
       "name": "Gaia DR3 66555985749157760",
-      "dx_arcsec": 1999.0,
+      "dx_arcsec": -1999.0,
       "dy_arcsec": 470.9,
       "magnitude": 7.99,
       "b_v": 0.11,
@@ -285,7 +285,7 @@
     },
     {
       "name": "Gaia DR3 65222209423382912",
-      "dx_arcsec": -1284.6,
+      "dx_arcsec": 1284.6,
       "dy_arcsec": -294.3,
       "magnitude": 8.06,
       "b_v": 0.17,
@@ -294,7 +294,7 @@
     },
     {
       "name": "Gaia DR3 68306099020642432",
-      "dx_arcsec": -2460.3,
+      "dx_arcsec": 2460.3,
       "dy_arcsec": 1584.3,
       "magnitude": 8.08,
       "b_v": 0.14,
@@ -303,7 +303,7 @@
     },
     {
       "name": "Gaia DR3 64929391436043264",
-      "dx_arcsec": 2203.5,
+      "dx_arcsec": -2203.5,
       "dy_arcsec": -2791.2,
       "magnitude": 8.13,
       "b_v": 0.14,
@@ -312,7 +312,7 @@
     },
     {
       "name": "Gaia DR3 66506331628024832",
-      "dx_arcsec": 1810.1,
+      "dx_arcsec": -1810.1,
       "dy_arcsec": -828.4,
       "magnitude": 8.14,
       "b_v": 0.16,
@@ -321,7 +321,7 @@
     },
     {
       "name": "HIP 17694",
-      "dx_arcsec": 313.8,
+      "dx_arcsec": -313.8,
       "dy_arcsec": -4301.2,
       "magnitude": 8.17,
       "b_v": 0.26,
@@ -330,7 +330,7 @@
     },
     {
       "name": "Gaia DR3 65292234570088064",
-      "dx_arcsec": -2111.9,
+      "dx_arcsec": 2111.9,
       "dy_arcsec": 1000.1,
       "magnitude": 8.17,
       "b_v": 0.22,
@@ -339,7 +339,7 @@
     },
     {
       "name": "Gaia DR3 68293729514855040",
-      "dx_arcsec": -2693.5,
+      "dx_arcsec": 2693.5,
       "dy_arcsec": 927.7,
       "magnitude": 8.25,
       "b_v": 0.2,
@@ -348,7 +348,7 @@
     },
     {
       "name": "Gaia DR3 65230764996027776",
-      "dx_arcsec": -602.0,
+      "dx_arcsec": 602.0,
       "dy_arcsec": 262.9,
       "magnitude": 8.29,
       "b_v": 0.27,
@@ -357,7 +357,7 @@
     },
     {
       "name": "Gaia DR3 66715273197982848",
-      "dx_arcsec": 265.2,
+      "dx_arcsec": -265.2,
       "dy_arcsec": 80.0,
       "magnitude": 8.29,
       "b_v": 0.2,
@@ -366,7 +366,7 @@
     },
     {
       "name": "Gaia DR3 66724451545088128",
-      "dx_arcsec": 1007.3,
+      "dx_arcsec": -1007.3,
       "dy_arcsec": 725.4,
       "magnitude": 8.29,
       "b_v": 0.32,
@@ -375,7 +375,7 @@
     },
     {
       "name": "HIP 17729",
-      "dx_arcsec": 641.5,
+      "dx_arcsec": -641.5,
       "dy_arcsec": 4567.7,
       "magnitude": 8.32,
       "b_v": 0.26,
@@ -384,7 +384,7 @@
     },
     {
       "name": "Gaia DR3 64933759417769984",
-      "dx_arcsec": 1422.7,
+      "dx_arcsec": -1422.7,
       "dy_arcsec": -3085.5,
       "magnitude": 8.39,
       "b_v": 0.22,
@@ -393,7 +393,7 @@
     },
     {
       "name": "Gaia DR3 65212107660378880",
-      "dx_arcsec": 58.0,
+      "dx_arcsec": -58.0,
       "dy_arcsec": -438.1,
       "magnitude": 8.39,
       "b_v": 0.24,

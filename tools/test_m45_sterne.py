@@ -66,9 +66,10 @@ class Mitgliedschaft(unittest.TestCase):
         with self.assertRaises(SystemExit):
             list(m.kandidaten(gaia, [], hip2))
 
-    def test_lage_nach_osten_und_norden(self):
+    def test_lage_osten_links_und_norden_oben(self):
+        # Groessere Rektaszension liegt oestlich, also links (dx negativ, Naht +x rechts)
         dx, dy = m.lage_arcsec(m.MITTE_RA_GRAD + 0.1, m.MITTE_DEC_GRAD - 0.1)
-        self.assertGreater(dx, 0)
+        self.assertLess(dx, 0)
         self.assertAlmostEqual(dy, -360.0, places=6)
 
 

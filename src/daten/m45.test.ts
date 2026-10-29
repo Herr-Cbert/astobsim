@@ -47,6 +47,15 @@ describe("M45 in daten/objekte.json und daten/sterne/m45.json", () => {
     expect(abstand("24 Tau", "Alkyone")).toBeCloseTo(117, 0);
   });
 
+  it("legt Osten links (dx negativ) und Norden oben wie die Naht (deep-sky.md 4.2, Kopf)", () => {
+    const lage = (name: string) => sterne.find((s) => s.name === name)!;
+    // Atlas und Pleione stehen oestlich der Mitte, Elektra und Kelaeno westlich, Maia noerdlich.
+    expect([lage("Atlas").dxArcsec, lage("Pleione").dxArcsec, lage("Alkyone").dxArcsec].every((dx) => dx < 0)).toBe(true);
+    expect([lage("Elektra").dxArcsec, lage("Kelaeno").dxArcsec].every((dx) => dx > 0)).toBe(true);
+    expect(lage("Atlas").dxArcsec).toBeCloseTo(-1776.6, 1);
+    expect(lage("Maia").dyArcsec).toBeCloseTo(903.0, 1);
+  });
+
   it("traegt Quelle und Lizenz CC BY-NC 3.0 IGO (ADR-0003 Nachtrag V2)", () => {
     expect(m45Json.lizenz).toContain("CC BY-NC 3.0 IGO");
     expect(m45Json.quelle).toContain("Gaia DR3");
