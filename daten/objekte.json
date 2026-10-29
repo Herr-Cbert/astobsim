@@ -235,5 +235,727 @@
         "kommentar": "Werte aus objekte.md 6.1 mit Ringoeffnung 19 Grad (Projektentscheidung) statt 15 Grad: ring_aussen_arcsec = 2,269 x 20\" (1.1); magnitude -0,1 nach Mallama und Hilton (5.1) mit B = 19 Grad (bei 15 Grad 0,0). Trabanten nach 3.3 in der Ringebene: dx wie dort (Titan +150, Rhea -60), dy mit der Formel aus 3.3 fuer B = 19 statt 15 Grad neu gerechnet, dy = sqrt(1 - (dx/E)^2) E sin B mit E = 202,7\" bzw. 87,4\" (3.2): Titan -44,4 statt -35, Rhea +20,7 statt +17; Titan vor dem Planeten (suedlich), Rhea dahinter. Quellbild Hubble 12.09.2021 bei 18,11\" (bilder.json), Planetennorden oben. weiss_mag_arcsec2 auf den Pixelwert 1,0 geeicht, Kugel plus Ring (objekte.md 5.3, bis #71: 6,6 als Kugel aus 5.2)."
       }
     ]
+  },
+  {
+    "id": "albireo",
+    "name": "Albireo (Beta Cygni)",
+    "typ": "doppelstern",
+    "quelle_physik": "docs/recherche/doppelsterne.md",
+    "zustaende": [
+      {
+        "id": "albireo_2025",
+        "name": "Albireo (34,3\", 3,19 und 4,68 mag)",
+        "magnitude": 2.94,
+        "katalog": [
+          {
+            "wds": "19307+2758",
+            "komponenten": "STFA 43 AB",
+            "sterne": [
+              "A",
+              "B"
+            ],
+            "trennung_arcsec": 34.3,
+            "positionswinkel_grad": 54.0,
+            "epoche": 2025.0,
+            "quelle": "WDS, letzte Messung 2025 (296 Messungen)"
+          }
+        ],
+        "sterne": [
+          {
+            "name": "A",
+            "dx_arcsec": -17.15,
+            "dy_arcsec": 0,
+            "magnitude": 3.19,
+            "b_v": 1.088,
+            "katalog": "HIP 95947",
+            "quelle_farbe": "Hipparcos"
+          },
+          {
+            "name": "B",
+            "dx_arcsec": 17.15,
+            "dy_arcsec": 0,
+            "magnitude": 4.68,
+            "b_v": -0.095,
+            "katalog": "HIP 95951",
+            "quelle_farbe": "Hipparcos"
+          }
+        ],
+        "kommentar": "A ist selbst eng doppelt (Aa,Ac 0,4\"), fuer astobsim ein Stern; Magnitude und B-V von A gelten fuer A gesamt. B-V aus dem Hipparcos-Hauptkatalog (ESA 1997, Johnson B-V; Credit: ESA). Trennung, Positionswinkel und Magnituden aus dem WDS (USNO), Abruf 2026-10-29. Lage nach A-Z9: Mitte im Ursprung, A bei -rho/2 (Westen), B bei +rho/2 (Osten), dy = 0."
+      }
+    ]
+  },
+  {
+    "id": "mizar",
+    "name": "Mizar (Zeta Ursae Majoris)",
+    "typ": "doppelstern",
+    "quelle_physik": "docs/recherche/doppelsterne.md",
+    "zustaende": [
+      {
+        "id": "mizar_2022",
+        "name": "Mizar (14,4\", 2,23 und 3,88 mag)",
+        "magnitude": 2.02,
+        "katalog": [
+          {
+            "wds": "13239+5456",
+            "komponenten": "STF1744 AB",
+            "sterne": [
+              "A",
+              "B"
+            ],
+            "trennung_arcsec": 14.4,
+            "positionswinkel_grad": 153.0,
+            "epoche": 2022.0,
+            "quelle": "WDS, letzte Messung 2022 (502 Messungen)"
+          }
+        ],
+        "sterne": [
+          {
+            "name": "A",
+            "dx_arcsec": -7.2,
+            "dy_arcsec": 0,
+            "magnitude": 2.23,
+            "b_v": 0.02,
+            "katalog": "HR 5054",
+            "quelle_farbe": "BSC"
+          },
+          {
+            "name": "B",
+            "dx_arcsec": 7.2,
+            "dy_arcsec": 0,
+            "magnitude": 3.88,
+            "b_v": 0.13,
+            "katalog": "HR 5055",
+            "quelle_farbe": "BSC"
+          }
+        ],
+        "kommentar": "B-V aus dem Bright Star Catalogue, 5. Aufl. (Hoffleit und Warren 1991), HR 5054 und 5055. Trennung, Positionswinkel und Magnituden aus dem WDS (USNO), Abruf 2026-10-29. Lage nach A-Z9: Mitte im Ursprung, A bei -rho/2 (Westen), B bei +rho/2 (Osten), dy = 0."
+      }
+    ]
+  },
+  {
+    "id": "gamma_and",
+    "name": "Gamma Andromedae (Alamak)",
+    "typ": "doppelstern",
+    "quelle_physik": "docs/recherche/doppelsterne.md",
+    "zustaende": [
+      {
+        "id": "gamma_and_2024",
+        "name": "Gamma Andromedae (9,5\", 2,31 und 5,02 mag)",
+        "magnitude": 2.22,
+        "katalog": [
+          {
+            "wds": "02039+4220",
+            "komponenten": "STF 205 A,BC",
+            "sterne": [
+              "A",
+              "BC"
+            ],
+            "trennung_arcsec": 9.5,
+            "positionswinkel_grad": 63.0,
+            "epoche": 2024.0,
+            "quelle": "WDS, letzte Messung 2024 (367 Messungen)"
+          }
+        ],
+        "sterne": [
+          {
+            "name": "A",
+            "dx_arcsec": -4.75,
+            "dy_arcsec": 0,
+            "magnitude": 2.31,
+            "b_v": 1.37,
+            "katalog": "HR 603",
+            "quelle_farbe": "BSC"
+          },
+          {
+            "name": "BC",
+            "dx_arcsec": 4.75,
+            "dy_arcsec": 0,
+            "magnitude": 5.02,
+            "b_v": 0.03,
+            "katalog": "HR 604",
+            "quelle_farbe": "BSC"
+          }
+        ],
+        "kommentar": "BC ist eng doppelt (STT 38, 0,37\" fuer 2027,0 nach ORB6), fuer astobsim ein Stern. B-V aus dem Bright Star Catalogue (HR 603, 604). Magnitude von BC nach WDS 5,02 (BSC 4,84). Trennung, Positionswinkel und Magnituden aus dem WDS (USNO), Abruf 2026-10-29. Lage nach A-Z9: Mitte im Ursprung, A bei -rho/2 (Westen), B bei +rho/2 (Osten), dy = 0."
+      }
+    ]
+  },
+  {
+    "id": "castor",
+    "name": "Castor (Alpha Geminorum)",
+    "typ": "doppelstern",
+    "quelle_physik": "docs/recherche/doppelsterne.md",
+    "zustaende": [
+      {
+        "id": "castor_2027",
+        "name": "Castor (5,8\", 1,93 und 2,97 mag)",
+        "magnitude": 1.58,
+        "katalog": [
+          {
+            "wds": "07346+3153",
+            "komponenten": "STF1110 AB",
+            "sterne": [
+              "A",
+              "B"
+            ],
+            "trennung_arcsec": 5.772,
+            "positionswinkel_grad": 48.9,
+            "epoche": 2027.0,
+            "quelle": "ORB6 CIA2022d (Note 3), Ephemeride 2027,0; Magnituden WDS"
+          }
+        ],
+        "sterne": [
+          {
+            "name": "A",
+            "dx_arcsec": -2.886,
+            "dy_arcsec": 0,
+            "magnitude": 1.93,
+            "b_v": 0.03,
+            "katalog": "HR 2891",
+            "quelle_farbe": "BSC"
+          },
+          {
+            "name": "B",
+            "dx_arcsec": 2.886,
+            "dy_arcsec": 0,
+            "magnitude": 2.97,
+            "b_v": 0.04,
+            "katalog": "HR 2890",
+            "quelle_farbe": "BSC"
+          }
+        ],
+        "kommentar": "C (YY Gem, 70\") entfaellt (doppelsterne.md 2.2). B-V aus dem Bright Star Catalogue (HR 2891 fuer A, HR 2890 fuer B). Trennung und Positionswinkel aus der ORB6-Ephemeride 2027,0 (USNO), Magnituden aus dem WDS, Abruf 2026-10-29. Lage nach A-Z9: Mitte im Ursprung, A bei -rho/2 (Westen), B bei +rho/2 (Osten), dy = 0."
+      }
+    ]
+  },
+  {
+    "id": "porrima",
+    "name": "Porrima (Gamma Virginis)",
+    "typ": "doppelstern",
+    "quelle_physik": "docs/recherche/doppelsterne.md",
+    "zustaende": [
+      {
+        "id": "porrima_2027",
+        "name": "Porrima (3,7\", 3,48 und 3,53 mag)",
+        "magnitude": 2.75,
+        "katalog": [
+          {
+            "wds": "12417-0127",
+            "komponenten": "STF1670 AB",
+            "sterne": [
+              "A",
+              "B"
+            ],
+            "trennung_arcsec": 3.664,
+            "positionswinkel_grad": 350.0,
+            "epoche": 2027.0,
+            "quelle": "ORB6 Sca2007c (Note 2), Ephemeride 2027,0; Magnituden WDS"
+          }
+        ],
+        "sterne": [
+          {
+            "name": "A",
+            "dx_arcsec": -1.832,
+            "dy_arcsec": 0,
+            "magnitude": 3.48,
+            "b_v": 0.33,
+            "katalog": "TDSC 34064 A",
+            "quelle_farbe": "TDSC"
+          },
+          {
+            "name": "B",
+            "dx_arcsec": 1.832,
+            "dy_arcsec": 0,
+            "magnitude": 3.53,
+            "b_v": 0.33,
+            "katalog": "TDSC 34064 B",
+            "quelle_farbe": "TDSC"
+          }
+        ],
+        "hinweis_hilfe": "Die beiden Sterne von Porrima umlaufen einander in rund 169 Jahren; 2005 standen sie nur 0,4 Bogensekunden auseinander, gezeigt ist der Abstand fuer 2027.",
+        "kommentar": "B-V aus dem TDSC (Fabricius et al. 2002) umgerechnet mit B-V = 0,850 (BT - VT), ESA 1997 Bd. 1 Gl. 1.3.20 (physik.md 21). Credit: ESA. Trennung und Positionswinkel aus der ORB6-Ephemeride 2027,0 (USNO), Magnituden aus dem WDS, Abruf 2026-10-29. Lage nach A-Z9: Mitte im Ursprung, A bei -rho/2 (Westen), B bei +rho/2 (Osten), dy = 0."
+      }
+    ]
+  },
+  {
+    "id": "zeta_aqr",
+    "name": "Zeta Aquarii",
+    "typ": "doppelstern",
+    "quelle_physik": "docs/recherche/doppelsterne.md",
+    "zustaende": [
+      {
+        "id": "zeta_aqr_2027",
+        "name": "Zeta Aquarii (2,5\", 4,34 und 4,49 mag)",
+        "magnitude": 3.66,
+        "katalog": [
+          {
+            "wds": "22288-0001",
+            "komponenten": "STF2909 AB",
+            "sterne": [
+              "A",
+              "B"
+            ],
+            "trennung_arcsec": 2.481,
+            "positionswinkel_grad": 150.0,
+            "epoche": 2027.0,
+            "quelle": "ORB6 Izm2019 (Note 3), Ephemeride 2027,0; Magnituden WDS"
+          }
+        ],
+        "sterne": [
+          {
+            "name": "A",
+            "dx_arcsec": -1.2405,
+            "dy_arcsec": 0,
+            "magnitude": 4.34,
+            "b_v": 0.38,
+            "katalog": "TDSC 61498 A",
+            "quelle_farbe": "TDSC"
+          },
+          {
+            "name": "B",
+            "dx_arcsec": 1.2405,
+            "dy_arcsec": 0,
+            "magnitude": 4.49,
+            "b_v": 0.34,
+            "katalog": "TDSC 61498 B",
+            "quelle_farbe": "TDSC"
+          }
+        ],
+        "kommentar": "B-V aus dem TDSC (Fabricius et al. 2002) umgerechnet mit B-V = 0,850 (BT - VT), ESA 1997 Bd. 1 Gl. 1.3.20 (physik.md 21). Credit: ESA. Trennung und Positionswinkel aus der ORB6-Ephemeride 2027,0 (USNO), Magnituden aus dem WDS, Abruf 2026-10-29. Lage nach A-Z9: Mitte im Ursprung, A bei -rho/2 (Westen), B bei +rho/2 (Osten), dy = 0."
+      }
+    ]
+  },
+  {
+    "id": "eps_lyr",
+    "name": "Epsilon Lyrae",
+    "typ": "doppelstern",
+    "quelle_physik": "docs/recherche/doppelsterne.md",
+    "zustaende": [
+      {
+        "id": "eps_lyr_2027",
+        "name": "Epsilon Lyrae (209\", Paare 2,0\" und 2,4\")",
+        "magnitude": 3.91,
+        "katalog": [
+          {
+            "wds": "18443+3940",
+            "komponenten": "STF2382 AB",
+            "sterne": [
+              "eps1 A",
+              "eps1 B"
+            ],
+            "trennung_arcsec": 2.011,
+            "positionswinkel_grad": 341.4,
+            "epoche": 2027.0,
+            "quelle": "ORB6 Doc2020e (Note 4), Ephemeride 2027,0; Magnituden WDS"
+          },
+          {
+            "wds": "18443+3940",
+            "komponenten": "STF2383 CD",
+            "sterne": [
+              "eps2 C",
+              "eps2 D"
+            ],
+            "trennung_arcsec": 2.421,
+            "positionswinkel_grad": 71.3,
+            "epoche": 2027.0,
+            "quelle": "ORB6 Doc2020e (Note 4), Ephemeride 2027,0; Magnituden WDS"
+          },
+          {
+            "wds": "18443+3940",
+            "komponenten": "STFA 37 AB,CD",
+            "sterne": [
+              [
+                "eps1 A",
+                "eps1 B"
+              ],
+              [
+                "eps2 C",
+                "eps2 D"
+              ]
+            ],
+            "trennung_arcsec": 209.4,
+            "positionswinkel_grad": 172.0,
+            "epoche": 2021.0,
+            "quelle": "WDS, letzte Messung 2021 (98 Messungen); im Modell zwischen den Mittelpunkten der Paare (Naeherung, ADR-0003 Nachtrag V2)"
+          }
+        ],
+        "sterne": [
+          {
+            "name": "eps1 A",
+            "dx_arcsec": -14.251,
+            "dy_arcsec": 102.728,
+            "magnitude": 5.15,
+            "b_v": 0.12,
+            "katalog": "TDSC 48456 A",
+            "quelle_farbe": "TDSC"
+          },
+          {
+            "name": "eps1 B",
+            "dx_arcsec": -14.892,
+            "dy_arcsec": 104.634,
+            "magnitude": 6.1,
+            "b_v": 0.28,
+            "katalog": "TDSC 48456 B",
+            "quelle_farbe": "TDSC"
+          },
+          {
+            "name": "eps2 C",
+            "dx_arcsec": 13.425,
+            "dy_arcsec": -104.069,
+            "magnitude": 5.25,
+            "b_v": 0.16,
+            "katalog": "TDSC 48456 C",
+            "quelle_farbe": "TDSC"
+          },
+          {
+            "name": "eps2 D",
+            "dx_arcsec": 15.718,
+            "dy_arcsec": -103.293,
+            "magnitude": 5.38,
+            "b_v": 0.21,
+            "katalog": "TDSC 48456 D",
+            "quelle_farbe": "TDSC"
+          }
+        ],
+        "hinweis_hilfe": "Epsilon Lyrae ist ein Mehrfachstern aus zwei Paaren in 209 Bogensekunden Abstand; er ist in seiner echten Lage mit Norden oben gezeigt, die Doppelsterne aus zwei Sternen dagegen fest in Ost-West-Richtung.",
+        "kommentar": "Mehrfachstern in echter Lage, Norden oben (Entscheidung Herbert 2026-10-29, docs/recherche/README.md Entscheidung 4): dx positiv = Osten, dy positiv = Norden, Ursprung in der Mitte zwischen den Mittelpunkten der Paare; eps1 (AB) noerdlich, eps2 (CD) suedlich nach WDS STFA 37 (172 Grad, 209,4\"); eps1 nach ORB6 Doc2020e (die neuere der beiden Bahnen, doppelsterne.md 1.2), eps2 ebenso. Lagen auf 0,001\" gerundet. B-V aus dem TDSC (Fabricius et al. 2002) umgerechnet mit B-V = 0,850 (BT - VT), ESA 1997 Bd. 1 Gl. 1.3.20 (physik.md 21). Credit: ESA."
+      }
+    ]
+  },
+  {
+    "id": "pi_aql",
+    "name": "Pi Aquilae",
+    "typ": "doppelstern",
+    "quelle_physik": "docs/recherche/doppelsterne.md",
+    "zustaende": [
+      {
+        "id": "pi_aql_2021",
+        "name": "Pi Aquilae (1,4\", 6,34 und 6,75 mag)",
+        "magnitude": 5.77,
+        "katalog": [
+          {
+            "wds": "19487+1149",
+            "komponenten": "STF2583 AB",
+            "sterne": [
+              "A",
+              "B"
+            ],
+            "trennung_arcsec": 1.4,
+            "positionswinkel_grad": 104.0,
+            "epoche": 2021.0,
+            "quelle": "WDS, letzte Messung 2021 (344 Messungen)"
+          }
+        ],
+        "sterne": [
+          {
+            "name": "A",
+            "dx_arcsec": -0.7,
+            "dy_arcsec": 0,
+            "magnitude": 6.34,
+            "b_v": 0.94,
+            "katalog": "TDSC 52472 A",
+            "quelle_farbe": "TDSC"
+          },
+          {
+            "name": "B",
+            "dx_arcsec": 0.7,
+            "dy_arcsec": 0,
+            "magnitude": 6.75,
+            "b_v": 0.04,
+            "katalog": "TDSC 52472 B",
+            "quelle_farbe": "TDSC"
+          }
+        ],
+        "kommentar": "Keine Bahn in ORB6. B-V aus dem TDSC (Fabricius et al. 2002) umgerechnet mit B-V = 0,850 (BT - VT), ESA 1997 Bd. 1 Gl. 1.3.20 (physik.md 21). Credit: ESA. Trennung, Positionswinkel und Magnituden aus dem WDS (USNO), Abruf 2026-10-29. Lage nach A-Z9: Mitte im Ursprung, A bei -rho/2 (Westen), B bei +rho/2 (Osten), dy = 0."
+      }
+    ]
+  },
+  {
+    "id": "eps_ari",
+    "name": "Epsilon Arietis",
+    "typ": "doppelstern",
+    "quelle_physik": "docs/recherche/doppelsterne.md",
+    "zustaende": [
+      {
+        "id": "eps_ari_2027",
+        "name": "Epsilon Arietis (1,3\", 5,17 und 5,57 mag)",
+        "magnitude": 4.6,
+        "katalog": [
+          {
+            "wds": "02592+2120",
+            "komponenten": "STF 333 AB",
+            "sterne": [
+              "A",
+              "B"
+            ],
+            "trennung_arcsec": 1.266,
+            "positionswinkel_grad": 210.7,
+            "epoche": 2027.0,
+            "quelle": "ORB6 Izm2019 (Note 4), Ephemeride 2027,0; Magnituden WDS"
+          }
+        ],
+        "sterne": [
+          {
+            "name": "A",
+            "dx_arcsec": -0.633,
+            "dy_arcsec": 0,
+            "magnitude": 5.17,
+            "b_v": 0.05,
+            "katalog": "TDSC 6524 A",
+            "quelle_farbe": "TDSC"
+          },
+          {
+            "name": "B",
+            "dx_arcsec": 0.633,
+            "dy_arcsec": 0,
+            "magnitude": 5.57,
+            "b_v": 0.04,
+            "katalog": "TDSC 6524 B",
+            "quelle_farbe": "TDSC"
+          }
+        ],
+        "kommentar": "B-V aus dem TDSC (Fabricius et al. 2002) umgerechnet mit B-V = 0,850 (BT - VT), ESA 1997 Bd. 1 Gl. 1.3.20 (physik.md 21). Credit: ESA. Trennung und Positionswinkel aus der ORB6-Ephemeride 2027,0 (USNO), Magnituden aus dem WDS, Abruf 2026-10-29. Lage nach A-Z9: Mitte im Ursprung, A bei -rho/2 (Westen), B bei +rho/2 (Osten), dy = 0."
+      }
+    ]
+  },
+  {
+    "id": "ori_52",
+    "name": "52 Orionis",
+    "typ": "doppelstern",
+    "quelle_physik": "docs/recherche/doppelsterne.md",
+    "zustaende": [
+      {
+        "id": "ori_52_2027",
+        "name": "52 Orionis (0,94\", 5,99 und 6,03 mag)",
+        "magnitude": 5.26,
+        "katalog": [
+          {
+            "wds": "05480+0627",
+            "komponenten": "STF 795",
+            "sterne": [
+              "A",
+              "B"
+            ],
+            "trennung_arcsec": 0.944,
+            "positionswinkel_grad": 221.8,
+            "epoche": 2027.0,
+            "quelle": "ORB6 Izm2019 (Note 4), Ephemeride 2027,0; Magnituden WDS"
+          }
+        ],
+        "sterne": [
+          {
+            "name": "A",
+            "dx_arcsec": -0.472,
+            "dy_arcsec": 0,
+            "magnitude": 5.99,
+            "b_v": 0.27,
+            "katalog": "TDSC 12820 A",
+            "quelle_farbe": "TDSC"
+          },
+          {
+            "name": "B",
+            "dx_arcsec": 0.472,
+            "dy_arcsec": 0,
+            "magnitude": 6.03,
+            "b_v": 0.16,
+            "katalog": "TDSC 12820 B",
+            "quelle_farbe": "TDSC"
+          }
+        ],
+        "kommentar": "B-V aus dem TDSC (Fabricius et al. 2002) umgerechnet mit B-V = 0,850 (BT - VT), ESA 1997 Bd. 1 Gl. 1.3.20 (physik.md 21). Credit: ESA. Trennung und Positionswinkel aus der ORB6-Ephemeride 2027,0 (USNO), Magnituden aus dem WDS, Abruf 2026-10-29. Lage nach A-Z9: Mitte im Ursprung, A bei -rho/2 (Westen), B bei +rho/2 (Osten), dy = 0."
+      }
+    ]
+  },
+  {
+    "id": "ari_52",
+    "name": "52 Arietis",
+    "typ": "doppelstern",
+    "quelle_physik": "docs/recherche/doppelsterne.md",
+    "zustaende": [
+      {
+        "id": "ari_52_2027",
+        "name": "52 Arietis (0,56\", 6,21 und 6,19 mag)",
+        "magnitude": 5.45,
+        "katalog": [
+          {
+            "wds": "03054+2515",
+            "komponenten": "STF 346 AB",
+            "sterne": [
+              "A",
+              "B"
+            ],
+            "trennung_arcsec": 0.557,
+            "positionswinkel_grad": 260.2,
+            "epoche": 2027.0,
+            "quelle": "ORB6 Hei1981a (Note 3), Ephemeride 2027,0; Magnituden WDS"
+          }
+        ],
+        "sterne": [
+          {
+            "name": "A",
+            "dx_arcsec": -0.2785,
+            "dy_arcsec": 0,
+            "magnitude": 6.21,
+            "b_v": -0.03,
+            "katalog": "TDSC 6733 AB",
+            "quelle_farbe": "TDSC"
+          },
+          {
+            "name": "B",
+            "dx_arcsec": 0.2785,
+            "dy_arcsec": 0,
+            "magnitude": 6.19,
+            "b_v": -0.03,
+            "katalog": "TDSC 6733 AB",
+            "quelle_farbe": "TDSC"
+          }
+        ],
+        "kommentar": "Im TDSC nicht aufgeloest: B-V des Systems fuer beide Sterne (beide B7V; Hipparcos -0,031). Bahn von 1981 (Note 3), die Ephemeride ist unsicher (WDS 2024: 0,5\"). B-V aus dem TDSC (Fabricius et al. 2002) umgerechnet mit B-V = 0,850 (BT - VT), ESA 1997 Bd. 1 Gl. 1.3.20 (physik.md 21). Credit: ESA. Trennung und Positionswinkel aus der ORB6-Ephemeride 2027,0 (USNO), Magnituden aus dem WDS, Abruf 2026-10-29. Lage nach A-Z9: Mitte im Ursprung, A bei -rho/2 (Westen), B bei +rho/2 (Osten), dy = 0."
+      }
+    ]
+  },
+  {
+    "id": "zeta_her",
+    "name": "Zeta Herculis",
+    "typ": "doppelstern",
+    "quelle_physik": "docs/recherche/doppelsterne.md",
+    "zustaende": [
+      {
+        "id": "zeta_her_2027",
+        "name": "Zeta Herculis (1,5\", 2,95 und 5,40 mag)",
+        "magnitude": 2.84,
+        "katalog": [
+          {
+            "wds": "16413+3136",
+            "komponenten": "STF2084",
+            "sterne": [
+              "A",
+              "B"
+            ],
+            "trennung_arcsec": 1.542,
+            "positionswinkel_grad": 72.2,
+            "epoche": 2027.0,
+            "quelle": "ORB6 Izm2019 (Note 1), Ephemeride 2027,0; Magnituden WDS"
+          }
+        ],
+        "sterne": [
+          {
+            "name": "A",
+            "dx_arcsec": -0.771,
+            "dy_arcsec": 0,
+            "magnitude": 2.95,
+            "b_v": 0.61,
+            "katalog": "TDSC 42506 A",
+            "quelle_farbe": "TDSC"
+          },
+          {
+            "name": "B",
+            "dx_arcsec": 0.771,
+            "dy_arcsec": 0,
+            "magnitude": 5.4,
+            "b_v": 0.77,
+            "katalog": "TDSC 42506 B",
+            "quelle_farbe": "TDSC"
+          }
+        ],
+        "kommentar": "Bahn mit 34,5 Jahren Umlauf (Note 1). B-V aus dem TDSC (Fabricius et al. 2002) umgerechnet mit B-V = 0,850 (BT - VT), ESA 1997 Bd. 1 Gl. 1.3.20 (physik.md 21). Credit: ESA. Trennung und Positionswinkel aus der ORB6-Ephemeride 2027,0 (USNO), Magnituden aus dem WDS, Abruf 2026-10-29. Lage nach A-Z9: Mitte im Ursprung, A bei -rho/2 (Westen), B bei +rho/2 (Osten), dy = 0."
+      }
+    ]
+  },
+  {
+    "id": "antares",
+    "name": "Antares (Alpha Scorpii)",
+    "typ": "doppelstern",
+    "quelle_physik": "docs/recherche/doppelsterne.md",
+    "zustaende": [
+      {
+        "id": "antares_2027",
+        "name": "Antares (2,6\", 0,96 und 5,40 mag)",
+        "magnitude": 0.94,
+        "katalog": [
+          {
+            "wds": "16294-2626",
+            "komponenten": "GNT 1",
+            "sterne": [
+              "A",
+              "B"
+            ],
+            "trennung_arcsec": 2.579,
+            "positionswinkel_grad": 276.7,
+            "epoche": 2027.0,
+            "quelle": "ORB6 Izm2019 (Note 5), Ephemeride 2027,0; Magnituden WDS"
+          }
+        ],
+        "sterne": [
+          {
+            "name": "A",
+            "dx_arcsec": -1.2895,
+            "dy_arcsec": 0,
+            "magnitude": 0.96,
+            "b_v": 1.865,
+            "katalog": "HIP 80763",
+            "quelle_farbe": "Hipparcos"
+          },
+          {
+            "name": "B",
+            "dx_arcsec": 1.2895,
+            "dy_arcsec": 0,
+            "magnitude": 5.4,
+            "b_v": -0.2,
+            "katalog": "SIMBAD alf Sco B",
+            "quelle_farbe": "SIMBAD"
+          }
+        ],
+        "kommentar": "B-V von A ist der Hipparcos-Wert des Systems (HIP 80763, Credit: ESA); B traegt weniger als 2 % zum Fluss bei. B-V von B aus SIMBAD B 5,0 und V 5,2 (Qualitaet E, ohne Bibcode). Bahn Note 5. Trennung und Positionswinkel aus der ORB6-Ephemeride 2027,0 (USNO), Magnituden aus dem WDS, Abruf 2026-10-29. Lage nach A-Z9: Mitte im Ursprung, A bei -rho/2 (Westen), B bei +rho/2 (Osten), dy = 0."
+      }
+    ]
+  },
+  {
+    "id": "polaris",
+    "name": "Polaris (Alpha Ursae Minoris)",
+    "typ": "doppelstern",
+    "quelle_physik": "docs/recherche/doppelsterne.md",
+    "zustaende": [
+      {
+        "id": "polaris_2016",
+        "name": "Polaris (18,4\", 2,04 und 8,60 mag)",
+        "magnitude": 2.04,
+        "katalog": [
+          {
+            "wds": "02318+8916",
+            "komponenten": "STF 93 AB",
+            "sterne": [
+              "A",
+              "B"
+            ],
+            "trennung_arcsec": 18.4,
+            "positionswinkel_grad": 236.0,
+            "epoche": 2016.0,
+            "quelle": "WDS, letzte Messung 2016 (65 Messungen)"
+          }
+        ],
+        "sterne": [
+          {
+            "name": "A",
+            "dx_arcsec": -9.2,
+            "dy_arcsec": 0,
+            "magnitude": 2.04,
+            "b_v": 0.636,
+            "katalog": "HIP 11767",
+            "quelle_farbe": "Hipparcos"
+          },
+          {
+            "name": "B",
+            "dx_arcsec": 9.2,
+            "dy_arcsec": 0,
+            "magnitude": 8.6,
+            "b_v": 0.42,
+            "katalog": "Polaris B",
+            "quelle_farbe": "Usenko und Klochkova 2007 nach Turner 2005"
+          }
+        ],
+        "kommentar": "B-V von A ist der Hipparcos-Wert des Systems (HIP 11767, Credit: ESA; Ab mit 0,2\" eingeschlossen). Polaris B mit V 8,60 und B-V 0,42 nach Usenko und Klochkova 2007 (arXiv:0708.0333, doi:10.1111/j.1745-3933.2008.00426.x), die B-V von Turner 2005 uebernehmen; WDS nennt 9,1, SIMBAD 8,2 (Lee 2008). Entscheidung Herbert 2026-10-29 (docs/recherche/README.md, Entscheidung 7). Trennung und Positionswinkel aus dem WDS, Abruf 2026-10-29. Lage nach A-Z9: Mitte im Ursprung, A bei -rho/2 (Westen), B bei +rho/2 (Osten), dy = 0."
+      }
+    ]
   }
 ]

@@ -843,3 +843,15 @@ Interpolation der Reserve (Entscheidung Herbert zu PR #121): Mit "keine sichtbar
 Korrektur: wahrnehmung.md 2.3, Fernglas 10x50 bei Bortle 3 mit $F$ = 1,4, von 11,1 auf 11,0 mag (ungerundet 11,05).
 
 Quelle [A&S]: Abramowitz, M., Stegun, I. A.: *Handbook of Mathematical Functions*, NBS Applied Mathematics Series 55, 1964, Formel 7.1.26.
+
+## 21. Farbindex aus Tycho-Photometrie (Issue #103)
+
+Fuer die Doppelsterne ohne eigenen Johnson-Wert je Komponente (Porrima, Zeta Aqr, Epsilon Lyrae, Pi Aql, Epsilon Ari, 52 Ori, 52 Ari, Zeta Her) rechnet die Aufbereitung der Daten (Python-Skript im Scratchpad, nicht im Repo) $B_T$ und $V_T$ aus dem Tycho Double Star Catalogue [TDSC] ins Johnson-System um (doppelsterne.md 1.3, 2.2):
+
+$$(B-V)_J = 0{,}850\,(B_T - V_T)$$
+
+Quelle: ESA 1997 [ESA97], Bd. 1, Abschn. 1.3 Anhang 4, Gl. 1.3.20 (im PDF nachgeschlagen am 2026-10-29), abgeleitet an 8000 Standardsternen fuer $-0{,}2 < (B-V)_T < 1{,}8$, "giving errors generally below 0.015 mag in $V_J$ and below 0.05 mag in $(B-V)_J$. The transformations apply to unreddened stars and ignore variations due to luminosity class. They should not be applied to M-type stars". Die Begleitgleichung $V_J = V_T - 0{,}090\,(B-V)_T$ nimmt astobsim nicht: die Magnituden kommen einheitlich aus dem WDS. Kein Stern der Liste mit TDSC-Farbe ist vom Typ M; der Fehler von bis zu 0,05 mag ist fuer die Sternfarbe (Abschnitt 18) ohne Belang. Gerundet auf 0,01. Fuer heisse Sterne weicht die Naeherung staerker ab (Albireo B: TDSC ergibt +0,15, Hipparcos misst $-0{,}095$), deshalb nimmt astobsim dort den Hipparcos-Wert.
+
+Testwert (A-Q1, ber.): Zeta Her B, $B_T$ 6,31, $V_T$ 5,40: $0{,}850 \cdot 0{,}91 = 0{,}774$, gerundet 0,77 (`src/daten/doppelsterne.test.ts`).
+
+Quellen: [TDSC] Fabricius, C. et al.: "The Tycho double star catalogue", A&A 384, 180 (2002), abgefragt als `tycho2.tdsc_catalogue` im Hipparcos and Tycho Legacy Archive der ESA (TAP https://esaskylegacy.esac.esa.int/esasky-legacy-sl-tap/tap). [ESA97] ESA: *The Hipparcos and Tycho Catalogues*, ESA SP-1200 (1997), Bd. 1, https://www.cosmos.esa.int/documents/532822/552851/vol1_all.pdf
