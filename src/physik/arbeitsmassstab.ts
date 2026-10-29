@@ -13,19 +13,22 @@ import { rundeSignifikant, schluessel } from "./schluessel";
 
 /**
  * Arbeitsmassstab ohne Anzeige: max(Quellmassstab, Gesamt-FWHM / 2,5) (ADR-0002). Der feinste
- * Massstab, den ein Fenster bekommen kann; die UI waehlt damit die kleinste Zoombreite.
+ * Massstab, den ein Fenster bekommen kann; die UI waehlt damit die kleinste Zoombreite. Ohne
+ * Quellbild (Doppelstern, M45; docs/architektur.md 5.4) entfaellt die Quellgrenze.
  */
-export function arbeitsmassstabOhneFenster(aufloesung: Aufloesung, quelle: NonNullable<Objektzustand["quelle"]>): number {
-  return Math.max(quelle.massstabArcsecProPx, aufloesung.gesamtFwhmArcsec / ARBEITSPIXEL_PRO_FWHM);
+export function arbeitsmassstabOhneFenster(aufloesung: Aufloesung, quelle: Objektzustand["quelle"]): number {
+  const psf = aufloesung.gesamtFwhmArcsec / ARBEITSPIXEL_PRO_FWHM;
+  return quelle === undefined ? psf : Math.max(quelle.massstabArcsecProPx, psf);
 }
 
 /**
  * ADR-0002: Arbeitsmassstab = max(Quellmassstab, Gesamt-FWHM / 2,5, Fenstermassstab). Nie feiner
  * als das Quellbild, nie feiner als noetig fuer die Gesamt-PSF, nie feiner als die Anzeige.
- * Folge: die Gesamt-FWHM ist hoechstens 2,5 Arbeitspixel breit, der Kern bleibt klein.
+ * Folge: die Gesamt-FWHM ist hoechstens 2,5 Arbeitspixel breit, der Kern bleibt klein. Ohne
+ * Quellbild faellt die Quellgrenze weg.
  * Wirft PhysikFehler bei Fenster mit px < 16 oder Breite <= 0.
  */
-export function arbeitsmassstab(aufloesung: Aufloesung, quelle: NonNullable<Objektzustand["quelle"]>, fenster: Fenster): number {
+export function arbeitsmassstab(aufloesung: Aufloesung, quelle: Objektzustand["quelle"], fenster: Fenster): number {
   pruefeBereich("fenster.px", fenster.px, FENSTER_MIN_PX, Infinity);
   pruefeBereich("fenster.breiteArcsec", fenster.breiteArcsec, Number.MIN_VALUE, Infinity);
   return Math.max(arbeitsmassstabOhneFenster(aufloesung, quelle), fenster.breiteArcsec / fenster.px);

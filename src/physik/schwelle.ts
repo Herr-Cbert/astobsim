@@ -9,7 +9,7 @@ import type { Isophote } from "../naht/konfiguration";
 import type { Atmosphaere } from "./atmosphaere";
 import { PhysikFehler, pruefeBereich, pruefePositiv } from "./fehler";
 import { ARCSEC_PRO_RAD, BELEUCHTUNG_NULL_MAG_LX, BLACKWELL_BREITE, FELDFAKTOR, FELDFAKTOR_FERNROHR, NULLHINTERGRUND_CD_M2, PUPILLE_MM } from "./konstanten";
-import { flaechenhelligkeitsfaktor, type Optik } from "./optik";
+import { flaechenhelligkeitsfaktor, type Optik, transmissionMitAbschattung } from "./optik";
 
 // Koeffizienten des skotopischen Zweigs (Crumey Gl. 47 bis 49, wahrnehmung.md 1.2). Nur hier
 // verwendet, darum nicht in konstanten.ts.
@@ -83,11 +83,11 @@ function steradiant(flaecheArcsec2: number): number {
 
 /**
  * Himmel im Okular und gesamter Feldfaktor (Gl. 78 bis 80): B_a = min(1, (AP/p)^2) B / F_t mit
- * 1/F_t = tau (1 - eps^2), dieselbe Transmission wie der Hintergrund in okularhelligkeit()
- * (physik.md 6.2; zweite Stelle des Abschattungsfaktors neben okularhelligkeit()); phi = F F_T F_M mit F_T = sqrt 2 einaeugig, 1 beidaeugig, F_M = 1.
+ * 1/F_t = tau (1 - eps^2) aus transmissionMitAbschattung(), dieselbe Transmission wie der Hintergrund
+ * in okularhelligkeit() (physik.md 6.2); phi = F F_T F_M mit F_T = sqrt 2 einaeugig, 1 beidaeugig, F_M = 1.
  */
 function okular(optik: Optik, muHimmel: number, beobachter: Beobachter): { bOkular: number; transmission: number; phi: number } {
-  const transmission = optik.transmission * (1 - optik.obstruktion ** 2);
+  const transmission = transmissionMitAbschattung(optik);
   const bOkular = leuchtdichteCdM2(muHimmel) * transmission * flaechenhelligkeitsfaktor(optik.austrittspupilleMm, beobachter.pupilleMm);
   const phi = beobachter.feldfaktor * (optik.beidaeugig ? 1 : FELDFAKTOR_FERNROHR);
   return { bOkular, transmission, phi };

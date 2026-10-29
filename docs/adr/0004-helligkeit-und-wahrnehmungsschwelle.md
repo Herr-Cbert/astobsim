@@ -51,3 +51,9 @@ Befunde:
 - Ein gemeinsames Weiss fuer Flaechen und Punkte (A-P13 i und ii nicht zugleich erreichbar, `helligkeit-v2.md` 3).
 
 **Nachtrag 2026-10-29 (Sockel, Issue #97, Review PR #118):** "Ueber dem Himmel" meint den Himmel $h = \min(1, s^n)$ ohne Sockel. Der Sockel hebt den gemalten Himmel bei $q$ = 0 um $P_0\,\sigma$ an, $P_0 = \Phi(-1/0{,}484)$ = 0,019; die genaue Korrektur $P' = (P - P_0)/(1 - P_0)$ kommt in bild erst, wenn es am Bild stoert (#111). Gegen das Runden beim Zeichnen zielt der Sockel auf $\Delta_\mathrm{min}$ + 0,15 Kodes (`docs/recherche/physik.md`, Abschnitt "Mischgewicht und Sockel").
+
+**Nachtrag 2026-10-29 (Sterne und Trabanten, Issue #100, PR #126, entschieden von Herbert):**
+- **Gezeigte Deckkraft $P' = (P - P_0)/(1 - P_0)$** fuer Sterne und Trabanten, $P_0 = \Phi(-1/0{,}484) = 0{,}0194$. Begruendung: Blackwells Kurve endet fuer Kontrast 0 bei $P_0$, nicht bei 0; sonst bliebe jeder Katalogstern mit 1,9 % Deckkraft als Schleier im Bild (M13, M45), und `unter_schwelle` (Deckkraft unter $10^{-3}$, `docs/architektur.md` 5.3) traete nie ein. Folge: an der Grenzgroesse ist die gezeigte Deckkraft 0,49 statt 0,5 ($P'$ = 0,5 liegt 0,013 mag heller); der Schnitt bei $10^{-3}$ liegt 5,02 mag unter der Grenzgroesse (`docs/recherche/physik.md` Abschnitt 20). Die Grenzgroesse selbst bleibt die Magnitude mit Blackwell-Wahrscheinlichkeit 0,5.
+- **Verhaeltnis zur Deep-Sky-Ebene:** dort bleibt $P'$ wie im Sockel-Nachtrag oben bis #111 zurueckgestellt; bild rechnet weiter mit $P$. Zwei Definitionen sind bewusst, die Vereinheitlichung kommt in #111.
+- **Ueberstrahlung:** `auswerten` prueft die Warnung `ueberstrahlung` nur bei Objekten der Klasse Doppelstern (Entscheidung 5 in `docs/recherche/README.md`); bei Deep-Sky-Objekten (Trapez in M42) erklaerte sie nichts.
+- **Seeing der Grenzgroesse:** `grenzgroesse` bekommt die Seeing-FWHM am Objekt (Zenitwert mal $X^{0{,}6}$), dieselbe, die das Sternbild im Kern verbreitert.

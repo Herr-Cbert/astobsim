@@ -571,6 +571,24 @@ Nach #71 (Quellweiss Mond 3,91, Mars 14'' 2,54, `objekte.md` 5.3; $\mu$ verschie
 
 Mond A-D9 und Mars 14'' bei 120x sind mit `rendere` nachgemessen (`faktorObjekt` 0,2735 bzw. 0,2624).
 
+Version 2 (Issue #100, Anzeigeweiss 9,2 und Punktweiss 6,4, A-P13): dieselben Eingaben wie in der ersten Tabelle (Quellweiss Mond 3,35, Mars 14'' 4,1); $w$ waechst um den festen Faktor $10^{(0{,}4/3)(9{,}2 - 3{,}35)} = 6{,}0256$, der Punktfaktor $a$ (Abschnitt 14.2) um $10^{0{,}4(6{,}4 - 3{,}35)} = 16{,}596$ (ber.). Werte ber. mit $w = 10^{-0{,}4 n (\mu - 9{,}2)}$, $a = 10^{-0{,}4(\mu - 6{,}4)}$, $n$ = 1/3, $\mu$ aus Abschnitt 9 (45 Grad, klar, Kasten-Young); Unit-Tests in `src/physik/helligkeit.test.ts`, die Werte mit 3,35 in `src/physik/regression_v1.test.ts`.
+
+| Fall | $\mu$ | Anzeige $w$ (Version 1) | sRGB |
+|---|---|---|---|
+| $w(9{,}2)$, $w(11{,}7)$, $w(16{,}7)$, $w(7{,}35)$ | | 1; 0,4642; 0,1; 1,7647 | |
+| Quellweiss 3,4, AP 0,8 mm ohne Verluste | 7,7753 | 1,5487 (0,2570); $a$ = 0,28176 | |
+| Himmel 21,875 mag/arcsec$^2$ (Bortle 8, AP 0,8 mm) | 21,875 | 0,020415 (0,003388) | |
+| Mond A-D9 | 7,013 | 1,9571 (0,3248) | |
+| Mond Fernglas 10x50 | 4,205 | 4,6346 (0,7692) | |
+| Mond an 80 mm bei 200x | 9,627 | 0,8770 (0,1456) | |
+| Mond blosses Auge | 3,633 | 5,5250 (0,9169) | |
+| Mars 14'' (4,1) an 80 mm bei 120x | 9,268 | 0,9793 (0,1625) | |
+| Himmel Fernglas 10x50, Bortle 1 / 9 | 22,47 / 17,57 | 0,0170 / 0,0765 (0,00282 / 0,0127) | 35 / 78 |
+| Jupiter 47'' (4,29) im 10x50 | 5,144 | 3,4728 (0,5763); $a$ = 3,1772 (0,1914) | |
+| Io auf einem Arbeitspixel 22,85'', $p$ = 0,000996 (14.3) | | $\min(1, (a p)^{1/3})$ = 0,1468 (0,0576); linear $w p$ = 0,0035 | 107 (68); 11 |
+| Mars 14'' (2,54) / 25'' (1,68) bei AP 6 mm am 80 mm (14.4) | | 6,840 / 8,907 (1,135 / 1,478) | |
+| Himmel bei AP 6 mm am 80 mm, Bortle 5 | 20,114 | 0,03505 | |
+
 ### 12.5 Unsicher
 
 1. **Stevens & Stevens [54]:** Bibliographie nur aus [56], Band und Jahr widersprechen sich; fuer die Entscheidung nicht noetig, weil kein Adaptionsniveau eingeht.
@@ -843,6 +861,43 @@ Interpolation der Reserve (Entscheidung Herbert zu PR #121): Mit "keine sichtbar
 Korrektur: wahrnehmung.md 2.3, Fernglas 10x50 bei Bortle 3 mit $F$ = 1,4, von 11,1 auf 11,0 mag (ungerundet 11,05).
 
 Quelle [A&S]: Abramowitz, M., Stegun, I. A.: *Handbook of Mathematical Functions*, NBS Applied Mathematics Series 55, 1964, Formel 7.1.26.
+
+## 20. Auswerten Version 2: gezeigte Deckkraft der Punktquellen (Issue #100)
+
+**Datum:** 2026-10-29. **Kennungen:** A-P11, A-P6, A-P12; `docs/architektur.md` 5.3 und 5.4, ADR-0004. Umsetzung in `src/physik/punktquellen.ts` (`deckkraftPunktquelle`) und `src/physik/auswerten.ts`; alle anderen Formeln von `auswerten` stehen in den Abschnitten 12 bis 19.
+
+**Problem.** Blackwells Wahrscheinlichkeitskurve $P(v) = \Phi\big((v - 1)/0{,}484\big)$ mit $v = 10^{-0{,}4(m - m_\mathrm{lim})}$ (Abschnitt 19, `wahrnehmung.md` 1.3) endet fuer $v \to 0$ nicht bei 0, sondern bei $P_0 = \Phi(-1/0{,}484) = 0{,}0194$: die Kurve beschreibt Treffer im Laborversuch, $P_0$ ist der Anteil "gesehen" ohne Reiz. Als Deckkraft genommen bekaeme jeder noch so schwache Stern 1,9 % Deckkraft, und der Grund `unter_schwelle` (Deckkraft unter $10^{-3}$, `docs/architektur.md` 5.3) traete nie ein (Hinweis aus PR #121).
+
+**Festlegung (entschieden von Herbert am 2026-10-29, ADR-0004 Nachtrag Issue #100).** Gezeigt wird $P$ ohne diesen Sockel, dieselbe Korrektur, die ADR-0004 (Nachtrag 2026-10-29) fuer die Deep-Sky-Ebene nennt:
+
+$$P'(v) = \frac{P(v) - P_0}{1 - P_0},\qquad P_0 = P(0).$$
+
+$P'$ ist stetig und monoton in $v$ (streng, bis sie 1 erreicht), $P'(0) = 0$, $P'$ = 1 genau wo $P$ = 1 ist (in Gleitkomma ab 1,75 mag ueber der Grenze; alle Trabanten der Testfaelle T1 bis T6, die Simulationsparameter bleiben dort gleich). An der Grenzgroesse ist $P'(1) = 0{,}4901$ statt 0,5, ein Unterschied von 0,01 in der Deckkraft (ber.). Unter $P' < 10^{-3}$ ist die Punktquelle `unter_schwelle` und wird nicht gemalt; das ist bei $v = 0{,}00985$, also 5,02 mag unter der Grenzgroesse (ber., `statistics.NormalDist`). Die Deckkraft steht nur in der Naht, wenn sie unter 1 liegt (fehlt = 1).
+
+| Groesse | Eingabe | Erwartung | Herkunft |
+|---|---|---|---|
+| $P_0$ | $v$ = 0 | 0,0194 | ber. |
+| $P'$ | $m - m_\mathrm{lim}$ = 0 / +1 / -1 | 0,4901 / 0,0891 / 0,9991 | ber. |
+| Schnitt | $P'$ = $10^{-3}$ | $m - m_\mathrm{lim}$ = 5,017 | ber. |
+| $P'$ | $m - m_\mathrm{lim}$ = -1,745 | 1 (in Gleitkomma, ab hier) | ber. |
+
+Rechenweg: $P$ mit $\Phi$ aus `statistics.NormalDist` (Python), $P_0 = \Phi(-1/0{,}484)$, $v = 10^{-0{,}4(m - m_\mathrm{lim})}$; Schnitt aus $P = P_0 + 10^{-3}(1 - P_0)$, $v = 1 + 0{,}484\,\Phi^{-1}(P) = 0{,}00985$. Unit-Tests in `src/physik/punktquellen.test.ts`.
+
+Testwerte `auswerten` (Unit-Tests in `src/physik/auswerten.test.ts`, ber.):
+
+| Groesse | Eingabe | Erwartung | Rechenweg |
+|---|---|---|---|
+| Grenzgroesse | A-D9: 80 mm, 60x, Bortle 5, klar, 45 Grad, Seeing 2'' im Zenit (2,46'' am Objekt) | 12,00 mag | Abschnitt 19 `grenzgroesse`; Kontrolle wahrnehmung.md 2.3 (Zenit, ohne Extinktion: 11,94 bei 40x, 12,56 bei 80x), Extinktion 0,2 X = 0,28 mag |
+| Farbgrenze | 80 mm, $\tau$ 0,9, 60x, 45 Grad, klar / diesig | 7,53 / 7,17 mag | $2{,}3 + 5\log_{10}(\min(D, pV)/p) + 2{,}5\log_{10}\tau - kX$ (Abschnitt 18, wahrnehmung.md 5.1), $k$ = 0,2 / 0,45, $X$ = 1,413 |
+| Fluss eines Sterns ohne Quellbild | $m$ = 5 / 6, Durchmesser 0,01'' | $h \cdot \pi (0{,}005)^2$ = 0,01 / $10^{-2{,}4}$ | Abschnitt 13.1 mit Bezug 0 mag/arcsec$^2$: $h = 10^{-0{,}4(m + 2{,}5\log_{10}(\pi\,0{,}005^2))}$ |
+| Farbe B-V 0,6 / 1,5 | ueber der Farbgrenze | 1,0899 / 0,9787 / 0,9468; 1,4615 rot | Tabelle in `sternfarbe.ts` (Abschnitt 18) |
+| Blendung eines Sterns | A 5 mag, B 12 mag, 8'' | geblendet bis $V$ = 600''/8'' = 75 | Abschnitt 13.3 |
+| Schwellenkontrast Deep-Sky | $a q^*/s$ | $10^{-0{,}4(\mu_\mathrm{Schwelle} - \mu_\mathrm{Himmel} + kX)}$ | $a = \tau' A\,10^{-0{,}4(W - 9{,}2)}$, $s = \tau' 10^{-0{,}4(\mu_\mathrm{Himmel} - 9{,}2)}$ mit $\tau'$ = Transmission mal AP-Faktor, $A = 10^{-0{,}4kX}$; $q^*$ wie Abschnitt 19 |
+| Mischgewicht | Jupiter 47'' $V$ 1 / 10; Mars 6'' 120x / 60x / 240x | 0,8238 / 0,0401; 0,0147 / 0,0696 / 0 | Abschnitt 17.1 |
+
+**Verworfen.** (a) Schnitt bei $P < P_0 + 10^{-3}$ ohne Korrektur: Sterne bis 5 mag unter der Grenze blieben mit 1,9 % Deckkraft gemalt und sprangen dann auf 0; bei vielen Katalogsternen (M13, M45) ein Schleier. (b) Schnitt an einem festen Abstand zur Grenzgroesse: eine zweite Konstante neben $10^{-3}$, gleiche Wirkung wie die Korrektur ohne deren Stetigkeit.
+
+**Weitere Festlegungen in `auswerten` (entschieden von Herbert am 2026-10-29, keine neue Formel).** Grenzgroesse mit der Seeing-FWHM am Objekt (`Atmosphaere.seeingFwhmArcsec`, Zenitwert mal $X^{0{,}6}$, Abschnitt 2.1), wie im Kern. Die Schwelle gilt auch fuer Trabanten (ADR-0004: "die Schwelle wirkt dort nur auf Trabanten"); die Blendungsregel (Abschnitt 13.3) auch fuer Sterne, mit der Objektmitte als Blender nur bei Sonnensystem-Objekten. Warnung `ueberstrahlung` nur bei Doppelsternen (Abschnitt 16). Ohne Quellbild Bezug 0 mag/arcsec$^2$ (`docs/architektur.md` 5.2).
 
 ## 21. Farbindex aus Tycho-Photometrie (Issue #103)
 

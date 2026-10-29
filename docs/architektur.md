@@ -149,7 +149,7 @@ export interface Punktquelle {
   name: string; xArcsec: number; yArcsec: number; durchmesserArcsec: number;
   helligkeitRelativ: number;     // relativ zu Quellweiss; ohne Quellbild relativ zu 0 mag/arcsec^2
   sichtbar: boolean;
-  grund?: "blendung" | "unter_schwelle";   // unter_schwelle: Deckkraft unter 1e-3, nicht gemalt
+  grund?: "blendung" | "unter_schwelle";   // unter_schwelle: gezeigte Deckkraft P' unter 1e-3, nicht gemalt
   deckkraft?: number;            // (0, 1], Blackwell; fehlt = 1
   farbe?: [number, number, number];        // linear sRGB (D65), Y = 1 (A-P12); fehlt = grau
 }
@@ -211,7 +211,7 @@ Punktanteil, nur wo p > 0: `W = min(1, (aP * p)^n)`; `Pixel_k = F_k + (c ? c_k /
 
 Reihenfolge in `auswerten`: optik -> atmosphaere -> aufloesung -> fenster -> arbeitsmassstab (ohne `quelle` faellt die Quellgrenze weg) -> kernbeschreibung -> baueKern -> **grenzgroesse** -> punktquellen (Trabanten und Sterne; Sterne mit `STERN_DURCHMESSER_ARCSEC` = 0,01'', Deckkraft, Farbe) -> helligkeit (intern **mischgewicht**, bei deep_sky **sichtbareIsophote** und **sockel**) -> anzeige -> warnungen mit **ueberstrahlung**.
 
-Schluessel: Stufe 1 Objekt ohne Punktquellen (Bortle, Transparenz und Seeing aendern ihn nicht); Stufe 1b Punkte mit Lage, Fluss, Deckkraft und Farbe je gemalter Punktquelle; Stufe 2 unveraendert, bild haelt `kern|quellbild` und `kern|punkte` getrennt; Stufe 3 zusaetzlich `mischgewicht` und die `deepSky`-Felder; Stufe 4 unveraendert.
+Schluessel: Stufe 1 Objekt ohne Punktquellen (Bortle, Transparenz und Seeing aendern ihn nicht ueber die Punktquellen; Seeing kann ihn aber ueber den Arbeitsmassstab aendern, ADR-0002: Gesamt-FWHM / 2,5, z. B. Jupiter am 300 mm im Zoomfenster bei Seeing 1'' gegen 3''; Bortle und Transparenz nie); Stufe 1b Punkte mit Lage, Fluss, Deckkraft und Farbe je gemalter Punktquelle; Stufe 2 unveraendert, bild haelt `kern|quellbild` und `kern|punkte` getrennt; Stufe 3 zusaetzlich `mischgewicht` und die `deepSky`-Felder; Stufe 4 unveraendert.
 
 ### 5.5 Folgen fuer die Module
 

@@ -57,8 +57,7 @@ export const KASTEN_YOUNG = { a: 0.50572, b: 6.07995, c: -1.6364 } as const;
 /**
  * Transmission tau der Geraetearten einschliesslich Okular und Zenitspiegel (Abschnitt 5.2,
  * Groessenordnung nach [32, 38]). Ohne Abschattung: der Faktor (1 - eps^2) steht in
- * okularhelligkeit() (Abschnitt 9) und, fuer den Himmel im Okular der Wahrnehmungsschwelle, in
- * schwelle.ts (Issue #96); eine gemeinsame Funktion ist offen (Kandidat fuer #100 oder #113).
+ * transmissionMitAbschattung() (optik.ts), die okularhelligkeit() und schwelle.ts teilen (Issue #100).
  */
 export const TRANSMISSION: Readonly<Record<Bauart | "fernglas" | "auge", number>> = {
   refraktor: 0.9,
@@ -74,19 +73,19 @@ export const BORTLE_MAG_PRO_ARCSEC2: readonly number[] = [21.9, 21.7, 21.4, 21.0
 
 /**
  * Abbildung der Leuchtdichte auf den Bildschirm (Abschnitt 12): Flaechenhelligkeit im Okular in
- * mag je Quadratbogensekunde, die als Bildschirmweiss erscheint. Vollmond ohne Verluste
- * (docs/recherche/objekte.md 5.2, daten/objekte.json mond_ev), das hellste Objekt in Version 1.
- * Version 2 (A-P13 i, ADR-0004): 9,2 fuer die Flaechenebenen und den Himmel; die Umstellung macht
- * Issue #100, festgelegt am Bild in #111.
+ * mag je Quadratbogensekunde, die als Bildschirmweiss erscheint (Anzeigeweiss). Version 1: 3,35,
+ * der Vollmond ohne Verluste (docs/recherche/objekte.md 5.2). Version 2 (A-P13 i, ADR-0004, seit
+ * Issue #100): 9,2 fuer die Flaechenebenen und den Himmel, damit das hellste Perzentil des Monds
+ * bis etwa 1 mm Austrittspupille Weiss erreicht; am Bild nachzumessen in #111.
  */
-export const ANZEIGE_WEISS_MAG_PRO_ARCSEC2 = 3.35;
+export const ANZEIGE_WEISS_MAG_PRO_ARCSEC2 = 9.2;
 
 /**
  * Punktweiss: Flaechenhelligkeit im Okular, die in der Punktebene als Bildschirmweiss erscheint
- * (A-P13 ii, ADR-0004). Version 2: 6,4; bis Issue #100 gleich ANZEIGE_WEISS_MAG_PRO_ARCSEC2, damit
- * der Anblick byte-gleich bleibt.
+ * (A-P13 ii, ADR-0004): 6,4, damit Jupiter mit blossem Auge im Kern nahezu weiss ist (seit Issue
+ * #100; Version 1 wie das Anzeigeweiss 3,35).
  */
-export const PUNKT_WEISS_MAG_PRO_ARCSEC2 = 3.35;
+export const PUNKT_WEISS_MAG_PRO_ARCSEC2 = 6.4;
 
 /**
  * Kompressionsexponent der Abbildung auf den Bildschirm (Abschnitt 12): Groessenordnung nach Stevens
@@ -186,6 +185,13 @@ export const NULLHINTERGRUND_CD_M2 = 1e-5;
  * docs/entwuerfe/naht-v2-variante-b.md).
  */
 export const STERN_DURCHMESSER_ARCSEC = 0.01;
+
+/**
+ * Punktquellen mit einer Deckkraft darunter malt bild nicht (sichtbar false, grund "unter_schwelle",
+ * docs/architektur.md 5.3). Bezogen auf die gezeigte Deckkraft (punktquellen.ts, physik.md Abschnitt 20),
+ * die fuer sehr schwache Sterne gegen 0 geht; Blackwells Kurve selbst endet bei 0,019.
+ */
+export const DECKKRAFT_MIN = 1e-3;
 
 /** Mindestsichtbarkeit: Sockel von Delta_min sRGB-Kodes ueber dem Himmel an der Schwelle (ADR-0004 Punkt 3). */
 export const SOCKEL_DELTA_KODES = 3;

@@ -1,0 +1,1434 @@
+{
+ "T1 Standardfenster": {
+  "quellbild": {
+   "schluessel": "quellbild|jup_47|1.7578125|1024|0|0",
+   "massstabArcsecProPx": 1.7578125,
+   "rasterPx": 1024,
+   "mitteXArcsec": 0,
+   "mitteYArcsec": 0,
+   "punkte": {
+    "schluessel": "punkte|Io|-110|2.9|1.2|1.166|Europa|175|-4.7|1.03|1.2|Ganymed|330|4.3|1.73|0.8106|Kallisto|-520|-11.7|1.58|0.3529",
+    "punktquellen": [
+     {
+      "name": "Io",
+      "xArcsec": -110,
+      "yArcsec": 2.9,
+      "durchmesserArcsec": 1.2,
+      "helligkeitRelativ": 1.1655948678080694,
+      "sichtbar": true
+     },
+     {
+      "name": "Europa",
+      "xArcsec": 175,
+      "yArcsec": -4.7,
+      "durchmesserArcsec": 1.03,
+      "helligkeitRelativ": 1.2001503862146878,
+      "sichtbar": true
+     },
+     {
+      "name": "Ganymed",
+      "xArcsec": 330,
+      "yArcsec": 4.3,
+      "durchmesserArcsec": 1.73,
+      "helligkeitRelativ": 0.8106211156571421,
+      "sichtbar": true
+     },
+     {
+      "name": "Kallisto",
+      "xArcsec": -520,
+      "yArcsec": -11.7,
+      "durchmesserArcsec": 1.58,
+      "helligkeitRelativ": 0.35285473099123216,
+      "sichtbar": true
+     }
+    ]
+   }
+  },
+  "kern": {
+   "schluessel": "kern|70|0|2|0.6|1.758",
+   "beschreibung": {
+    "oeffnungMm": 70,
+    "obstruktion": 0,
+    "seeingFwhmArcsec": 2,
+    "augeFwhmArcsec": 0.6,
+    "massstabArcsecProPx": 1.758
+   },
+   "groesse": 11,
+   "radius": 5,
+   "massstabArcsecProPx": 1.7578125,
+   "pruefsumme": "69e6c733"
+  },
+  "helligkeit": {
+   "schluessel": "helligkeit|0.1191|0.001389|24.78|0.001691|0.3333",
+   "faktorObjekt": 0.11913875107937058,
+   "hintergrundRelativ": 0.001389031291882468,
+   "hintergrundMagProArcsec2": 24.77965977824862,
+   "punktFaktor": 0.0016910604376908596,
+   "punktExponent": 0.3333333333333333,
+   "mischgewicht": 0
+  },
+  "gesichtsfeld": {
+   "form": "kreis",
+   "breiteArcsec": 1800,
+   "hoeheArcsec": 1800
+  },
+  "fenster": {
+   "breiteArcsec": 1800,
+   "mitteXArcsec": 0,
+   "mitteYArcsec": 0,
+   "px": 1024
+  }
+ },
+ "T1 Zoom": {
+  "quellbild": {
+   "schluessel": "quellbild|jup_47|1.0742857142857143|175|0|0",
+   "massstabArcsecProPx": 1.0742857142857143,
+   "rasterPx": 175,
+   "mitteXArcsec": 0,
+   "mitteYArcsec": 0,
+   "punkte": {
+    "schluessel": "punkte",
+    "punktquellen": [
+     {
+      "name": "Io",
+      "xArcsec": -110,
+      "yArcsec": 2.9,
+      "durchmesserArcsec": 1.2,
+      "helligkeitRelativ": 1.1655948678080694,
+      "sichtbar": true
+     },
+     {
+      "name": "Europa",
+      "xArcsec": 175,
+      "yArcsec": -4.7,
+      "durchmesserArcsec": 1.03,
+      "helligkeitRelativ": 1.2001503862146878,
+      "sichtbar": true
+     },
+     {
+      "name": "Ganymed",
+      "xArcsec": 330,
+      "yArcsec": 4.3,
+      "durchmesserArcsec": 1.73,
+      "helligkeitRelativ": 0.8106211156571421,
+      "sichtbar": true
+     },
+     {
+      "name": "Kallisto",
+      "xArcsec": -520,
+      "yArcsec": -11.7,
+      "durchmesserArcsec": 1.58,
+      "helligkeitRelativ": 0.35285473099123216,
+      "sichtbar": true
+     }
+    ]
+   }
+  },
+  "kern": {
+   "schluessel": "kern|70|0|2|0.6|1.074",
+   "beschreibung": {
+    "oeffnungMm": 70,
+    "obstruktion": 0,
+    "seeingFwhmArcsec": 2,
+    "augeFwhmArcsec": 0.6,
+    "massstabArcsecProPx": 1.074
+   },
+   "groesse": 17,
+   "radius": 8,
+   "massstabArcsecProPx": 1.0742857142857143,
+   "pruefsumme": "47d1031b"
+  },
+  "helligkeit": {
+   "schluessel": "helligkeit|0.1191|0.001389|24.78|0.001691|0.3333",
+   "faktorObjekt": 0.11913875107937058,
+   "hintergrundRelativ": 0.001389031291882468,
+   "hintergrundMagProArcsec2": 24.77965977824862,
+   "punktFaktor": 0.0016910604376908596,
+   "punktExponent": 0.3333333333333333,
+   "mischgewicht": 0
+  },
+  "gesichtsfeld": {
+   "form": "kreis",
+   "breiteArcsec": 1800,
+   "hoeheArcsec": 1800
+  },
+  "fenster": {
+   "breiteArcsec": 188,
+   "mitteXArcsec": 0,
+   "mitteYArcsec": 0,
+   "px": 768
+  }
+ },
+ "T2a Standardfenster": {
+  "quellbild": {
+   "schluessel": "quellbild|sat_20|1.171875|1024|0|0",
+   "massstabArcsecProPx": 1.171875,
+   "rasterPx": 1024,
+   "mitteXArcsec": 0,
+   "mitteYArcsec": 0,
+   "punkte": {
+    "schluessel": "punkte|Titan|150|-44.4|0.85|0.3682|Rhea|-60|20.7|0.25|1.409",
+    "punktquellen": [
+     {
+      "name": "Titan",
+      "xArcsec": 150,
+      "yArcsec": -44.4,
+      "durchmesserArcsec": 0.85,
+      "helligkeitRelativ": 0.36819023591218425,
+      "sichtbar": true
+     },
+     {
+      "name": "Rhea",
+      "xArcsec": -60,
+      "yArcsec": 20.7,
+      "durchmesserArcsec": 0.25,
+      "helligkeitRelativ": 1.4093864807144194,
+      "sichtbar": true
+     }
+    ]
+   }
+  },
+  "kern": {
+   "schluessel": "kern|100|0|1.5|0.4|1.172",
+   "beschreibung": {
+    "oeffnungMm": 100,
+    "obstruktion": 0,
+    "seeingFwhmArcsec": 1.5,
+    "augeFwhmArcsec": 0.4,
+    "massstabArcsecProPx": 1.172
+   },
+   "groesse": 11,
+   "radius": 5,
+   "massstabArcsecProPx": 1.171875,
+   "pruefsumme": "89675d7e"
+  },
+  "helligkeit": {
+   "schluessel": "helligkeit|0.07737|0.001345|24.89|0.0004632|0.3333",
+   "faktorObjekt": 0.07737372585910694,
+   "hintergrundRelativ": 0.0013445774710201613,
+   "hintergrundMagProArcsec2": 24.885606273598313,
+   "punktFaktor": 0.0004632127780597096,
+   "punktExponent": 0.3333333333333333,
+   "mischgewicht": 0
+  },
+  "gesichtsfeld": {
+   "form": "kreis",
+   "breiteArcsec": 1200,
+   "hoeheArcsec": 1200
+  },
+  "fenster": {
+   "breiteArcsec": 1200,
+   "mitteXArcsec": 0,
+   "mitteYArcsec": 0,
+   "px": 1024
+  }
+ },
+ "T2a Zoom": {
+  "quellbild": {
+   "schluessel": "quellbild|sat_20|0.7843137254901961|102|0|0",
+   "massstabArcsecProPx": 0.7843137254901961,
+   "rasterPx": 102,
+   "mitteXArcsec": 0,
+   "mitteYArcsec": 0,
+   "punkte": {
+    "schluessel": "punkte",
+    "punktquellen": [
+     {
+      "name": "Titan",
+      "xArcsec": 150,
+      "yArcsec": -44.4,
+      "durchmesserArcsec": 0.85,
+      "helligkeitRelativ": 0.36819023591218425,
+      "sichtbar": true
+     },
+     {
+      "name": "Rhea",
+      "xArcsec": -60,
+      "yArcsec": 20.7,
+      "durchmesserArcsec": 0.25,
+      "helligkeitRelativ": 1.4093864807144194,
+      "sichtbar": true
+     }
+    ]
+   }
+  },
+  "kern": {
+   "schluessel": "kern|100|0|1.5|0.4|0.7843",
+   "beschreibung": {
+    "oeffnungMm": 100,
+    "obstruktion": 0,
+    "seeingFwhmArcsec": 1.5,
+    "augeFwhmArcsec": 0.4,
+    "massstabArcsecProPx": 0.7843
+   },
+   "groesse": 17,
+   "radius": 8,
+   "massstabArcsecProPx": 0.7843137254901961,
+   "pruefsumme": "8dab9995"
+  },
+  "helligkeit": {
+   "schluessel": "helligkeit|0.07737|0.001345|24.89|0.0004632|0.3333",
+   "faktorObjekt": 0.07737372585910694,
+   "hintergrundRelativ": 0.0013445774710201613,
+   "hintergrundMagProArcsec2": 24.885606273598313,
+   "punktFaktor": 0.0004632127780597096,
+   "punktExponent": 0.3333333333333333,
+   "mischgewicht": 0
+  },
+  "gesichtsfeld": {
+   "form": "kreis",
+   "breiteArcsec": 1200,
+   "hoeheArcsec": 1200
+  },
+  "fenster": {
+   "breiteArcsec": 80,
+   "mitteXArcsec": 0,
+   "mitteYArcsec": 0,
+   "px": 768
+  }
+ },
+ "T2b Standardfenster": {
+  "quellbild": {
+   "schluessel": "quellbild|sat_20|1.7578125|1024|0|0",
+   "massstabArcsecProPx": 1.7578125,
+   "rasterPx": 1024,
+   "mitteXArcsec": 0,
+   "mitteYArcsec": 0,
+   "punkte": {
+    "schluessel": "punkte|Titan|150|-44.4|0.85|0.3682|Rhea|-60|20.7|0.25|1.409",
+    "punktquellen": [
+     {
+      "name": "Titan",
+      "xArcsec": 150,
+      "yArcsec": -44.4,
+      "durchmesserArcsec": 0.85,
+      "helligkeitRelativ": 0.36819023591218425,
+      "sichtbar": true
+     },
+     {
+      "name": "Rhea",
+      "xArcsec": -60,
+      "yArcsec": 20.7,
+      "durchmesserArcsec": 0.25,
+      "helligkeitRelativ": 1.4093864807144194,
+      "sichtbar": true
+     }
+    ]
+   }
+  },
+  "kern": {
+   "schluessel": "kern|60|0|1.5|0.6|1.758",
+   "beschreibung": {
+    "oeffnungMm": 60,
+    "obstruktion": 0,
+    "seeingFwhmArcsec": 1.5,
+    "augeFwhmArcsec": 0.6,
+    "massstabArcsecProPx": 1.758
+   },
+   "groesse": 11,
+   "radius": 5,
+   "massstabArcsecProPx": 1.7578125,
+   "pruefsumme": "bae518e8"
+  },
+  "helligkeit": {
+   "schluessel": "helligkeit|0.07213|0.001253|25.11|0.0003752|0.3333",
+   "faktorObjekt": 0.0721254468288539,
+   "hintergrundRelativ": 0.0012533744474181236,
+   "hintergrundMagProArcsec2": 25.114393726401687,
+   "punktFaktor": 0.0003752023502283646,
+   "punktExponent": 0.3333333333333333,
+   "mischgewicht": 0
+  },
+  "gesichtsfeld": {
+   "form": "kreis",
+   "breiteArcsec": 1800,
+   "hoeheArcsec": 1800
+  },
+  "fenster": {
+   "breiteArcsec": 1800,
+   "mitteXArcsec": 0,
+   "mitteYArcsec": 0,
+   "px": 1024
+  }
+ },
+ "T2b Zoom": {
+  "quellbild": {
+   "schluessel": "quellbild|sat_20|1.0126582278481013|79|0|0",
+   "massstabArcsecProPx": 1.0126582278481013,
+   "rasterPx": 79,
+   "mitteXArcsec": 0,
+   "mitteYArcsec": 0,
+   "punkte": {
+    "schluessel": "punkte",
+    "punktquellen": [
+     {
+      "name": "Titan",
+      "xArcsec": 150,
+      "yArcsec": -44.4,
+      "durchmesserArcsec": 0.85,
+      "helligkeitRelativ": 0.36819023591218425,
+      "sichtbar": true
+     },
+     {
+      "name": "Rhea",
+      "xArcsec": -60,
+      "yArcsec": 20.7,
+      "durchmesserArcsec": 0.25,
+      "helligkeitRelativ": 1.4093864807144194,
+      "sichtbar": true
+     }
+    ]
+   }
+  },
+  "kern": {
+   "schluessel": "kern|60|0|1.5|0.6|1.013",
+   "beschreibung": {
+    "oeffnungMm": 60,
+    "obstruktion": 0,
+    "seeingFwhmArcsec": 1.5,
+    "augeFwhmArcsec": 0.6,
+    "massstabArcsecProPx": 1.013
+   },
+   "groesse": 17,
+   "radius": 8,
+   "massstabArcsecProPx": 1.0126582278481013,
+   "pruefsumme": "65f81912"
+  },
+  "helligkeit": {
+   "schluessel": "helligkeit|0.07213|0.001253|25.11|0.0003752|0.3333",
+   "faktorObjekt": 0.0721254468288539,
+   "hintergrundRelativ": 0.0012533744474181236,
+   "hintergrundMagProArcsec2": 25.114393726401687,
+   "punktFaktor": 0.0003752023502283646,
+   "punktExponent": 0.3333333333333333,
+   "mischgewicht": 0
+  },
+  "gesichtsfeld": {
+   "form": "kreis",
+   "breiteArcsec": 1800,
+   "hoeheArcsec": 1800
+  },
+  "fenster": {
+   "breiteArcsec": 80,
+   "mitteXArcsec": 0,
+   "mitteYArcsec": 0,
+   "px": 768
+  }
+ },
+ "T3 Standardfenster": {
+  "quellbild": {
+   "schluessel": "quellbild|mond-q1|1.7578125|1024|0|0",
+   "massstabArcsecProPx": 1.7578125,
+   "rasterPx": 1024,
+   "mitteXArcsec": 0,
+   "mitteYArcsec": 0,
+   "punkte": {
+    "schluessel": "punkte",
+    "punktquellen": []
+   }
+  },
+  "kern": {
+   "schluessel": "kern|80|0|2|0.6|1.758",
+   "beschreibung": {
+    "oeffnungMm": 80,
+    "obstruktion": 0,
+    "seeingFwhmArcsec": 2,
+    "augeFwhmArcsec": 0.6,
+    "massstabArcsecProPx": 1.758
+   },
+   "groesse": 11,
+   "radius": 5,
+   "massstabArcsecProPx": 1.7578125,
+   "pruefsumme": "ce07fcad"
+  },
+  "helligkeit": {
+   "schluessel": "helligkeit|0.2334|0.001518|24.49|0.01271|0.3333",
+   "faktorObjekt": 0.2333714230405367,
+   "hintergrundRelativ": 0.0015183550126220506,
+   "hintergrundMagProArcsec2": 24.489700043360187,
+   "punktFaktor": 0.012709926038180237,
+   "punktExponent": 0.3333333333333333,
+   "mischgewicht": 0
+  },
+  "gesichtsfeld": {
+   "form": "kreis",
+   "breiteArcsec": 1800,
+   "hoeheArcsec": 1800
+  },
+  "fenster": {
+   "breiteArcsec": 1800,
+   "mitteXArcsec": 0,
+   "mitteYArcsec": 0,
+   "px": 1024
+  }
+ },
+ "T3 Zoom": {
+  "quellbild": {
+   "schluessel": "quellbild|mond-q1|9.6875|768|0|0",
+   "massstabArcsecProPx": 9.6875,
+   "rasterPx": 768,
+   "mitteXArcsec": 0,
+   "mitteYArcsec": 0,
+   "punkte": {
+    "schluessel": "punkte",
+    "punktquellen": []
+   }
+  },
+  "kern": {
+   "schluessel": "kern|80|0|2|0.6|9.688",
+   "beschreibung": {
+    "oeffnungMm": 80,
+    "obstruktion": 0,
+    "seeingFwhmArcsec": 2,
+    "augeFwhmArcsec": 0.6,
+    "massstabArcsecProPx": 9.688
+   },
+   "groesse": 5,
+   "radius": 2,
+   "massstabArcsecProPx": 9.6875,
+   "pruefsumme": "c779c315"
+  },
+  "helligkeit": {
+   "schluessel": "helligkeit|0.2334|0.001518|24.49|0.01271|0.3333",
+   "faktorObjekt": 0.2333714230405367,
+   "hintergrundRelativ": 0.0015183550126220506,
+   "hintergrundMagProArcsec2": 24.489700043360187,
+   "punktFaktor": 0.012709926038180237,
+   "punktExponent": 0.3333333333333333,
+   "mischgewicht": 0
+  },
+  "gesichtsfeld": {
+   "form": "kreis",
+   "breiteArcsec": 1800,
+   "hoeheArcsec": 1800
+  },
+  "fenster": {
+   "breiteArcsec": 7440,
+   "mitteXArcsec": 0,
+   "mitteYArcsec": 0,
+   "px": 768
+  }
+ },
+ "T4a Standardfenster": {
+  "quellbild": {
+   "schluessel": "quellbild|jup_47|1.2162162162162162|740|0|0",
+   "massstabArcsecProPx": 1.2162162162162162,
+   "rasterPx": 740,
+   "mitteXArcsec": 0,
+   "mitteYArcsec": 0,
+   "punkte": {
+    "schluessel": "punkte|Io|-110|2.9|1.2|1.166|Europa|175|-4.7|1.03|1.2|Ganymed|330|4.3|1.73|0.8106",
+    "punktquellen": [
+     {
+      "name": "Io",
+      "xArcsec": -110,
+      "yArcsec": 2.9,
+      "durchmesserArcsec": 1.2,
+      "helligkeitRelativ": 1.1655948678080694,
+      "sichtbar": true
+     },
+     {
+      "name": "Europa",
+      "xArcsec": 175,
+      "yArcsec": -4.7,
+      "durchmesserArcsec": 1.03,
+      "helligkeitRelativ": 1.2001503862146878,
+      "sichtbar": true
+     },
+     {
+      "name": "Ganymed",
+      "xArcsec": 330,
+      "yArcsec": 4.3,
+      "durchmesserArcsec": 1.73,
+      "helligkeitRelativ": 0.8106211156571421,
+      "sichtbar": true
+     },
+     {
+      "name": "Kallisto",
+      "xArcsec": -520,
+      "yArcsec": -11.7,
+      "durchmesserArcsec": 1.58,
+      "helligkeitRelativ": 0.35285473099123216,
+      "sichtbar": true
+     }
+    ]
+   }
+  },
+  "kern": {
+   "schluessel": "kern|300|0|2.999|0.3|1.216",
+   "beschreibung": {
+    "oeffnungMm": 300,
+    "obstruktion": 0,
+    "seeingFwhmArcsec": 2.999,
+    "augeFwhmArcsec": 0.3,
+    "massstabArcsecProPx": 1.216
+   },
+   "groesse": 17,
+   "radius": 8,
+   "massstabArcsecProPx": 1.2162162162162162,
+   "pruefsumme": "9e8ff692"
+  },
+  "helligkeit": {
+   "schluessel": "helligkeit|0.198|0.002309|23.12|0.007765|0.3333",
+   "faktorObjekt": 0.1980227963955822,
+   "hintergrundRelativ": 0.0023087354719396776,
+   "hintergrundMagProArcsec2": 23.1246936830415,
+   "punktFaktor": 0.007765073438376397,
+   "punktExponent": 0.3333333333333333,
+   "mischgewicht": 0
+  },
+  "gesichtsfeld": {
+   "form": "kreis",
+   "breiteArcsec": 900,
+   "hoeheArcsec": 900
+  },
+  "fenster": {
+   "breiteArcsec": 900,
+   "mitteXArcsec": 0,
+   "mitteYArcsec": 0,
+   "px": 1024
+  }
+ },
+ "T4a Zoom": {
+  "quellbild": {
+   "schluessel": "quellbild|jup_47|1.2207792207792207|154|0|0",
+   "massstabArcsecProPx": 1.2207792207792207,
+   "rasterPx": 154,
+   "mitteXArcsec": 0,
+   "mitteYArcsec": 0,
+   "punkte": {
+    "schluessel": "punkte",
+    "punktquellen": [
+     {
+      "name": "Io",
+      "xArcsec": -110,
+      "yArcsec": 2.9,
+      "durchmesserArcsec": 1.2,
+      "helligkeitRelativ": 1.1655948678080694,
+      "sichtbar": true
+     },
+     {
+      "name": "Europa",
+      "xArcsec": 175,
+      "yArcsec": -4.7,
+      "durchmesserArcsec": 1.03,
+      "helligkeitRelativ": 1.2001503862146878,
+      "sichtbar": true
+     },
+     {
+      "name": "Ganymed",
+      "xArcsec": 330,
+      "yArcsec": 4.3,
+      "durchmesserArcsec": 1.73,
+      "helligkeitRelativ": 0.8106211156571421,
+      "sichtbar": true
+     },
+     {
+      "name": "Kallisto",
+      "xArcsec": -520,
+      "yArcsec": -11.7,
+      "durchmesserArcsec": 1.58,
+      "helligkeitRelativ": 0.35285473099123216,
+      "sichtbar": true
+     }
+    ]
+   }
+  },
+  "kern": {
+   "schluessel": "kern|300|0|2.999|0.3|1.221",
+   "beschreibung": {
+    "oeffnungMm": 300,
+    "obstruktion": 0,
+    "seeingFwhmArcsec": 2.999,
+    "augeFwhmArcsec": 0.3,
+    "massstabArcsecProPx": 1.221
+   },
+   "groesse": 17,
+   "radius": 8,
+   "massstabArcsecProPx": 1.2207792207792207,
+   "pruefsumme": "c978debb"
+  },
+  "helligkeit": {
+   "schluessel": "helligkeit|0.198|0.002309|23.12|0.007765|0.3333",
+   "faktorObjekt": 0.1980227963955822,
+   "hintergrundRelativ": 0.0023087354719396776,
+   "hintergrundMagProArcsec2": 23.1246936830415,
+   "punktFaktor": 0.007765073438376397,
+   "punktExponent": 0.3333333333333333,
+   "mischgewicht": 0
+  },
+  "gesichtsfeld": {
+   "form": "kreis",
+   "breiteArcsec": 900,
+   "hoeheArcsec": 900
+  },
+  "fenster": {
+   "breiteArcsec": 188,
+   "mitteXArcsec": 0,
+   "mitteYArcsec": 0,
+   "px": 768
+  }
+ },
+ "T4b Standardfenster": {
+  "quellbild": {
+   "schluessel": "quellbild|jup_47|1.293103448275862|696|0|0",
+   "massstabArcsecProPx": 1.293103448275862,
+   "rasterPx": 696,
+   "mitteXArcsec": 0,
+   "mitteYArcsec": 0,
+   "punkte": {
+    "schluessel": "punkte|Io|-110|2.9|1.2|1.166|Europa|175|-4.7|1.03|1.2|Ganymed|330|4.3|1.73|0.8106",
+    "punktquellen": [
+     {
+      "name": "Io",
+      "xArcsec": -110,
+      "yArcsec": 2.9,
+      "durchmesserArcsec": 1.2,
+      "helligkeitRelativ": 1.1655948678080694,
+      "sichtbar": true
+     },
+     {
+      "name": "Europa",
+      "xArcsec": 175,
+      "yArcsec": -4.7,
+      "durchmesserArcsec": 1.03,
+      "helligkeitRelativ": 1.2001503862146878,
+      "sichtbar": true
+     },
+     {
+      "name": "Ganymed",
+      "xArcsec": 330,
+      "yArcsec": 4.3,
+      "durchmesserArcsec": 1.73,
+      "helligkeitRelativ": 0.8106211156571421,
+      "sichtbar": true
+     },
+     {
+      "name": "Kallisto",
+      "xArcsec": -520,
+      "yArcsec": -11.7,
+      "durchmesserArcsec": 1.58,
+      "helligkeitRelativ": 0.35285473099123216,
+      "sichtbar": true
+     }
+    ]
+   }
+  },
+  "kern": {
+   "schluessel": "kern|100|0|2.999|0.3|1.293",
+   "beschreibung": {
+    "oeffnungMm": 100,
+    "obstruktion": 0,
+    "seeingFwhmArcsec": 2.999,
+    "augeFwhmArcsec": 0.3,
+    "massstabArcsecProPx": 1.293
+   },
+   "groesse": 17,
+   "radius": 8,
+   "massstabArcsecProPx": 1.293103448275862,
+   "pruefsumme": "99b5241d"
+  },
+  "helligkeit": {
+   "schluessel": "helligkeit|0.0952|0.00111|25.51|0.0008628|0.3333",
+   "faktorObjekt": 0.09519943100419995,
+   "hintergrundRelativ": 0.001109924247452824,
+   "hintergrundMagProArcsec2": 25.510299956639813,
+   "punktFaktor": 0.0008627859375973768,
+   "punktExponent": 0.3333333333333333,
+   "mischgewicht": 0
+  },
+  "gesichtsfeld": {
+   "form": "kreis",
+   "breiteArcsec": 900,
+   "hoeheArcsec": 900
+  },
+  "fenster": {
+   "breiteArcsec": 900,
+   "mitteXArcsec": 0,
+   "mitteYArcsec": 0,
+   "px": 1024
+  }
+ },
+ "T4b Zoom": {
+  "quellbild": {
+   "schluessel": "quellbild|jup_47|1.296551724137931|145|0|0",
+   "massstabArcsecProPx": 1.296551724137931,
+   "rasterPx": 145,
+   "mitteXArcsec": 0,
+   "mitteYArcsec": 0,
+   "punkte": {
+    "schluessel": "punkte",
+    "punktquellen": [
+     {
+      "name": "Io",
+      "xArcsec": -110,
+      "yArcsec": 2.9,
+      "durchmesserArcsec": 1.2,
+      "helligkeitRelativ": 1.1655948678080694,
+      "sichtbar": true
+     },
+     {
+      "name": "Europa",
+      "xArcsec": 175,
+      "yArcsec": -4.7,
+      "durchmesserArcsec": 1.03,
+      "helligkeitRelativ": 1.2001503862146878,
+      "sichtbar": true
+     },
+     {
+      "name": "Ganymed",
+      "xArcsec": 330,
+      "yArcsec": 4.3,
+      "durchmesserArcsec": 1.73,
+      "helligkeitRelativ": 0.8106211156571421,
+      "sichtbar": true
+     },
+     {
+      "name": "Kallisto",
+      "xArcsec": -520,
+      "yArcsec": -11.7,
+      "durchmesserArcsec": 1.58,
+      "helligkeitRelativ": 0.35285473099123216,
+      "sichtbar": true
+     }
+    ]
+   }
+  },
+  "kern": {
+   "schluessel": "kern|100|0|2.999|0.3|1.297",
+   "beschreibung": {
+    "oeffnungMm": 100,
+    "obstruktion": 0,
+    "seeingFwhmArcsec": 2.999,
+    "augeFwhmArcsec": 0.3,
+    "massstabArcsecProPx": 1.297
+   },
+   "groesse": 17,
+   "radius": 8,
+   "massstabArcsecProPx": 1.296551724137931,
+   "pruefsumme": "56723bf1"
+  },
+  "helligkeit": {
+   "schluessel": "helligkeit|0.0952|0.00111|25.51|0.0008628|0.3333",
+   "faktorObjekt": 0.09519943100419995,
+   "hintergrundRelativ": 0.001109924247452824,
+   "hintergrundMagProArcsec2": 25.510299956639813,
+   "punktFaktor": 0.0008627859375973768,
+   "punktExponent": 0.3333333333333333,
+   "mischgewicht": 0
+  },
+  "gesichtsfeld": {
+   "form": "kreis",
+   "breiteArcsec": 900,
+   "hoeheArcsec": 900
+  },
+  "fenster": {
+   "breiteArcsec": 188,
+   "mitteXArcsec": 0,
+   "mitteYArcsec": 0,
+   "px": 768
+  }
+ },
+ "T4c Standardfenster": {
+  "quellbild": {
+   "schluessel": "quellbild|jup_47|0.87890625|1024|0|0",
+   "massstabArcsecProPx": 0.87890625,
+   "rasterPx": 1024,
+   "mitteXArcsec": 0,
+   "mitteYArcsec": 0,
+   "punkte": {
+    "schluessel": "punkte|Io|-110|2.9|1.2|1.166|Europa|175|-4.7|1.03|1.2|Ganymed|330|4.3|1.73|0.8106",
+    "punktquellen": [
+     {
+      "name": "Io",
+      "xArcsec": -110,
+      "yArcsec": 2.9,
+      "durchmesserArcsec": 1.2,
+      "helligkeitRelativ": 1.1655948678080694,
+      "sichtbar": true
+     },
+     {
+      "name": "Europa",
+      "xArcsec": 175,
+      "yArcsec": -4.7,
+      "durchmesserArcsec": 1.03,
+      "helligkeitRelativ": 1.2001503862146878,
+      "sichtbar": true
+     },
+     {
+      "name": "Ganymed",
+      "xArcsec": 330,
+      "yArcsec": 4.3,
+      "durchmesserArcsec": 1.73,
+      "helligkeitRelativ": 0.8106211156571421,
+      "sichtbar": true
+     },
+     {
+      "name": "Kallisto",
+      "xArcsec": -520,
+      "yArcsec": -11.7,
+      "durchmesserArcsec": 1.58,
+      "helligkeitRelativ": 0.35285473099123216,
+      "sichtbar": true
+     }
+    ]
+   }
+  },
+  "kern": {
+   "schluessel": "kern|300|0|0.9998|0.3|0.8789",
+   "beschreibung": {
+    "oeffnungMm": 300,
+    "obstruktion": 0,
+    "seeingFwhmArcsec": 0.9998,
+    "augeFwhmArcsec": 0.3,
+    "massstabArcsecProPx": 0.8789
+   },
+   "groesse": 9,
+   "radius": 4,
+   "massstabArcsecProPx": 0.87890625,
+   "pruefsumme": "d2c095e6"
+  },
+  "helligkeit": {
+   "schluessel": "helligkeit|0.198|0.002309|23.12|0.007765|0.3333",
+   "faktorObjekt": 0.1980227963955822,
+   "hintergrundRelativ": 0.0023087354719396776,
+   "hintergrundMagProArcsec2": 23.1246936830415,
+   "punktFaktor": 0.007765073438376397,
+   "punktExponent": 0.3333333333333333,
+   "mischgewicht": 0
+  },
+  "gesichtsfeld": {
+   "form": "kreis",
+   "breiteArcsec": 900,
+   "hoeheArcsec": 900
+  },
+  "fenster": {
+   "breiteArcsec": 900,
+   "mitteXArcsec": 0,
+   "mitteYArcsec": 0,
+   "px": 1024
+  }
+ },
+ "T4c Zoom": {
+  "quellbild": {
+   "schluessel": "quellbild|jup_47|0.44655581947743467|421|0|0",
+   "massstabArcsecProPx": 0.44655581947743467,
+   "rasterPx": 421,
+   "mitteXArcsec": 0,
+   "mitteYArcsec": 0,
+   "punkte": {
+    "schluessel": "punkte",
+    "punktquellen": [
+     {
+      "name": "Io",
+      "xArcsec": -110,
+      "yArcsec": 2.9,
+      "durchmesserArcsec": 1.2,
+      "helligkeitRelativ": 1.1655948678080694,
+      "sichtbar": true
+     },
+     {
+      "name": "Europa",
+      "xArcsec": 175,
+      "yArcsec": -4.7,
+      "durchmesserArcsec": 1.03,
+      "helligkeitRelativ": 1.2001503862146878,
+      "sichtbar": true
+     },
+     {
+      "name": "Ganymed",
+      "xArcsec": 330,
+      "yArcsec": 4.3,
+      "durchmesserArcsec": 1.73,
+      "helligkeitRelativ": 0.8106211156571421,
+      "sichtbar": true
+     },
+     {
+      "name": "Kallisto",
+      "xArcsec": -520,
+      "yArcsec": -11.7,
+      "durchmesserArcsec": 1.58,
+      "helligkeitRelativ": 0.35285473099123216,
+      "sichtbar": true
+     }
+    ]
+   }
+  },
+  "kern": {
+   "schluessel": "kern|300|0|0.9998|0.3|0.4466",
+   "beschreibung": {
+    "oeffnungMm": 300,
+    "obstruktion": 0,
+    "seeingFwhmArcsec": 0.9998,
+    "augeFwhmArcsec": 0.3,
+    "massstabArcsecProPx": 0.4466
+   },
+   "groesse": 17,
+   "radius": 8,
+   "massstabArcsecProPx": 0.44655581947743467,
+   "pruefsumme": "5a41b605"
+  },
+  "helligkeit": {
+   "schluessel": "helligkeit|0.198|0.002309|23.12|0.007765|0.3333",
+   "faktorObjekt": 0.1980227963955822,
+   "hintergrundRelativ": 0.0023087354719396776,
+   "hintergrundMagProArcsec2": 23.1246936830415,
+   "punktFaktor": 0.007765073438376397,
+   "punktExponent": 0.3333333333333333,
+   "mischgewicht": 0
+  },
+  "gesichtsfeld": {
+   "form": "kreis",
+   "breiteArcsec": 900,
+   "hoeheArcsec": 900
+  },
+  "fenster": {
+   "breiteArcsec": 188,
+   "mitteXArcsec": 0,
+   "mitteYArcsec": 0,
+   "px": 768
+  }
+ },
+ "T4d Standardfenster": {
+  "quellbild": {
+   "schluessel": "quellbild|jup_47|0.87890625|1024|0|0",
+   "massstabArcsecProPx": 0.87890625,
+   "rasterPx": 1024,
+   "mitteXArcsec": 0,
+   "mitteYArcsec": 0,
+   "punkte": {
+    "schluessel": "punkte|Io|-110|2.9|1.2|1.166|Europa|175|-4.7|1.03|1.2|Ganymed|330|4.3|1.73|0.8106",
+    "punktquellen": [
+     {
+      "name": "Io",
+      "xArcsec": -110,
+      "yArcsec": 2.9,
+      "durchmesserArcsec": 1.2,
+      "helligkeitRelativ": 1.1655948678080694,
+      "sichtbar": true
+     },
+     {
+      "name": "Europa",
+      "xArcsec": 175,
+      "yArcsec": -4.7,
+      "durchmesserArcsec": 1.03,
+      "helligkeitRelativ": 1.2001503862146878,
+      "sichtbar": true
+     },
+     {
+      "name": "Ganymed",
+      "xArcsec": 330,
+      "yArcsec": 4.3,
+      "durchmesserArcsec": 1.73,
+      "helligkeitRelativ": 0.8106211156571421,
+      "sichtbar": true
+     },
+     {
+      "name": "Kallisto",
+      "xArcsec": -520,
+      "yArcsec": -11.7,
+      "durchmesserArcsec": 1.58,
+      "helligkeitRelativ": 0.35285473099123216,
+      "sichtbar": true
+     }
+    ]
+   }
+  },
+  "kern": {
+   "schluessel": "kern|100|0|0.9998|0.3|0.8789",
+   "beschreibung": {
+    "oeffnungMm": 100,
+    "obstruktion": 0,
+    "seeingFwhmArcsec": 0.9998,
+    "augeFwhmArcsec": 0.3,
+    "massstabArcsecProPx": 0.8789
+   },
+   "groesse": 13,
+   "radius": 6,
+   "massstabArcsecProPx": 0.87890625,
+   "pruefsumme": "5ef6f8ef"
+  },
+  "helligkeit": {
+   "schluessel": "helligkeit|0.0952|0.00111|25.51|0.0008628|0.3333",
+   "faktorObjekt": 0.09519943100419995,
+   "hintergrundRelativ": 0.001109924247452824,
+   "hintergrundMagProArcsec2": 25.510299956639813,
+   "punktFaktor": 0.0008627859375973768,
+   "punktExponent": 0.3333333333333333,
+   "mischgewicht": 0
+  },
+  "gesichtsfeld": {
+   "form": "kreis",
+   "breiteArcsec": 900,
+   "hoeheArcsec": 900
+  },
+  "fenster": {
+   "breiteArcsec": 900,
+   "mitteXArcsec": 0,
+   "mitteYArcsec": 0,
+   "px": 1024
+  }
+ },
+ "T4d Zoom": {
+  "quellbild": {
+   "schluessel": "quellbild|jup_47|0.6266666666666667|300|0|0",
+   "massstabArcsecProPx": 0.6266666666666667,
+   "rasterPx": 300,
+   "mitteXArcsec": 0,
+   "mitteYArcsec": 0,
+   "punkte": {
+    "schluessel": "punkte",
+    "punktquellen": [
+     {
+      "name": "Io",
+      "xArcsec": -110,
+      "yArcsec": 2.9,
+      "durchmesserArcsec": 1.2,
+      "helligkeitRelativ": 1.1655948678080694,
+      "sichtbar": true
+     },
+     {
+      "name": "Europa",
+      "xArcsec": 175,
+      "yArcsec": -4.7,
+      "durchmesserArcsec": 1.03,
+      "helligkeitRelativ": 1.2001503862146878,
+      "sichtbar": true
+     },
+     {
+      "name": "Ganymed",
+      "xArcsec": 330,
+      "yArcsec": 4.3,
+      "durchmesserArcsec": 1.73,
+      "helligkeitRelativ": 0.8106211156571421,
+      "sichtbar": true
+     },
+     {
+      "name": "Kallisto",
+      "xArcsec": -520,
+      "yArcsec": -11.7,
+      "durchmesserArcsec": 1.58,
+      "helligkeitRelativ": 0.35285473099123216,
+      "sichtbar": true
+     }
+    ]
+   }
+  },
+  "kern": {
+   "schluessel": "kern|100|0|0.9998|0.3|0.6267",
+   "beschreibung": {
+    "oeffnungMm": 100,
+    "obstruktion": 0,
+    "seeingFwhmArcsec": 0.9998,
+    "augeFwhmArcsec": 0.3,
+    "massstabArcsecProPx": 0.6267
+   },
+   "groesse": 17,
+   "radius": 8,
+   "massstabArcsecProPx": 0.6266666666666667,
+   "pruefsumme": "ffde28d3"
+  },
+  "helligkeit": {
+   "schluessel": "helligkeit|0.0952|0.00111|25.51|0.0008628|0.3333",
+   "faktorObjekt": 0.09519943100419995,
+   "hintergrundRelativ": 0.001109924247452824,
+   "hintergrundMagProArcsec2": 25.510299956639813,
+   "punktFaktor": 0.0008627859375973768,
+   "punktExponent": 0.3333333333333333,
+   "mischgewicht": 0
+  },
+  "gesichtsfeld": {
+   "form": "kreis",
+   "breiteArcsec": 900,
+   "hoeheArcsec": 900
+  },
+  "fenster": {
+   "breiteArcsec": 188,
+   "mitteXArcsec": 0,
+   "mitteYArcsec": 0,
+   "px": 768
+  }
+ },
+ "T5a Standardfenster": {
+  "quellbild": {
+   "schluessel": "quellbild|mars_14|0.87890625|1024|0|0",
+   "massstabArcsecProPx": 0.87890625,
+   "rasterPx": 1024,
+   "mitteXArcsec": 0,
+   "mitteYArcsec": 0,
+   "punkte": {
+    "schluessel": "punkte",
+    "punktquellen": []
+   }
+  },
+  "kern": {
+   "schluessel": "kern|150|0|1.5|0.3|0.8789",
+   "beschreibung": {
+    "oeffnungMm": 150,
+    "obstruktion": 0,
+    "seeingFwhmArcsec": 1.5,
+    "augeFwhmArcsec": 0.3,
+    "massstabArcsecProPx": 0.8789
+   },
+   "groesse": 13,
+   "radius": 6,
+   "massstabArcsecProPx": 0.87890625,
+   "pruefsumme": "85919887"
+  },
+  "helligkeit": {
+   "schluessel": "helligkeit|0.2729|0.001454|24.63|0.02033|0.3333",
+   "faktorObjekt": 0.27291570336574866,
+   "hintergrundRelativ": 0.001454412209867888,
+   "hintergrundMagProArcsec2": 24.629843661361406,
+   "punktFaktor": 0.020327575187589212,
+   "punktExponent": 0.3333333333333333,
+   "mischgewicht": 0
+  },
+  "gesichtsfeld": {
+   "form": "kreis",
+   "breiteArcsec": 900,
+   "hoeheArcsec": 900
+  },
+  "fenster": {
+   "breiteArcsec": 900,
+   "mitteXArcsec": 0,
+   "mitteYArcsec": 0,
+   "px": 1024
+  }
+ },
+ "T5a Zoom": {
+  "quellbild": {
+   "schluessel": "quellbild|mars_14|0.691358024691358|81|0|0",
+   "massstabArcsecProPx": 0.691358024691358,
+   "rasterPx": 81,
+   "mitteXArcsec": 0,
+   "mitteYArcsec": 0,
+   "punkte": {
+    "schluessel": "punkte",
+    "punktquellen": []
+   }
+  },
+  "kern": {
+   "schluessel": "kern|150|0|1.5|0.3|0.6914",
+   "beschreibung": {
+    "oeffnungMm": 150,
+    "obstruktion": 0,
+    "seeingFwhmArcsec": 1.5,
+    "augeFwhmArcsec": 0.3,
+    "massstabArcsecProPx": 0.6914
+   },
+   "groesse": 17,
+   "radius": 8,
+   "massstabArcsecProPx": 0.691358024691358,
+   "pruefsumme": "5430a795"
+  },
+  "helligkeit": {
+   "schluessel": "helligkeit|0.2729|0.001454|24.63|0.02033|0.3333",
+   "faktorObjekt": 0.27291570336574866,
+   "hintergrundRelativ": 0.001454412209867888,
+   "hintergrundMagProArcsec2": 24.629843661361406,
+   "punktFaktor": 0.020327575187589212,
+   "punktExponent": 0.3333333333333333,
+   "mischgewicht": 0
+  },
+  "gesichtsfeld": {
+   "form": "kreis",
+   "breiteArcsec": 900,
+   "hoeheArcsec": 900
+  },
+  "fenster": {
+   "breiteArcsec": 56,
+   "mitteXArcsec": 0,
+   "mitteYArcsec": 0,
+   "px": 768
+  }
+ },
+ "T6a Standardfenster": {
+  "quellbild": {
+   "schluessel": "quellbild|mond-q1|25.245441795231418|713|0|0",
+   "massstabArcsecProPx": 25.245441795231418,
+   "rasterPx": 713,
+   "mitteXArcsec": 0,
+   "mitteYArcsec": 0,
+   "punkte": {
+    "schluessel": "punkte",
+    "punktquellen": []
+   }
+  },
+  "kern": {
+   "schluessel": "kern|6|0|2|60|25.25",
+   "beschreibung": {
+    "oeffnungMm": 6,
+    "obstruktion": 0,
+    "seeingFwhmArcsec": 2,
+    "augeFwhmArcsec": 60,
+    "massstabArcsecProPx": 25.25
+   },
+   "groesse": 17,
+   "radius": 8,
+   "massstabArcsecProPx": 25.245441795231418,
+   "pruefsumme": "6984a3a5"
+  },
+  "helligkeit": {
+   "schluessel": "helligkeit|0.9261|0.006026|20|0.7944|0.3333",
+   "faktorObjekt": 0.9261351060846591,
+   "hintergrundRelativ": 0.0060255958607435805,
+   "hintergrundMagProArcsec2": 20,
+   "punktFaktor": 0.7943703773862647,
+   "punktExponent": 0.3333333333333333,
+   "mischgewicht": 0
+  },
+  "gesichtsfeld": {
+   "form": "rechteck",
+   "breiteArcsec": 18000,
+   "hoeheArcsec": 18000
+  },
+  "fenster": {
+   "breiteArcsec": 18000,
+   "mitteXArcsec": 0,
+   "mitteYArcsec": 0,
+   "px": 1024
+  }
+ },
+ "T6a Zoom": {
+  "quellbild": {
+   "schluessel": "quellbild|mond-q1|25.306122448979593|294|0|0",
+   "massstabArcsecProPx": 25.306122448979593,
+   "rasterPx": 294,
+   "mitteXArcsec": 0,
+   "mitteYArcsec": 0,
+   "punkte": {
+    "schluessel": "punkte",
+    "punktquellen": []
+   }
+  },
+  "kern": {
+   "schluessel": "kern|6|0|2|60|25.31",
+   "beschreibung": {
+    "oeffnungMm": 6,
+    "obstruktion": 0,
+    "seeingFwhmArcsec": 2,
+    "augeFwhmArcsec": 60,
+    "massstabArcsecProPx": 25.31
+   },
+   "groesse": 17,
+   "radius": 8,
+   "massstabArcsecProPx": 25.306122448979593,
+   "pruefsumme": "6ff0ad58"
+  },
+  "helligkeit": {
+   "schluessel": "helligkeit|0.9261|0.006026|20|0.7944|0.3333",
+   "faktorObjekt": 0.9261351060846591,
+   "hintergrundRelativ": 0.0060255958607435805,
+   "hintergrundMagProArcsec2": 20,
+   "punktFaktor": 0.7943703773862647,
+   "punktExponent": 0.3333333333333333,
+   "mischgewicht": 0
+  },
+  "gesichtsfeld": {
+   "form": "rechteck",
+   "breiteArcsec": 18000,
+   "hoeheArcsec": 18000
+  },
+  "fenster": {
+   "breiteArcsec": 7440,
+   "mitteXArcsec": 0,
+   "mitteYArcsec": 0,
+   "px": 768
+  }
+ },
+ "A-D9 Standardfenster": {
+  "quellbild": {
+   "schluessel": "quellbild|mond-q1|2.9296875|1024|0|0",
+   "massstabArcsecProPx": 2.9296875,
+   "rasterPx": 1024,
+   "mitteXArcsec": 0,
+   "mitteYArcsec": 0,
+   "punkte": {
+    "schluessel": "punkte",
+    "punktquellen": []
+   }
+  },
+  "kern": {
+   "schluessel": "kern|80|0|2.461|1|2.93",
+   "beschreibung": {
+    "oeffnungMm": 80,
+    "obstruktion": 0,
+    "seeingFwhmArcsec": 2.461,
+    "augeFwhmArcsec": 1,
+    "massstabArcsecProPx": 2.93
+   },
+   "groesse": 9,
+   "radius": 4,
+   "massstabArcsecProPx": 2.9296875,
+   "pruefsumme": "456d0b10"
+  },
+  "helligkeit": {
+   "schluessel": "helligkeit|0.3198|0.002134|23.38|0.03272|0.3333",
+   "faktorObjekt": 0.3198428308140075,
+   "hintergrundRelativ": 0.002134383691950146,
+   "hintergrundMagProArcsec2": 23.380456295278407,
+   "punktFaktor": 0.03271974133624758,
+   "punktExponent": 0.3333333333333333,
+   "mischgewicht": 0
+  },
+  "gesichtsfeld": {
+   "form": "kreis",
+   "breiteArcsec": 3000,
+   "hoeheArcsec": 3000
+  },
+  "fenster": {
+   "breiteArcsec": 3000,
+   "mitteXArcsec": 0,
+   "mitteYArcsec": 0,
+   "px": 1024
+  }
+ },
+ "A-D9 Zoom": {
+  "quellbild": {
+   "schluessel": "quellbild|mond-q1|9.6875|768|0|0",
+   "massstabArcsecProPx": 9.6875,
+   "rasterPx": 768,
+   "mitteXArcsec": 0,
+   "mitteYArcsec": 0,
+   "punkte": {
+    "schluessel": "punkte",
+    "punktquellen": []
+   }
+  },
+  "kern": {
+   "schluessel": "kern|80|0|2.461|1|9.688",
+   "beschreibung": {
+    "oeffnungMm": 80,
+    "obstruktion": 0,
+    "seeingFwhmArcsec": 2.461,
+    "augeFwhmArcsec": 1,
+    "massstabArcsecProPx": 9.688
+   },
+   "groesse": 5,
+   "radius": 2,
+   "massstabArcsecProPx": 9.6875,
+   "pruefsumme": "7e871fda"
+  },
+  "helligkeit": {
+   "schluessel": "helligkeit|0.3198|0.002134|23.38|0.03272|0.3333",
+   "faktorObjekt": 0.3198428308140075,
+   "hintergrundRelativ": 0.002134383691950146,
+   "hintergrundMagProArcsec2": 23.380456295278407,
+   "punktFaktor": 0.03271974133624758,
+   "punktExponent": 0.3333333333333333,
+   "mischgewicht": 0
+  },
+  "gesichtsfeld": {
+   "form": "kreis",
+   "breiteArcsec": 3000,
+   "hoeheArcsec": 3000
+  },
+  "fenster": {
+   "breiteArcsec": 7440,
+   "mitteXArcsec": 0,
+   "mitteYArcsec": 0,
+   "px": 768
+  }
+ }
+}

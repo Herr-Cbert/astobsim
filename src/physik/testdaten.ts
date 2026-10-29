@@ -1,7 +1,7 @@
 // Gemeinsame Testdaten der physik-Tests: Startkonfiguration A-D9, Quellbilder, Hilfsbauer.
 // Kein Teil des Moduls (nicht in index.ts exportiert), nur von *.test.ts importiert.
 
-import type { Fenster } from "../naht/simulationsparameter";
+import type { Fenster, Simulationsparameter } from "../naht/simulationsparameter";
 import type { Bedingungen, Fernrohr, Konfiguration, Objektzustand } from "../naht/konfiguration";
 
 /** Mondquelle nach ADR-0002: NASA SVS, 7600 px, 0,643''/px, Weiss entspricht etwa Vollmond 3,4 mag/arcsec2. */
@@ -111,4 +111,57 @@ export const MARS_6: Objektzustand = {
   magnitude: 1.0,
   quelle: { breitePx: 664, hoehePx: 664, massstabArcsecProPx: 6 / 620, weissMagProArcsec2: 3.31 },
   trabanten: []
+};
+
+/**
+ * Faelle des Regressionstests Version 1 (Issue #100, docs/architektur.md 5.3 Bitgleichheit): T1 bis
+ * T5a und T6a wie in validierung.test.ts, je im Standardfenster (1024 px) und in einem Zoomfenster
+ * von vier Objektdurchmessern (768 px). Mit beiden Weiss auf 3,35 muessen sie dieselben
+ * Simulationsparameter liefern wie vor Issue #100 (regression_v1.json).
+ */
+export const REGRESSION_V1_FAELLE: readonly { fall: string; konfiguration: Konfiguration }[] = [
+  { fall: "T1", konfiguration: { geraet: refraktorMitVergroesserung(70, 100), objekt: JUPITER_47, bedingungen: zenit(2) } },
+  { fall: "T2a", konfiguration: { geraet: refraktorMitVergroesserung(100, 150), objekt: SATURN_20, bedingungen: zenit(1.5) } },
+  { fall: "T2b", konfiguration: { geraet: refraktorMitVergroesserung(60, 100), objekt: SATURN_20, bedingungen: zenit(1.5) } },
+  { fall: "T3", konfiguration: { geraet: refraktorMitVergroesserung(80, 100), objekt: MOND_Q1, bedingungen: zenit(2) } },
+  { fall: "T4a", konfiguration: { geraet: refraktorMitVergroesserung(300, 200), objekt: JUPITER_47, bedingungen: zenit(3) } },
+  { fall: "T4b", konfiguration: { geraet: refraktorMitVergroesserung(100, 200), objekt: JUPITER_47, bedingungen: zenit(3) } },
+  { fall: "T4c", konfiguration: { geraet: refraktorMitVergroesserung(300, 200), objekt: JUPITER_47, bedingungen: zenit(1) } },
+  { fall: "T4d", konfiguration: { geraet: refraktorMitVergroesserung(100, 200), objekt: JUPITER_47, bedingungen: zenit(1) } },
+  { fall: "T5a", konfiguration: { geraet: refraktorMitVergroesserung(150, 200), objekt: MARS_14, bedingungen: zenit(1.5) } },
+  { fall: "T6a", konfiguration: { geraet: { art: "auge" }, objekt: MOND_Q1, bedingungen: zenit(2) } },
+  { fall: "A-D9", konfiguration: KONFIGURATION_A_D9 }
+];
+
+/** FNV-1a ueber die Bytes eines Float32Array, als Hex; vergleicht Kerndaten bitgenau ohne sie abzulegen. */
+export function pruefsumme(daten: Float32Array): string {
+  const bytes = new Uint8Array(daten.buffer, daten.byteOffset, daten.byteLength);
+  let h = 0x811c9dc5;
+  for (let i = 0; i < bytes.length; i++) h = Math.imul(h ^ (bytes[i] as number), 0x01000193) >>> 0;
+  return h.toString(16).padStart(8, "0");
+}
+
+/** Simulationsparameter als JSON-taugliches Objekt: kern.daten durch die Pruefsumme ersetzt. */
+export function vergleichbar(p: Simulationsparameter): unknown {
+  const { daten, ...kern } = p.kern;
+  return JSON.parse(JSON.stringify({ ...p, kern: { ...kern, pruefsumme: pruefsumme(daten) } }));
+}
+
+/**
+ * Synthetischer Deep-Sky-Zustand mit Quellbild und Flaechentabelle (Ring wie M57, nicht die Werte aus
+ * daten/): Isophoten 17 bis 22 mag/arcsec^2 in 0,5-mag-Schritten, Flaeche von 300 bis 3000
+ * Quadratbogensekunden; ein Zentralstern 15,8 mag (B-V -0,3) und ein Feldstern-artiger 13 mag (B-V 1,5).
+ */
+export const DEEP_SKY_RING: Objektzustand = {
+  kennung: "ring-test",
+  klasse: "deep_sky",
+  durchmesserArcsec: 80,
+  magnitude: 8.8,
+  quelle: { breitePx: 400, hoehePx: 400, massstabArcsecProPx: 0.25, weissMagProArcsec2: 16.5 },
+  trabanten: [],
+  sterne: [
+    { name: "Zentralstern", dxArcsec: 0, dyArcsec: 0, magnitude: 15.8, bv: -0.3 },
+    { name: "Nachbar", dxArcsec: 30, dyArcsec: 10, magnitude: 13, bv: 1.5 }
+  ],
+  isophoten: Array.from({ length: 11 }, (_, i) => ({ magProArcsec2: 17 + 0.5 * i, flaecheArcsec2: 300 * Math.pow(10, i / 10) }))
 };

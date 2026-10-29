@@ -30,12 +30,29 @@ export {
   seeingAmObjektArcsec,
   seeingstufe
 } from "./atmosphaere";
-export { type Optik, austrittspupilleMm, flaechenhelligkeitsfaktor, okularBrennweiteFuer, optik, vergroesserungsgrenzen } from "./optik";
+export {
+  type Optik,
+  austrittspupilleMm,
+  flaechenhelligkeitsfaktor,
+  okularBrennweiteFuer,
+  optik,
+  transmissionMitAbschattung,
+  vergroesserungsgrenzen
+} from "./optik";
 export { airyProfil, gaussProfil, moffatProfil, quadratur } from "./profile";
 export { type Aufloesung, type Aufloesungsgrenze, aufloesung } from "./aufloesung";
-export { anzeigefaktor, bortleMagProArcsec2, helligkeit, leuchtdichteRelativ, type Okularhelligkeit, okularhelligkeit } from "./helligkeit";
+export {
+  anzeigefaktor,
+  bezugMagProArcsec2,
+  bortleMagProArcsec2,
+  helligkeit,
+  helligkeitUndIsophote,
+  leuchtdichteRelativ,
+  type Okularhelligkeit,
+  okularhelligkeit
+} from "./helligkeit";
 export { arbeitsmassstab, arbeitsmassstabOhneFenster, kernSchluessel, kernbeschreibung } from "./arbeitsmassstab";
-export { geblendet, helligkeitRelativ, punktquellen, scheibenFlaechenhelligkeit } from "./punktquellen";
+export { deckkraftPunktquelle, geblendet, helligkeitRelativ, punktquellen, scheibenFlaechenhelligkeit } from "./punktquellen";
 export { GRENZEN, type Grenze, type Hinweis, aufSchritt, begrenze } from "./begrenze";
 export { baueKern, kernFwhmArcsec, kontrastUebertragung, type Profilstufe, profilDelle } from "./kern";
 export { type Anzeigewerte, type Auswertoptionen, type Auswertung, type Warnung, auswerten } from "./auswerten";

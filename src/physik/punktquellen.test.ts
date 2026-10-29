@@ -2,8 +2,10 @@ import { describe, expect, it } from "vitest";
 import type { Auge, Fernglas, Konfiguration, Objektzustand } from "../naht/konfiguration";
 import { auswerten } from "./auswerten";
 import { PhysikFehler } from "./fehler";
+import { atmosphaere } from "./atmosphaere";
 import { optik } from "./optik";
-import { geblendet, helligkeitRelativ, punktquellen, scheibenFlaechenhelligkeit } from "./punktquellen";
+import { deckkraftPunktquelle, geblendet, helligkeitRelativ, punktquellen, scheibenFlaechenhelligkeit } from "./punktquellen";
+import { deckkraft, deckkraftStern } from "./schwelle";
 import { BEDINGUNGEN_A_D9, JUPITER_47, MOND_Q1, refraktorMitVergroesserung, SATURN_20 } from "./testdaten";
 
 // Testwerte aus docs/recherche/physik.md Abschnitt 13.4 (eigene Rechnung mit den Werten aus
@@ -15,6 +17,10 @@ const FERNGLAS_10X50: Fernglas = { art: "fernglas", oeffnungMm: 50, vergroesseru
 function konfiguration(objekt: Objektzustand, geraet: Konfiguration["geraet"]): Konfiguration {
   return { geraet, objekt, bedingungen: BEDINGUNGEN_A_D9 };
 }
+
+/** Atmosphaere von A-D9 und eine Grenzgroesse weit unter allen Trabanten: Deckkraft 1 wie in Version 1. */
+const A_D9 = atmosphaere(BEDINGUNGEN_A_D9);
+const TIEF = 20;
 
 describe("scheibenFlaechenhelligkeit: mu = m + 2,5 log10(pi (d/2)^2)", () => {
   it("Scheibe mit 1 Quadratbogensekunde Flaeche hat mu = m", () => {
@@ -82,24 +88,24 @@ describe("geblendet: scheinbarer Abstand unter 10' und mehr als 6 mag Unterschie
 
 describe("punktquellen", () => {
   it("uebernimmt Name, Position (+x rechts, +y Norden) und Durchmesser der Trabanten", () => {
-    const p = punktquellen(JUPITER_47, optik(FERNGLAS_10X50));
+    const p = punktquellen(JUPITER_47, optik(FERNGLAS_10X50), A_D9, TIEF);
     expect(p.map((q) => q.name)).toEqual(["Io", "Europa", "Ganymed", "Kallisto"]);
     expect(p[3]).toMatchObject({ xArcsec: -520, yArcsec: -11.7, durchmesserArcsec: 1.58 });
     expect(p[0]!.helligkeitRelativ).toBeCloseTo(1.1656, 4);
   });
   it("Helligkeit haengt nicht vom Geraet ab (Faktoren stecken in faktorObjekt)", () => {
-    const auge = punktquellen(JUPITER_47, optik(AUGE)).map((q) => q.helligkeitRelativ);
-    const fernrohr = punktquellen(JUPITER_47, optik(refraktorMitVergroesserung(200, 300))).map((q) => q.helligkeitRelativ);
+    const auge = punktquellen(JUPITER_47, optik(AUGE), A_D9, TIEF).map((q) => q.helligkeitRelativ);
+    const fernrohr = punktquellen(JUPITER_47, optik(refraktorMitVergroesserung(200, 300)), A_D9, TIEF).map((q) => q.helligkeitRelativ);
     expect(fernrohr).toEqual(auge);
   });
   it("Objekt ohne Trabanten (Mond) hat keine Punktquellen", () => {
-    expect(punktquellen(MOND_Q1, optik(AUGE))).toEqual([]);
+    expect(punktquellen(MOND_Q1, optik(AUGE), A_D9, TIEF)).toEqual([]);
   });
   it("wirft PhysikFehler bei Durchmesser 0 oder Position NaN", () => {
     const o = optik(FERNGLAS_10X50);
     const t = JUPITER_47.trabanten[0]!;
-    expect(() => punktquellen({ ...JUPITER_47, trabanten: [{ ...t, durchmesserArcsec: 0 }] }, o)).toThrow(PhysikFehler);
-    expect(() => punktquellen({ ...JUPITER_47, trabanten: [{ ...t, dxArcsec: Number.NaN }] }, o)).toThrow(PhysikFehler);
+    expect(() => punktquellen({ ...JUPITER_47, trabanten: [{ ...t, durchmesserArcsec: 0 }] }, o, A_D9, TIEF)).toThrow(PhysikFehler);
+    expect(() => punktquellen({ ...JUPITER_47, trabanten: [{ ...t, dxArcsec: Number.NaN }] }, o, A_D9, TIEF)).toThrow(PhysikFehler);
   });
 });
 
@@ -137,5 +143,72 @@ describe("Saturn 20'' an 80 mm (Issue #14, Ergaenzung zu T6)", () => {
     const p = (d: number): boolean[] =>
       auswerten(konfiguration(SATURN_20, refraktorMitVergroesserung(d, 8))).parameter.quellbild.punkte.punktquellen.map((q) => q.sichtbar);
     expect(p(300)).toEqual(p(80));
+  });
+});
+
+// Gezeigte Deckkraft (physik.md Abschnitt 20, Issue #100): Blackwell ohne den Sockel P0 = 0,0194 bei
+// Kontrast 0. Testwerte und Rechenweg in physik.md Abschnitt 20.
+describe("deckkraftPunktquelle: (P - P0) / (1 - P0)", () => {
+  it("an der Grenzgroesse 0,4901, 1 mag darunter 0,0891, 1 mag darueber 0,9991", () => {
+    expect(deckkraftPunktquelle(12, 12)).toBeCloseTo(0.4901, 4);
+    expect(deckkraftPunktquelle(13, 12)).toBeCloseTo(0.0891, 4);
+    expect(deckkraftPunktquelle(11, 12)).toBeCloseTo(0.9991, 4);
+  });
+  it("geht fuer schwache Sterne gegen 0 (Blackwell allein bliebe bei 0,0194), Schnitt 1e-3 bei 5,017 mag unter der Grenze", () => {
+    expect(deckkraft(0)).toBeCloseTo(0.0194, 4);
+    expect(deckkraftStern(40, 12)).toBeCloseTo(0.0194, 4);
+    expect(deckkraftPunktquelle(40, 12)).toBeLessThan(1e-9);
+    expect(deckkraftPunktquelle(12 + 5.0, 12)).toBeGreaterThan(1e-3);
+    expect(deckkraftPunktquelle(12 + 5.03, 12)).toBeLessThan(1e-3);
+  });
+  it("genau 1, wo Blackwell genau 1 ist (alle Trabanten der Version 1), und monoton fallend in m", () => {
+    expect(deckkraftPunktquelle(5, 12)).toBe(1);
+    let vorher = 1;
+    for (let m = 9; m <= 18; m += 0.05) {
+      const d = deckkraftPunktquelle(m, 12);
+      expect(d).toBeLessThanOrEqual(vorher);
+      vorher = d;
+    }
+  });
+});
+
+describe("punktquellen: Sterne (Issue #100)", () => {
+  const paar: Objektzustand = {
+    kennung: "paar",
+    klasse: "doppelstern",
+    durchmesserArcsec: 20,
+    magnitude: 4.6,
+    trabanten: [],
+    sterne: [
+      { name: "A", dxArcsec: -10, dyArcsec: 0, magnitude: 5, bv: 1.5 },
+      { name: "B", dxArcsec: 10, dyArcsec: 0, magnitude: 9, bv: 0 }
+    ]
+  };
+  const o = optik(refraktorMitVergroesserung(80, 60));
+
+  it("Durchmesser 0,01'', Bezug 0 mag/arcsec^2 ohne Quellbild, Deckkraft aus der Grenzgroesse", () => {
+    const [a, b] = punktquellen(paar, o, A_D9, 9);
+    expect(a!.durchmesserArcsec).toBe(0.01);
+    expect(a!.helligkeitRelativ).toBeCloseTo(helligkeitRelativ(5, 0.01, 0), 12);
+    expect(a!.deckkraft).toBeUndefined();
+    expect(b!.deckkraft).toBeCloseTo(0.4901, 4);
+  });
+  it("Farbe ueber der Farbgrenze (80 mm, 60x: 7,53 mag), darunter grau; Trabanten immer grau", () => {
+    const [a, b] = punktquellen(paar, o, A_D9, 12);
+    expect(a!.farbe![0]).toBeCloseTo(1.4615, 4);
+    expect(b!.farbe).toBeUndefined();
+    expect(punktquellen(JUPITER_47, o, A_D9, 12).every((q) => q.farbe === undefined)).toBe(true);
+  });
+  it("mit Quellbild relativ zu Quellweiss, erst Trabanten, dann Sterne", () => {
+    const gemischt: Objektzustand = { ...JUPITER_47, sterne: paar.sterne };
+    const p = punktquellen(gemischt, o, A_D9, 12);
+    expect(p.map((q) => q.name)).toEqual(["Io", "Europa", "Ganymed", "Kallisto", "A", "B"]);
+    expect(p[4]!.helligkeitRelativ).toBeCloseTo(helligkeitRelativ(5, 0.01, 5.3), 12);
+  });
+  it("wirft PhysikFehler bei nicht endlicher Lage, Magnitude oder B-V eines Sterns", () => {
+    const mit = (teil: object): Objektzustand => ({ ...paar, sterne: [{ ...paar.sterne[0]!, ...teil }] });
+    expect(() => punktquellen(mit({ dyArcsec: Number.NaN }), o, A_D9, 12)).toThrow(PhysikFehler);
+    expect(() => punktquellen(mit({ magnitude: Number.POSITIVE_INFINITY }), o, A_D9, 12)).toThrow(PhysikFehler);
+    expect(() => punktquellen(mit({ bv: Number.NaN }), o, A_D9, 12)).toThrow(PhysikFehler);
   });
 });
