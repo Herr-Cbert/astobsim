@@ -122,6 +122,7 @@ Reserve, falls Herbert tauschen will: M13 am 200 mm gegen 80 mm (Rand aufgeloest
 - Konstanten der Abbildung (Frage 1): Empfehlung aus helligkeit-v2.md 4 angenommen.
 - Feldfaktor $F$ = 2 (wahrnehmung.md 7). **Geaendert in Phase 3 Version 2 (2026-10-29): $F$ = 1,4** nach dem Prototyp (M31 mit blossem Auge, ADR-0004); Tabellen und Testwerte mit $F$ = 2 in wahrnehmung.md werden in Phase 4 umgerechnet (Grenzgroesse plus 0,39 mag); erledigt am 2026-10-29.
 - Entscheidungen 1 bis 7 unten: 1 ja (Sterndaten mit eigener Lizenz), 2 ja (lineare Archivdaten fuer M42, M57, M13; M31 per Tonkurve gegen das Profil), 3 Testfaelle mit Seeing 0,5'', A-B6 bleibt Kann, der Hilfetext nennt das Langzeitmittel, 4 Begriff "Mehrfachstern" fuer Systeme mit mehr als zwei Sternen (GLOSSARY), 5 ja, 6 Nachtseite auf Schwarz, 7 ja (Polaris B 8,6 mag).
+- Issue #100 (PR #126), drei Punkte zu `auswerten`: (a) Warnung `ueberstrahlung` nur bei Doppelsternen, nicht bei Deep-Sky (Trapez in M42); (b) die Grenzgroesse rechnet mit der Seeing-FWHM am Objekt (Zenitwert mal $X^{0{,}6}$); (c) Sterne und Trabanten zeigen die Deckkraft $P' = (P - P_0)/(1 - P_0)$, `unter_schwelle` bei $P'$ unter $10^{-3}$ (5,02 mag unter der Grenzgroesse), an der Grenzgroesse 0,49; Deep-Sky-Ebene bis #111 weiter mit $P$ (ADR-0004, Nachtrag Issue #100; `physik.md` 20). Die Startwerte Anzeigeweiss 9,2 und Punktweiss 6,4 bleiben bis #111.
 
 ## Entscheidungen vor Phase 3 (alle entschieden, siehe oben)
 

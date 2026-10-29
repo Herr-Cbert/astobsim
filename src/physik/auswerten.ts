@@ -30,7 +30,7 @@ import { grenzgroesse } from "./schwelle";
  * Objektklassen, fuer die auswerten die Warnung ueberstrahlung prueft (A-Z9, Entscheidung 5 in
  * docs/recherche/README.md betrifft Doppelsterne). Nicht deep_sky: das Trapez in M42 (Theta1 Ori C
  * gegen die schwachen Komponenten) oder Sternpaare in M45 schluegen sonst an, ohne dass die
- * Warnung dort etwas erklaert. Vorschlag zur Entscheidung im PR zu Issue #100.
+ * Warnung dort etwas erklaert. Entschieden von Herbert am 2026-10-29 (ADR-0004, Nachtrag Issue #100).
  */
 const UEBERSTRAHLUNG_KLASSEN: readonly Objektklasse[] = ["doppelstern"];
 
@@ -189,7 +189,7 @@ export function auswerten(k: Konfiguration, optionen: Auswertoptionen = {}): Aus
   const kern = gebaut.massstabArcsecProPx === massstabArcsecProPx ? gebaut : { ...gebaut, massstabArcsecProPx };
 
   // Grenzgroesse am Okular (A-P11) mit dem Seeing am Objekt, wie im Kern: dieselbe FWHM, die das
-  // Sternbild verbreitert, setzt die Seeing-Scheibe der Schwelle (Vorschlag im PR zu Issue #100).
+  // Sternbild verbreitert, setzt die Seeing-Scheibe der Schwelle (ADR-0004, Nachtrag Issue #100).
   const muHimmel = bortleMagProArcsec2(k.bedingungen.bortle);
   const grenzgroesseMag = grenzgroesse(o, a, muHimmel, a.seeingFwhmArcsec);
 

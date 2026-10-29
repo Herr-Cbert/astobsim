@@ -149,7 +149,7 @@ export interface Punktquelle {
   name: string; xArcsec: number; yArcsec: number; durchmesserArcsec: number;
   helligkeitRelativ: number;     // relativ zu Quellweiss; ohne Quellbild relativ zu 0 mag/arcsec^2
   sichtbar: boolean;
-  grund?: "blendung" | "unter_schwelle";   // unter_schwelle: Deckkraft unter 1e-3, nicht gemalt
+  grund?: "blendung" | "unter_schwelle";   // unter_schwelle: gezeigte Deckkraft P' unter 1e-3, nicht gemalt
   deckkraft?: number;            // (0, 1], Blackwell; fehlt = 1
   farbe?: [number, number, number];        // linear sRGB (D65), Y = 1 (A-P12); fehlt = grau
 }

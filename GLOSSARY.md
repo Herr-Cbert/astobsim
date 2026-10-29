@@ -186,7 +186,7 @@ _Vermeiden_: Sichtbarkeitsgrenze, Kontrastgrenze
 Faktor F, um den die Schwelle des festen Beobachters ueber Blackwells Laborschwelle liegt (Crumey 2014); in astobsim 1,4 (ADR-0004), am Fernrohr zusaetzlich sqrt 2 fuer einaeugiges Sehen. Steht fuer Erfahrung und Alter, keine Eingabe (A-P9).
 
 **Grenzgroesse**:
-Die Magnitude des schwaechsten Sterns, der bei der eingestellten Konfiguration an der Wahrnehmungsschwelle liegt (Deckkraft 0,5); im Infopanel angezeigt.
+Die Magnitude des schwaechsten Sterns, der bei der eingestellten Konfiguration an der Wahrnehmungsschwelle liegt (Blackwell-Wahrscheinlichkeit 0,5, gezeigte Deckkraft 0,49); im Infopanel angezeigt.
 _Vermeiden_: NELM (nur fuer das blosse Auge gebraeuchlich), Reichweite
 
 **Isophote**:
@@ -196,7 +196,7 @@ Linie gleicher Flaechenhelligkeit eines Deep-Sky-Objekts am Himmel, in mag/arcse
 Je Deep-Sky-Zustand die Liste "Isophote gegen eingeschlossene Flaeche" (`isophoten` in `daten/objekte.json`), von `tools/` am aufbereiteten Quellbild gemessen; aus ihr bestimmt physik die sichtbare Isophote, ohne Pixel zu sehen.
 
 **Deckkraft**:
-Anteil 0 bis 1, mit dem ein Stern oder ein Deep-Sky-Pixel ueber dem Himmel erscheint, nach Blackwells Wahrscheinlichkeitskurve aus dem Verhaeltnis Kontrast zu Schwelle (0,5 an der Schwelle). Macht die Wahrnehmungsschwelle gleitend.
+Anteil 0 bis 1, mit dem ein Stern oder ein Deep-Sky-Pixel ueber dem Himmel erscheint, nach Blackwells Wahrscheinlichkeitskurve aus dem Verhaeltnis Kontrast zu Schwelle (Wahrscheinlichkeit 0,5 an der Schwelle). Bei Sternen und Trabanten gezeigt ohne den Anteil bei Kontrast 0, P' = (P - P0) / (1 - P0), also 0,49 an der Schwelle und 0 fuer sehr schwache Sterne (ADR-0004, Nachtrag Issue #100). Macht die Wahrnehmungsschwelle gleitend.
 _Vermeiden_: Alpha, Transparenz (ist eine Bedingung)
 
 **Mischgewicht**:
