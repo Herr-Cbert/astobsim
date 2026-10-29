@@ -299,6 +299,8 @@ $$B - V = -0{,}022 + 0{,}763\,(G_{BP} - G_{RP}), \qquad \text{Streuung } 0{,}042
 
 Fuer rote Sterne (M13-Riesen, $x$ = 1,6 bis 1,8; Trapez E) ist die Gerade eine Extrapolation; dort geben gaengige Tabellen B-V etwa 1,2 bis 1,4 (nicht belegt). Fuer A-P12 reicht das, weil die Farbe nur oberhalb einer Leuchtdichteschwelle gezeigt wird.
 
+> Nachtrag 2026-10-29 (Issue #104): Die Gaia-DR3-Dokumentation, Kapitel 5.5.1, Tabelle 5.9, gibt $G_{BP}-G_{RP} = f(B-V)$ (Streuung 0,066). `tools/m45_sterne.py` nimmt deren Umkehrung statt der Geraden; Formeln und Probe in `physik.md` 22. Die Zuordnung Gaia zu Hipparcos laeuft ueber die Lage, weil `gaiadr3.hipparcos2_best_neighbour` Merope, Taygeta, HIP 17791, HIP 17401 und HIP 17694 nicht fuehrt. Ergebnis wie in 4.2: 44 Mitglieder, Zaehlung 6 / 6 / 9 / 11 / 14 / 22 / 24 / 31 / 44.
+
 ### 6.4 Lizenzen und Folge fuer das Repo
 
 - **Gaia:** "Gaia data are distributed under the CC BY-NC 3.0 IGO license" (ESA Gaia-Lizenzseite [6]). Nicht CC BY-SA. Namensnennung "ESA/Gaia/DPAC"; fuer kommerzielle Nutzung ist eine Genehmigung bei ESA noetig (data.licences@esa.int) [7]. CC BY-SA 3.0 IGO gilt bei ESA fuer Bilder und Videos, nicht fuer Archivdaten [7].

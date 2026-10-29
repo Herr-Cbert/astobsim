@@ -34,6 +34,12 @@ Architektur: Stack ([ADR-0001](docs/adr/0001-stack.md)), Simulationsmodell ([ADR
 
 Der Code steht unter der MIT-Lizenz ([LICENSE](LICENSE)). Die Bilder unter `daten/bilder/` behalten ihre eigene Lizenz (NASA gemeinfrei bzw. ESA/Hubble CC BY 4.0); Quelle, Credit und Bearbeitung stehen je Bild in [daten/bilder.json](daten/bilder.json) und auf der Seite im Fuss unter "Bildnachweise".
 
+## Sterndaten
+
+Sterndaten unter `daten/` behalten wie die Bilder ihre eigene Lizenz (ADR-0003, Nachtrag Version 2); der Nachweis steht je Liste in den Daten (`quelle`, `lizenz`, `katalog` je Stern).
+
+- M45 (Plejaden), [daten/sterne/m45.json](daten/sterne/m45.json): 44 Mitglieder bis V 8,5 aus ESA Gaia DR3 und Hipparcos (ESA 1997, Neureduktion van Leeuwen 2007), abgefragt im Gaia-Archiv, erzeugt von `tools/m45_sterne.py`. Credit: ESA, Gaia DPAC; Hipparcos: ESA. Lizenz [CC BY-NC 3.0 IGO](https://creativecommons.org/licenses/by-nc/3.0/igo/) (ESA Space Science Archives, https://www.cosmos.esa.int/web/gaia-users/license); kommerzielle Nutzung nur nach Genehmigung der ESA. This work has made use of data from the European Space Agency (ESA) mission Gaia (https://www.cosmos.esa.int/gaia), processed by the Gaia Data Processing and Analysis Consortium (DPAC, https://www.cosmos.esa.int/web/gaia/dpac/consortium). Funding for the DPAC has been provided by national institutions, in particular the institutions participating in the Gaia Multilateral Agreement.
+
 ## Entwicklung
 
 ```

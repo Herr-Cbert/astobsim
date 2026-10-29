@@ -235,5 +235,23 @@
         "kommentar": "Werte aus objekte.md 6.1 mit Ringoeffnung 19 Grad (Projektentscheidung) statt 15 Grad: ring_aussen_arcsec = 2,269 x 20\" (1.1); magnitude -0,1 nach Mallama und Hilton (5.1) mit B = 19 Grad (bei 15 Grad 0,0). Trabanten nach 3.3 in der Ringebene: dx wie dort (Titan +150, Rhea -60), dy mit der Formel aus 3.3 fuer B = 19 statt 15 Grad neu gerechnet, dy = sqrt(1 - (dx/E)^2) E sin B mit E = 202,7\" bzw. 87,4\" (3.2): Titan -44,4 statt -35, Rhea +20,7 statt +17; Titan vor dem Planeten (suedlich), Rhea dahinter. Quellbild Hubble 12.09.2021 bei 18,11\" (bilder.json), Planetennorden oben. weiss_mag_arcsec2 auf den Pixelwert 1,0 geeicht, Kugel plus Ring (objekte.md 5.3, bis #71: 6,6 als Kugel aus 5.2)."
       }
     ]
+  },
+  {
+    "id": "m45",
+    "name": "M45 (Plejaden)",
+    "typ": "deep_sky",
+    "quelle_physik": "docs/recherche/deep-sky.md",
+    "zustaende": [
+      {
+        "id": "m45",
+        "name": "M45",
+        "winkelgroesse_arcsec": 7200,
+        "polar_arcsec": 7200,
+        "positionswinkel_grad": 0,
+        "magnitude": 1.4,
+        "sterne_datei": "m45.json",
+        "kommentar": "Offener Sternhaufen ohne Quellbild und ohne Profil (A-Z10: kein Reflexionsnebel; A-X9: keine Feldsterne). Ausdehnung etwa 2 Grad (deep-sky.md 4.1) als Kreis, positionswinkel_grad ohne Bedeutung. Sterne: 44 Mitglieder bis V 8,5 im Kegel 1,3 Grad, erzeugt von tools/m45_sterne.py aus Gaia DR3 und Hipparcos (deep-sky.md 4.2, physik.md 22), Lizenz CC BY-NC 3.0 IGO (daten/sterne/m45.json). magnitude ist die Summe dieser Sterne (1,38); die Literatur nennt 1,6 (deep-sky.md 4.1, Sekundaerquelle)."
+      }
+    ]
   }
 ]
