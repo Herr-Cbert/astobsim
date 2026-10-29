@@ -40,8 +40,13 @@ describe("auswerten: Rundreise A-D9", () => {
   it("keine Warnungen bei AP 1,33 mm und V 60 an 80 mm", () => {
     expect(warnungen).toEqual([]);
   });
+  it("Vorgaben Version 2 bis Issue #100: Mischgewicht 0, Grenzgroesse NaN", () => {
+    expect(parameter.helligkeit.mischgewicht).toBe(0);
+    expect(parameter.helligkeit.deepSky).toBeUndefined();
+    expect(anzeige.grenzgroesseMag).toBeNaN();
+  });
   it("Simulationsparameter: Mond, Kreismaske 3000'', Punktquellen leer, Kernmassstab gleich Arbeitsmassstab", () => {
-    expect(parameter.quellbild.punktquellen).toEqual([]);
+    expect(parameter.quellbild.punkte.punktquellen).toEqual([]);
     expect(parameter.gesichtsfeld).toEqual({ form: "kreis", breiteArcsec: 3000, hoeheArcsec: 3000 });
     expect(parameter.kern.massstabArcsecProPx).toBe(parameter.quellbild.massstabArcsecProPx);
     expect(parameter.helligkeit.faktorObjekt).toBeGreaterThan(0);
@@ -81,7 +86,7 @@ describe("auswerten: Fenster und Arbeitsraster", () => {
         expect(Number.isInteger(quellbild.rasterPx)).toBe(true);
         expect(quellbild.rasterPx * quellbild.massstabArcsecProPx).toBeCloseTo(fe.breiteArcsec, 9);
         expect(anzeige.aufloesung.gesamtFwhmArcsec / quellbild.massstabArcsecProPx).toBeLessThanOrEqual(2.5 + 1e-9);
-        expect(quellbild.massstabArcsecProPx).toBeGreaterThanOrEqual(k.objekt.quelle.massstabArcsecProPx);
+        expect(quellbild.massstabArcsecProPx).toBeGreaterThanOrEqual(k.objekt.quelle!.massstabArcsecProPx);
         expect(quellbild.massstabArcsecProPx).toBeGreaterThanOrEqual(fe.breiteArcsec / fe.px - 1e-12);
         expect(kern.massstabArcsecProPx).toBe(quellbild.massstabArcsecProPx);
         // Der Kern ist mit dem gerundeten Massstab gebaut; Abweichung hoechstens die Rundung auf 4 Stellen.
@@ -167,28 +172,36 @@ describe("auswerten: Punktquellen im Quellbild (Issue #14)", () => {
   const f = fenster(600, 64);
 
   it("fuellt quellbild.punktquellen mit den Trabanten des Objektzustands", () => {
-    const p = auswerten(saturn(60), { fenster: f }).parameter.quellbild.punktquellen;
+    const p = auswerten(saturn(60), { fenster: f }).parameter.quellbild.punkte.punktquellen;
     expect(p.map((q) => q.name)).toEqual(["Titan", "Rhea"]);
     expect(p.every((q) => q.sichtbar)).toBe(true);
   });
-  it("andere Sichtbarkeit bei gleichem Fenster gibt einen anderen Quellbild-Schluessel", () => {
+  it("andere Sichtbarkeit bei gleichem Fenster gibt einen anderen Punkte-Schluessel, das Objektraster bleibt (Stufe 1b)", () => {
     const a = auswerten(saturn(8), { fenster: f }).parameter.quellbild;
     const b = auswerten(saturn(10), { fenster: f }).parameter.quellbild;
     expect(a.massstabArcsecProPx).toBe(b.massstabArcsecProPx);
-    expect(a.punktquellen.map((q) => q.sichtbar)).toEqual([true, false]);
-    expect(b.punktquellen.map((q) => q.sichtbar)).toEqual([true, true]);
-    expect(b.schluessel).not.toBe(a.schluessel);
+    expect(a.punkte.punktquellen.map((q) => q.sichtbar)).toEqual([true, false]);
+    expect(b.punkte.punktquellen.map((q) => q.sichtbar)).toEqual([true, true]);
+    expect(b.punkte.schluessel).not.toBe(a.punkte.schluessel);
+    expect(b.schluessel).toBe(a.schluessel);
   });
   it("andere Sichtbarkeit eines Trabanten ausserhalb des Fensters aendert den Schluessel nicht", () => {
     // Fenster 160'' um Titan (150, -44,4): Rhea bei (-60, 20,7) liegt weit draussen.
     const umTitan = { breiteArcsec: 160, mitteXArcsec: 150, mitteYArcsec: -44.4, px: 16 };
     const a = auswerten(saturn(8), { fenster: umTitan }).parameter.quellbild;
     const b = auswerten(saturn(10), { fenster: umTitan }).parameter.quellbild;
-    expect(a.punktquellen[1]!.sichtbar).not.toBe(b.punktquellen[1]!.sichtbar);
+    expect(a.punkte.punktquellen[1]!.sichtbar).not.toBe(b.punkte.punktquellen[1]!.sichtbar);
+    expect(b.punkte.schluessel).toBe(a.punkte.schluessel);
+  });
+  it("Bortle, Transparenz und Seeing aendern den Objektschluessel nicht (Stufe 1, docs/architektur.md 5.4)", () => {
+    const a = auswerten(saturn(10), { fenster: f }).parameter.quellbild;
+    const k = saturn(10);
+    const b = auswerten({ ...k, bedingungen: { ...k.bedingungen, bortle: 2, transparenz: "diesig", seeingFwhmArcsec: 1 } }, { fenster: f }).parameter.quellbild;
     expect(b.schluessel).toBe(a.schluessel);
+    expect(b.punkte.schluessel).toBe(a.punkte.schluessel);
   });
   it("gleiche Sichtbarkeit bei gleichem Fenster gibt denselben Quellbild-Schluessel", () => {
-    expect(auswerten(saturn(10), { fenster: f }).parameter.quellbild.schluessel).toBe(auswerten(saturn(12), { fenster: f }).parameter.quellbild.schluessel);
+    expect(auswerten(saturn(10), { fenster: f }).parameter.quellbild.punkte.schluessel).toBe(auswerten(saturn(12), { fenster: f }).parameter.quellbild.punkte.schluessel);
   });
 });
 
@@ -203,7 +216,9 @@ describe("auswerten: Fehlerfaelle sind Programmierfehler", () => {
       [KONFIGURATION_A_D9, { fenster: { ...fenster(3000, 1024), mitteXArcsec: NaN } }, "fenster.mitteXArcsec"],
       [KONFIGURATION_A_D9, { anzeigePx: 512.5 }, "fenster.px"],
       [KONFIGURATION_A_D9, { fenster: fenster(1, 1024) }, "fenster.breiteArcsec"],
-      [mitBedingungen({ bortle: 0 }), {}, "bortle"]
+      [mitBedingungen({ bortle: 0 }), {}, "bortle"],
+      // Zustaende ohne Quellbild rechnet auswerten erst ab Issue #100.
+      [{ ...KONFIGURATION_A_D9, objekt: { ...KONFIGURATION_A_D9.objekt, quelle: undefined } }, {}, "mond-q1.quelle"]
     ];
     for (const [k, optionen, feld] of faelle) {
       let fehler: unknown;

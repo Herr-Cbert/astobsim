@@ -29,9 +29,9 @@ function quelle(): QuelleAusRaster {
 
 function parameter(teil: Partial<Simulationsparameter> = {}): Simulationsparameter {
   return {
-    quellbild: { schluessel: "q|0|0", massstabArcsecProPx: 1, rasterPx: N, mitteXArcsec: 0, mitteYArcsec: 0, punktquellen: [] },
+    quellbild: { schluessel: "q|0|0", massstabArcsecProPx: 1, rasterPx: N, mitteXArcsec: 0, mitteYArcsec: 0, punkte: { schluessel: "p", punktquellen: [] } },
     kern: deltaKern(5),
-    helligkeit: { schluessel: "h1", faktorObjekt: 1, hintergrundRelativ: 0, hintergrundMagProArcsec2: 20, punktFaktor: 1, punktExponent: 1 },
+    helligkeit: { schluessel: "h1", faktorObjekt: 1, hintergrundRelativ: 0, hintergrundMagProArcsec2: 20, punktFaktor: 1, punktExponent: 1, mischgewicht: 0 },
     gesichtsfeld: { form: "kreis", breiteArcsec: 100, hoeheArcsec: 100 },
     fenster: { breiteArcsec: N, mitteXArcsec: 0, mitteYArcsec: 0, px: N },
     ...teil
@@ -51,7 +51,7 @@ describe("rendere", () => {
   });
 
   it("Tonwert: Objektfaktor multipliziert, Hintergrundgrau addiert", () => {
-    const p = parameter({ helligkeit: { schluessel: "h2", faktorObjekt: 0.5, hintergrundRelativ: 0.1, hintergrundMagProArcsec2: 20, punktFaktor: 1, punktExponent: 1 } });
+    const p = parameter({ helligkeit: { schluessel: "h2", faktorObjekt: 0.5, hintergrundRelativ: 0.1, hintergrundMagProArcsec2: 20, punktFaktor: 1, punktExponent: 1, mischgewicht: 0 } });
     const anblick = rendere(p, quelle(), falter);
     expect(anblick.raster.daten[pixelIndex(anblick.raster, 0, 0)]).toBeCloseTo(0.6, 6);
     expect(anblick.raster.daten[pixelIndex(anblick.raster, 13, 2)]).toBeCloseTo(2.6, 6);
@@ -87,7 +87,7 @@ describe("rendere", () => {
   it("Maske bleibt bei verschobenem Fenster in der Fenstermitte, das Objekt wandert (A-D2)", () => {
     // 16''-Fenster um 8'' nach rechts verschoben, Kreis 16'': ganzer Kreis sichtbar, Ecken schwarz.
     const p = parameter({
-      quellbild: { schluessel: "q|8|0", massstabArcsecProPx: 1, rasterPx: N, mitteXArcsec: 8, mitteYArcsec: 0, punktquellen: [] },
+      quellbild: { schluessel: "q|8|0", massstabArcsecProPx: 1, rasterPx: N, mitteXArcsec: 8, mitteYArcsec: 0, punkte: { schluessel: "p", punktquellen: [] } },
       fenster: { breiteArcsec: N, mitteXArcsec: 8, mitteYArcsec: 0, px: N },
       gesichtsfeld: { form: "kreis", breiteArcsec: N, hoeheArcsec: N }
     });
@@ -168,7 +168,7 @@ describe("rendere", () => {
     const aussen: Punktquelle = { ...trabant, name: "Kallisto", xArcsec: 30 };
     const geblendet: Punktquelle = { ...trabant, name: "Europa", xArcsec: 19.5, sichtbar: false, grund: "blendung" };
     const p = parameter({
-      quellbild: { schluessel: "q|t", massstabArcsecProPx: 1, rasterPx: 48, mitteXArcsec: 0, mitteYArcsec: 0, punktquellen: [trabant, aussen, geblendet] },
+      quellbild: { schluessel: "q|t", massstabArcsecProPx: 1, rasterPx: 48, mitteXArcsec: 0, mitteYArcsec: 0, punkte: { schluessel: "p|t", punktquellen: [trabant, aussen, geblendet] } },
       fenster: { breiteArcsec: 48, mitteXArcsec: 0, mitteYArcsec: 0, px: 48 }
     });
     const r = rendere(p, quelle(), falter).raster;
@@ -178,27 +178,27 @@ describe("rendere", () => {
     expect(summe(r)).toBeCloseTo(N * N + 4 + fluss, 3);
   });
 
-  it("Trabanten liegen in Stufe 1: neuer Quellbild-Schluessel malt neu, gleicher nicht", () => {
+  it("Trabanten liegen in Stufe 1b: neuer Punkte-Schluessel malt neu, Objektraster und Faltung bleiben", () => {
     const q = quelle();
     const f = new FalterZaehlend();
     const zwischen: Zwischenspeicher = {};
     const p = parameter();
     const trabant: Punktquelle = { name: "Io", xArcsec: -5.5, yArcsec: 0.5, durchmesserArcsec: 1, helligkeitRelativ: 1, sichtbar: true };
     const ohne = rendere(p, q, f, zwischen).raster;
-    const mit = rendere(parameter({ quellbild: { ...p.quellbild, schluessel: "q|io", punktquellen: [trabant] } }), q, f, zwischen).raster;
-    expect([q.aufrufe, f.aufrufe]).toEqual([2, 2]);
+    const mit = rendere(parameter({ quellbild: { ...p.quellbild, punkte: { schluessel: "p|io", punktquellen: [trabant] } } }), q, f, zwischen).raster;
+    expect([q.aufrufe, f.aufrufe]).toEqual([1, 1]);
     expect(summe(mit) - summe(ohne)).toBeCloseTo(Math.PI / 4, 4);
   });
 
   it("flaechige Objekte bitgleich (Issue #72): ohne sichtbare Punktquelle ist der Anblick der lineare Tonwert wie vorher", () => {
     // Referenz ist die Pipeline vor #72: maskiere(skaliere(f * falte(mittele(quelle)) + h)).
     const kern = kastenKern(3);
-    const h = { schluessel: "h4", faktorObjekt: 1.7, hintergrundRelativ: 0.0123, hintergrundMagProArcsec2: 20, punktFaktor: 4.9, punktExponent: 1 / 3 };
+    const h = { schluessel: "h4", faktorObjekt: 1.7, hintergrundRelativ: 0.0123, hintergrundMagProArcsec2: 20, punktFaktor: 4.9, punktExponent: 1 / 3, mischgewicht: 0 };
     const geblendet: Punktquelle = { name: "Io", xArcsec: -5.5, yArcsec: 0.5, durchmesserArcsec: 1, helligkeitRelativ: 1, sichtbar: false, grund: "blendung" };
     const gesichtsfeld = { form: "kreis" as const, breiteArcsec: 14, hoeheArcsec: 14 };
     const fenster = { breiteArcsec: N, mitteXArcsec: 0, mitteYArcsec: 0, px: 37 };
     for (const punktquellen of [[], [geblendet]]) {
-      const p = parameter({ kern, helligkeit: h, gesichtsfeld, fenster, quellbild: { ...parameter().quellbild, punktquellen } });
+      const p = parameter({ kern, helligkeit: h, gesichtsfeld, fenster, quellbild: { ...parameter().quellbild, punkte: { schluessel: `p|${punktquellen.length}`, punktquellen } } });
       const q = quelle();
       const ausschnitt = q.ausschnitt({ xArcsec: 0, yArcsec: 0 }, N, 1);
       const gefaltet = falter.falte(mittele(ausschnitt, p.quellbild), kern);
@@ -212,18 +212,18 @@ describe("rendere", () => {
     // Trabant 0,1'' mit h = 1: Fluss pi/400 = 0,00785 auf ein Pixel (Deltakern). Linear 0,00785, mit
     // punktFaktor 1 und Exponent 1/3 dagegen 0,199.
     const trabant: Punktquelle = { name: "Io", xArcsec: -5.5, yArcsec: 0.5, durchmesserArcsec: 0.1, helligkeitRelativ: 1, sichtbar: true };
-    const p = parameter({ quellbild: { ...parameter().quellbild, schluessel: "q|io", punktquellen: [trabant] } });
+    const p = parameter({ quellbild: { ...parameter().quellbild, punkte: { schluessel: "p|io", punktquellen: [trabant] } } });
     const zwischen: Zwischenspeicher = {};
     const f = new FalterZaehlend();
     const linear = rendere(p, quelle(), f, zwischen).raster;
     expect(linear.daten[pixelIndex(linear, 2, 7)]).toBeCloseTo(1 + Math.PI / 400, 6);
-    const ebene = zwischen.stufe2?.punktebene;
+    const ebene = zwischen.punktebene?.raster;
     expect(ebene).toBeDefined();
     const komprimiert = rendere({ ...p, helligkeit: { ...p.helligkeit, schluessel: "h5", punktExponent: 1 / 3 } }, quelle(), f, zwischen).raster;
     expect(komprimiert.daten[pixelIndex(komprimiert, 2, 7)]).toBeCloseTo(1 + Math.cbrt(Math.PI / 400), 6);
     expect(komprimiert.daten[pixelIndex(komprimiert, 3, 7)]).toBe(1);
     expect(f.aufrufe).toBe(1);
-    expect(zwischen.stufe2?.punktebene).toBe(ebene);
+    expect(zwischen.punktebene?.raster).toBe(ebene);
   });
 
   it("wirft BildFehler bei verletzten Invarianten der Naht", () => {

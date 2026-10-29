@@ -115,11 +115,11 @@ describe("helligkeit: Naht-Werte sind Anzeigehelligkeiten", () => {
 });
 
 /** Mond mit dem Quellweiss aus daten/objekte.json (mond_ev, 3,35). */
-const MOND_EV: Objektzustand = { ...MOND, quelle: { ...MOND.quelle, weissMagProArcsec2: 3.35 } };
+const MOND_EV: Objektzustand = { ...MOND, quelle: { ...MOND.quelle!, weissMagProArcsec2: 3.35 } };
 /** Mars 14'' mit Quellweiss 4,1 (daten/objekte.json mars_14). */
-const MARS_14: Objektzustand = { kennung: "mars-14", durchmesserArcsec: 14, magnitude: -1, quelle: { breitePx: 1000, hoehePx: 1000, massstabArcsecProPx: 0.04, weissMagProArcsec2: 4.1 }, trabanten: [] };
+const MARS_14: Objektzustand = { kennung: "mars-14", klasse: "sonnensystem", sterne: [], durchmesserArcsec: 14, magnitude: -1, quelle: { breitePx: 1000, hoehePx: 1000, massstabArcsecProPx: 0.04, weissMagProArcsec2: 4.1 }, trabanten: [] };
 /** Mars 6'' mit Quellweiss 4,5 (daten/objekte.json mars_6), der dunkelste Zustand der Version 1. */
-const MARS_6: Objektzustand = { ...MARS_14, kennung: "mars-6", durchmesserArcsec: 6, quelle: { ...MARS_14.quelle, weissMagProArcsec2: 4.5 } };
+const MARS_6: Objektzustand = { ...MARS_14, kennung: "mars-6", durchmesserArcsec: 6, quelle: { ...MARS_14.quelle!, weissMagProArcsec2: 4.5 } };
 const AUGE: Auge = { art: "auge" };
 const FERNGLAS_10X50: Fernglas = { art: "fernglas", oeffnungMm: 50, vergroesserung: 10, wahresGesichtsfeldGrad: 6.5 };
 
@@ -192,10 +192,10 @@ describe("helligkeit: Akzeptanz Issue #55 (Tabelle 12.4)", () => {
 });
 
 /** Mars mit Quellweiss nach Issue #71 (daten/objekte.json mars_14 2,54, mars_25 1,68). */
-const MARS_14_GEEICHT: Objektzustand = { ...MARS_14, quelle: { ...MARS_14.quelle, weissMagProArcsec2: 2.54 } };
-const MARS_25_GEEICHT: Objektzustand = { ...MARS_14, kennung: "mars-25", durchmesserArcsec: 25, magnitude: -3, quelle: { ...MARS_14.quelle, weissMagProArcsec2: 1.68 } };
+const MARS_14_GEEICHT: Objektzustand = { ...MARS_14, quelle: { ...MARS_14.quelle!, weissMagProArcsec2: 2.54 } };
+const MARS_25_GEEICHT: Objektzustand = { ...MARS_14, kennung: "mars-25", durchmesserArcsec: 25, magnitude: -3, quelle: { ...MARS_14.quelle!, weissMagProArcsec2: 1.68 } };
 /** Jupiter 47'' mit Quellweiss nach Issue #71 (daten/objekte.json jup_47 4,29). */
-const JUPITER_47: Objektzustand = { kennung: "jup-47", durchmesserArcsec: 47, magnitude: -2.7, quelle: { breitePx: 1000, hoehePx: 1000, massstabArcsecProPx: 0.05, weissMagProArcsec2: 4.29 }, trabanten: [] };
+const JUPITER_47: Objektzustand = { kennung: "jup-47", klasse: "sonnensystem", sterne: [], durchmesserArcsec: 47, magnitude: -2.7, quelle: { breitePx: 1000, hoehePx: 1000, massstabArcsecProPx: 0.05, weissMagProArcsec2: 4.29 }, trabanten: [] };
 
 // Punktebene, docs/recherche/physik.md Abschnitt 14 (Tabelle 14.3).
 describe("helligkeit: Punktebene (Issue #72)", () => {

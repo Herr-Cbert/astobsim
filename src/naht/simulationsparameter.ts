@@ -7,7 +7,9 @@
 // bedeutet), linear. Massstaebe in Bogensekunden je Pixel.
 //
 // Vertrag fuer bild: Anblick = tonwert(falte(mittele(quelle, quellbild), kern),
-// faltePunkte(punktquellen, kern), helligkeit), maskiert mit gesichtsfeld, gezeichnet in fenster.
+// faltePunkte(quellbild.punkte.punktquellen, kern), helligkeit), maskiert mit gesichtsfeld, gezeichnet
+// in fenster. Version 2 (docs/architektur.md 5.3): Objektraster (Stufe 1) und Punkte (Stufe 1b)
+// tragen getrennte Schluessel, damit ein Zug an Bortle das Objektraster nicht neu faltet.
 // Punktquellen liegen in einer eigenen Ebene (Issue #72), nicht im Objektraster, weil tonwert sie
 // je Pixel abbildet (docs/recherche/physik.md Abschnitt 14). Jede Stufe traegt einen Schluessel aus
 // den gerundeten Eingangsgroessen: gleicher Schluessel heisst gleiches Ergebnis, bild darf das
@@ -25,10 +27,11 @@ export interface Fenster {
 }
 
 /**
- * Stufe 1: Ausschnitt des Quellbilds auf das Arbeitsraster mitteln, Punktquellen malen.
+ * Stufe 1: Ausschnitt des Quellbilds auf das Arbeitsraster mitteln; Stufe 1b: Punktquellen malen.
  * Invariante: rasterPx * massstabArcsecProPx = fenster.breiteArcsec.
  */
 export interface Quellbild {
+  /** Objektraster: kennung, Massstab, rasterPx, Mitte; ohne Punktquellen. */
   schluessel: string;
   /** Arbeitsmassstab in Bogensekunden je Arbeitspixel. */
   massstabArcsecProPx: number;
@@ -37,15 +40,20 @@ export interface Quellbild {
   /** Mitte des Ausschnitts in Objektkoordinaten, gleich Fenster.mitte. */
   mitteXArcsec: number;
   mitteYArcsec: number;
-  /** Vor der Faltung als Scheibchen in die Punktebene malen (nicht ins Objektraster, Issue #72). */
-  punktquellen: Punktquelle[];
+  /**
+   * Stufe 1b: vor der Faltung als Scheibchen in die Punktebene malen (nicht ins Objektraster,
+   * Issue #72). Der Schluessel enthaelt Lage, Fluss, Deckkraft und Farbe je gemalter Punktquelle.
+   */
+  punkte: { schluessel: string; punktquellen: Punktquelle[] };
 }
 
 /**
  * Trabant als Punktquelle: Position und Durchmesser in Bogensekunden in Objektkoordinaten.
  * helligkeitRelativ ist die Flaechenhelligkeit relativ zu Quellweiss ohne den gemeinsamen
- * Faktor aus Helligkeit (punktFaktor, punktExponent). Die Blendungsregel (A-P6) ist bereits entschieden:
- * sichtbar false mit grund "blendung" heisst unterdrueckt, ui kann das erklaeren.
+ * Faktor aus Helligkeit (punktFaktor, punktExponent); ohne Quellbild relativ zu 0 mag/arcsec^2.
+ * Blendungsregel (A-P6) und Wahrnehmungsschwelle (A-P11) sind bereits entschieden: sichtbar false
+ * mit grund "blendung" heisst unterdrueckt, mit "unter_schwelle" Deckkraft unter 1e-3, nicht gemalt;
+ * ui kann das erklaeren.
  */
 export interface Punktquelle {
   name: string;
@@ -54,7 +62,11 @@ export interface Punktquelle {
   durchmesserArcsec: number;
   helligkeitRelativ: number;
   sichtbar: boolean;
-  grund?: "blendung";
+  grund?: "blendung" | "unter_schwelle";
+  /** (0, 1], Blackwell (A-P11); fehlt = 1. */
+  deckkraft?: number;
+  /** Linear sRGB (D65), Y = 1 (A-P12); fehlt = grau. */
+  farbe?: [number, number, number];
 }
 
 /**
@@ -107,9 +119,13 @@ export interface Kernbeschreibung {
  * Punktebene (Issue #72, physik.md Abschnitt 14): jedes Pixel p (relativ zu Quellweiss) wird wie eine
  * eigene Flaeche abgebildet und addiert: min(1, (punktFaktor * p)^punktExponent). punktFaktor ist die
  * Leuchtdichte von Quellweiss im Okular relativ zu Anzeigeweiss (linear, nicht komprimiert),
- * punktExponent der Kompressionsexponent; es gilt faktorObjekt = punktFaktor^punktExponent.
+ * punktExponent der Kompressionsexponent. faktorObjekt = punktFaktor^punktExponent gilt nur, solange
+ * Anzeigeweiss und Punktweiss gleich sind (heute beide 3,35; Version 2: 9,2 und 6,4, A-P13).
  * hintergrundMagProArcsec2 ist physikalisch; heute liest es niemand ausser dem Schluessel (die UI zeigt
  * die Himmelshelligkeit ueber bortleMagProArcsec2).
+ *
+ * Bitgleichheit (docs/architektur.md 5.3): mit mischgewicht 0 und ohne deepSky rechnet tonwert den
+ * Ausdruck aus Version 1 in gleicher Reihenfolge.
  */
 export interface Helligkeit {
   schluessel: string;
@@ -118,6 +134,21 @@ export interface Helligkeit {
   hintergrundMagProArcsec2: number;
   punktFaktor: number;
   punktExponent: number;
+  /** g in [0, 1) (A-P10), nur sonnensystem; 0 = Flaeche wie Version 1. */
+  mischgewicht: number;
+  /** Nur deep_sky mit Quellbild (ADR-0004 Ebene b). */
+  deepSky?: {
+    /** a: Leuchtdichte von Quellweiss im Okular relativ zum Anzeigeweiss. */
+    faktor: number;
+    /** s: Leuchtdichte des Himmels im Okular relativ zum Anzeigeweiss. */
+    himmel: number;
+    /** q*: Pixelwert (relativ zu Quellweiss) an der sichtbaren Isophote. */
+    schwelleRelativ: number;
+    /** Breite der Blackwell-Kurve, 0,484; Konstante aus physik, nicht in bild. */
+    breite: number;
+    /** Anzeigehelligkeit, >= 0 (Mindestsichtbarkeit, ADR-0004). */
+    sockel: number;
+  };
 }
 
 /**

@@ -1,10 +1,10 @@
 // rendere: aus Simulationsparametern und einer Quelle entsteht der Anblick (docs/architektur.md
 // Abschnitt 3): Anblick = tonwert(falte(mittele(quelle, quellbild), kern),
-// faltePunkte(male(quellbild.punktquellen), kern), helligkeit), maskiert mit gesichtsfeld, gezeichnet
-// in fenster. Objekt und Punktquellen liegen seit Issue #72 in getrennten Ebenen, weil tonwert sie
-// verschieden auf die Anzeige abbildet (docs/recherche/physik.md Abschnitt 14). Zwischenergebnisse
-// der Stufen 1 und 2 werden nach Stufenschluessel wiederverwendet; der Aufrufer haelt dazu einen
-// Zwischenspeicher.
+// faltePunkte(male(quellbild.punkte.punktquellen), kern), helligkeit), maskiert mit gesichtsfeld,
+// gezeichnet in fenster. Objekt und Punktquellen liegen seit Issue #72 in getrennten Ebenen, weil
+// tonwert sie verschieden auf die Anzeige abbildet (docs/recherche/physik.md Abschnitt 14).
+// Zwischenergebnisse der Stufen 1, 1b und 2 werden nach Stufenschluessel wiederverwendet, Objekt und
+// Punkte getrennt (docs/architektur.md 5.4); der Aufrufer haelt dazu einen Zwischenspeicher.
 
 import type { Fenster, Gesichtsfeld, Helligkeit, Simulationsparameter } from "../naht/simulationsparameter";
 import type { Falter } from "./falter";
@@ -30,10 +30,14 @@ export interface Anblick {
 
 /** Behaelt je Stufe das letzte Ergebnis mit seinem Schluessel. Einer je Anzeige, vom Aufrufer als {} angelegt. */
 export interface Zwischenspeicher {
-  /** Gemitteltes Objektraster und die gemalten Punktquellen. */
-  stufe1?: { schluessel: string; raster: Raster; scheibchen: Scheibchen[] };
-  /** Gefaltetes Objektraster und die gefaltete Punktebene (undefined ohne Punktquelle im Raster). */
-  stufe2?: { schluessel: string; raster: Raster; punktebene: Raster | undefined };
+  /** Stufe 1: gemitteltes Objektraster. */
+  objekt?: { schluessel: string; raster: Raster };
+  /** Stufe 1b: die gemalten Punktquellen. */
+  punkte?: { schluessel: string; scheibchen: Scheibchen[] };
+  /** Stufe 2: gefaltetes Objektraster. */
+  gefaltet?: { schluessel: string; raster: Raster };
+  /** Stufe 2: gefaltete Punktebene (undefined ohne Punktquelle im Raster). */
+  punktebene?: { schluessel: string; raster: Raster | undefined };
 }
 
 /** Relative Toleranz fuer Gleichheit von Massstaeben und Breiten, die physik gerundet liefert. */
@@ -133,9 +137,11 @@ function maskiereAn(raster: Raster, gesichtsfeld: Gesichtsfeld, fenster: Fenster
 }
 
 /**
- * Fuehrt die Pipeline aus. Stufe 1 (Ausschnitt holen, mitteln, Trabanten malen) wird unter
- * quellbild.schluessel behalten, Stufe 2 (Faltung des Objekts mit dem Falter, der Punktebene lokal
- * in punktebene.ts) unter kern.schluessel plus quellbild.schluessel.
+ * Fuehrt die Pipeline aus. Stufe 1 (Ausschnitt holen, mitteln) wird unter quellbild.schluessel
+ * behalten, Stufe 1b (Trabanten malen) unter quellbild.schluessel plus quellbild.punkte.schluessel,
+ * weil das Malen auch Massstab, Raster und Mitte braucht. Stufe 2 getrennt: die Faltung des Objekts
+ * mit dem Falter unter kern.schluessel plus Objektschluessel, die der Punktebene (lokal in
+ * punktebene.ts) unter kern.schluessel plus Punkteschluessel.
  * Wer den Zwischenspeicher weglaesst, rechnet alles neu. Der Zwischenspeicher gehoert zu genau
  * einer Quelle; bei Wechsel der Quelle einen neuen anlegen.
  */
@@ -143,28 +149,37 @@ export function rendere(parameter: Simulationsparameter, quelle: Quelle, falter:
   pruefeParameter(parameter);
   const { quellbild, kern, helligkeit, gesichtsfeld, fenster } = parameter;
 
-  let stufe1 = zwischen.stufe1;
-  if (!stufe1 || stufe1.schluessel !== quellbild.schluessel) {
+  let objekt = zwischen.objekt;
+  if (!objekt || objekt.schluessel !== quellbild.schluessel) {
     const mitte = { xArcsec: quellbild.mitteXArcsec, yArcsec: quellbild.mitteYArcsec };
     const ausschnitt = quelle.ausschnitt(mitte, quellbild.rasterPx * quellbild.massstabArcsecProPx, quellbild.massstabArcsecProPx);
     pruefeRaster(ausschnitt.raster, "Quellausschnitt");
-    stufe1 = { schluessel: quellbild.schluessel, raster: mittele(ausschnitt, quellbild), scheibchen: malePunktquellen(quellbild) };
-    zwischen.stufe1 = stufe1;
-    zwischen.stufe2 = undefined;
+    objekt = { schluessel: quellbild.schluessel, raster: mittele(ausschnitt, quellbild) };
+    zwischen.objekt = objekt;
   }
 
-  const schluessel2 = `${kern.schluessel}|${quellbild.schluessel}`;
-  let stufe2 = zwischen.stufe2;
-  if (!stufe2 || stufe2.schluessel !== schluessel2) {
-    stufe2 = {
-      schluessel: schluessel2,
-      raster: falter.falte(stufe1.raster, kern),
-      punktebene: faltePunkte(stufe1.scheibchen, kern, stufe1.raster.breite)
-    };
-    zwischen.stufe2 = stufe2;
+  const schluesselPunkte = `${quellbild.schluessel}|${quellbild.punkte.schluessel}`;
+  let punkte = zwischen.punkte;
+  if (!punkte || punkte.schluessel !== schluesselPunkte) {
+    punkte = { schluessel: schluesselPunkte, scheibchen: malePunktquellen(quellbild) };
+    zwischen.punkte = punkte;
   }
 
-  const getont = tonwert(stufe2.raster, stufe2.punktebene, helligkeit);
+  const schluesselGefaltet = `${kern.schluessel}|${objekt.schluessel}`;
+  let gefaltet = zwischen.gefaltet;
+  if (!gefaltet || gefaltet.schluessel !== schluesselGefaltet) {
+    gefaltet = { schluessel: schluesselGefaltet, raster: falter.falte(objekt.raster, kern) };
+    zwischen.gefaltet = gefaltet;
+  }
+
+  const schluesselPunktebene = `${kern.schluessel}|${punkte.schluessel}`;
+  let punktebene = zwischen.punktebene;
+  if (!punktebene || punktebene.schluessel !== schluesselPunktebene) {
+    punktebene = { schluessel: schluesselPunktebene, raster: faltePunkte(punkte.scheibchen, kern, objekt.raster.breite) };
+    zwischen.punktebene = punktebene;
+  }
+
+  const getont = tonwert(gefaltet.raster, punktebene.raster, helligkeit);
   const raster = skaliere(getont, fenster.px);
   maskiereAn(raster, gesichtsfeld, fenster);
   return { fenster, massstabArcsecProPx: fenster.breiteArcsec / fenster.px, raster };

@@ -2,7 +2,7 @@
 // einem Aufruf (docs/architektur.md Abschnitt 3, docs/entwuerfe/naht-variante-3.md Abschnitt 1.3,
 // A-D4, A-D5, A-D7). Reihenfolge: optik -> atmosphaere -> aufloesung -> fenster -> arbeitsmassstab
 // -> Arbeitsraster -> kernbeschreibung; dann nur bei geaendertem Kernschluessel baueKern; dann
-// punktquellen, Quellbild mit Schluessel, helligkeit, Anzeigewerte, Warnungen. Formeln stehen in den Stufe-1-Funktionen, hier kommt keine neue hinzu.
+// punktquellen, Quellbild mit Schluesseln fuer Objektraster und Punkte, helligkeit, Anzeigewerte, Warnungen. Formeln stehen in den Stufe-1-Funktionen, hier kommt keine neue hinzu.
 //
 // Keine Memoisierung: Wiederverwendet wird nur der Kern aus vorher (architektur.md: ein vorher
 // statt Cache). Bortle, Transparenz und Verschieben bauen keinen Kern; Seeing, Hoehe, Oeffnung,
@@ -13,7 +13,7 @@ import type { Fenster, Kern, Punktquelle, Quellbild, Simulationsparameter } from
 import { arbeitsmassstab, kernbeschreibung, kernSchluessel } from "./arbeitsmassstab";
 import { atmosphaere, seeingstufe } from "./atmosphaere";
 import { type Aufloesung, aufloesung } from "./aufloesung";
-import { PhysikFehler, pruefePositiv } from "./fehler";
+import { PhysikFehler, pruefePositiv, quelleVon } from "./fehler";
 import { helligkeit } from "./helligkeit";
 import { baueKern } from "./kern";
 import { ANZEIGE_PX_STANDARD, ARCSEC_PRO_GRAD, AUSTRITTSPUPILLE_MIN_MM, PUPILLE_MM, type Seeingwortstufe } from "./konstanten";
@@ -26,6 +26,8 @@ import { schluessel } from "./schluessel";
  * blossen Auge die Breite des Rechtecks), Austrittspupille in mm, die Aufloesung mit Rayleigh,
  * Dawes, den drei Grenzen und der dominanten, Seeing als Wortstufe und Pickering-Bereich zur
  * eingestellten Zenit-FWHM (A-B1), Luftmasse und Extinktion in mag. Texte macht ui.
+ * Version 2 (docs/architektur.md 5.3): Grenzgroesse der Sterne am Okular mit Extinktion (A-P11),
+ * sichtbare Isophote bei deep_sky, Mischgewicht bei sonnensystem (Hilfetext "unaufgeloest", A-P10).
  */
 export interface Anzeigewerte {
   vergroesserung: number;
@@ -37,17 +39,23 @@ export interface Anzeigewerte {
   pickeringBis: number;
   luftmasse: number;
   extinktionMag: number;
+  grenzgroesseMag: number;
+  isophote?: { magProArcsec2: number; flaecheArcsec2: number; alleSichtbar: boolean };
+  mischgewicht?: number;
 }
 
 /**
  * Warnung nach A-D5 mit dem Wert und der ueberschrittenen Grenze: Austrittspupille ueber 6 mm
  * oder unter 0,5 mm (in mm), Vergroesserung ueber 2 D (als Vergroesserung). Unter 0,5 mm und
  * ueber 2 D fallen zusammen (AP = D / V), beide werden gemeldet, ui entscheidet ueber die Anzeige.
+ * ueberstrahlung (A-Z9, Version 2): wert ist |Delta m| der beiden Sterne, grenze 4.
  */
 export interface Warnung {
-  art: "ap-ueber-6" | "ap-unter-0-5" | "v-ueber-2d";
+  art: "ap-ueber-6" | "ap-unter-0-5" | "v-ueber-2d" | "ueberstrahlung";
   wert: number;
   grenze: number;
+  /** Nur ueberstrahlung: die beiden Sterne. */
+  sterne?: [string, string];
 }
 
 /** Ergebnis von auswerten: was bild braucht, was ui anzeigt, und die Warnungen. */
@@ -139,9 +147,10 @@ export function auswerten(k: Konfiguration, optionen: Auswertoptionen = {}): Aus
   const aufl = aufloesung(o, a);
   const fenster = optionen.fenster ?? standardfenster(o, optionen.anzeigePx ?? ANZEIGE_PX_STANDARD);
   pruefeFenster(fenster);
-  pruefePositiv("objekt.quelle.massstabArcsecProPx", k.objekt.quelle.massstabArcsecProPx);
+  const quelle = quelleVon(k.objekt);
+  pruefePositiv("objekt.quelle.massstabArcsecProPx", quelle.massstabArcsecProPx);
 
-  const { rasterPx, massstabArcsecProPx } = arbeitsraster(fenster, arbeitsmassstab(aufl, k.objekt.quelle, fenster));
+  const { rasterPx, massstabArcsecProPx } = arbeitsraster(fenster, arbeitsmassstab(aufl, quelle, fenster));
   const beschreibung = kernbeschreibung(o, a, aufl, massstabArcsecProPx);
   const vorherKern = optionen.vorher?.kern;
   const gebaut: Kern = vorherKern !== undefined && vorherKern.schluessel === kernSchluessel(beschreibung) ? vorherKern : baueKern(beschreibung);
@@ -149,10 +158,12 @@ export function auswerten(k: Konfiguration, optionen: Auswertoptionen = {}): Aus
 
   // Massstab und Mitte gehen ungerundet in den Schluessel, damit gleicher Schluessel gleiches
   // Ergebnis heisst: Verschieben um weniger als die vierte Stelle ist bei feinem Massstab mehrere
-  // Arbeitspixel weit, und bild fragt mit rasterPx * massstab an. Die sichtbaren Punktquellen im
-  // Fenster gehen mit allen Feldern ein, die bild malt: die Blendungsregel haengt von der
-  // Vergroesserung ab, ein Okularwechsel kann also Stufe 1 aendern, ohne Ausschnitt oder Massstab
-  // zu aendern. Punktquellen ganz ausserhalb des Fensters malt bild nicht, sie bleiben draussen.
+  // Arbeitspixel weit, und bild fragt mit rasterPx * massstab an. Die Punktquellen haben einen
+  // eigenen Schluessel (Stufe 1b, docs/architektur.md 5.4), damit Bortle, Transparenz und Seeing
+  // das Objektraster nicht neu rechnen lassen. In ihn gehen die sichtbaren Punktquellen im Fenster
+  // mit allen Feldern ein, die bild malt: die Blendungsregel haengt von der Vergroesserung ab, ein
+  // Okularwechsel kann also Stufe 1b aendern, ohne Ausschnitt oder Massstab zu aendern.
+  // Punktquellen ganz ausserhalb des Fensters malt bild nicht, sie bleiben draussen.
   const punkte = punktquellen(k.objekt, o);
   const gemalt = punkte
     .filter((p) => p.sichtbar && imFenster(p, fenster, massstabArcsecProPx))
@@ -164,14 +175,13 @@ export function auswerten(k: Konfiguration, optionen: Auswertoptionen = {}): Aus
       String(massstabArcsecProPx),
       rasterPx,
       String(fenster.mitteXArcsec),
-      String(fenster.mitteYArcsec),
-      ...gemalt
+      String(fenster.mitteYArcsec)
     ),
     massstabArcsecProPx,
     rasterPx,
     mitteXArcsec: fenster.mitteXArcsec,
     mitteYArcsec: fenster.mitteYArcsec,
-    punktquellen: punkte
+    punkte: { schluessel: schluessel("punkte", ...gemalt), punktquellen: punkte }
   };
 
   const stufe = seeingstufe(k.bedingungen.seeingFwhmArcsec);
@@ -192,7 +202,9 @@ export function auswerten(k: Konfiguration, optionen: Auswertoptionen = {}): Aus
       pickeringVon: stufe.pickeringVon,
       pickeringBis: stufe.pickeringBis,
       luftmasse: a.luftmasse,
-      extinktionMag: a.extinktionMag
+      extinktionMag: a.extinktionMag,
+      // Vorgabe bis Issue #100 (grenzgroesse aus schwelle.ts, #96); ui zeigt sie noch nicht an.
+      grenzgroesseMag: NaN
     },
     warnungen: warnungen(o)
   };

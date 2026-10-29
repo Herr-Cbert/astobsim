@@ -98,6 +98,6 @@ describe("Startkonfiguration A-D9 durch Stufe 1", () => {
     expect(aufl.gesamtFwhmArcsec).toBeGreaterThan(2.5);
     expect(aufl.gesamtFwhmArcsec).toBeLessThan(3.2);
     const f = fenster(o.gesichtsfeld.breiteArcsec, 1024);
-    expect(arbeitsmassstab(aufl, k.objekt.quelle, f)).toBeCloseTo(3000 / 1024, 12);
+    expect(arbeitsmassstab(aufl, k.objekt.quelle!, f)).toBeCloseTo(3000 / 1024, 12);
   });
 });

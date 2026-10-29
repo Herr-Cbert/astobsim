@@ -33,6 +33,8 @@ export function objektzustand(objekte: readonly Objekt[], nachweise: readonly Bi
   }
   return {
     kennung: zustand.id,
+    // Vorgaben bis Issue #102: objekte.json kennt nur mond und planet, beide sonnensystem.
+    klasse: "sonnensystem",
     durchmesserArcsec: zustand.winkelgroesseArcsec,
     magnitude: zustand.magnitude,
     quelle: {
@@ -41,7 +43,8 @@ export function objektzustand(objekte: readonly Objekt[], nachweise: readonly Bi
       massstabArcsecProPx: zustand.winkelgroesseArcsec / nachweis.objektDurchmesserPx,
       weissMagProArcsec2: zustand.weissMagProArcsec2
     },
-    trabanten: zustand.trabanten.map((t) => ({ ...t }))
+    trabanten: zustand.trabanten.map((t) => ({ ...t })),
+    sterne: []
   };
 }
 

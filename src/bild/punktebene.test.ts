@@ -12,7 +12,7 @@ import { deltaKern, kastenKern, kernAusDaten, verschobenerDeltaKern } from "./te
 const N = 32;
 
 function quellbild(punktquellen: Punktquelle[], teil: Partial<Quellbild> = {}): Quellbild {
-  return { schluessel: "q", massstabArcsecProPx: 1, rasterPx: N, mitteXArcsec: 0, mitteYArcsec: 0, punktquellen, ...teil };
+  return { schluessel: "q", massstabArcsecProPx: 1, rasterPx: N, mitteXArcsec: 0, mitteYArcsec: 0, punkte: { schluessel: "p", punktquellen }, ...teil };
 }
 
 function punkt(teil: Partial<Punktquelle> = {}): Punktquelle {
@@ -32,7 +32,7 @@ function gaussKern(): ReturnType<typeof deltaKern> {
 }
 
 function helligkeit(teil: Partial<Helligkeit> = {}): Helligkeit {
-  return { schluessel: "h", faktorObjekt: 0.5, hintergrundRelativ: 0.01, hintergrundMagProArcsec2: 20, punktFaktor: 1, punktExponent: 1, ...teil };
+  return { schluessel: "h", faktorObjekt: 0.5, hintergrundRelativ: 0.01, hintergrundMagProArcsec2: 20, punktFaktor: 1, punktExponent: 1, mischgewicht: 0, ...teil };
 }
 
 describe("faltePunkte", () => {

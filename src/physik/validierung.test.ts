@@ -63,7 +63,7 @@ interface Fall {
 function kern(f: Fall): Kern {
   const breite = f.geraet.art === "fernrohr" ? 100 : 2000;
   const a = auswerten({ geraet: f.geraet, objekt: f.objekt, bedingungen: f.bedingungen }, { fenster: fenster(breite, 1024) });
-  const ohneFenster = arbeitsmassstabOhneFenster(a.anzeige.aufloesung, f.objekt.quelle);
+  const ohneFenster = arbeitsmassstabOhneFenster(a.anzeige.aufloesung, f.objekt.quelle!);
   // Das Arbeitsraster rundet die Pixelzahl im Fenster ab, der Massstab wird daher hoechstens etwas groeber.
   expect(a.parameter.kern.massstabArcsecProPx).toBeGreaterThanOrEqual(ohneFenster);
   expect(a.parameter.kern.massstabArcsecProPx).toBeLessThan(1.02 * ohneFenster);
@@ -105,8 +105,8 @@ describe("Validierung T6: blosses Auge und Fernglas 10x50 (Blendungsregel, Gesic
 
   it("blosses Auge: alle vier Jupitertrabanten geblendet, Gesichtsfeld rechteckig", () => {
     const p = jupiter(AUGE);
-    expect(p.quellbild.punktquellen).toHaveLength(4);
-    for (const q of p.quellbild.punktquellen) {
+    expect(p.quellbild.punkte.punktquellen).toHaveLength(4);
+    for (const q of p.quellbild.punkte.punktquellen) {
       expect(q.sichtbar).toBe(false);
       expect(q.grund).toBe("blendung");
     }
@@ -115,7 +115,7 @@ describe("Validierung T6: blosses Auge und Fernglas 10x50 (Blendungsregel, Gesic
 
   it("Fernglas 10x50: alle vier Jupitertrabanten sichtbar, Gesichtsfeld rund", () => {
     const p = jupiter(FERNGLAS_10X50);
-    expect(p.quellbild.punktquellen.map((q) => q.sichtbar)).toEqual([true, true, true, true]);
+    expect(p.quellbild.punkte.punktquellen.map((q) => q.sichtbar)).toEqual([true, true, true, true]);
     expect(p.gesichtsfeld.form).toBe("kreis");
   });
 });

@@ -5,12 +5,12 @@ import type { Fenster } from "../naht/simulationsparameter";
 import type { Bedingungen, Fernrohr, Konfiguration, Objektzustand } from "../naht/konfiguration";
 
 /** Mondquelle nach ADR-0002: NASA SVS, 7600 px, 0,643''/px, Weiss entspricht etwa Vollmond 3,4 mag/arcsec2. */
-export const MOND_QUELLE: Objektzustand["quelle"] = { breitePx: 7600, hoehePx: 7600, massstabArcsecProPx: 0.643, weissMagProArcsec2: 3.4 };
+export const MOND_QUELLE: NonNullable<Objektzustand["quelle"]> = { breitePx: 7600, hoehePx: 7600, massstabArcsecProPx: 0.643, weissMagProArcsec2: 3.4 };
 
 /** Planetenquelle mit feinem Massstab, Weiss etwa Jupiter 5,5 mag/arcsec2 (physik.md 6.3). */
-export const JUPITER_QUELLE: Objektzustand["quelle"] = { breitePx: 1000, hoehePx: 1000, massstabArcsecProPx: 0.047, weissMagProArcsec2: 5.5 };
+export const JUPITER_QUELLE: NonNullable<Objektzustand["quelle"]> = { breitePx: 1000, hoehePx: 1000, massstabArcsecProPx: 0.047, weissMagProArcsec2: 5.5 };
 
-export const MOND_Q1: Objektzustand = { kennung: "mond-q1", durchmesserArcsec: 1860, magnitude: -10, quelle: MOND_QUELLE, trabanten: [] };
+export const MOND_Q1: Objektzustand = { kennung: "mond-q1", klasse: "sonnensystem", sterne: [], durchmesserArcsec: 1860, magnitude: -10, quelle: MOND_QUELLE, trabanten: [] };
 
 /** Bedingungen der Startkonfiguration A-D9: Seeing 2'', Bortle 5, klar, 45 Grad. */
 export const BEDINGUNGEN_A_D9: Bedingungen = { seeingFwhmArcsec: 2, bortle: 5, transparenz: "klar", hoeheGrad: 45 };
@@ -58,6 +58,8 @@ export function fenster(breiteArcsec: number, px: number): Fenster {
  */
 export const JUPITER_47: Objektzustand = {
   kennung: "jup_47",
+  klasse: "sonnensystem",
+  sterne: [],
   durchmesserArcsec: 47,
   magnitude: -2.7,
   quelle: { ...JUPITER_QUELLE, weissMagProArcsec2: 5.3 },
@@ -75,6 +77,8 @@ export const JUPITER_47: Objektzustand = {
  */
 export const SATURN_20: Objektzustand = {
   kennung: "sat_20",
+  klasse: "sonnensystem",
+  sterne: [],
   durchmesserArcsec: 20,
   magnitude: -0.1,
   quelle: { breitePx: 1000, hoehePx: 1000, massstabArcsecProPx: 0.05, weissMagProArcsec2: 6.6 },
@@ -91,6 +95,8 @@ export const SATURN_20: Objektzustand = {
  */
 export const MARS_14: Objektzustand = {
   kennung: "mars_14",
+  klasse: "sonnensystem",
+  sterne: [],
   durchmesserArcsec: 14,
   magnitude: -1.4,
   quelle: { breitePx: 664, hoehePx: 664, massstabArcsecProPx: 14 / 620, weissMagProArcsec2: 2.75 },
@@ -99,6 +105,8 @@ export const MARS_14: Objektzustand = {
 
 export const MARS_6: Objektzustand = {
   kennung: "mars_6",
+  klasse: "sonnensystem",
+  sterne: [],
   durchmesserArcsec: 6,
   magnitude: 1.0,
   quelle: { breitePx: 664, hoehePx: 664, massstabArcsecProPx: 6 / 620, weissMagProArcsec2: 3.31 },

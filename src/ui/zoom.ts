@@ -6,7 +6,7 @@
 // Koordinaten wie in der Naht: Objektmitte 0/0, +x rechts, +y Norden (A-D11), Bogensekunden.
 
 import type { Kern, Simulationsparameter } from "../naht/simulationsparameter";
-import { arbeitsmassstabOhneFenster, atmosphaere, aufloesung, type Konfiguration, optik } from "../physik";
+import { arbeitsmassstabOhneFenster, atmosphaere, aufloesung, type Konfiguration, optik, quelleVon } from "../physik";
 import type { Mitte } from "./verschieben";
 import { verschiebbar } from "./verschieben";
 
@@ -40,7 +40,8 @@ const DETAIL_ANTEIL_ZOOM_MAX = 0.75;
  * Durchmesser nicht stecken, und liegt sonst knapp um die Scheibe.
  */
 export function objektausdehnungArcsec(k: Konfiguration): number {
-  const { durchmesserArcsec, quelle } = k.objekt;
+  const { durchmesserArcsec } = k.objekt;
+  const quelle = quelleVon(k.objekt);
   return Math.max(durchmesserArcsec, quelle.breitePx * quelle.massstabArcsecProPx, quelle.hoehePx * quelle.massstabArcsecProPx);
 }
 
@@ -65,7 +66,7 @@ function breiten(k: Konfiguration): { zoom: number; detail: number } {
   const o = optik(k.geraet);
   const feld = Math.min(o.gesichtsfeld.breiteArcsec, o.gesichtsfeld.hoeheArcsec);
   const aufl = aufloesung(o, atmosphaere(k.bedingungen));
-  const arbeitspixel = arbeitsmassstabOhneFenster(aufl, k.objekt.quelle);
+  const arbeitspixel = arbeitsmassstabOhneFenster(aufl, quelleVon(k.objekt));
   const breite = Math.min(objektausdehnungArcsec(k) * (1 + 2 * ZOOM_RAND), feld * ZOOM_ANTEIL_GESICHTSFELD_MAX);
   return { zoom: Math.max(breite, arbeitspixel * ZOOM_ARBEITSPIXEL_MIN), detail: arbeitspixel * DETAIL_ARBEITSPIXEL };
 }
@@ -141,7 +142,8 @@ export function vergleichsparameter(anblick: Simulationsparameter, quellmassstab
     ...anblick,
     quellbild: {
       ...quellbild,
-      // Der Schluessel des Anblicks deckt alles ab, was physik fuer Stufe 1 zaehlt (auch Punktquellen).
+      // Der Schluessel des Anblicks deckt alles ab, was physik fuer Stufe 1 zaehlt; die Punktquellen
+      // (Stufe 1b) gehen mit quellbild.punkte unveraendert mit, bild verbindet beide Schluessel.
       schluessel: [VERGLEICH, quellbild.schluessel, massstabArcsecProPx, rasterPx].join("|"),
       massstabArcsecProPx,
       rasterPx

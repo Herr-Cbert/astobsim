@@ -28,7 +28,7 @@ describe("ausschnittsanfrage", () => {
       rasterPx: 200,
       mitteXArcsec: 10,
       mitteYArcsec: -20,
-      punktquellen: []
+      punkte: { schluessel: "p", punktquellen: [] }
     });
     expect(a).toEqual({ mitte: { xArcsec: 10, yArcsec: -20 }, breiteArcsec: 300, massstabArcsecProPx: 1.5 });
   });

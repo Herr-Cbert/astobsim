@@ -13,10 +13,13 @@ describe("Naht-Typen sind strukturiert klonbar", () => {
         rasterPx: 853,
         mitteXArcsec: 0,
         mitteYArcsec: 0,
-        punktquellen: [
-          { name: "Io", xArcsec: 120, yArcsec: 3, durchmesserArcsec: 1.1, helligkeitRelativ: 0.4, sichtbar: true },
-          { name: "Europa", xArcsec: -20, yArcsec: 0, durchmesserArcsec: 1.0, helligkeitRelativ: 0.3, sichtbar: false, grund: "blendung" },
-        ],
+        punkte: {
+          schluessel: "punkte|Io|120|3|1.1|0.4",
+          punktquellen: [
+            { name: "Io", xArcsec: 120, yArcsec: 3, durchmesserArcsec: 1.1, helligkeitRelativ: 0.4, sichtbar: true, deckkraft: 0.8, farbe: [1.1, 0.98, 0.9] },
+            { name: "Europa", xArcsec: -20, yArcsec: 0, durchmesserArcsec: 1.0, helligkeitRelativ: 0.3, sichtbar: false, grund: "blendung" },
+          ],
+        },
       },
       kern: {
         schluessel: "80|0|2|1.5|1.2",
@@ -26,7 +29,7 @@ describe("Naht-Typen sind strukturiert klonbar", () => {
         massstabArcsecProPx: 1.2,
         daten: new Float32Array(25).fill(1 / 25),
       },
-      helligkeit: { schluessel: "0.7|0.02", faktorObjekt: 0.7, hintergrundRelativ: 0.02, hintergrundMagProArcsec2: 20.5, punktFaktor: 0.343, punktExponent: 1 / 3 },
+      helligkeit: { schluessel: "0.7|0.02", faktorObjekt: 0.7, hintergrundRelativ: 0.02, hintergrundMagProArcsec2: 20.5, punktFaktor: 0.343, punktExponent: 1 / 3, mischgewicht: 0 },
       gesichtsfeld: { form: "kreis", breiteArcsec: 1024, hoeheArcsec: 1024 },
       fenster: { breiteArcsec: 1024, mitteXArcsec: 0, mitteYArcsec: 0, px: 1024 },
     };
@@ -48,10 +51,12 @@ describe("Naht-Typen sind strukturiert klonbar", () => {
       },
       objekt: {
         kennung: "mond-q1",
+        klasse: "sonnensystem",
         durchmesserArcsec: 1860,
         magnitude: -10,
         quelle: { breitePx: 7600, hoehePx: 7600, massstabArcsecProPx: 0.643, weissMagProArcsec2: 3.4 },
         trabanten: [],
+        sterne: [],
       },
       bedingungen: { seeingFwhmArcsec: 2, bortle: 5, transparenz: "klar", hoeheGrad: 45 },
     };

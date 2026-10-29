@@ -75,8 +75,17 @@ export const BORTLE_MAG_PRO_ARCSEC2: readonly number[] = [21.9, 21.7, 21.4, 21.0
  * Abbildung der Leuchtdichte auf den Bildschirm (Abschnitt 12): Flaechenhelligkeit im Okular in
  * mag je Quadratbogensekunde, die als Bildschirmweiss erscheint. Vollmond ohne Verluste
  * (docs/recherche/objekte.md 5.2, daten/objekte.json mond_ev), das hellste Objekt in Version 1.
+ * Version 2 (A-P13 i, ADR-0004): 9,2 fuer die Flaechenebenen und den Himmel; die Umstellung macht
+ * Issue #100, festgelegt am Bild in #111.
  */
 export const ANZEIGE_WEISS_MAG_PRO_ARCSEC2 = 3.35;
+
+/**
+ * Punktweiss: Flaechenhelligkeit im Okular, die in der Punktebene als Bildschirmweiss erscheint
+ * (A-P13 ii, ADR-0004). Version 2: 6,4; bis Issue #100 gleich ANZEIGE_WEISS_MAG_PRO_ARCSEC2, damit
+ * der Anblick byte-gleich bleibt.
+ */
+export const PUNKT_WEISS_MAG_PRO_ARCSEC2 = 3.35;
 
 /**
  * Kompressionsexponent der Abbildung auf den Bildschirm (Abschnitt 12): Groessenordnung nach Stevens
@@ -139,6 +148,34 @@ export const SIGNIFIKANTE_STELLEN = 4;
  */
 export const BLENDUNG_ABSTAND_SCHEINBAR_ARCSEC = 600;
 export const BLENDUNG_DELTA_MAG = 6;
+
+/**
+ * Feldfaktor F der Wahrnehmungsschwelle (A-P11, A-P9 V2): fester, erfahrener Beobachter, gilt fuer
+ * alle Geraete (ADR-0004 Punkt 2, docs/recherche/wahrnehmung.md 1.3; Crumey 2014 nennt 2 als typisch).
+ */
+export const FELDFAKTOR = 1.4;
+
+/** Zusaetzlicher Feldfaktor F_T am Fernrohr: einaeugig statt beidaeugig (wahrnehmung.md 1.3, Lythgoe & Phillips nach Crumey). */
+export const FELDFAKTOR_FERNROHR = Math.SQRT2;
+
+/**
+ * Breite sigma/M der Blackwell-Wahrscheinlichkeitskurve P = Phi((C/C_th - 1) / 0,484) fuer die
+ * Deckkraft (ADR-0004, wahrnehmung.md 1.3: 0,62 / 1,2816).
+ */
+export const BLACKWELL_BREITE = 0.484;
+
+/** Nullhintergrund in cd/m^2: darunter bleibt die Schwelle fest (wahrnehmung.md 2, Crumey Gl. 50 und 71). */
+export const NULLHINTERGRUND_CD_M2 = 1e-5;
+
+/**
+ * Winkeldurchmesser, mit dem ein Stern als Punktquelle gemalt wird: weit unter jedem Kern, bild malt
+ * ohnehin mindestens ein Arbeitspixel, der Fluss haengt nicht davon ab (docs/architektur.md 5.4,
+ * docs/entwuerfe/naht-v2-variante-b.md).
+ */
+export const STERN_DURCHMESSER_ARCSEC = 0.01;
+
+/** Mindestsichtbarkeit: Sockel von Delta_min sRGB-Kodes ueber dem Himmel an der Schwelle (ADR-0004 Punkt 3). */
+export const SOCKEL_DELTA_KODES = 3;
 
 /**
  * Kontrastschwelle "erkennbar" der Tabellen-Tests (A-Q2, docs/validierung.md): eine Struktur gilt

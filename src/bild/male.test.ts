@@ -12,7 +12,7 @@ import { deltaKern } from "./testkerne";
 const N = 32;
 
 function quellbild(punktquellen: Punktquelle[], teil: Partial<Quellbild> = {}): Quellbild {
-  return { schluessel: "q", massstabArcsecProPx: 1, rasterPx: N, mitteXArcsec: 0, mitteYArcsec: 0, punktquellen, ...teil };
+  return { schluessel: "q", massstabArcsecProPx: 1, rasterPx: N, mitteXArcsec: 0, mitteYArcsec: 0, punkte: { schluessel: "p", punktquellen }, ...teil };
 }
 
 function punkt(teil: Partial<Punktquelle> = {}): Punktquelle {
