@@ -29,13 +29,17 @@ Deep-Sky-Bilder mit log-Kennlinie (kennlinie im Bildnachweis, Issue #105):
 Grauwert (Rot-Kanal) ueber die Tabelle der Kennlinie dekodiert, Quellweiss
 ist kennlinie.mag_hell (Deep-Sky-Zustaende tragen kein weiss_mag_arcsec2),
 der Vorschlag ist dann der Wert fuer mag_hell. Zustaende ohne bild
-(Doppelsterne, M45) werden uebergangen.
+(Doppelsterne, M45) werden uebergangen. Deep-Sky-Zustaende mit Bild und
+Sternen (sterne_datei oder sterne, "Sterne plus Restlicht" wie M13, Issue #108)
+tragen im Bild nur das Restlicht: geprueft wird Bild plus Sterne gegen
+magnitude, der Vorschlag gilt fuer das Bild allein (magnitude minus Sterne);
+eine Zusatzzeile nennt Sterne und Flaeche einzeln.
 
 Exit-Code 0, wenn alle Zustaende die Probe bestehen, sonst 1.
 
 Verwendung (aus dem Repo-Root, nur numpy und Pillow noetig):
     python3 tools/quellweiss_eichen.py [--objekte daten/objekte.json]
-        [--bildnachweis daten/bilder.json] [--bilder daten/bilder]
+        [--bildnachweis daten/bilder.json] [--bilder daten/bilder] [--sterne daten/sterne]
 """
 
 import argparse
@@ -94,6 +98,15 @@ def leuchtdichte(nachweis, bilder):
     return y
 
 
+def sternfluss(zustand, sterne_ordner):
+    """Summe 10^(-0,4 V) der Sterne des Zustands (sterne oder sterne_datei unter sterne_ordner); 0 ohne Sterne."""
+    sterne = zustand.get("sterne", [])
+    if "sterne_datei" in zustand:
+        with open(os.path.join(sterne_ordner, zustand["sterne_datei"]), encoding="utf-8") as f:
+            sterne = json.load(f)["sterne"]
+    return sum(10 ** (-0.4 * s["magnitude"]) for s in sterne)
+
+
 def mond_magnitude_ks(phasenwinkel_grad):
     """V-Magnitude des Mondes nach Krisciunas und Schaefer 1991, Gl. 9."""
     a = abs(phasenwinkel_grad)
@@ -105,6 +118,7 @@ def main():
     parser.add_argument("--objekte", default="daten/objekte.json")
     parser.add_argument("--bildnachweis", default="daten/bilder.json")
     parser.add_argument("--bilder", default="daten/bilder")
+    parser.add_argument("--sterne", default="daten/sterne")
     args = parser.parse_args()
 
     with open(args.objekte, encoding="utf-8") as f:
@@ -126,14 +140,25 @@ def main():
                 cache[z["bild"]] = float(leuchtdichte(nachweis, args.bilder).sum())
             massstab = z["winkelgroesse_arcsec"] / nachweis["objekt_durchmesser_px"]
             fluss = cache[z["bild"]] * massstab ** 2
-            vorschlag = round(z["magnitude"] + 2.5 * math.log10(fluss), 2)
-            m_bild = weiss - 2.5 * math.log10(fluss)
+            stern_fluss = sternfluss(z, args.sterne) if objekt["typ"] == "deep_sky" else 0.0
+            if stern_fluss > 0:
+                # Sterne plus Restlicht: das Bild traegt magnitude minus die Sterne.
+                m_flaeche = weiss - 2.5 * math.log10(fluss)
+                m_soll = -2.5 * math.log10(10 ** (-0.4 * z["magnitude"]) - stern_fluss)
+                vorschlag = round(m_soll + 2.5 * math.log10(fluss), 2)
+                m_bild = -2.5 * math.log10(10 ** (-0.4 * m_flaeche) + stern_fluss)
+            else:
+                vorschlag = round(z["magnitude"] + 2.5 * math.log10(fluss), 2)
+                m_bild = weiss - 2.5 * math.log10(fluss)
             abweichung = m_bild - z["magnitude"]
             ok = abs(abweichung) <= TOLERANZ_MAG
             fehler += 0 if ok else 1
             print(f"{z['id']:<9} {z['bild']:<22} {massstab:>9.6f} {fluss:>11.2f} {z['magnitude']:>6.2f} "
                   f"{weiss:>6.2f} {vorschlag:>9.2f} {m_bild:>7.3f} {abweichung:>+6.3f}  "
                   f"{'ok' if ok else 'FEHLER'}")
+            if stern_fluss > 0:
+                print(f"          Sterne plus Restlicht: Flaeche V {m_flaeche:.3f} (Soll {m_soll:.3f}), Sterne V "
+                      f"{-2.5 * math.log10(stern_fluss):.3f}, Summe V {m_bild:.3f}")
             if objekt["typ"] == "mond":
                 m_ks = mond_magnitude_ks(z["phasenwinkel_grad"])
                 print(f"          Plausibilitaet Mond: Krisciunas/Schaefer Gl. 9 bei {z['phasenwinkel_grad']} Grad "
