@@ -194,6 +194,30 @@ body {
   text-align: right;
 }
 
+/* Hinweise unter den Kennwerten (Issue #110): Saetze, die umbrechen duerfen. */
+.info-hinweise {
+  margin: 12px 0 0;
+  padding: 0;
+  list-style: none;
+  max-width: 320px;
+  font-size: 0.9rem;
+}
+
+.info-hinweis {
+  margin: 0 0 6px;
+  padding-left: 10px;
+  border-left: 3px solid var(--text-leise);
+}
+
+.info-hinweis[data-art="ueberstrahlung"] {
+  border-left-color: var(--warnung);
+  color: var(--warnung);
+}
+
+.info-hinweis[data-art="ueberstrahlung"] .hilfe-text {
+  color: var(--text);
+}
+
 .status {
   margin-top: 16px;
   color: var(--text-leise);
