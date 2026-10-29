@@ -2,7 +2,7 @@
 // unaufgeloeste Zustaende (A-P10) und additiver Sockel fuer die Mindestsichtbarkeit der
 // Deep-Sky-Ebene (ADR-0004). Quelle: docs/recherche/wahrnehmung.md 3.2 (Uebergangsfunktion) und
 // 4.4 Punkt 4, ADR-0004, docs/architektur.md 5.3 (Pixelformel, Bitgleichheit); Herleitung und
-// Testwerte in docs/recherche/physik.md Abschnitt 16. Reine Funktionen, keine Pixel.
+// Testwerte in docs/recherche/physik.md Abschnitt 17 (Mischgewicht und Sockel). Reine Funktionen, keine Pixel.
 
 import { PhysikFehler, pruefeBereich, pruefePositiv } from "./fehler";
 import { AUGE_AUFLOESUNG_ARCSEC } from "./konstanten";
@@ -25,6 +25,15 @@ const MISCHGEWICHT_SCHNITT = 0.005;
 const SRGB_KODE_MAX = 255;
 
 /**
+ * Reserve in sRGB-Kodes gegen das Runden beim Zeichnen: Himmel und Schwellenpixel werden einzeln
+ * auf ganze Kodes gerundet (Float32-Raster, Tabelle in src/ui/zeichne.ts). Ohne Reserve blieben bei
+ * etwa 0,6 % der Himmelskodes (Nachkommateil um 0,43 bis 0,58, meist Kode unter 40) nur
+ * Delta_min - 1 Kodes Abstand; mit 0,15 im Test ueber Kode 0,5 bis 240 keiner (Review PR #118,
+ * physik.md Abschnitt 17).
+ */
+const SOCKEL_RESERVE_KODES = 0.15;
+
+/**
  * Uebergangsfunktion vor dem Schnitt: Anteil der Punktebene g(x) = 1/(1 + 0,3466 x^2) mit
  * x = theta V / 60'' (scheinbare Winkelgroesse in Einheiten der Augenaufloesung). 1 fuer x = 0,
  * streng fallend in x (wahrnehmung.md 3.2, Testwerte 6). Wirft PhysikFehler bei x < 0 oder NaN.
@@ -35,11 +44,11 @@ export function uebergang(x: number): number {
 }
 
 /**
- * Mischgewicht g' in [0, 1) zwischen Flaechen- (0) und Punktebene (1) fuer einen Zustand mit
+ * Mischgewicht g' in [0, 1] zwischen Flaechen- (0) und Punktebene (1) fuer einen Zustand mit
  * Winkelgroesse theta in Bogensekunden bei Vergroesserung V (A-P10; blosses Auge V = 1):
  * g' = max(0, (g(x) - 0,005) / 0,995) mit x = theta V / 60''. Stetig und monoton fallend in theta
  * und V; exakt 0 fuer x > 24, dann gilt der Ausdruck aus Version 1 (architektur.md 5.3). Fuer
- * theta = 0 waere g' = 1; reale Zustaende haben theta > 0. Wirft PhysikFehler bei theta < 0 oder
+ * theta = 0 genau 1; reale Zustaende haben theta > 0. Wirft PhysikFehler bei theta < 0 oder
  * V < 1 (Programmierfehler, begrenze schneidet die Eingaben vorher).
  */
 export function mischgewicht(winkelgroesseArcsec: number, vergroesserung: number): number {
@@ -74,9 +83,10 @@ export function srgbDekodierung(kodiert: number): number {
  * dem ein Pixel an der Schwelle (q = q*, Deckkraft P = 0,5) mindestens Delta_min sRGB-Kodes ueber
  * dem Himmel liegt:
  *   sigma = max(0, 2 (L_ziel - h) - (min(1, (a q* + s)^n) - h)),
- *   L_ziel = linear(min(255, Kode(h) + Delta_min) / 255),
- * mit Kode(h) = 255 srgbKodierung(h) als stetiger Groesse (wie der Prototyp; Runden aendert die
- * Differenz zweier um ganze Kodes verschobener Werte nicht). 0, wenn die Abbildung den Abstand schon
+ *   L_ziel = linear(min(255, Kode(h) + Delta_min + 0,15) / 255),
+ * mit Kode(h) = 255 srgbKodierung(h) als stetiger Groesse (wie der Prototyp) und der Reserve
+ * SOCKEL_RESERVE_KODES gegen das Runden beim Zeichnen. "Ueber dem Himmel" meint h ohne Sockel
+ * (ADR-0004, Nachtrag). 0, wenn die Abbildung den Abstand schon
  * leistet. Eingaben: a, s Leuchtdichte von Quellweiss und Himmel im Okular relativ zum Anzeigeweiss,
  * qStern Pixelwert (relativ zu Quellweiss) an der sichtbaren Isophote, n Kompressionsexponent.
  * Wirft PhysikFehler bei a, qStern, n <= 0, s < 0 oder Delta_min ausserhalb 0 bis 255.
@@ -90,6 +100,6 @@ export function sockel(a: number, s: number, qStern: number, deltaMinKodes: numb
   const h = Math.min(1, Math.pow(s, n));
   const anSchwelle = Math.min(1, Math.pow(a * qStern + s, n));
   const kodeHimmel = SRGB_KODE_MAX * srgbKodierung(h);
-  const ziel = srgbDekodierung(Math.min(SRGB_KODE_MAX, kodeHimmel + deltaMinKodes) / SRGB_KODE_MAX);
+  const ziel = srgbDekodierung(Math.min(SRGB_KODE_MAX, kodeHimmel + deltaMinKodes + SOCKEL_RESERVE_KODES) / SRGB_KODE_MAX);
   return Math.max(0, 2 * (ziel - h) - (anSchwelle - h));
 }

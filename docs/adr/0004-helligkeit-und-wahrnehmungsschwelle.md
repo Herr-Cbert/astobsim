@@ -49,3 +49,5 @@ Befunde:
 - Verstaerkungsfaktor G fuer die Mindestsichtbarkeit (hebt helle Kerne mit, Prototyp Befund 3).
 - Adaptionsabhaengiges Tone-Mapping (Adaption ist nach A-P9 keine Eingabe).
 - Ein gemeinsames Weiss fuer Flaechen und Punkte (A-P13 i und ii nicht zugleich erreichbar, `helligkeit-v2.md` 3).
+
+**Nachtrag 2026-10-29 (Sockel, Issue #97, Review PR #118):** "Ueber dem Himmel" meint den Himmel $h = \min(1, s^n)$ ohne Sockel. Der Sockel hebt den gemalten Himmel bei $q$ = 0 um $P_0\,\sigma$ an, $P_0 = \Phi(-1/0{,}484)$ = 0,019; die genaue Korrektur $P' = (P - P_0)/(1 - P_0)$ kommt in bild erst, wenn es am Bild stoert (#111). Gegen das Runden beim Zeichnen zielt der Sockel auf $\Delta_\mathrm{min}$ + 0,15 Kodes (`docs/recherche/physik.md`, Abschnitt "Mischgewicht und Sockel").

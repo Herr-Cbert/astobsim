@@ -759,11 +759,11 @@ Uebergangsfunktion nach `wahrnehmung.md` 3.2 (eigene Herleitung aus den Varianze
 
 ### 16.2 Sockel (Mindestsichtbarkeit)
 
-Deep-Sky-Pixel nach ADR-0004: $h + P\,(w(q) - h + \sigma)$ mit $w(q) = \min(1, (a q + s)^n)$, $h = \min(1, s^n)$. An der Schwelle ist $q = q^*$ und $P$ = 0,5. Gefordert ist, dass dort das Pixel mindestens $\Delta_\mathrm{min}$ sRGB-Kodes ueber dem Himmel liegt: $h + \tfrac12\,(w(q^*) - h + \sigma) \ge L_\mathrm{ziel}$ mit $L_\mathrm{ziel} = \mathrm{lin}\big(\min(255, K(h) + \Delta_\mathrm{min})/255\big)$, $K(h) = 255\,\mathrm{sRGB}(h)$. Der kleinste Sockel ist (ber.)
+Deep-Sky-Pixel nach ADR-0004: $h + P\,(w(q) - h + \sigma)$ mit $w(q) = \min(1, (a q + s)^n)$, $h = \min(1, s^n)$. An der Schwelle ist $q = q^*$ und $P$ = 0,5. Gefordert ist, dass dort das Pixel mindestens $\Delta_\mathrm{min}$ sRGB-Kodes ueber dem Himmel $h$ (ohne Sockel, ADR-0004 Nachtrag) liegt: $h + \tfrac12\,(w(q^*) - h + \sigma) \ge L_\mathrm{ziel}$ mit $L_\mathrm{ziel} = \mathrm{lin}\big(\min(255, K(h) + \Delta_\mathrm{min} + 0{,}15)/255\big)$, $K(h) = 255\,\mathrm{sRGB}(h)$. Der kleinste Sockel ist (ber.)
 
 $$\sigma = \max\big(0,\; 2\,(L_\mathrm{ziel} - h) - (w(q^*) - h)\big).$$
 
-Der Kode des Himmels geht stetig ein, nicht gerundet (wie im Prototyp); weil $\mathrm{round}(K + 3) = \mathrm{round}(K) + 3$, bleibt der Abstand nach dem Runden auf 8 Bit erhalten. sRGB-Kennlinie und Umkehrung nach IEC 61966-2-1 [59] als reine Funktionen in `mischung.ts` (dieselbe Kennlinie wie `src/ui/zeichne.ts` und `src/daten/srgb.ts`; physik importiert diese Module nicht). $\Delta_\mathrm{min}$ = 3 (`SOCKEL_DELTA_KODES`) ist ein Vorschlag ohne Quelle, am Bild festgelegt (`wahrnehmung.md` 9 Punkt 8).
+Der Kode des Himmels geht stetig ein, nicht gerundet (wie im Prototyp). **Reserve 0,15 Kodes** (`SOCKEL_RESERVE_KODES`, Review PR #118): beim Zeichnen werden Himmel und Schwellenpixel einzeln gerundet, aus einem Float32-Raster und ueber die Tabelle in `src/ui/zeichne.ts`. Ohne Reserve blieben bei etwa 0,6 % der Himmelskodes ($K$ = 0,5 bis 240, $C = a q^*/s$ = 0,135, $\Delta_\mathrm{min}$ = 3) nur 2 statt 3 Kodes Abstand, und zwar dort, wo der Nachkommateil von $K$ um 0,43 bis 0,58 liegt, meist bei $K < 40$. Mit der Reserve ergibt der Test ueber denselben Bereich (Schritt 0,003, Float32 und Tabelle nachgebaut) ueberall mindestens 3 (ber.). sRGB-Kennlinie und Umkehrung nach IEC 61966-2-1 [59] als reine Funktionen in `mischung.ts` (dieselbe Kennlinie wie `src/ui/zeichne.ts` und `src/daten/srgb.ts`; physik importiert diese Module nicht). $\Delta_\mathrm{min}$ = 3 (`SOCKEL_DELTA_KODES`) ist ein Vorschlag ohne Quelle, am Bild festgelegt (`wahrnehmung.md` 9 Punkt 8).
 
 ### 16.3 Testwerte (A-Q1)
 
@@ -775,11 +775,12 @@ Der Kode des Himmels geht stetig ein, nicht gerundet (wie im Prototyp); weil $\m
 | $g'$ | T5b Mars 6'' bei 120x ($x$ = 12) | 0,0147 | ber. |
 | $g'$ | T1, T2a, T2b, T3, T4, T5a ($x$ = 33 bis 3100) | 0 | ADR-0004; ber. |
 | sRGB | linear 0,5 / 0,18; kodiert 0,5 | 0,73536 / 0,46136; 0,21404 | [59]; ber. |
-| $\sigma$ | Prototyp M31 im 10x50, Bortle 5: $a$ = 7,566e-4 (Kern = 1), $s$ = 2,825e-5, $q^*$ = 5,040e-3, $\Delta_\mathrm{min}$ = 3, $n$ = 1/3 | 0,005905; Kern sRGB 86 -> 88 | ADR-0004 Befund 3; `prototyp/deep_sky.py` mit `additiv.py` nachgerechnet (mit $F$ = 1,4: $q^*$ = 3,43e-3, $\sigma$ = 0,00631, Kern ebenfalls 88) |
+| $\sigma$ | Prototyp M31 im 10x50, Bortle 5: $a$ = 7,566e-4 (Kern = 1), $s$ = 2,825e-5, $q^*$ = 5,040e-3, $\Delta_\mathrm{min}$ = 3, $n$ = 1/3 | 0,006279 mit Reserve (Prototyp ohne Reserve 0,005905); Kern sRGB 86 -> 88 (stetig 88,41) | ADR-0004 Befund 3; `prototyp/deep_sky.py` mit `additiv.py` nachgerechnet, ohne Reserve stellengleich (mit $F$ = 1,4 ohne Reserve: $q^*$ = 3,43e-3, $\sigma$ = 0,00631, Kern ebenfalls 88) |
 | $\sigma$ | $a q^*$ = 10 $s$, $\Delta_\mathrm{min}$ = 3 | 0 (Abstand an der Schwelle etwa 14 Kodes) | ber. |
 
 ### 16.4 Unsicher
 
 1. **Uebergangsfunktion:** eigene Herleitung, siehe `wahrnehmung.md` 9 Punkt 2; am Bild bei T6 pruefen.
 2. **Sockel bei hellem Himmel:** liegt $K(h) + \Delta_\mathrm{min}$ ueber 255, wird das Ziel auf Weiss begrenzt; dann ist der Abstand kleiner als $\Delta_\mathrm{min}$. Kommt erst bei einem Himmel nahe Bildschirmweiss vor, also nicht in den Testfaellen.
-3. **Quantisierung beim Zeichnen:** der Sockel rechnet mit der exakten Kennlinie; `src/ui/zeichne.ts` kodiert ueber eine Tabelle. Weicht die Tabelle um Bruchteile eines Kodes ab, kann der Abstand nach dem Runden um einen Kode fehlen; am Bild pruefen.
+3. **Quantisierung beim Zeichnen:** durch die Reserve abgedeckt (16.2); geprueft nur fuer $C$ = 0,135 und $K \le 240$, die Tabelle in `src/ui/zeichne.ts` ist im Test nachgebaut, nicht importiert.
+4. **Sockel hebt den Himmel:** bei $q$ = 0 ist $P_0 = \Phi(-1/0{,}484)$ = 0,019, der gemalte Himmel liegt also um $P_0\,\sigma$ ueber $h$ (ADR-0004 Nachtrag).

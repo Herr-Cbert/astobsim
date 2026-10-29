@@ -4,7 +4,7 @@ import { PhysikFehler } from "./fehler";
 import { mischgewicht, sockel, srgbDekodierung, srgbKodierung, uebergang } from "./mischung";
 
 // Testwerte aus docs/recherche/wahrnehmung.md 3.2 und 6 (Uebergang), ADR-0004 (Schnitt, Sockel,
-// Prototyp M31 im 10x50) und docs/recherche/physik.md Abschnitt 16 (eigene Rechnung).
+// Prototyp M31 im 10x50) und docs/recherche/physik.md Abschnitt 17, Mischgewicht und Sockel (eigene Rechnung).
 
 const kode = (linear: number) => 255 * srgbKodierung(linear);
 
@@ -116,19 +116,36 @@ describe("sockel: kleinster Sockel, mit dem die Schwelle Delta_min Kodes ueber d
     return h + p * (Math.min(1, (a * q + s) ** n) - h + sigma);
   };
 
-  it("Prototyp M31 im 10x50: Sockel 0,005905, Kern 86 -> 88 bei 3 Kodes (Plausibilitaet)", () => {
+  it("Prototyp M31 im 10x50: Sockel 0,006279 (Prototyp ohne Reserve 0,005905), Kern 86 -> 88 bei 3 Kodes (Plausibilitaet)", () => {
     const sigma = sockel(A_M31, S_M31, Q_STERN_M31, SOCKEL_DELTA_KODES, n);
-    expect(sigma).toBeCloseTo(0.005905, 6);
+    expect(sigma).toBeCloseTo(0.006279, 6);
     expect(Math.round(kode(pixel(A_M31, S_M31, 1, 1, 0)))).toBe(86);
     expect(Math.round(kode(pixel(A_M31, S_M31, 1, 1, sigma)))).toBe(88);
   });
-  it("mit Sockel liegt das Pixel an der Schwelle (P = 0,5) genau Delta_min Kodes ueber dem Himmel", () => {
+  it("mit Sockel liegt das Pixel an der Schwelle (P = 0,5) stetig genau Delta_min + 0,15 Kodes ueber dem Himmel", () => {
     for (const delta of [1, 3, 6]) {
       const sigma = sockel(A_M31, S_M31, Q_STERN_M31, delta, n);
       expect(sigma).toBeGreaterThan(0);
       const h = S_M31 ** n;
-      expect(kode(pixel(A_M31, S_M31, Q_STERN_M31, 0.5, sigma)) - kode(h)).toBeCloseTo(delta, 9);
+      expect(kode(pixel(A_M31, S_M31, Q_STERN_M31, 0.5, sigma)) - kode(h)).toBeCloseTo(delta + 0.15, 9);
     }
+  });
+  it("nach dem Runden wie beim Zeichnen (Float32, Tabelle 2^14 wie src/ui/zeichne.ts) ueberall >= Delta_min: Himmelskode 0,5 bis 240, C = a q* / s = 0,135", () => {
+    // Nachbau von linearZuSrgb8 (ui darf physik nicht importieren, umgekehrt auch nicht)
+    const stufen = 16384;
+    const tabelle = Array.from({ length: stufen + 1 }, (_, i) => Math.round(255 * srgbKodierung(i / stufen)));
+    const kode8 = (w: number) => (w > 0 ? (w >= 1 ? 255 : tabelle[Math.round(w * stufen)]!) : 0);
+    const kodeGerundet = (w: number) => Math.round(Math.fround(srgbKodierung(w)) * 255);
+    let zuKlein = 0;
+    for (let k = 0.5; k <= 240; k += 0.003) {
+      const h = srgbDekodierung(k / 255);
+      const s = h ** 3;
+      const sigma = sockel(0.135 * s, s, 1, SOCKEL_DELTA_KODES, n);
+      const p = Math.fround(pixel(0.135 * s, s, 1, 0.5, sigma));
+      const himmel = Math.fround(h);
+      if (kode8(p) - kode8(himmel) < SOCKEL_DELTA_KODES || kodeGerundet(p) - kodeGerundet(himmel) < SOCKEL_DELTA_KODES) zuKlein++;
+    }
+    expect(zuKlein).toBe(0);
   });
   it("Sockel 0, wenn die Abbildung den Abstand schon leistet (Schwelle hoch ueber dem Himmel)", () => {
     // a q* = 10 s: an der Schwelle (11^(1/3) - 1) h / 2 = 0,61 h Zuwachs, bei h = 0,0305 etwa 14 Kodes
