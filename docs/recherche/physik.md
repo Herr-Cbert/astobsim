@@ -979,3 +979,37 @@ Dabei ist $\rho$ der Abstand zur Kernmitte in Arbeitspixeln und $r$ der Kernradi
 **Warum ein cos²-Fenster.** Ein groesserer Radius allein verschiebt die Kante nur, weil die Kubikwurzel jeden Randwert sichtbar macht. Die Alternative $k' = \max(0, k - k_\text{Rand})$ geht nur linear gegen 0, unter der Kubikwurzel also wie $d^{1/3}$ (bei 10 % der Strecke noch 46 % des Werts). Das cos²-Fenster geht quadratisch gegen 0, also wie $d^{2/3}$ (bei 10 % noch 21 %). Der Halo laeuft damit sichtbar weich aus.
 
 **Grenzen.** Die Punktquellen verlieren Licht jenseits von etwa 2 Gesamt-FWHM an den Kern innen. Das ist dieselbe Groessenordnung, die der harte Schnitt bei 3 FWHM ohnehin abschneidet. Das Fenster ist ein Darstellungsfenster, keine Physik. Die Flaeche (Falter JS und WebGL2) faltet weiter mit dem unveraenderten Kern. Trabanten gehen ebenfalls durch die Punktebene; ihre Werte aendern sich deshalb in T1, T2, T4 und T6 geringfuegig (siehe PR #127).
+
+## 25. Tonkurve eines Pressebilds gegen ein Flaechenhelligkeitsprofil (Issue #106)
+
+**Zweck.** Fuer M31 gibt es kein lineares Archivbild mit belegter Lizenz (`bilder-v2.md` 2); Entscheidung 2 in `docs/recherche/README.md`: das NOIRLab-Pressebild (nichtlinear gestreckt) wird per Tonkurve gegen das Profil aus `deep-sky.md` 1.2 zurueckgerechnet. Umgesetzt in `tools/deep_sky_aufbereiten.py` (`tonkurve_aus_profil`, `tonkurve_anpassen`, `tonkurve_anwenden`), Parameter `tools/parameter/m31_noirlab_lgs.json`.
+
+**Modell.** Sersic-Bulge plus exponentielle Scheibe wie `deep-sky.md` 1.2, ausserhalb der grossen Achse mit eigenen Achsenverhaeltnissen (Annahme aus `deep-sky.md` 1.2: $q_b$ = 0,8, $q_d$ = 0,27):
+
+$$\mu(u, v) = -2{,}5\log_{10}\!\left[10^{-0{,}4\,\mu_e}\, e^{-b_n\left((r_b/R_e)^{1/n}-1\right)} + 10^{-0{,}4\,\mu_0}\, e^{-r_d/R_d}\right],\quad r_b = \sqrt{u^2 + (v/q_b)^2},\ r_d = \sqrt{u^2 + (v/q_d)^2}$$
+
+mit $u$, $v$ dem Abstand auf grosser und kleiner Achse und den Werten aus `daten/objekte.json` (`profil`, eine Quelle fuer Werkzeug und Daten). Auf der grossen Achse ($v$ = 0) trifft die Formel die Tabelle in `deep-sky.md` 1.2 auf 0,05 mag (Test `test_modell_wie_deep_sky_tabelle`).
+
+**Tonkurve (Rechenweg, eigene Festlegung).**
+1. Ringe auf der grossen Achse (PA 37,5 Grad, am Bild gemessen): Kanten 0 bis 200'' fest, dann 30 geometrische Ringe bis 6500''; Streifen $|v| < \max(10'', 0{,}03\,r_1)$, beide Seiten, M32 (Kreis 4') ausgenommen.
+2. Je Ring der Median des Kodes $g_i$ und der Median des Modells $\mu_i$ (Mediane, damit Sterne, Staubbaender und HII-Knoten das Paar nicht verschieben).
+3. Ringe mit gleichem Kode werden gemittelt; ueber fallendem Kode wird $\mu$ isoton steigend gemacht (Pool Adjacent Violators); Kodes mit danach gleichem $\mu$ werden ein Knoten. Ergebnis: Knoten $(g_k, \mu_k)$ mit streng fallendem $\mu$ (M31: 38 Knoten von Kode 10 bei 24,63 bis Kode 255 bei 16,22).
+4. Zwischen den Knoten ist $\mu$ linear in $g$; ueber dem hellsten Knoten gilt dessen $\mu$ (Saettigung); unter dem dunkelsten Knoten ist die Helligkeit linear in $g$ bis 0 beim Schwarzpunkt $g_0$ (Himmel des Pressebilds, M31: Kode 7, Median der Mosaikecken):
+$$L(g) = 10^{-0{,}4\,\mu_\mathrm{min}}\ \frac{g - g_0}{g_\mathrm{min} - g_0}\quad (g_0 < g < g_\mathrm{min}),\qquad L(g) = 0\quad (g \le g_0).$$
+5. Pixel $\to L(g)$ in absoluten Einheiten $10^{-0{,}4\mu}$, dann wie bei den FITS-Bildern ausrichten, auf 4''/px mitteln, Sterne entfernen, log-kodieren. Quellweiss `mag_hell` ist das hellste Pixel dieser Werte (`eichung.art` "tonkurve"); eine Eichung auf $V_T$ entfaellt, sie dient als Probe.
+
+**Restfehler (gerechnet, Lauf vom 2026-10-29).** Am fertigen Bild (dekodiertes WebP, 4''/px, sternbereinigt), Streifen auf der grossen Achse bei PA 37,5 Grad, Ring $\pm\max(6'', 5\,\%)$ um $r$, Median beider Seiten; in Klammern das Mittel:
+
+| $r$ | 0,5' | 1' | 2' | 5' | 10' | 20' | 30' | 45' | 60' | 80' | 95' |
+|---|---|---|---|---|---|---|---|---|---|---|---|
+| Modell | 16,72 | 17,25 | 17,97 | 19,23 | 20,21 | 21,01 | 21,51 | 22,18 | 22,85 | 23,74 | 24,40 |
+| Bild - Modell | -0,50 (-0,39) | -0,12 (-0,08) | +0,02 (+0,02) | 0,00 (-0,02) | -0,03 (-0,01) | 0,00 (0,00) | +0,03 (+0,04) | -0,12 (-0,17) | +0,07 (+0,06) | -0,04 (-0,09) | +0,01 (+0,02) |
+
+Bei PA 35 Grad (RC3) dieselben Werte auf 0,08 mag. Innerhalb von 1' liegt der Fehler am gesaettigten Kern: alle drei Kanaele des Pressebilds stehen innerhalb etwa 30'' auf Kode 255, das Bild hat dort eine flache Kuppe bei 16,22 statt des Anstiegs auf 15,4 (Modell) bzw. 13 bis 14 (Kern, `deep-sky.md` 1.2). Die Ringe der Anpassung selbst (1,3''/px) treffen das Modell zwischen 40'' und 6500'' per Konstruktion (Abweichung 0,00); je Seite einzeln (NO gegen SW) bleiben -0,20 bis +0,20 mag bis 5150'', am aeussersten Ring -0,40 / +0,44.
+
+**Unabhaengige Proben (gerechnet).**
+- Kleine Achse (nicht angepasst), gegen das 2D-Modell an denselben Pixeln: -0,51 bis +0,25 mag bis 283'' (Ring in Einheiten der grossen Achse, $|v| = r\,q_d$; das Bulge-Achsenverhaeltnis 0,8 ist angenommen), +0,04 bis +0,48 mag von 283'' bis 4086'' (die Scheibe ist auf der kleinen Achse schwaecher als mit $q$ = 0,27); darueber +0,65, +1,09 und dann kein Licht mehr (Mosaikkante und Schwarzpunkt).
+- Gesamthelligkeit des dekodierten Bilds 3,426 mag gegen RC3 $V_T$ = 3,44 (`deep-sky.md` 1.1): -0,014 mag, ohne dass $V_T$ in die Eichung eingeht. Das Modell selbst ergibt 3,34 (`deep-sky.md` 1.2), das Bild endet an der Mosaikkante und ist im Kern gesaettigt.
+- Flaechentabelle gegen das unverschmierte Modell bei 4''/px: Verhaeltnis der Flaechen 0,88 bis 1,19 zwischen 17,0 und 22,5 mag/arcsec$^2$ (20,5 und 21,0: 0,88; 21,5: 1,19, der Ring bei 10 kpc), unter 17,0 bis 3,2 (gesaettigter Kern). Die Tabelle endet bei 22,9, vor der ersten Isophote, die mehr als 1 % der Mosaikkante erreicht (`flaechentabelle(..., rand_maske)`).
+
+**Grenzen.** Die Tonkurve ist eine Funktion des Kodes allein. Wo das Pressebild lokal anders gestreckt ist (Mosaikfelder, lokale Kontrastverstaerkung), bleibt der Fehler; die Seitenunterschiede oben (bis 0,2 mag) sind die Obergrenze dafuer zusammen mit echter Asymmetrie. Das Profil selbst ist auf Faktor 1,5 in der Ausdehnung unsicher (`deep-sky.md` 9 Punkt 1); die Tonkurve uebertraegt diese Unsicherheit unveraendert ins Bild.

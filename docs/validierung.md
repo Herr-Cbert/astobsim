@@ -251,3 +251,26 @@ Grauwerte unten: Mittel der drei sRGB-Kanaele im Anblick des Zooms (linke Haelft
 
 **Nachtrag `mond_ev` (Entscheidung Herbert 2026-10-29):** `mond_ev` hat jetzt -10,51 mag (Krisciunas und Schaefer bei 79,3 Grad), Quellweiss 3,60 und eine geschwaerzte Nachtseite (neue Kacheln). Damit aendern sich T3 und T6a; T1, T2, T4, T5, T6b und T6c bleiben byte-gleich mit main 15da6ee (Bilder am 2026-10-29 verglichen, die T-Bilder werden bei der Zusammenfuehrung neu erzeugt und hier nicht eingecheckt). T6a: die aschgraue Nachtseite (vorher 61 gegen Himmel 54 im Zoom) ist weg, sie hat jetzt Himmelsgrau 54; die Tagseite ist durch den um 0,31 mag helleren Quellweiss etwas staerker abgeschnitten (55 statt 51 % der Mondpixel ueber 250), Mare Crisium und die Maria am Terminator bleiben als Flecken sichtbar. T3: Nachtseite gleich Himmel (24), Tagseite im Median 118 statt 114.
 
+
+## 10. M31 mit blossem Auge (Issue #106)
+
+Pruefung des Quellbilds `m31_noirlab_lgs` (Pressebild, per Tonkurve gegen das Profil zurueckgerechnet, `docs/recherche/physik.md` 25) gegen den Prototyp (ADR-0004 Befund 2: mit $F$ = 1,4 bei Bortle 3 sichtbar mit 106' Ausdehnung, bei Bortle 5 knapp darunter mit 0,78, bei Bortle 7 unsichtbar mit 0,42).
+
+**Gerechnet** mit `sichtbareIsophote` aus `src/physik/schwelle.ts` (blosses Auge, Transparenz klar, Zenit: Extinktion 0,20 mag, wie die Validierungsbilder), einmal mit der Flaechentabelle aus `daten/objekte.json`, einmal mit der Tabelle des unverschmierten Modells (`deep-sky.md` 1.2, 4''/px, 0,1-mag-Schritte). $C/C_\mathrm{th}$ ist das beste Verhaeltnis ueber alle Zeilen, die Ausdehnung die grosse Achse einer Ellipse mit $q$ = 0,27 und der Flaeche der sichtbaren Isophote.
+
+| Bortle (Himmel) | Bild: $C/C_\mathrm{th}$, sichtbar bis | Modell: $C/C_\mathrm{th}$, sichtbar bis | Prototyp (ADR-0004) |
+|---|---|---|---|
+| 3 (21,4) | 1,58, 22,48 mag/arcsec$^2$, 102' | 1,42, 22,57, 110' | sichtbar, 106' |
+| 5 (20,0) | 0,84 (Scheitel bei 21,4) | 0,78 (bei 21,0) | 0,78 |
+| 7 (18,3) | 0,43 (bei 19,8) | 0,42 (bei 20,2) | 0,42 |
+
+Das Modell reproduziert den Prototyp genau; das Bild weicht um +0,06 (Bortle 5), +0,01 (Bortle 7) und -4 % in der Ausdehnung (Bortle 3) ab. **Toleranz:** $C/C_\mathrm{th}$ auf 10 % und die Ausdehnung auf 10 %, begruendet mit der Flaechentabelle: das Bild hat bei 21,4 bis 21,5 mag/arcsec$^2$ (Ring bei 10 kpc, im Modell nicht enthalten) bis 19 % mehr Flaeche als das Modell; bei der flachen Reserve $d(\mu)$ von M31 aendert das $C/C_\mathrm{th}$ um wenige Prozent. Das Profil selbst ist in der Ausdehnung auf Faktor 1,5 unsicher (`deep-sky.md` 9 Punkt 1), die Toleranz ist also deutlich enger als die Unsicherheit der Vorlage. Ohne Extinktion (Zenit ohne Atmosphaere) liegt Bortle 5 beim Bild mit 1,01 knapp auf der Schwelle, beim Modell mit 0,94 knapp darunter; die Aussage "knapp" gilt in beiden Faellen.
+
+**Geprueft (Sichtpruefung, Screenshots nicht eingecheckt)** mit einer Kopie von `scripts/validierung-bilder.mjs` und den Suchteilen `?v=1&g=auge&z=m31&s=2&b=3|5|7&t=klar&h=90` (SwiftShader, 2026-10-29). Grauwerte (Mittel der sRGB-Kanaele) in der Uebersicht, Kern / Scheibe nordoestlich der Mitte / Himmel:
+- Bortle 3: laengliche Scheibe von oben links nach unten rechts (PA etwa 38 Grad, Norden oben, Osten links), M32 als Fleck suedlich des Kerns; 84 / 51 / 43.
+- Bortle 5: Kern und innere Scheibe schwach, Aussenscheibe kaum vom Himmel zu trennen; 85 / 55 / 54.
+- Bortle 7: nur der Kern als kleiner, undeutlicher Fleck, Scheibe gleich Himmel; 88 / 70 / 70.
+
+Der Kern bleibt bei Bortle 7 als Fleck sichtbar, obwohl $C/C_\mathrm{th}$ = 0,43 ist: die Deckkraft $P = \Phi((0{,}43-1)/0{,}484)$ = 0,12 wirkt auf den grossen Kernkontrast (ADR-0004, gleitender Rand). Das entspricht Bortles Beschreibung fuer Klasse 7 ("may be glimpsed ... very indistinct", `deep-sky.md` 8 Punkt 2) und ist kein Fehler des Quellbilds.
+
+**Urteil:** erfuellt; M31 ist bei Bortle 3 sichtbar, bei 5 knapp darunter, bei 7 nicht (Scheibe), wie ADR-0004 Befund 2.
