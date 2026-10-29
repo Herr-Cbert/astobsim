@@ -161,7 +161,7 @@
             "magnitude": 5.7
           }
         ],
-        "kommentar": "Werte aus objekte.md 6.1 (mittlere Opposition), Phasenwinkel 0,5 Grad aus 5.1. Trabanten aus 3.3 (dx positiv = Osten = links, dy positiv = Norden, Bahnneigung 2 Grad, alle vier sichtbar). Quellbild Hubble 27.06.2019 bei 45,65\" (bilder.json), Planetennorden oben. weiss_mag_arcsec2 auf den Pixelwert 1,0 geeicht (objekte.md 5.3, bis #71: 5,3 aus 5.2)."
+        "kommentar": "Werte aus objekte.md 6.1 (mittlere Opposition), Phasenwinkel 0,5 Grad aus 5.1. Trabanten aus 3.3 (dx positiv = rechts = Westen bei Norden oben wie in der Naht, Vorzeichen der Stellung frei gewaehlt, dy positiv = Norden, Bahnneigung 2 Grad, alle vier sichtbar). Quellbild Hubble 27.06.2019 bei 45,65\" (bilder.json), Planetennorden oben. weiss_mag_arcsec2 auf den Pixelwert 1,0 geeicht (objekte.md 5.3, bis #71: 5,3 aus 5.2)."
       }
     ]
   },

@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import bilderJson from "../../daten/bilder.json";
 import objekteJson from "../../daten/objekte.json";
+import m45Json from "../../daten/sterne/m45.json";
 import { pruefeBildnachweise, pruefeObjekte, pruefeVerweise } from "../daten";
 import { TEXTE } from "../texte";
 import { nachweiseImFuss, sterndatenImFuss } from "./bildnachweise";
@@ -81,5 +82,18 @@ describe("sterndatenImFuss (#103)", () => {
       expect(muster, f).toBeDefined();
       expect(eintraege.some((e) => muster!.test(e.titel)), f).toBe(true);
     }
+  });
+
+  it("deckt die Herkunft der M45-Sternliste ab (HIP, GDR3)", () => {
+    const zuQuelle: Record<string, RegExp> = { HIP: /^Hipparcos/, GDR3: /^Gaia DR3/ };
+    const farben = new Set(m45Json.sterne.map((s) => s.quelle_farbe));
+    for (const f of farben) {
+      const muster = zuQuelle[f];
+      expect(muster, f).toBeDefined();
+      expect(eintraege.some((e) => muster!.test(e.titel)), f).toBe(true);
+    }
+    const gaia = T.sterndaten.quellen.find((q) => q.titel.startsWith("Gaia"))!;
+    expect(gaia.lizenz).toContain("CC BY-NC 3.0 IGO");
+    expect(gaia.danksagung).toMatch(/^Credit: ESA, Gaia DPAC\./);
   });
 });

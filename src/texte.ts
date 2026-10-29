@@ -63,13 +63,24 @@ export const TEXTE = {
           titel: "Hipparcos- und Tycho-Kataloge, ESA",
           verwendet:
             "B-V und V von Albireo B aus dem Hipparcos-Hauptkatalog (ESA 1997) und dem Tycho Double Star Catalogue (Fabricius et al. 2002, A&A 384, 180), " +
-            "abgefragt im Hipparcos and Tycho Legacy Archive der ESA",
+            "abgefragt im Hipparcos and Tycho Legacy Archive der ESA; V und B-V von 25 Plejaden-Sternen (M45), abgefragt im Gaia-Archiv",
           lizenz:
             "„The Hipparcos and Tycho Catalogues are distributed under the CC BY-NC 3.0 IGO licence and the Terms and Conditions " +
             "for the use of these data require users to acknowledge ESA using “Credit: ESA”.“",
           lizenzUrl: "https://creativecommons.org/licenses/by-nc/3.0/igo/deed.en",
           danksagung: "Credit: ESA",
           url: "https://www.cosmos.esa.int/web/hipparcos/catalogues"
+        },
+        {
+          titel: "Gaia DR3, ESA",
+          verwendet: "Lage aller 44 Plejaden-Sterne (M45) und V und B-V der 19 Sterne ohne Hipparcos-Wert, umgerechnet nach der Gaia-DR3-Dokumentation 5.5.1",
+          lizenz: "„Gaia data are distributed under the CC BY-NC 3.0 IGO license.“",
+          lizenzUrl: "https://creativecommons.org/licenses/by-nc/3.0/igo/",
+          danksagung:
+            "Credit: ESA, Gaia DPAC. This work has made use of data from the European Space Agency (ESA) mission Gaia (https://www.cosmos.esa.int/gaia), " +
+            "processed by the Gaia Data Processing and Analysis Consortium (DPAC, https://www.cosmos.esa.int/web/gaia/dpac/consortium). " +
+            "Funding for the DPAC has been provided by national institutions, in particular the institutions participating in the Gaia Multilateral Agreement.",
+          url: "https://www.cosmos.esa.int/web/gaia-users/license"
         },
         {
           titel: "Bright Star Catalogue, 5. Ausgabe (Hoffleit und Warren 1991)",

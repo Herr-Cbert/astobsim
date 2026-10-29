@@ -16,6 +16,7 @@ import { baueFormularBedingungen } from "./formular_bedingungen";
 import { baueFormularGeraet } from "./formular_geraet";
 import { baueFormularObjekt } from "./formular_objekt";
 import { baueGesichtsfeld, type GesichtsfeldPlaetze } from "./gesichtsfeld";
+import { nurMitQuellbild } from "./nur_mit_quellbild";
 import { type Bildquelle, type Stand, Steuerung } from "./steuerung";
 import { waermeVor } from "./vorwaermen";
 import { baueZoomansicht } from "./zoomansicht";
@@ -165,7 +166,7 @@ function planeFrame(f: () => void): void {
 
 async function ladeKataloge(): Promise<Kataloge> {
   const [geraete, nachweise] = await Promise.all([ladeGeraete(), ladeBildnachweise()]);
-  const objekte = await ladeObjekte(nachweise);
+  const objekte = nurMitQuellbild(await ladeObjekte(nachweise));
   return { geraete, objekte, nachweise };
 }
 

@@ -129,9 +129,18 @@ describe("Doppelsterne in daten/objekte.json (#103)", () => {
 describe("ladeObjekte mit den Doppelsternen", () => {
   afterEach(() => vi.unstubAllGlobals());
 
+  // Sternlisten anderer Objekte (M45) liegen unter daten/sterne/ und laedt ladeObjekte mit.
+  const sternlisten = new Map(
+    Object.entries(import.meta.glob("../../daten/sterne/*.json", { import: "default", eager: true })).map(([pfad, inhalt]) => [
+      pfad.replace("../../daten/", ""),
+      inhalt
+    ])
+  );
+
   it("laedt und prueft die echte Datei samt Bildnachweisen", async () => {
     vi.stubGlobal("fetch", async (url: string) => {
-      const inhalt = url.endsWith("objekte.json") ? objekteJson : url.endsWith("bilder.json") ? bilderJson : undefined;
+      const datei = url.slice((import.meta.env.BASE_URL + "daten/").length);
+      const inhalt = datei === "objekte.json" ? objekteJson : datei === "bilder.json" ? bilderJson : sternlisten.get(datei);
       return inhalt === undefined ? new Response("", { status: 404 }) : new Response(JSON.stringify(inhalt));
     });
     const geladen = await ladeObjekte(await ladeBildnachweise());
