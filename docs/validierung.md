@@ -251,3 +251,12 @@ Grauwerte unten: Mittel der drei sRGB-Kanaele im Anblick des Zooms (linke Haelft
 
 **Nachtrag `mond_ev` (Entscheidung Herbert 2026-10-29):** `mond_ev` hat jetzt -10,51 mag (Krisciunas und Schaefer bei 79,3 Grad), Quellweiss 3,60 und eine geschwaerzte Nachtseite (neue Kacheln). Damit aendern sich T3 und T6a; T1, T2, T4, T5, T6b und T6c bleiben byte-gleich mit main 15da6ee (Bilder am 2026-10-29 verglichen, die T-Bilder werden bei der Zusammenfuehrung neu erzeugt und hier nicht eingecheckt). T6a: die aschgraue Nachtseite (vorher 61 gegen Himmel 54 im Zoom) ist weg, sie hat jetzt Himmelsgrau 54; die Tagseite ist durch den um 0,31 mag helleren Quellweiss etwas staerker abgeschnitten (55 statt 51 % der Mondpixel ueber 250), Mare Crisium und die Maria am Terminator bleiben als Flecken sichtbar. T3: Nachtseite gleich Himmel (24), Tagseite im Median 118 statt 114.
 
+
+## 11. M42 (Issue #107)
+
+Geprueft am 2026-10-29 mit Screenshots aus dem Produktionsbau (nicht eingecheckt, Bortle 5, Zenit, wie `scripts/validierung-bilder.mjs`): blosses Auge, 10x50, Refraktor 80/400 mit 20 mm (20-fach), 200/1200 mit 25 mm (48-fach) und 8 mm (150-fach, Seeing 1,5"). Keine Konsolenfehler, keine CSP-Verstoesse.
+
+- **Trapez:** Bei 150-fach stehen die vier hellen Sterne (C, A, D, B) als Viereck mit Norden oben, Osten links: A nordwestlich von C, D oestlich (Lage aus Gaia DR3, `daten/sterne/m42.json`, Probe gegen die WDS-Abstaende auf 0,5"). Theta2 Ori A und B stehen 2,3' bzw. 3' suedoestlich. E und F (V 11,1 und 10,0) sind bei Bortle 5 und 200 mm im Nebel nicht abgesetzt; ihre Helligkeiten sind bis 1,5 mag unsicher.
+- **Nebel:** Huygens-Region, Fischmaul (Dunkelbucht oestlich des Trapezes), M43 im Norden und der Ostfluegel sind ab 48-fach erkennbar; im Bild gibt es keine Reste der entfernten Sterne (Hoefe der Sterne V 6,8 bis 8,4 per Kreismaske entfernt).
+- **Grenze:** Das Quellbild endet 800" um das Trapez. Der Nebel ist dort mit 19,5 bis 20 mag/arcsec$^2$ noch heller als der Himmel bei Bortle 5; der Rand des Bildausschnitts ist deshalb bei 20- und 48-fach als Quadrat sichtbar (offene Frage an Herbert: weicher Randabfall oder groesseres Feld).
+- **Gesamthelligkeit:** Bild 2,51 mag gegen Literatur 4,0 (physik.md 26, offen).

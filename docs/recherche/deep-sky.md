@@ -104,6 +104,8 @@ B-V der Trapezsterne ist durch die Roetung im Nebel ($E(B-V)$ um 0,3 bis 0,5, ni
 
 Weitere Sterne der Gruppe: Theta2 Ori B (V etwa 6,4, nicht abgefragt) und die schwachen Komponenten G, H (V 14 bis 16, WDS [16]). Vorschlag: nur A bis F und Theta2 A, Theta2 B ergaenzen, wenn das Quellbild die Gegend zeigt.
 
+> Nachtrag 2026-10-29 (Issue #107): Die Sternliste erzeugt `tools/m42_sterne.py` nach `daten/sterne/m42.json` mit dem Vorzeichen der Naht (dx positiv nach Westen, also umgekehrt zur Tabelle oben: A +9,59/+8,58, D -11,81/+6,34, Theta2 A -96,08/-94,89). Theta2 Ori B ist Gaia DR3 3017360833515044480 (V 6,33 aus Gaia, 52" oestlich von Theta2 A). Der Abstand C-D aus Gaia (13,40") weicht um 0,4" vom WDS (13,8") ab. Zur Gesamthelligkeit und Flaechenhelligkeit in 2.1 siehe physik.md 26: das geeichte WFI-Bild ist im Ausschnitt 26,7' x 26,7' 1,5 mag heller als V 4,0, der Kern heller als 14 mag/arcsec$^2$.
+
 ---
 
 ## 3. M13 (Herkuleshaufen, NGC 6205)
