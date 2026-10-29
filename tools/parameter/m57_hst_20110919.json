@@ -1,0 +1,64 @@
+{
+  "kommentar": "M57: Hubble WFC3/UVIS F502N ([O III] 501 nm), 19.09.2011, Programm GO 12309 (Issue #105). Lineares, kalibriertes Archivbild aus MAST (Entscheidung 2 in docs/recherche/README.md, bilder-v2.md 5). Lizenz am 2026-10-29 auf lizenz_url gelesen: 'Most data hosted at MAST are in the public domain'; Ausnahmen (exklusive Frist, HLSP unter CC BY 4.0, DSS und Guide Star Catalogs) treffen auf ein HST-Pipelinebild ausserhalb der Sperrfrist nicht zu.",
+  "id": "m57_hst_20110919",
+  "objekt": "m57",
+  "zustand": "m57",
+  "datei": "m57/hst_2011-09-19_f502n.webp",
+  "rohbild": "data/roh/ibh601070_drc.fits",
+  "roh_url": "https://mast.stsci.edu/api/v0.1/Download/file?uri=mast:HST/product/ibh601070_drc.fits",
+  "roh_sha256": "01ecf5a655216ad6a788616d597308a947f82c232a3168a4bcc851c4f2dea263",
+  "roh_bytes": 222851520,
+  "roh_abruf": "2026-10-29",
+  "original_pixel": "4162x4459",
+  "fits_erweiterung": "SCI",
+  "fits_filter": "F502N",
+  "roh_mitte_px": [
+    2112.21,
+    2239.56
+  ],
+  "mitte_beleg": "Schwerpunkt des Zentralsterns, ber. mit WCS RA 283,39624 Grad, Dec +33,02915 Grad",
+  "bogensekunden_pro_pixel": 0.1,
+  "ueberabtastung": 3,
+  "leinwand_px": 1200,
+  "winkelgroesse_arcsec": 88.0,
+  "eichung": {
+    "art": "gesamt",
+    "magnitude": 8.8,
+    "quelle": "V = 8,8 aus docs/recherche/deep-sky.md Abschnitt 5 (Wikipedia, Sekundaerquelle)"
+  },
+  "kennlinie": {
+    "umfang_mag": 9.0
+  },
+  "sterne": {
+    "im_bild_entfernen": true,
+    "punktquellen": "Feldsterne, der Zentralstern (V 15,75; im Schmalband nicht im Verhaeltnis zum V-Band) und Reste kosmischer Strahlung und heisser Pixel, vor allem im Streifen der Chipluecke, den nur eine Belichtung deckt",
+    "fenster_px": 9,
+    "schwelle_sigma": 6.0,
+    "kontrast": 0.5,
+    "zusaetzlich_px": [
+      [
+        1126.5,
+        128.5,
+        30
+      ],
+      [
+        3.5,
+        583.5,
+        30
+      ]
+    ],
+    "zusaetzlich_beleg": "Kreise um die Hoefe der zwei hellsten Feldsterne (Leinwandpixel, Mitte bei dx -52,7\"/dy +47,2\" und am Ostrand bei dx +59,7\"/dy +1,7\"), deren Fluegel die Maske nicht erfasst"
+  },
+  "hintergrund": "kein Abzug: das Bildfeld liegt ganz im Halo (Radius 115\", deep-sky.md 5), MDRIZSKY = 0",
+  "quelle_url": "https://www.stsci.edu/hst-program-info/program/?program=12309",
+  "quelle_datei": "ibh601070_drc.fits (MAST, HST-Pipeline, Assoziation ibh601070: ibh601akq und ibh601bnq)",
+  "mission": "Hubble Space Telescope",
+  "instrument": "WFC3/UVIS, Filter F502N ([O III] 501 nm, Pivot 501,0 nm), zwei Belichtungen zusammen 1230 s, CTE-korrigiert und gedrizzelt (drc)",
+  "aufnahmedatum": "2011-09-19",
+  "lizenz": "Public Domain (MAST, HST-Archivdaten)",
+  "lizenz_url": "https://archive.stsci.edu/publishing/data-use",
+  "namensnennung": "Based on observations made with the NASA/ESA Hubble Space Telescope obtained from the Space Telescope Science Institute, which is operated by the Association of Universities for Research in Astronomy, Inc., under NASA contract NAS5-26555. These observations are associated with program 12309 (PI C. R. O'Dell).",
+  "orientierung": "Himmelsnorden oben, Osten links (CD-Matrix des FITS-Kopfs, ORIENTAT -25,0 Grad; Gegenprobe: zwei Feldsterne mit der Vorwaertsrechnung der CD-Matrix an derselben Stelle der Leinwand); belegt am Bild: grosse Achse der Isophoten 20 und 21 mag/arcsec^2 bei Positionswinkel 61 und 58 Grad (Flaechenmomente), Literatur etwa 60 Grad (deep-sky.md 5).",
+  "bearbeitung_kanal": "Graustufe aus dem Schmalbandfilter F502N ([O III] 501 nm), weil das dunkeladaptierte Auge bei 507 nm am empfindlichsten ist und [O III] das V-Band von M57 beherrscht (bilder-v2.md 1 und 5, deep-sky.md 2.1); die Verteilung im V-Band ist damit genaehert.",
+  "hinweise": "Lineare Pipelinedaten statt des Pressebilds heic1310a (gestreckt). Flaechentabelle in daten/objekte.json (m57, isophoten) aus demselben Lauf."
+}

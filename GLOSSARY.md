@@ -193,7 +193,7 @@ _Vermeiden_: NELM (nur fuer das blosse Auge gebraeuchlich), Reichweite
 Linie gleicher Flaechenhelligkeit eines Deep-Sky-Objekts am Himmel, in mag/arcsec². Die sichtbare Isophote ist die schwaechste, deren eingeschlossene Flaeche ueber der Wahrnehmungsschwelle liegt; darunter verblasst das Objekt gleitend in den Himmel.
 
 **Flaechentabelle**:
-Je Deep-Sky-Zustand die Liste "Isophote gegen eingeschlossene Flaeche" (`isophoten` in `daten/objekte.json`), von `tools/` am aufbereiteten Quellbild gemessen; aus ihr bestimmt physik die sichtbare Isophote, ohne Pixel zu sehen.
+Je Deep-Sky-Zustand die Liste "Isophote gegen eingeschlossene Flaeche" (`isophoten` in `daten/objekte.json`), von `tools/` am aufbereiteten Quellbild gemessen; aus ihr bestimmt physik die sichtbare Isophote, ohne Pixel zu sehen. Festlegung seit #105 (Stand 2026-10-29, Herbert kann auf die gefuellte Flaeche umentscheiden): "eingeschlossene Flaeche" ist die Flaeche aller Pixel mit $\mu \le$ Isophote; ein schwaecheres Loch (M57 innen) zaehlt erst mit, wenn die Isophote es erreicht. Bei M57 unterscheidet sich das von der gefuellten Flaeche nur zwischen 17,8 und 18,7 mag/arcsec² (17,8: 1618 statt 2626 arcsec², ab 19,0 gleich).
 
 **Deckkraft**:
 Anteil 0 bis 1, mit dem ein Stern oder ein Deep-Sky-Pixel ueber dem Himmel erscheint, nach Blackwells Wahrscheinlichkeitskurve aus dem Verhaeltnis Kontrast zu Schwelle (0,5 an der Schwelle). Macht die Wahrnehmungsschwelle gleitend.

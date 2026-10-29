@@ -25,6 +25,11 @@ Beim Mond zusaetzlich: Phasenmagnitude nach Krisciunas und Schaefer 1991,
 Gl. 9 (m = -12,73 + 0,026 a + 4e-9 a^4, a = phasenwinkel_grad), und der
 Quellweiss, der daraus folgen wuerde, als Plausibilitaet fuer die Magnitude
 des Zustands (docs/recherche/objekte.md 5.3).
+Deep-Sky-Bilder mit log-Kennlinie (kennlinie im Bildnachweis, Issue #105):
+Grauwert (Rot-Kanal) ueber die Tabelle der Kennlinie dekodiert, Quellweiss
+ist kennlinie.mag_hell (Deep-Sky-Zustaende tragen kein weiss_mag_arcsec2),
+der Vorschlag ist dann der Wert fuer mag_hell. Zustaende ohne bild
+(Doppelsterne, M45) werden uebergangen.
 
 Exit-Code 0, wenn alle Zustaende die Probe bestehen, sonst 1.
 
@@ -41,6 +46,8 @@ import sys
 
 import numpy as np
 from PIL import Image
+
+from deep_sky_aufbereiten import log_tabelle
 
 TOLERANZ_MAG = 0.05
 GEWICHTE_Y = np.array([0.2126, 0.7152, 0.0722])
@@ -60,6 +67,15 @@ def lade_linear(pfad):
 def leuchtdichte(nachweis, bilder):
     """Lineare Leuchtdichte Y des ganzen Quellbilds (Einzelbild oder Stufe 0 der Kachelpyramide)."""
     kacheln = nachweis.get("kacheln")
+    kennlinie = nachweis.get("kennlinie")
+    if kennlinie is not None and kacheln is None:
+        with Image.open(os.path.join(bilder, nachweis["datei"])) as bild:
+            kodes = np.asarray(bild.convert("RGB"))[..., 0]
+        if kodes.shape[1] != nachweis["pixel_breite"] or kodes.shape[0] != nachweis["pixel_hoehe"]:
+            raise ValueError(f"{nachweis['id']}: Masse {kodes.shape[1]}x{kodes.shape[0]} statt laut Nachweis")
+        return log_tabelle(kennlinie["mag_hell"], kennlinie["mag_dunkel"]).astype(np.float64)[kodes]
+    if kennlinie is not None:
+        raise ValueError(f"{nachweis['id']}: Kachelpyramide mit log-Kennlinie ist noch nicht umgesetzt")
     if kacheln is None:
         rgb = lade_linear(os.path.join(bilder, nachweis["datei"]))
         if rgb.shape[1] != nachweis["pixel_breite"] or rgb.shape[0] != nachweis["pixel_hoehe"]:
@@ -102,18 +118,21 @@ def main():
           f"{'weiss':>6} {'Vorschlag':>9} {'m Bild':>7} {'Abw.':>6}  Probe")
     for objekt in objekte:
         for z in objekt["zustaende"]:
+            if "bild" not in z:
+                continue
             nachweis = nachweise[z["bild"]]
+            weiss = nachweis["kennlinie"]["mag_hell"] if "kennlinie" in nachweis else z["weiss_mag_arcsec2"]
             if z["bild"] not in cache:
                 cache[z["bild"]] = float(leuchtdichte(nachweis, args.bilder).sum())
             massstab = z["winkelgroesse_arcsec"] / nachweis["objekt_durchmesser_px"]
             fluss = cache[z["bild"]] * massstab ** 2
             vorschlag = round(z["magnitude"] + 2.5 * math.log10(fluss), 2)
-            m_bild = z["weiss_mag_arcsec2"] - 2.5 * math.log10(fluss)
+            m_bild = weiss - 2.5 * math.log10(fluss)
             abweichung = m_bild - z["magnitude"]
             ok = abs(abweichung) <= TOLERANZ_MAG
             fehler += 0 if ok else 1
             print(f"{z['id']:<9} {z['bild']:<22} {massstab:>9.6f} {fluss:>11.2f} {z['magnitude']:>6.2f} "
-                  f"{z['weiss_mag_arcsec2']:>6.2f} {vorschlag:>9.2f} {m_bild:>7.3f} {abweichung:>+6.3f}  "
+                  f"{weiss:>6.2f} {vorschlag:>9.2f} {m_bild:>7.3f} {abweichung:>+6.3f}  "
                   f"{'ok' if ok else 'FEHLER'}")
             if objekt["typ"] == "mond":
                 m_ks = mond_magnitude_ks(z["phasenwinkel_grad"])

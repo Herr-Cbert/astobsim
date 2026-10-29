@@ -72,9 +72,29 @@ describe("log-Kennlinie", () => {
 
   it("kodetabelle waehlt sRGB ohne und log mit Kennlinie", () => {
     const echt = pruefeBildnachweise(bilderJson);
-    expect(echt.every((n) => n.kennlinie === undefined)).toBe(true);
+    // Mond und Planeten sRGB, Deep-Sky-Bilder (ab #105 M57) mit log-Kennlinie.
+    const sonnensystem = ["mond", "mars", "jupiter", "saturn"];
+    expect(echt.filter((n) => sonnensystem.includes(n.objekt)).every((n) => n.kennlinie === undefined)).toBe(true);
+    expect(echt.find((n) => n.objekt === "m57")?.kennlinie).toBeDefined();
     expect(kodetabelle(echt[0]!)).toBe(LINEAR_8BIT);
     expect(Array.from(kodetabelle({ ...echt[0]!, kennlinie: KENNLINIE }))).toEqual(Array.from(logTabelle(KENNLINIE)));
+  });
+
+  it("dekodiert M57 bitgleich zu tools/deep_sky_aufbereiten.py (log_tabelle)", () => {
+    const m57 = pruefeBildnachweise(bilderJson).find((n) => n.id === "m57_hst_20110919");
+    expect(m57?.kennlinie).toEqual({ art: "log", magHell: 16.72, magDunkel: 25.72 });
+    const t = kodetabelle(m57!);
+    // Werte aus python3 -c "import deep_sky_aufbereiten as ds; print(ds.log_tabelle(16.72, 25.72)[v])" in tools/.
+    const python: [number, number][] = [
+      [0, 0],
+      [1, 0.0002511886414140463],
+      [2, 0.00025952141731977463],
+      [100, 0.00635549845173955],
+      [200, 0.16613931953907013],
+      [254, 0.9678916931152344],
+      [255, 1]
+    ];
+    for (const [v, wert] of python) expect(t[v], `Kode ${v}`).toBe(wert);
   });
 });
 
