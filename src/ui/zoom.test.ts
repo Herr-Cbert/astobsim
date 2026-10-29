@@ -173,3 +173,25 @@ describe("vergleichsparameter", () => {
     expect(spanne(gefaltet) / p.helligkeit.faktorObjekt).toBeLessThan(0.5 * spanne(vergleich));
   });
 });
+
+describe("Zoom ohne Quellbild (Doppelsterne, M45, Issue #109)", () => {
+  it("Ausdehnung ist der Durchmesser, die Zoombreite der Sternabstand mit Rand oder das halbe Feld", () => {
+    const albireo = mit("albireo_2025");
+    expect(albireo.objekt.quelle).toBeUndefined();
+    expect(objektausdehnungArcsec(albireo)).toBe(albireo.objekt.durchmesserArcsec);
+    expect(zoombreiteArcsec(albireo)).toBeCloseTo(albireo.objekt.durchmesserArcsec * (1 + 2 * ZOOM_RAND), 9);
+    // M45 ist groesser als das Feld: hoechstens die Haelfte des Felds.
+    const m45 = mit("m45");
+    expect(zoombreiteArcsec(m45)).toBeCloseTo(feld(m45) / 2, 9);
+    expect(verschiebelage(m45, true)?.erlaubt).toBe(true);
+  });
+
+  it("Vergleichsbild ohne Quellmassstab nimmt das Raster der Anzeige", () => {
+    const k = mit("eps_lyr_2027");
+    const fenster = zoomfenster(k, { xArcsec: 0, yArcsec: 0 }, 300);
+    const anblick = auswerten(k, { fenster }).parameter;
+    const v = vergleichsparameter(anblick, 0);
+    expect(v.quellbild.rasterPx).toBe(300);
+    expect(v.quellbild.massstabArcsecProPx).toBeCloseTo(fenster.breiteArcsec / 300, 12);
+  });
+});

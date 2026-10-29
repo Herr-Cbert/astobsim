@@ -5,7 +5,7 @@ import objekteJson from "../../daten/objekte.json";
 import { FalterJs, neuesRaster, QuelleAusRaster } from "../bild";
 import { objektzustand, pruefeBildnachweise, pruefeGeraete, pruefeObjekte, pruefeVerweise } from "../daten";
 import type { Konfiguration, Objektzustand } from "../naht/konfiguration";
-import { GRENZEN } from "../physik";
+import { freiesPaar, GRENZEN } from "../physik";
 import { PARAMETER, voreinstellung, type Kataloge } from "../zustand";
 import type { Ausschnittsanfrage } from "./fenster";
 import { type Bildquelle, type Stand, Steuerung, type Umgebung } from "./steuerung";
@@ -454,5 +454,67 @@ describe("Steuerung, Zoomansicht (A-D3)", () => {
     await u.frame();
     expect(s.stand.zoom).toBe(true);
     expect(s.stand.zoombilder?.anblick.fenster.breiteArcsec).toBeCloseTo(zoombreiteArcsec(s.konfiguration), 9);
+  });
+});
+
+describe("Steuerung, Zustaende ohne Quellbild (QuelleLeer, Issue #109)", () => {
+  /** Hellster Wert eines Rasters ueber alle Kanaele. */
+  function hellster(daten: Float32Array): number {
+    let m = 0;
+    for (const v of daten) m = Math.max(m, v);
+    return m;
+  }
+
+  it("rechnet Doppelsterne, M45 und das freie Paar ohne die Bildquelle der Umgebung", async () => {
+    const { u, s } = neu();
+    await u.frame();
+    expect(u.bildquellen).toEqual(["mond_ev"]);
+    const paar = freiesPaar({ trennungArcsec: 20, magnitudeA: 3, magnitudeB: 4, bvA: 0.6, bvB: 1.5 });
+    for (const k of [mitZustand(s.konfiguration, "albireo_2025"), mitZustand(s.konfiguration, "eps_lyr_2027"), mitZustand(s.konfiguration, "m45"), { ...s.konfiguration, objekt: paar }]) {
+      expect(k.objekt.quelle).toBeUndefined();
+      s.aendere(k);
+      await u.frame();
+      expect(s.stand.phase, k.objekt.kennung).toBe("fertig");
+      expect(s.stand.fehler).toBeUndefined();
+      expect(s.stand.anblick?.raster.breite).toBe(ANZEIGE_PX);
+    }
+    // Keine weitere Bildquelle und keine Anfrage an die Umgebung fuer die vier Zustaende ohne Bild.
+    expect(u.bildquellen).toEqual(["mond_ev"]);
+    expect(u.urls.at(-1)).toContain("z=frei&tr=20&ma=3&mb=4&bva=0.6&bvb=1.5");
+  });
+
+  it("zeigt die Sterne des freien Paars im Gesichtsfeld und rechnet im Zoom mit Vergleichsbild", async () => {
+    const { u, s } = neu();
+    await u.frame();
+    s.aendere({ ...s.konfiguration, objekt: freiesPaar({ trennungArcsec: 30, magnitudeA: 2, magnitudeB: 3, bvA: 0.6, bvB: 0.6 }) });
+    await u.frame();
+    expect(s.stand.phase).toBe("fertig");
+    // Die Sterne heben sich vom Himmel ab (die Mitte zwischen den Sternen ist Himmel); bei 64
+    // Anzeigepixeln fallen etwa 47'' auf ein Pixel, deshalb nur knapp.
+    const himmelVon = (r: { daten: Float32Array; kanaele: number }): number => r.daten[((ANZEIGE_PX / 2) * ANZEIGE_PX + ANZEIGE_PX / 2) * r.kanaele]!;
+    const raster = s.stand.anblick!.raster;
+    expect(hellster(raster.daten)).toBeGreaterThan(himmelVon(raster));
+
+    s.zoome(true);
+    await u.frame();
+    expect(s.stand.phase).toBe("fertig");
+    const zb = s.stand.zoombilder!;
+    expect(zb.anblick.fenster).toEqual(zb.vergleich.fenster);
+    expect(hellster(zb.anblick.raster.daten)).toBeGreaterThan(2 * himmelVon(zb.anblick.raster));
+    expect(hellster(zb.vergleich.raster.daten)).toBeGreaterThan(0);
+    // Zoombreite aus dem Sternabstand (zoom.ts ohne quelle): 30'' mit Rand.
+    expect(zoombreiteArcsec(s.konfiguration)).toBeGreaterThanOrEqual(30);
+    expect(u.bildquellen).toEqual(["mond_ev"]);
+  });
+
+  it("wechselt vom freien Paar zurueck auf ein Objekt mit Bild und holt dessen Bildquelle", async () => {
+    const { u, s } = neu();
+    await u.frame();
+    s.aendere({ ...s.konfiguration, objekt: freiesPaar({ trennungArcsec: 2, magnitudeA: 5, magnitudeB: 6, bvA: 0.6, bvB: 0.6 }) });
+    await u.frame();
+    s.aendere(mitZustand(s.konfiguration, "jup_47"));
+    await u.frame();
+    expect(s.stand.phase).toBe("fertig");
+    expect(u.bildquellen).toEqual(["mond_ev", "jup_47"]);
   });
 });

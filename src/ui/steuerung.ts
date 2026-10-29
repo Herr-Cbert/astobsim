@@ -9,17 +9,20 @@
 // zoome wechselt zwischen Uebersicht und Zoomansicht (A-D3, Issue #20): der Zoom ist nur ein
 // anderes Fenster (zoom.ts) mit derselben Fenstermitte, dazu das Vergleichsbild aus derselben
 // Quelle; er schreibt keine URL. zeigeDetail schaltet im Zoom auf das schmalere Detailfenster
-// (Issue #77), wo zoom.ts es anbietet.
+// (Issue #77), wo zoom.ts es anbietet. Fuer Zustaende ohne Quellbild (Doppelsterne, freies Paar,
+// M45: Objektzustand ohne quelle) fragt die Steuerung die Umgebung nicht, sondern nimmt QuelleLeer
+// aus daten (docs/architektur.md 5.5); dann zaehlen nur die Punktquellen.
 //
 // Alles, was den Browser braucht (Frame, URL, Bildquelle, Anzeigegroesse), kommt ueber die
 // Umgebung herein; so prueft Vitest die Schleife in Node. Die Steuerung wirft nie: Fehler landen
 // im Stand und die UI zeigt sie an.
 
 import { type Anblick, type Falter, FalterJs, rendere, type Zwischenspeicher } from "../bild";
+import { QuelleLeer } from "../daten";
 import type { Objektzustand } from "../naht/konfiguration";
 import type { Quelle } from "../naht/quelle";
 import type { Simulationsparameter } from "../naht/simulationsparameter";
-import { type Auswertung, auswerten, begrenze, type Hinweis, type Konfiguration, optik, quelleVon } from "../physik";
+import { type Auswertung, auswerten, begrenze, type Hinweis, type Konfiguration, optik } from "../physik";
 import { inUrl, type Kataloge } from "../zustand";
 import { type Ausschnittsanfrage, ausschnittsanfrage } from "./fenster";
 import { sollMitte } from "./verschieben";
@@ -36,7 +39,7 @@ export interface Bildquelle {
 export interface Umgebung {
   kataloge: Kataloge;
   falter: Falter;
-  /** Bildquelle zum Objektzustand (Browser: Kachelpyramide oder Einzelbild). */
+  /** Bildquelle zum Objektzustand mit quelle (Browser: Kachelpyramide oder Einzelbild); ohne quelle nimmt die Steuerung QuelleLeer. */
   bildquelle(objekt: Objektzustand): Promise<Bildquelle>;
   /** Ruft f einmal vor dem naechsten Frame (Browser: requestAnimationFrame). */
   plane(f: () => void): void;
@@ -304,7 +307,8 @@ export class Steuerung {
 
   private quelleFuer(objekt: Objektzustand): AktuelleQuelle {
     if (this.aktuell?.kennung !== objekt.kennung) {
-      this.aktuell = { kennung: objekt.kennung, bildquelle: this.umgebung.bildquelle(objekt), zwischen: { uebersicht: {}, zoom: {}, detail: {}, vergleich: {} } };
+      const bildquelle = objekt.quelle === undefined ? Promise.resolve(leereBildquelle()) : this.umgebung.bildquelle(objekt);
+      this.aktuell = { kennung: objekt.kennung, bildquelle, zwischen: { uebersicht: {}, zoom: {}, detail: {}, vergleich: {} } };
     }
     return this.aktuell;
   }
@@ -329,7 +333,8 @@ export class Steuerung {
         : { breiteArcsec: optik(k.geraet).gesichtsfeld.breiteArcsec, mitteXArcsec: mitte.xArcsec, mitteYArcsec: mitte.yArcsec, px };
       // Der Kern der letzten Auswertung wird bei gleichem Schluessel wiederverwendet (auswerten, vorher).
       auswertung = auswerten(k, { fenster, vorher: this.zustand.auswertung?.parameter });
-      if (zoom) vergleich = vergleichsparameter(auswertung.parameter, quelleVon(k.objekt).massstabArcsecProPx);
+      // Ohne Quellbild gibt es keinen Quellmassstab; das Vergleichsbild nimmt dann den der Anzeige.
+      if (zoom) vergleich = vergleichsparameter(auswertung.parameter, k.objekt.quelle?.massstabArcsecProPx ?? 0);
     } catch (e) {
       this.setze({ phase: "fehler", fehler: { art: "rechnen", ursache: e } });
       return;
@@ -375,6 +380,11 @@ export class Steuerung {
       this.setze({ phase: "fehler", fehler: { art: "rechnen", ursache: e } });
     }
   }
+}
+
+/** Bildquelle fuer Zustaende ohne Quellbild: schwarz, nichts zu laden (QuelleLeer, Doppelsterne, M45). */
+function leereBildquelle(): Bildquelle {
+  return { quelle: new QuelleLeer(), lade: () => Promise.resolve() };
 }
 
 /** Zwischenspeicher des Anblicks in der gezeigten Ansicht. */

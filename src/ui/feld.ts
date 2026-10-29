@@ -60,6 +60,11 @@ export interface ZahlOptionen extends Feldbasis {
   schritt: number;
   /** Nachkommastellen der Anzeige. */
   stellen: number;
+  /**
+   * Ab grob.ab ein groeberer Schritt mit weniger Nachkommastellen (Grenze.grob aus physik, die
+   * Trennung des freien Paars: 0,05'' unter 10'', 1'' ab 10''). Ohne Angabe gelten schritt und stellen.
+   */
+  grob?: { ab: number; schritt: number; stellen: number };
   wert: number;
   /** Gueltige Eingabe uebernehmen; liefert die Hinweise von Steuerung.aendere. */
   beiAenderung(wert: number): readonly Hinweis[];
@@ -105,6 +110,15 @@ export interface Auswahl {
   setzeWert(wert: string): void;
 }
 
+/**
+ * Schritt und Nachkommastellen eines Felds beim Wert wert: ab grob.ab die groben, sonst die des
+ * Felds. Dieselbe Regel wie begrenze (physik), damit das Feld genau den Wert zeigt, mit dem
+ * gerechnet wird (34 statt 34,05), und ein Regler nur Werte anbietet, die begrenze nicht verschiebt.
+ */
+export function rasterBei(o: Pick<ZahlOptionen, "schritt" | "stellen" | "grob">, wert: number): { schritt: number; stellen: number } {
+  return o.grob !== undefined && wert >= o.grob.ab ? { schritt: o.grob.schritt, stellen: o.grob.stellen } : { schritt: o.schritt, stellen: o.stellen };
+}
+
 /** Zeile mit Beschriftung (und Infosymbol) ueber dem Eingabeteil. */
 function feldrahmen(d: Document, o: Feldbasis): { element: HTMLElement; zeile: HTMLElement } {
   const element = d.createElement("div");
@@ -147,13 +161,13 @@ function zahlteil(d: Document, o: ZahlOptionen, zeile: HTMLElement, element: HTM
   let aktuell = o.wert;
   const zeigeHinweis = (h: Hinweis | undefined): void => {
     hinweis.hidden = h === undefined;
-    hinweis.textContent = h === undefined ? "" : hinweistext(h, o.stellen);
+    hinweis.textContent = h === undefined ? "" : hinweistext(h, rasterBei(o, h.wert).stellen);
     if (h === undefined) eingabe.removeAttribute("aria-describedby");
     else eingabe.setAttribute("aria-describedby", hinweis.id);
   };
   const zeigeWert = (wert: number): void => {
     aktuell = wert;
-    eingabe.value = zahl(wert, o.stellen);
+    eingabe.value = zahl(wert, rasterBei(o, wert).stellen);
     beiWert?.(wert);
   };
   // Ein Wert von aussen (anderes Feld, Beobachter) macht einen alten Hinweis ungueltig.
@@ -197,7 +211,10 @@ export function regler(d: Document, o: ZahlOptionen): Regler {
   r.step = String(o.schritt);
   r.setAttribute("aria-label", o.beschriftung);
   zeile.append(r);
+  // Mit grob wechselt der Schritt des Reglers mit dem Wert (rasterBei); der Browser zaehlt die
+  // Schritte ab min, min muss dann ein Vielfaches des groben Schritts sein.
   const feld = zahlteil(d, o, zeile, element, (wert) => {
+    r.step = String(rasterBei(o, wert).schritt);
     r.value = String(wert);
   });
   // Der Regler bleibt in den Grenzen; Hinweise gibt es nur aus dem Zahlenfeld. Eine Aenderung

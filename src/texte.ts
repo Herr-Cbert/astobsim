@@ -264,7 +264,30 @@ export const TEXTE = {
     objekt: "Objekt",
     zustand: "Zustand",
     /** Steht unter der Auswahl, solange das Bild des gewaehlten Zustands nachgeladen wird. */
-    laedt: "Lade Bild …"
+    laedt: "Lade Bild …",
+    /** Gruppen der Objektauswahl je Objektklasse (A-D18), in dieser Reihenfolge. */
+    klassen: { sonnensystem: "Sonnensystem", doppelstern: "Doppelsterne", deep_sky: "Deep-Sky" },
+    /** Eintrag des freien Paars am Ende der Gruppe Doppelsterne (A-Z9). */
+    freiesPaar: "Freies Paar (eigene Werte)",
+    /** Eingaben des freien Paars (A-Z9), nur sichtbar, wenn es gewählt ist. */
+    paar: {
+      ueberschrift: "Freies Paar",
+      trennung: "Trennung",
+      magnitudeA: "Helligkeit Stern A",
+      magnitudeB: "Helligkeit Stern B",
+      bvA: "Farbindex B-V Stern A",
+      bvB: "Farbindex B-V Stern B",
+      einheitMag: "mag",
+      trennungHilfe:
+        "Abstand der beiden Sterne am Himmel in Bogensekunden (″). Die Sterne stehen fest in Ost-West-Richtung nebeneinander. " +
+        "Unter 10″ lässt sich die Trennung in Schritten von 0,05″ einstellen, darüber in ganzen Bogensekunden.",
+      magnitudeHilfe:
+        "Scheinbare Helligkeit des Sterns in Magnituden; kleinere Werte sind heller, 1 mag Unterschied ist etwa das 2,5-Fache. " +
+        "Vorgabe: Stern A 5 mag, Stern B 6 mag.",
+      bvHilfe:
+        "Farbindex B-V des Sterns: negative Werte sind bläulich weiß, 0,6 etwa sonnenähnlich (Vorgabe), über 1,2 orange bis rot. " +
+        "Farbe zeigt das Bild nur bei Sternen, die im Fernrohr hell genug dafür erscheinen."
+    }
   },
 
   /** Formular Bedingungen (src/ui/formular_bedingungen.ts). */

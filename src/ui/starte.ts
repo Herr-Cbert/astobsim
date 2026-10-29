@@ -16,7 +16,6 @@ import { baueFormularBedingungen } from "./formular_bedingungen";
 import { baueFormularGeraet } from "./formular_geraet";
 import { baueFormularObjekt } from "./formular_objekt";
 import { baueGesichtsfeld, type GesichtsfeldPlaetze } from "./gesichtsfeld";
-import { nurMitQuellbild } from "./nur_mit_quellbild";
 import { type Bildquelle, type Stand, Steuerung } from "./steuerung";
 import { waermeVor } from "./vorwaermen";
 import { baueZoomansicht } from "./zoomansicht";
@@ -166,11 +165,14 @@ function planeFrame(f: () => void): void {
 
 async function ladeKataloge(): Promise<Kataloge> {
   const [geraete, nachweise] = await Promise.all([ladeGeraete(), ladeBildnachweise()]);
-  const objekte = nurMitQuellbild(await ladeObjekte(nachweise));
+  const objekte = await ladeObjekte(nachweise);
   return { geraete, objekte, nachweise };
 }
 
-/** Bildquelle im Browser: Kachelpyramide, wenn der Nachweis eine hat, sonst ein Einzelbild. */
+/**
+ * Bildquelle im Browser: Kachelpyramide, wenn der Nachweis eine hat, sonst ein Einzelbild. Zustaende
+ * ohne Quellbild kommen nicht hierher, fuer sie nimmt die Steuerung QuelleLeer.
+ */
 async function bildquelleBrowser(kataloge: Kataloge, objekt: Objektzustand): Promise<Bildquelle> {
   const nachweis = nachweisZu(kataloge.objekte, kataloge.nachweise, objekt.kennung);
   if (nachweis === undefined) throw new Error(`ui: kein Bildnachweis zum Zustand "${objekt.kennung}"`);
