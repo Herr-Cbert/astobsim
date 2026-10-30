@@ -8,17 +8,20 @@
 // Meldet Chrome einen Verstoss gegen die Content-Security-Policy des Baus (Issue #22) oder einen
 // Fehler auf der Konsole, endet das Skript mit Exit-Code 1.
 //
-// Aufruf: node scripts/validierung-bilder.mjs [--gpu] [fall ...]. Chrome ueber CHROME, sonst google-chrome.
+// Aufruf: node scripts/validierung-bilder.mjs [--gpu] [--ziel=ordner] [fall ...]. Chrome ueber CHROME,
+// sonst google-chrome. --ziel legt die Bilder statt unter docs/validierung/ in einem anderen Ordner ab
+// (Varianten der Konstanten, Issue #111).
 import { spawn } from "node:child_process";
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { createServer } from "node:http";
 import { tmpdir } from "node:os";
-import { extname, join, normalize, sep } from "node:path";
+import { extname, join, normalize, resolve, sep } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const wurzel = fileURLToPath(new URL("..", import.meta.url));
 const bau = join(wurzel, "dist");
-const ziel = join(wurzel, "docs", "validierung");
+const zielArgument = process.argv.find((a) => a.startsWith("--ziel="));
+const ziel = zielArgument ? resolve(zielArgument.slice("--ziel=".length)) : join(wurzel, "docs", "validierung");
 const chrome = process.env.CHROME || "google-chrome";
 const BASIS = "/astobsim/";
 const BREITE = 1400;
@@ -35,7 +38,7 @@ const B = "b=5&t=klar&h=90";
 const refraktor = (d, f, ok) => `a=fernrohr&ba=refraktor&d=${d}&f=${f}&o=0&ok=${ok}&sg=50`;
 
 /**
- * Die Faelle aus docs/validierung.md (T1 bis T6, Mondphasen P1 bis P3): Name, Suchteil der URL,
+ * Die Faelle aus docs/validierung.md (T1 bis T6, Mondphasen P1 bis P3, Helligkeit T12): Name, Suchteil der URL,
  * optional die Pfeiltaste und Anzahl der Schritte mit Umschalt (je 25 % der Detailbreite), die das
  * Detail an die gepruefte Stelle schieben (T3: knapp rechts vom Terminator, Issue #77).
  */
@@ -59,7 +62,13 @@ export const FAELLE = [
   ["P2a", `g=auge&z=mond_voll&s=2`],
   ["P2b", `${refraktor(80, 800, 8)}&z=mond_voll&s=2`],
   ["P3a", `g=auge&z=mond_lv&s=2`],
-  ["P3b", `${refraktor(80, 800, 8)}&z=mond_lv&s=2`]
+  ["P3b", `${refraktor(80, 800, 8)}&z=mond_lv&s=2`],
+  // Helligkeit T12 (A-P13, Issue #111): Mond am 80 mm bei AP 1 mm (80-fach), Jupiter, Mars 14''
+  // und Saturn mit blossem Auge.
+  ["T12a", `${refraktor(80, 800, 10)}&z=mond_ev&s=2`],
+  ["T12b", `g=auge&z=jup_47&s=2`],
+  ["T12c", `g=auge&z=mars_14&s=2`],
+  ["T12d", `g=auge&z=sat_20&s=2`]
 ].map(([name, such, detail]) => ({ name, such: `?v=1&${such}&${B}`, detail }));
 
 if (!existsSync(join(bau, "index.html"))) {
