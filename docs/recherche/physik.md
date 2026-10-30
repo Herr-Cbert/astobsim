@@ -571,23 +571,23 @@ Nach #71 (Quellweiss Mond 3,91, Mars 14'' 2,54, `objekte.md` 5.3; $\mu$ verschie
 
 Mond A-D9 und Mars 14'' bei 120x sind mit `rendere` nachgemessen (`faktorObjekt` 0,2735 bzw. 0,2624).
 
-Version 2 (Issue #100, Anzeigeweiss 9,2 und Punktweiss 6,4, A-P13): dieselben Eingaben wie in der ersten Tabelle (Quellweiss Mond 3,35, Mars 14'' 4,1); $w$ waechst um den festen Faktor $10^{(0{,}4/3)(9{,}2 - 3{,}35)} = 6{,}0256$, der Punktfaktor $a$ (Abschnitt 14.2) um $10^{0{,}4(6{,}4 - 3{,}35)} = 16{,}596$ (ber.). Werte ber. mit $w = 10^{-0{,}4 n (\mu - 9{,}2)}$, $a = 10^{-0{,}4(\mu - 6{,}4)}$, $n$ = 1/3, $\mu$ aus Abschnitt 9 (45 Grad, klar, Kasten-Young); Unit-Tests in `src/physik/helligkeit.test.ts`, die Werte mit 3,35 in `src/physik/regression_v1.test.ts`.
+Version 2 (Issue #100, A-P13; seit Issue #111 Anzeigeweiss 8,9 und Punktweiss 6,9, vorher 9,2 und 6,4, `helligkeit-v2.md` 1.1): dieselben Eingaben wie in der ersten Tabelle (Quellweiss Mond 3,35, Mars 14'' 4,1); $w$ waechst um den festen Faktor $10^{(0{,}4/3)(8{,}9 - 3{,}35)} = 5{,}4954$, der Punktfaktor $a$ (Abschnitt 14.2) um $10^{0{,}4(6{,}9 - 3{,}35)} = 26{,}303$ (ber.). Werte ber. mit $w = 10^{-0{,}4 n (\mu - 8{,}9)}$, $a = 10^{-0{,}4(\mu - 6{,}9)}$, $n$ = 1/3, $\mu$ aus Abschnitt 9 (45 Grad, klar, Kasten-Young); Unit-Tests in `src/physik/helligkeit.test.ts`, die Werte mit 3,35 in `src/physik/regression_v1.test.ts`.
 
 | Fall | $\mu$ | Anzeige $w$ (Version 1) | sRGB |
 |---|---|---|---|
-| $w(9{,}2)$, $w(11{,}7)$, $w(16{,}7)$, $w(7{,}35)$ | | 1; 0,4642; 0,1; 1,7647 | |
-| Quellweiss 3,4, AP 0,8 mm ohne Verluste | 7,7753 | 1,5487 (0,2570); $a$ = 0,28176 | |
-| Himmel 21,875 mag/arcsec$^2$ (Bortle 8, AP 0,8 mm) | 21,875 | 0,020415 (0,003388) | |
-| Mond A-D9 | 7,013 | 1,9571 (0,3248) | |
-| Mond Fernglas 10x50 | 4,205 | 4,6346 (0,7692) | |
-| Mond an 80 mm bei 200x | 9,627 | 0,8770 (0,1456) | |
-| Mond blosses Auge | 3,633 | 5,5250 (0,9169) | |
-| Mars 14'' (4,1) an 80 mm bei 120x | 9,268 | 0,9793 (0,1625) | |
-| Himmel Fernglas 10x50, Bortle 1 / 9 | 22,47 / 17,57 | 0,0170 / 0,0765 (0,00282 / 0,0127) | 35 / 78 |
-| Jupiter 47'' (4,29) im 10x50 | 5,144 | 3,4728 (0,5763); $a$ = 3,1772 (0,1914) | |
-| Io auf einem Arbeitspixel 22,85'', $p$ = 0,000996 (14.3) | | $\min(1, (a p)^{1/3})$ = 0,1468 (0,0576); linear $w p$ = 0,0035 | 107 (68); 11 |
-| Mars 14'' (2,54) / 25'' (1,68) bei AP 6 mm am 80 mm (14.4) | | 6,840 / 8,907 (1,135 / 1,478) | |
-| Himmel bei AP 6 mm am 80 mm, Bortle 5 | 20,114 | 0,03505 | |
+| $w(8{,}9)$, $w(11{,}4)$, $w(16{,}4)$, $w(7{,}35)$ | | 1; 0,4642; 0,1; 1,6094 | |
+| Quellweiss 3,4, AP 0,8 mm ohne Verluste | 7,7753 | 1,4124 (0,2570); $a$ = 0,44656 | |
+| Himmel 21,875 mag/arcsec$^2$ (Bortle 8, AP 0,8 mm) | 21,875 | 0,018619 (0,003388) | |
+| Mond A-D9 | 7,013 | 1,7849 (0,3248) | |
+| Mond Fernglas 10x50 | 4,205 | 4,2268 (0,7692) | |
+| Mond an 80 mm bei 200x | 9,627 | 0,7998 (0,1456) | |
+| Mond blosses Auge | 3,633 | 5,0389 (0,9169) | |
+| Mars 14'' (4,1) an 80 mm bei 120x | 9,268 | 0,8931 (0,1625) | |
+| Himmel Fernglas 10x50, Bortle 1 / 9 | 22,47 / 17,57 | 0,0155 / 0,0698 (0,00282 / 0,0127) | 33 / 75 |
+| Jupiter 47'' (4,29) im 10x50 | 5,144 | 3,1672 (0,5763); $a$ = 5,0355 (0,1914) | |
+| Io auf einem Arbeitspixel 22,85'', $p$ = 0,000996 (14.3) | | $\min(1, (a p)^{1/3})$ = 0,1712 (0,0576); linear $w p$ = 0,0032 | 115 (68); 10 |
+| Mars 14'' (2,54) / 25'' (1,68) bei AP 6 mm am 80 mm (14.4) | | 6,238 / 8,123 (1,135 / 1,478) | |
+| Himmel bei AP 6 mm am 80 mm, Bortle 5 | 20,114 | 0,03197 | |
 
 ### 12.5 Unsicher
 

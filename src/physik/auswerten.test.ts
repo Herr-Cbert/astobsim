@@ -71,7 +71,7 @@ describe("auswerten: Rundreise A-D9", () => {
     expect(parameter.quellbild.punkte.punktquellen).toEqual([]);
     expect(parameter.gesichtsfeld).toEqual({ form: "kreis", breiteArcsec: 3000, hoeheArcsec: 3000 });
     expect(parameter.kern.massstabArcsecProPx).toBe(parameter.quellbild.massstabArcsecProPx);
-    // Seit dem Anzeigeweiss 9,2 (A-P13 i) liegt Quellweiss des Monds bei AP 1,33 mm ueber Bildschirmweiss.
+    // Seit dem Anzeigeweiss der Version 2 (A-P13 i, 8,9) liegt Quellweiss des Monds bis etwa AP 1,5 mm (mit 9,2: 1,33 mm) ueber Bildschirmweiss.
     expect(parameter.helligkeit.faktorObjekt).toBeGreaterThan(1);
   });
   it("Ergebnis ist strukturiert klonbar (postMessage an einen Worker)", () => {

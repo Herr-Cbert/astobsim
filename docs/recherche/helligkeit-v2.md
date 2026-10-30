@@ -89,14 +89,17 @@ $\mu_\mathrm{obj}$ ist die Flaechenhelligkeit von Quellweiss im Okular nach `phy
 | Anzeigeweiss 9,5 | 255 / 3,6 % | 253 | 37 % / 41 % | 28 / 56 | 225 / 200 / 166 | 111 / 138 |
 | Punktweiss 6,9 | wie Ist | wie Ist | wie Ist | wie Ist | 237 / 212 / 176 | 119 / 148 |
 | Punktweiss 7,4 | wie Ist | wie Ist | wie Ist | wie Ist | 246 / 227 / 187 | 127 / 158 |
+| **Gewaehlt: 8,9 / 6,9** (Endstand, Bilder in `docs/validierung/`) | 253 / 0,7 % | 237 | 12 % / 16 % | 25 / 51 | 236 / 212 / 175 | 119 / 147 |
+
+**Entschieden von Herbert am 2026-10-30:** Anzeigeweiss 8,9 (T4: Zonen, weisse Ovale und Farbe des GRF bleiben erhalten; Kriterium (i) als "nahezu Bildschirmweiss" gelesen, P99 253), Punktweiss 6,9 (Jupiter mit blossem Auge nahezu weiss, Abstufung bleibt). Umgesetzt in `src/physik/konstanten.ts` und ADR-0004 (Nachtrag 2026-10-30); die Zeile "Gewaehlt" ist am Endstand nachgemessen.
 
 Das Anzeigeweiss wirkt kaum auf die Planeten mit blossem Auge (nur ueber Himmel und Flaechenanteil $1-g$), das Punktweiss nicht auf Flaechen und Himmel.
 
 **Nebenbefunde:**
 
-1. **Quadrat um unaufgeloeste Planeten.** Mit blossem Auge sitzt jeder Planet in einem hellen Quadrat von etwa 28 x 28 Anzeigepixeln (Jupiter: Kante 87 gegen Himmel 54). Ursache: der Mischanteil $g \cdot \min(1, (a_P\,q)^n)$ in `tonwert` (`src/bild/rendere.ts`) nimmt die Kubikwurzel des mit dem harten, quadratischen Kern gefalteten Objektrasters; das cos²-Fenster aus `physik.md` 24 gilt nur fuer die Punktebene. Kein Konstantenproblem; ein hoeheres Punktweiss macht das Quadrat heller (7,4: Kante 91).
+1. **Quadrat um unaufgeloeste Planeten (Issue #135).** Mit blossem Auge sitzt jeder Planet in einem hellen Quadrat von etwa 28 x 28 Anzeigepixeln (Jupiter: Kante 87 gegen Himmel 54). Ursache: der Mischanteil $g \cdot \min(1, (a_P\,q)^n)$ in `tonwert` (`src/bild/rendere.ts`) nimmt die Kubikwurzel des mit dem harten, quadratischen Kern gefalteten Objektrasters; das cos²-Fenster aus `physik.md` 24 gilt nur fuer die Punktebene. Kein Konstantenproblem; ein hoeheres Punktweiss macht das Quadrat heller (7,4: Kante 91).
 2. **M31 Bortle 7:** der Kern bleibt als schwacher Fleck (90 gegen Himmel 70), wie T11 ("hoechstens als Hauch des Kerns") und die Entscheidung vom 2026-10-30 (`docs/validierung.md` 10).
-3. **M32 mit blossem Auge:** als kleiner Fleck sichtbar, 71 gegen 46 (Bortle 3), 74 gegen 54 (5), 78 gegen 70 (7). Als Punktquelle mit $V$ 8,1 laege M32 1,9 mag (Bortle 3) bzw. 2,9 mag (Bortle 7) unter der Grenzgroesse, gezeigte Deckkraft unter 0,03 (ber.), waere also unsichtbar. Er erbt die Deckkraft der Isophote von M31 (ADR-0004 Befund 4: die Schwelle entscheidet Objekt gegen Himmel, nicht Binnendetails). Mit Anzeige- oder Punktweiss nicht zu beheben.
+3. **M32 mit blossem Auge (Issue #136):** als kleiner Fleck sichtbar, 71 gegen 46 (Bortle 3), 74 gegen 54 (5), 78 gegen 70 (7). Als Punktquelle mit $V$ 8,1 laege M32 1,9 mag (Bortle 3) bzw. 2,9 mag (Bortle 7) unter der Grenzgroesse, gezeigte Deckkraft unter 0,03 (ber.), waere also unsichtbar. Er erbt die Deckkraft der Isophote von M31 (ADR-0004 Befund 4: die Schwelle entscheidet Objekt gegen Himmel, nicht Binnendetails). Mit Anzeige- oder Punktweiss nicht zu beheben.
 
 ## 2. Konstanten fuer Kriterium (i)
 
