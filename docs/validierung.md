@@ -254,9 +254,10 @@ Grauwerte unten: Mittel der drei sRGB-Kanaele im Anblick des Zooms (linke Haelft
 
 ## 11. M42 (Issue #107)
 
-Geprueft am 2026-10-29 mit Screenshots aus dem Produktionsbau (nicht eingecheckt, Bortle 5, Zenit, wie `scripts/validierung-bilder.mjs`): blosses Auge, 10x50, Refraktor 80/400 mit 20 mm (20-fach), 200/1200 mit 25 mm (48-fach) und 8 mm (150-fach, Seeing 1,5"). Keine Konsolenfehler, keine CSP-Verstoesse.
+Geprueft am 2026-10-30 (nach dem Review von PR #132) mit Screenshots aus dem Produktionsbau (nicht eingecheckt, Bortle 5, Zenit, wie `scripts/validierung-bilder.mjs`): 10x50, Refraktor 80/400 mit 10 mm (40-fach), 200/1200 mit 25 mm (48-fach) und 8 mm (150-fach, Seeing 1,5"). Keine Konsolenfehler, keine CSP-Verstoesse.
 
-- **Trapez:** Bei 150-fach stehen die vier hellen Sterne (C, A, D, B) als Viereck mit Norden oben, Osten links: A nordwestlich von C, D oestlich (Lage aus Gaia DR3, `daten/sterne/m42.json`, Probe gegen die WDS-Abstaende auf 0,5"). Theta2 Ori A und B stehen 2,3' bzw. 3' suedoestlich. E und F (V 11,1 und 10,0) sind bei Bortle 5 und 200 mm im Nebel nicht abgesetzt; ihre Helligkeiten sind bis 1,5 mag unsicher.
-- **Nebel:** Huygens-Region, Fischmaul (Dunkelbucht oestlich des Trapezes), M43 im Norden und der Ostfluegel sind ab 48-fach erkennbar; im Bild gibt es keine Reste der entfernten Sterne (Hoefe der Sterne V 6,8 bis 8,4 per Kreismaske entfernt).
-- **Grenze:** Das Quellbild endet 800" um das Trapez. Der Nebel ist dort mit 19,5 bis 20 mag/arcsec$^2$ noch heller als der Himmel bei Bortle 5; der Rand des Bildausschnitts ist deshalb bei 20- und 48-fach als Quadrat sichtbar (offene Frage an Herbert: weicher Randabfall oder groesseres Feld).
-- **Gesamthelligkeit:** Bild 2,51 mag gegen Literatur 4,0 (physik.md 26, offen).
+- **Lage:** Die Objektmitte ist die Mitte des WFI-Felds; das Trapez steht 3,6' oestlich und 4,1' noerdlich davon (links oben). Bei 150-fach (Gesichtsfeld etwa 20') liegt es deshalb am oberen linken Rand des Anblicks, ein Beobachter wuerde es in die Mitte ruecken.
+- **Trapez:** Die vier hellen Sterne (C, A, D, B) stehen als Viereck mit Norden oben, Osten links (Lage aus Gaia DR3, `daten/sterne/m42.json`, Probe gegen die WDS-Abstaende auf 0,5"). Theta2 Ori A und B stehen suedoestlich, NU Ori in M43 im Norden. E und F (V 11,1 und 10,0) sind bei Bortle 5 im Nebel nicht abgesetzt; ihre Helligkeiten sind bis 1,5 mag unsicher.
+- **Nebel:** Huygens-Region, Fischmaul, M43 und der Ostfluegel sind ab 40-fach erkennbar; Beugungsspikes des Trapezes und Hoefe heller Feldsterne sind entfernt (Kreismasken, Kern um das Trapez dadurch flach).
+- **Grenze:** Das Quellbild endet 960" um die Feldmitte (32' x 32'). Der Nebel ist am Rand mit 19,5 bis 20 mag/arcsec$^2$ noch heller als der Himmel bei Bortle 5; der Rand ist bei 40- und 48-fach weiter als Quadrat sichtbar (kein weicher Randabfall, Entscheidung Herbert).
+- **Gesamthelligkeit und Literatur:** Bild 2,49 mag (objekte.json 2,51); innerhalb 2,5' um das Trapez trifft das Bild die Umrechnung von O'Dell und Harris 2010 auf 0,02 mag, weiter aussen ist es 0,3 bis 0,7 mag schwaecher (physik.md 26, offen).
