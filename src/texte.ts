@@ -211,19 +211,23 @@ export const TEXTE = {
       "ohne Beugung, Seeing und Augenauflösung. Liegen hier zwei Punkte getrennt, im Anblick aber nicht, trennen Fernrohr und Bedingungen das Paar nicht.",
     /**
      * Statt quellbild bei Deep-Sky-Objekten mit Aufnahme (Issue #110), je Abbildung des
-     * Vergleichsbilds (Vergleichsabbildung in src/ui/zoom.ts; Vorschlag, Entscheidung Herbert).
+     * Vergleichsbilds (Vergleichsabbildung in src/ui/zoom.ts; entschieden: kubikwurzelUeberBoden).
      */
     quellbildDeepSky: {
       linear:
         "Die Aufnahme, aus der der Anblick entsteht, im selben Maßstab und Ausschnitt, ohne Verschmierung und ohne Anpassung der Helligkeit: Weiß im Quellbild ist Weiß auf dem Bildschirm. " +
-        "Schwache äußere Teile des Objekts sind so kaum zu sehen, obwohl sie in der Aufnahme stecken.",
+        "Schwache äußere Teile des Objekts sind so kaum zu sehen, obwohl sie in der Aufnahme stecken. Sterne erscheinen so blass wie im Anblick.",
       kubikwurzel:
-        "Die Aufnahme, aus der der Anblick entsteht, im selben Maßstab und Ausschnitt, ohne Verschmierung und ohne Wahrnehmungsschwelle. " +
+        "Die Aufnahme, aus der der Anblick entsteht, im selben Maßstab und Ausschnitt, ohne Verschmierung; die Fläche ohne Wahrnehmungsschwelle. " +
         "Die Helligkeit ist gestreckt (Kubikwurzel, wie im Anblick), damit auch die schwachen äußeren Teile zu sehen sind: Ein Tausendstel der hellsten Stelle erscheint noch als dunkles Grau. " +
-        "Was hier zu sehen ist und im Anblick fehlt, liegt unter den eingestellten Bedingungen unter der Wahrnehmungsschwelle oder ist zu fein.",
+        "Was hier zu sehen ist und im Anblick fehlt, liegt unter den eingestellten Bedingungen unter der Wahrnehmungsschwelle oder ist zu fein. Sterne erscheinen so blass wie im Anblick.",
+      kubikwurzelUeberBoden:
+        "Die Aufnahme, aus der der Anblick entsteht, im selben Maßstab und Ausschnitt, ohne Verschmierung; die Fläche ohne Wahrnehmungsschwelle. " +
+        "Die Helligkeit ist gestreckt (Kubikwurzel, wie im Anblick), damit auch die schwachen äußeren Teile zu sehen sind; der dunkle Hintergrund der Aufnahme erscheint schwarz. " +
+        "Was hier zu sehen ist und im Anblick fehlt, liegt unter den eingestellten Bedingungen unter der Wahrnehmungsschwelle oder ist zu fein. Sterne erscheinen so blass wie im Anblick.",
       okularOhneSchwelle:
-        "Die Aufnahme so hell, wie sie im Okular erscheint, mit demselben Himmel wie der Anblick, aber ohne Verschmierung und ohne Wahrnehmungsschwelle. " +
-        "Was hier zu sehen ist und im Anblick fehlt, kann das Auge unter den eingestellten Bedingungen nicht wahrnehmen oder es ist zu fein."
+        "Die Aufnahme so hell, wie sie im Okular erscheint, mit demselben Himmel wie der Anblick, aber ohne Verschmierung; die Fläche ohne Wahrnehmungsschwelle. " +
+        "Was hier zu sehen ist und im Anblick fehlt, kann das Auge unter den eingestellten Bedingungen nicht wahrnehmen oder es ist zu fein. Sterne erscheinen so blass wie im Anblick."
     },
 
     /** Hilfetexte zu den Zahlen des Infopanels (A-D6), Schluessel wie in TEXTE.info. */
@@ -276,7 +280,7 @@ export const TEXTE = {
     hinweis: {
       // A-P10; Uebergang nach docs/recherche/wahrnehmung.md 3.2.
       unaufgeloest:
-        "Erscheint ein Objekt im Okular kleiner als etwa eine Bogenminute (Größe mal Vergrößerung), kann das Auge es nicht als Scheibe auflösen: " +
+        "Erscheint ein Objekt im Okular kleiner als etwa ein bis zwei Bogenminuten (Größe mal Vergrößerung), kann das Auge es nicht als Scheibe auflösen: " +
         "Es sieht einen Punkt wie bei einem Stern, so wie Jupiter mit bloßem Auge. Der Übergang ist gleitend; mehr Vergrößerung zeigt wieder die Scheibe.",
       // grund "unter_schwelle" (docs/architektur.md 5.3), Schnitt 5 mag unter der Grenzgroesse (physik.md Abschnitt 20).
       unterSchwelle:
