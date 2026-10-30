@@ -96,6 +96,12 @@ function pruefeParameter(p: Simulationsparameter): void {
     if (!(ds.schwelleRelativ > 0) || !(ds.breite > 0) || !Number.isFinite(ds.schwelleRelativ) || !Number.isFinite(ds.breite)) {
       throw new BildFehler(`Helligkeit.deepSky: schwelleRelativ ${ds.schwelleRelativ} und breite ${ds.breite} muessen positiv sein`);
     }
+    // Begleiter (Issue #141): dieselben Bedingungen wie fuer das Hauptobjekt, sonst rechnet tonwert NaN.
+    for (const [k, b] of (ds.begleiter ?? []).entries()) {
+      if (!(b.schwelleRelativ > 0) || !Number.isFinite(b.schwelleRelativ) || !(b.sockel >= 0) || !Number.isFinite(b.sockel)) {
+        throw new BildFehler(`Helligkeit.deepSky.begleiter[${k}]: schwelleRelativ ${b.schwelleRelativ} muss positiv, sockel ${b.sockel} >= 0 sein, beide endlich`);
+      }
+    }
   }
 }
 
