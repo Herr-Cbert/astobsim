@@ -8,15 +8,7 @@
 // formatiert und entschieden, welcher Hinweis erscheint.
 
 import type { Konfiguration } from "../naht/konfiguration";
-import {
-  arbeitsmassstabOhneFenster,
-  type Anzeigewerte,
-  atmosphaere,
-  type Auswertung,
-  bortleMagProArcsec2,
-  optik,
-  sichtbareIsophote
-} from "../physik";
+import { type Anzeigewerte, arbeitsmassstabOhneFenster, type Auswertung } from "../physik";
 import { TEXTE } from "../texte";
 import { zahl } from "./format";
 import { hilfesymbol } from "./hilfe";
@@ -62,18 +54,6 @@ export function kreisdurchmesserArcsec(flaecheArcsec2: number): number {
 }
 
 /**
- * Liegt bei Deep-Sky kein Teil des Objekts ueber der Schwelle? Anzeigewerte.isophote traegt das
- * Verhaeltnis C/C_th nicht; es kommt aus sichtbareIsophote mit denselben Eingaben wie in auswerten
- * (helligkeitUndIsophote). Verhaeltnis unter 1 heisst: auch die guenstigste Isophote liegt unter der
- * Schwelle (schwelle.ts). undefined ohne Flaechentabelle.
- */
-export function unterDerSchwelle(k: Konfiguration): boolean | undefined {
-  const isophoten = k.objekt.isophoten;
-  if (k.objekt.klasse !== "deep_sky" || k.objekt.quelle === undefined || isophoten === undefined || isophoten.length === 0) return undefined;
-  return sichtbareIsophote(isophoten, optik(k.geraet), atmosphaere(k.bedingungen), bortleMagProArcsec2(k.bedingungen.bortle)).verhaeltnis < 1;
-}
-
-/**
  * Die Zeilen des Infopanels in fester Reihenfolge: die Kennwerte aus Version 1, die Grenzgroesse und
  * bei Deep-Sky mit Flaechentabelle die sichtbare Isophote mit Ausdehnung oder "unter der Schwelle".
  * k ist die Konfiguration, aus der die Auswertung entstand; bei Doppelsternen nennt der Hilfetext
@@ -101,7 +81,8 @@ export function infozeilen(anzeige: Anzeigewerte, k?: Konfiguration): Infozeile[
   ];
   const iso = anzeige.isophote;
   if (iso !== undefined) {
-    if (k !== undefined && unterDerSchwelle(k) === true) {
+    // verhaeltnis unter 1: auch die guenstigste Isophote liegt unter der Schwelle (sichtbareIsophote).
+    if (iso.verhaeltnis < 1) {
       zeilen.push({ beschriftung: I.isophote, wert: I.unterSchwelle, hilfe: H.isophote });
     } else {
       const mu = `${zahl(iso.magProArcsec2, 1)} ${E.magProBogensekunde2}`;
@@ -145,8 +126,9 @@ export const NAMEN_MAX = 3;
  *
  * Grenze des Quellbilds (A-X11): wenn der Quellmassstab den Arbeitsmassstab bestimmt, also groeber ist
  * als Gesamt-FWHM / 2,5 (arbeitsmassstabOhneFenster, ADR-0002); dann zeigt der Anblick die Pixel der
- * Aufnahme und nicht die Aufloesung von Fernrohr, Luft und Auge. Haengt nur am Massstab im Quellbild,
- * nicht am Objekt.
+ * Aufnahme und nicht die Aufloesung von Fernrohr, Luft und Auge. Haengt am Massstab im Quellbild, nicht
+ * an der Objekt-id; nur bei Deep-Sky (Entscheidung Herbert, Review #129): beim Mond nennt der
+ * Hilfetext des Zustands die Grenze schon ("ab etwa 200 mm", A-X5).
  */
 export function infohinweise(auswertung: Auswertung, k: Konfiguration): Infohinweis[] {
   const I = TEXTE.info;
@@ -179,7 +161,7 @@ export function infohinweise(auswertung: Auswertung, k: Konfiguration): Infohinw
   }
 
   const quelle = k.objekt.quelle;
-  if (quelle !== undefined && arbeitsmassstabOhneFenster(anzeige.aufloesung, quelle) > arbeitsmassstabOhneFenster(anzeige.aufloesung, undefined)) {
+  if (k.objekt.klasse === "deep_sky" && quelle !== undefined && arbeitsmassstabOhneFenster(anzeige.aufloesung, quelle) > arbeitsmassstabOhneFenster(anzeige.aufloesung, undefined)) {
     const m = quelle.massstabArcsecProPx;
     hinweise.push({
       art: "quellbild-grenze",

@@ -8,7 +8,7 @@ import type { Konfiguration, Objektzustand } from "../naht/konfiguration";
 import { auswerten, freiesPaar } from "../physik";
 import { TEXTE } from "../texte";
 import { type Kataloge, voreinstellung } from "../zustand";
-import { austrittspupille, infohinweise, infozeilen, kreisdurchmesserArcsec, MISCHGEWICHT_UNAUFGELOEST, unterDerSchwelle, winkel } from "./infopanel";
+import { austrittspupille, infohinweise, infozeilen, kreisdurchmesserArcsec, MISCHGEWICHT_UNAUFGELOEST, winkel } from "./infopanel";
 
 const KATALOGE: Kataloge = { geraete: pruefeGeraete(geraeteJson), objekte: pruefeObjekte(objekteJson), nachweise: pruefeBildnachweise(bilderJson) };
 // Sterne von M45 aus daten/sterne/ wie ladeSterne, aber synchron.
@@ -70,7 +70,7 @@ describe("infozeilen", () => {
 
   it("M57 am 80 mm bei 100x: sichtbare Isophote und Ausdehnung", () => {
     const k = mit("m57", { okularMm: 6 });
-    expect(unterDerSchwelle(k)).toBe(false);
+    expect(auswerten(k, { anzeigePx: 64 }).anzeige.isophote?.verhaeltnis).toBe(1);
     const z = zeilen(k);
     expect(z.map((x) => x.beschriftung)).toEqual([...V1, I.grenzgroesse, I.isophote, I.ausdehnung]);
     const iso = auswerten(k, { anzeigePx: 64 }).anzeige.isophote!;
@@ -87,7 +87,7 @@ describe("infozeilen", () => {
 
   it("M57 mit blossem Auge bei Bortle 9: unter der Schwelle, ohne Ausdehnung", () => {
     const k = mit("m57", { geraet: "auge", bortle: 9 });
-    expect(unterDerSchwelle(k)).toBe(true);
+    expect(auswerten(k, { anzeigePx: 64 }).anzeige.isophote?.verhaeltnis).toBeLessThan(1);
     const z = zeilen(k);
     expect(z.map((x) => x.beschriftung)).toEqual([...V1, I.grenzgroesse, I.isophote]);
     expect(z[9]?.wert).toBe(I.unterSchwelle);
@@ -113,7 +113,6 @@ describe("infozeilen", () => {
   it("ohne Flaechentabelle (M45, Doppelstern, Planet) keine Isophote", () => {
     for (const id of ["m45", "albireo_2025", "jup_47"]) {
       expect(zeilen(mit(id)).map((x) => x.beschriftung)).toEqual([...V1, I.grenzgroesse]);
-      expect(unterDerSchwelle(mit(id))).toBeUndefined();
     }
   });
 });
@@ -204,6 +203,15 @@ describe("infohinweise", () => {
     // Mit blossem Auge (Gesamt-FWHM ueber 1') reicht auch das grobe Bild.
     const auge = { ...mit("m57", { geraet: "auge" }), objekt: grob.objekt };
     expect(hinweise(auge).some((x) => x.art === "quellbild-grenze")).toBe(false);
+  });
+
+  it("Grenze des Quellbilds nicht beim Mond, auch wenn sein Massstab den Arbeitsmassstab bestimmt (Review #129)", () => {
+    // Mond 0,68''/px am 80 mm bei 150x und Seeing 0,5'': Gesamt-FWHM / 2,5 liegt unter dem Quellmassstab.
+    const mond = mit("mond_ev", { okularMm: 4 });
+    const k = { ...mond, bedingungen: { ...mond.bedingungen, seeingFwhmArcsec: 0.5 } };
+    const a = auswerten(k, { anzeigePx: 64 });
+    expect(a.anzeige.aufloesung.gesamtFwhmArcsec / 2.5).toBeLessThan(k.objekt.quelle!.massstabArcsecProPx);
+    expect(infohinweise(a, k).some((x) => x.art === "quellbild-grenze")).toBe(false);
   });
 
   it("Voreinstellung (Mond am 80 mm) ohne Hinweis", () => {
