@@ -6,20 +6,20 @@
   "datei": "m42/wfi_2005-01-02_v.webp",
   "rohbild": "data/roh/m42/m42_wfi_v.fits",
   "roh_url": "https://archive.eso.org/eso/eso_archive_main.html (Programm 273.C-5042(A), 22 Aufnahmen V/89 plus Kalibration, Liste in tools/m42_wfi_stapeln.py ROHDATEN)",
-  "roh_sha256": "e123f2561dc51e4ca5623ee09b80aabdac179b27f166ec8659aee08a1bfe1cf4",
-  "roh_bytes": 74655360,
+  "roh_sha256": "e2686cd850b7d2d69ae26bd10c8cb45ff01fc51d33135391c87ff3edf1ee82a1",
+  "roh_bytes": 92165760,
   "roh_abruf": "2026-10-29",
-  "original_pixel": "4320x4320",
+  "original_pixel": "4800x4800",
   "fits_erweiterung": "PRIMARY",
   "roh_mitte_px": [
-    2159.5,
-    2159.5
+    2399.5,
+    2399.5
   ],
-  "mitte_beleg": "Mitte des WFI-Felds (RA 83,7585, Dec -5,4580 Grad, Mittel der Pointierungen der 280-s-Aufnahmen) ist Bezugspunkt der Tangentialebene des Stapels (CRPIX 2160,5/2160,5); Theta1 Ori C liegt bei dx -215,5\" (Osten), dy +245,9\"",
+  "mitte_beleg": "Theta1 Ori C (Gaia DR3 3017364063330718080) ist Bezugspunkt der Tangentialebene des Stapels (CRPIX 2400,5/2400,5)",
   "bogensekunden_pro_pixel": 1.0,
   "ueberabtastung": 2,
-  "leinwand_px": 1920,
-  "winkelgroesse_arcsec": 1920.0,
+  "leinwand_px": 1600,
+  "winkelgroesse_arcsec": 1600.0,
   "eichung": {
     "art": "nullpunkt",
     "fits_schluessel": "MAGZP",
@@ -39,87 +39,52 @@
     "ersatz_px": 41,
     "zusaetzlich_px": [
       [
-        745.2,
-        706.4,
+        800.6,
+        792.3,
         20
       ],
       [
-        522.0,
-        273.8,
+        577.5,
+        359.7,
         25
       ],
       [
-        897.9,
-        47.1,
+        953.4,
+        133.0,
         45
       ],
       [
-        1184.8,
-        1365.8,
+        1240.2,
+        1451.7,
         75
       ],
       [
-        521.1,
-        827.6,
+        576.6,
+        913.5,
         25
       ],
       [
-        843.6,
-        984.4,
+        899.0,
+        1070.3,
         25
       ],
       [
-        183.0,
-        1574.0,
-        35
-      ],
-      [
-        1060.7,
-        1133.3,
+        1116.1,
+        1219.2,
         20
       ],
       [
-        116.2,
-        662.7,
+        171.6,
+        748.6,
         20
       ],
       [
-        1368.0,
-        1809.0,
-        30
-      ],
-      [
-        1385.9,
-        1884.4,
-        30
-      ],
-      [
-        1674.7,
-        1525.5,
-        20
-      ],
-      [
-        1190.5,
-        1637.5,
-        2
-      ],
-      [
-        1190.5,
-        1722.5,
-        2
-      ],
-      [
-        1190.5,
-        1770.0,
-        3
-      ],
-      [
-        1190.5,
-        1807.5,
-        2
+        11.0,
+        1051.0,
+        5
       ]
     ],
-    "zusaetzlich_beleg": "Kreise in Leinwandpixeln (Lage aus Gaia DR3 in der Tangentialebene): Trapez (Theta1 Ori C, A, D, B samt ihren Beugungsspikes in Ost-West-Richtung, Mitte 745,2/706,4, 20 px; der Kern dort ist aus der Umgebung ersetzt, also flach); Hoefe und Spikes der Feldsterne mit V 6,8 bis 10,1, deren Fluegel die Maske nicht erfasst: NU Ori in M43 (25 px), V 7,9 bei 898/47 (45 px), V 8,0 bei 1185/1366 (75 px), V 8,3 bei 521/828, V 8,4 bei 844/984 (je 25 px), das Paar V 7,4 und 8,5 bei 183/1574 (35 px), V 9,0 bei 1061/1133 und 116/663, V 10,1 bei 1675/1526 (je 20 px), V 9,1 und 9,3 bei 1368/1809 und 1386/1884 (je 30 px); dazu 5 Pixel ohne Daten in Spalte 1190 (2 bis 3 px)"
+    "zusaetzlich_beleg": "Kreise in Leinwandpixeln (Lage aus Gaia DR3 in der Tangentialebene um Theta1 Ori C): Trapez (Theta1 Ori C, A, D, B samt ihren Beugungsspikes in Ost-West-Richtung, Mitte 800,6/792,3, 20 px; der Kern dort ist aus der Umgebung ersetzt, also flach); Hoefe und Spikes der Feldsterne mit V 6,8 bis 9,0, deren Fluegel die Maske nicht erfasst: NU Ori in M43 (25 px), V 7,9 bei 953/133 (45 px), V 8,0 bei 1240/1452 (75 px), V 8,3 bei 577/914, V 8,4 bei 899/1070 (je 25 px), V 9,0 bei 1116/1219 und 172/749 (je 20 px); dazu 14 Pixel ohne Daten am Ostrand (11/1051, 5 px)"
   },
   "hintergrund": "in tools/m42_wfi_stapeln.py: Median der Standardsternaufnahme WFI.2005-01-02T01:28:31.304, 21,16 mag/arcsec^2, mit Krisciunas und Schaefer 1991 auf die Luftmasse der M42-Aufnahmen umgerechnet, 21,54 mag/arcsec^2 (physik.md 26); das Bildfeld hat keine nebelfreie Stelle",
   "himmel_abgezogen": true,
