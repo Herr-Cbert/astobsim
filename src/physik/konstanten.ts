@@ -75,17 +75,20 @@ export const BORTLE_MAG_PRO_ARCSEC2: readonly number[] = [21.9, 21.7, 21.4, 21.0
  * Abbildung der Leuchtdichte auf den Bildschirm (Abschnitt 12): Flaechenhelligkeit im Okular in
  * mag je Quadratbogensekunde, die als Bildschirmweiss erscheint (Anzeigeweiss). Version 1: 3,35,
  * der Vollmond ohne Verluste (docs/recherche/objekte.md 5.2). Version 2 (A-P13 i, ADR-0004, seit
- * Issue #100): 9,2 fuer die Flaechenebenen und den Himmel, damit das hellste Perzentil des Monds
- * bis etwa 1 mm Austrittspupille Weiss erreicht; am Bild nachzumessen in #111.
+ * Issue #100): fuer die Flaechenebenen und den Himmel, damit das hellste Perzentil des Monds bei
+ * etwa 1 mm Austrittspupille nahezu Weiss erreicht. Am Bild nachgemessen in #111
+ * (docs/recherche/helligkeit-v2.md 1.1): 8,9 statt 9,2 (Entscheidung Herbert 2026-10-30), Mond bei
+ * AP 1 mm P99 sRGB 253, in T4a und T4c bleiben Zonen, weisse Ovale und die Farbe des GRF erhalten.
  */
-export const ANZEIGE_WEISS_MAG_PRO_ARCSEC2 = 9.2;
+export const ANZEIGE_WEISS_MAG_PRO_ARCSEC2 = 8.9;
 
 /**
  * Punktweiss: Flaechenhelligkeit im Okular, die in der Punktebene als Bildschirmweiss erscheint
- * (A-P13 ii, ADR-0004): 6,4, damit Jupiter mit blossem Auge im Kern nahezu weiss ist (seit Issue
- * #100; Version 1 wie das Anzeigeweiss 3,35).
+ * (A-P13 ii, ADR-0004), damit Jupiter mit blossem Auge im Kern nahezu weiss ist (seit Issue #100;
+ * Version 1 wie das Anzeigeweiss 3,35). Am Bild nachgemessen in #111 (helligkeit-v2.md 1.1): 6,9
+ * statt 6,4 (Entscheidung Herbert 2026-10-30), Jupiter im Kern sRGB 237, Mars 14'' 212, Saturn 176.
  */
-export const PUNKT_WEISS_MAG_PRO_ARCSEC2 = 6.4;
+export const PUNKT_WEISS_MAG_PRO_ARCSEC2 = 6.9;
 
 /**
  * Kompressionsexponent der Abbildung auf den Bildschirm (Abschnitt 12): Groessenordnung nach Stevens

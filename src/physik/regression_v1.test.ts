@@ -12,7 +12,7 @@ import { BEDINGUNGEN_A_D9, KONFIGURATION_A_D9, MOND_Q1, REGRESSION_V1_FAELLE, re
 // Das Mischgewicht ist dort 0, Deckkraft der Trabanten 1 und keine Punktquelle farbig: tonwert rechnet
 // damit den Ausdruck aus Version 1 (src/bild/rendere.ts), das Bild ist bytegleich.
 //
-// vi.mock gilt nur fuer diese Datei: die anderen Tests laufen mit 9,2 und 6,4.
+// vi.mock gilt nur fuer diese Datei: die anderen Tests laufen mit 8,9 und 6,9 (Issue #111).
 vi.mock("./konstanten", async (original) => ({
   ...(await original<typeof import("./konstanten")>()),
   ANZEIGE_WEISS_MAG_PRO_ARCSEC2: 3.35,
@@ -40,7 +40,7 @@ describe("Regression Version 1: beide Weiss 3,35", () => {
 
 // Akzeptanz Issue #55 (Tabelle 12.4, physik.md 12.4) und Punktebene (physik.md 14.3) in sRGB-Kodes:
 // gelten mit dem Anzeigeweiss 3,35. Aus helligkeit.test.ts hierher verschoben, dort stehen die Werte
-// mit 9,2 und 6,4.
+// mit 8,9 und 6,9.
 /** Mond mit dem Quellweiss aus daten/objekte.json (mond_ev, 3,35). */
 const MOND_EV: Objektzustand = { ...MOND_Q1, quelle: { ...MOND_Q1.quelle!, weissMagProArcsec2: 3.35 } };
 const MARS_14: Objektzustand = { kennung: "mars-14", klasse: "sonnensystem", sterne: [], durchmesserArcsec: 14, magnitude: -1, quelle: { breitePx: 1000, hoehePx: 1000, massstabArcsecProPx: 0.04, weissMagProArcsec2: 4.1 }, trabanten: [] };

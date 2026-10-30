@@ -120,7 +120,7 @@ export interface Kernbeschreibung {
  * eigene Flaeche abgebildet und addiert: min(1, (punktFaktor * p)^punktExponent). punktFaktor ist die
  * Leuchtdichte von Quellweiss im Okular relativ zum Punktweiss (linear, nicht komprimiert),
  * punktExponent der Kompressionsexponent. faktorObjekt = punktFaktor^punktExponent galt nur, solange
- * Anzeigeweiss und Punktweiss gleich waren (Version 1 beide 3,35; Version 2 9,2 und 6,4, A-P13).
+ * Anzeigeweiss und Punktweiss gleich waren (Version 1 beide 3,35; Version 2 8,9 und 6,9, A-P13).
  * hintergrundMagProArcsec2 ist physikalisch; heute liest es niemand ausser dem Schluessel (die UI zeigt
  * die Himmelshelligkeit ueber bortleMagProArcsec2).
  *

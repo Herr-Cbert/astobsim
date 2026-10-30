@@ -3,7 +3,7 @@
 // okularhelligkeit() rechnet die Flaechenhelligkeit im Okular (Physik), helligkeit() bildet sie
 // mit anzeigefaktor() auf den Bildschirm ab (Anzeigeentscheidung, Issue #55, kein Augenmodell) und
 // liefert fuer die Punktebene (Issue #72) Faktor und Exponent der Abbildung je Pixel. Version 2
-// (Issue #100, docs/architektur.md 5.3, ADR-0004): zwei Weiss (Anzeigeweiss 9,2, Punktweiss 6,4),
+// (Issue #100, docs/architektur.md 5.3, ADR-0004): zwei Weiss (Anzeigeweiss 8,9, Punktweiss 6,9),
 // Mischgewicht fuer unaufgeloeste Sonnensystem-Zustaende, Deep-Sky-Ebene mit Isophote und Sockel.
 
 import type { Helligkeit } from "../naht/simulationsparameter";
@@ -75,7 +75,7 @@ export function okularhelligkeit(optik: Optik, atmosphaere: Atmosphaere, bortle:
  * Abschnitt 12: Flaechenhelligkeit mu im Okular (mag/arcsec^2) als Anzeigehelligkeit (GLOSSARY:
  * linear, 1 = Bildschirmweiss, vor der sRGB-Kodierung). w = (L / L_weiss)^n =
  * 10^(-0,4 n (mu - mu_weiss)) mit n = 1/3 (Groessenordnung nach Stevens) und mu_weiss dem
- * Anzeigeweiss (9,2, Version 1 3,35). Streng monoton fallend in mu; gleiche Leuchtdichteverhaeltnisse geben
+ * Anzeigeweiss (8,9, Version 1 3,35). Streng monoton fallend in mu; gleiche Leuchtdichteverhaeltnisse geben
  * gleiche Anzeigeverhaeltnisse. Nicht begrenzt (seit Issue #72, physik.md 14.4): Flaechen heller als
  * mu_weiss ergeben Werte ueber 1, begrenzt wird erst das Pixel beim Zeichnen (ui, zeichne.ts) bzw.
  * der Himmel in helligkeit().
@@ -102,7 +102,7 @@ export function leuchtdichteRelativ(magProArcsec2: number, weissMagProArcsec2: n
  * mal faktorObjekt), nur das Niveau wird komprimiert; der Kontrast innerhalb des Quellbilds bleibt, der
  * zwischen Objekt und Himmel nicht (physik.md 12.5). Die Punktebene bildet bild je Pixel ab (Issue #72,
  * physik.md Abschnitt 14): punktFaktor ist die Leuchtdichte von Quellweiss im Okular relativ zum
- * Punktweiss (6,4, A-P13 ii), punktExponent der Kompressionsexponent; faktorObjekt = punktFaktor^n
+ * Punktweiss (6,9, A-P13 ii), punktExponent der Kompressionsexponent; faktorObjekt = punktFaktor^n
  * gilt mit zwei Weiss nicht mehr. hintergrundMagProArcsec2 ist physikalisch.
  *
  * Version 2 (docs/architektur.md 5.3, ADR-0004): mischgewicht g nur bei sonnensystem aus

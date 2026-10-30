@@ -42,6 +42,65 @@ $\mu_\mathrm{obj}$ ist die Flaechenhelligkeit von Quellweiss im Okular nach `phy
 - **(ii) Planeten mit blossem Auge:** Jupiter 47'' im Kern 81, Jupiter 35'' 64, Saturn 39, Mars 25'' 40, Mars 14'' nicht ueber dem Himmel. Die Scheibe wird auf das Arbeitsraster von 25'' je Pixel verschmiert und als Flaeche abgebildet; die Abstufung nach Magnitude fehlt (Mars 25'' mit -3,0 mag ist dunkler als Jupiter mit -2,7). Das ist kein Konstantenproblem, sondern A-P10: unaufgeloest muss der Planet als Punktquelle mit Gesamtfluss erscheinen (Abschnitt 3).
 - **(iii) Monotonie:** gilt, P99 steigt am Mond streng mit der AP (79, 105, 113, 140, 170, 181). Das Verhaeltnis AP 6 zu AP 1 ist 2,9 linear, erwartet $6^{2/3}$ = 3,3 (ber.); der Rest ist Beugung und Seeing bei kleiner AP.
 
+### 1.1 Nachmessung nach A-P10 (Issue #111)
+
+**Aufbau:** wie oben, Stand `main` ddeb87b mit `ANZEIGE_WEISS_MAG_PRO_ARCSEC2` = 9,2, `PUNKT_WEISS_MAG_PRO_ARCSEC2` = 6,4, `KOMPRESSIONSEXPONENT` = 1/3. `scripts/validierung-bilder.mjs` kennt dafuer die Faelle T12a bis T12d und die Option `--ziel=ordner`; die Zusatzfaelle (Mond bei anderen AP, Mars 25'', Jupiter 35'', M31) kamen aus einer Kopie des Skripts. Ausgewertet wie oben (Himmel = Median der dunkelsten 30 % im Gesichtsfeld, beim Fernrohr nur im runden Feld; Scheibe = mehr als 15 Kodes ueber dem Himmel); "begrenzt" = Anteil der Scheibenpixel mit Mittel der Kanaele ab 254. Bei Fernrohr und Fernglas zaehlen die Trabanten zur "Scheibe" (wenige Pixel, P99 unberuehrt). T4a und T4c zusaetzlich im Anblick des Zooms (Scheibe = mehr als 40 Kodes ueber dem Rand), weil die Uebersicht die Scheibe nur mit etwa 60 Pixeln zeigt. Die Bilder liegen nicht im Repo.
+
+| Fall | AP [mm] | Himmel | Scheibe Mittel | Scheibe P99 | Max | begrenzt |
+|---|---|---|---|---|---|---|
+| T1 Jupiter 47'', 70/700, 100x | 0,70 | 23 | 130 | 218 | 220 | 0 % |
+| T2a Saturn 20'', 100/1200, 150x | 0,67 | 22 | 104 | 154 | 155 | 0 % |
+| T2b Saturn 20'', 60/600, 100x | 0,60 | 21 | 96 | 148 | 148 | 0 % |
+| T3 Mond, 80/800, 100x | 0,80 | 24 | 151 | 247 | 255 | 0,4 % |
+| T4a Jupiter, 300/3000, 200x, Seeing 3'' | 1,50 | 31 | 160 | 255 | 255 | 7,5 % (Zoom 25 %) |
+| T4b Jupiter, 100/1000, 200x, Seeing 3'' | 0,50 | 19 | 117 | 197 | 199 | 0 % |
+| T4c Jupiter, 300/3000, 200x, Seeing 1'' | 1,50 | 31 | 197 | 255 | 255 | 13 % (Zoom 28 %) |
+| T4d Jupiter, 100/1000, 200x, Seeing 1'' | 0,50 | 19 | 141 | 199 | 202 | 0 % |
+| T5a Mars 14'', 150/1200, 200x | 0,75 | 23 | 133 | 222 | 230 | 0 % |
+| T5b Mars 6'', 80/960, 120x | 0,67 | 22 | 86 | 166 | 170 | 0 % |
+| T6a Mond, blosses Auge | 6 | 54 | 214 | 255 | 255 | 49 % |
+| T6b = T12b Jupiter 47'', blosses Auge | 6 | 54 | 99 | 213 | 224 | 0 % |
+| T6c Jupiter 47'', 10x50 | 5 | 49 | 98 | 217 | 217 | 0 % |
+| T12a Mond, 80/800, 80x | 1,00 | 26 | 164 | 255 | 255 | 1,7 % |
+| T12c Mars 14'', blosses Auge | 6 | 54 | 94 | 190 | 199 | 0 % |
+| T12d Saturn 20'', blosses Auge | 6 | 54 | 86 | 159 | 165 | 0 % |
+| Mars 25'', blosses Auge | 6 | 54 | 106 | 223 | 233 | 0 % |
+| Jupiter 35'', blosses Auge | 6 | 54 | 97 | 198 | 208 | 0 % |
+| Mond 80/800, AP 0,5 | 0,5 | 19 | 107 | 189 | 246 | 0 % |
+| Mond 80/800, AP 2 | 2 | 35 | 194 | 255 | 255 | 22 % |
+| Mond 80/800, AP 4 | 4 | 45 | 215 | 255 | 255 | 41 % |
+| Mond 80/800, AP 6 | 6 | 49 | 221 | 255 | 255 | 47 % |
+| M31 blosses Auge, Bortle 3 / 5 / 7 (Kern) | 6 | 43 / 54 / 70 | | | 88 / 89 / 90 | |
+
+**Gegen die Zielkriterien (Ist-Stand):**
+
+- **(i) Mond:** erfuellt. P99 bei AP 1 mm 255 (1,7 % der Scheibe begrenzt), bei AP 0,8 mm (T3) 247.
+- **(ii) Planeten mit blossem Auge:** Jupiter 47'' im Kern 224, Mars 25'' 233, Jupiter 35'' 208, Mars 14'' 199, Saturn 165; die Abstufung folgt der Magnitude. Jupiter ist hell, aber nicht nahezu weiss. Die Spanne Jupiter zu Mars 14'' (1,3 mag) ist durch die Kubikwurzel auf das 0,67-fache im linearen Anzeigewert begrenzt (ber.), am Bild 25 Kodes.
+- **(iii) Monotonie:** gilt, P99 am Mond 189, 247, 255 ab AP 1 mm; das Mittel steigt weiter (107, 151, 164, 194, 215, 221 fuer AP 0,5 bis 6).
+- **Himmel am Fernrohr bei Bortle 5:** sRGB 19 (AP 0,5) bis 31 (AP 1,5), bei AP 1 mm 26; passt zum Prototyp (26 bis 28). Mit blossem Auge 43 (Bortle 3), 54 (5), 70 (7), Prototyp 42 und 70.
+- **T4a:** im Zoom ein Viertel der Scheibe auf Weiss (ADR-0004 erwartete ein Fuenftel). In T4a und T4c verlieren die hellen Zonen ihre Struktur, die weissen Ovale suedlich des GRF sind in T4c kaum noch zu sehen, und der GRF wird gelblich, weil der Rotkanal zuerst begrenzt wird.
+
+**Varianten** (Konstanten lokal geaendert, neu gebaut, dieselben Faelle; Werte sRGB):
+
+| Variante | Mond AP 1 P99 / begrenzt | T3 P99 | T4a / T4c begrenzt im Zoom | Himmel AP 1 / Auge B5 | Jupiter / Mars 14'' / Saturn mit blossem Auge (Kern) | Trabanten T1 / T4a (max) |
+|---|---|---|---|---|---|---|
+| Ist (9,2 / 6,4) | 255 / 1,7 % | 247 | 25 % / 28 % | 26 / 54 | 224 / 199 / 165 | 111 / 138 |
+| Anzeigeweiss 8,9 | 253 / 0,7 % | 237 | 12 % / 16 % | 25 / 51 | 222 / 199 / 165 | 111 / 138 |
+| Anzeigeweiss 9,5 | 255 / 3,6 % | 253 | 37 % / 41 % | 28 / 56 | 225 / 200 / 166 | 111 / 138 |
+| Punktweiss 6,9 | wie Ist | wie Ist | wie Ist | wie Ist | 237 / 212 / 176 | 119 / 148 |
+| Punktweiss 7,4 | wie Ist | wie Ist | wie Ist | wie Ist | 246 / 227 / 187 | 127 / 158 |
+| **Gewaehlt: 8,9 / 6,9** (Endstand, Bilder in `docs/validierung/`) | 253 / 0,7 % | 237 | 12 % / 16 % | 25 / 51 | 236 / 212 / 175 | 119 / 147 |
+
+**Entschieden von Herbert am 2026-10-30:** Anzeigeweiss 8,9 (T4: Zonen, weisse Ovale und Farbe des GRF bleiben erhalten; Kriterium (i) als "nahezu Bildschirmweiss" gelesen, P99 253), Punktweiss 6,9 (Jupiter mit blossem Auge nahezu weiss, Abstufung bleibt). Umgesetzt in `src/physik/konstanten.ts` und ADR-0004 (Nachtrag 2026-10-30); die Zeile "Gewaehlt" ist am Endstand nachgemessen.
+
+Das Anzeigeweiss wirkt kaum auf die Planeten mit blossem Auge (nur ueber Himmel und Flaechenanteil $1-g$), das Punktweiss nicht auf Flaechen und Himmel.
+
+**Nebenbefunde:**
+
+1. **Quadrat um unaufgeloeste Planeten (Issue #135).** Mit blossem Auge sitzt jeder Planet in einem hellen Quadrat von etwa 28 x 28 Anzeigepixeln (Jupiter: Kante 87 gegen Himmel 54). Ursache: der Mischanteil $g \cdot \min(1, (a_P\,q)^n)$ in `tonwert` (`src/bild/rendere.ts`) nimmt die Kubikwurzel des mit dem harten, quadratischen Kern gefalteten Objektrasters; das cos²-Fenster aus `physik.md` 24 gilt nur fuer die Punktebene. Kein Konstantenproblem; ein hoeheres Punktweiss macht das Quadrat heller (7,4: Kante 91).
+2. **M31 Bortle 7:** der Kern bleibt als schwacher Fleck (90 gegen Himmel 70), wie T11 ("hoechstens als Hauch des Kerns") und die Entscheidung vom 2026-10-30 (`docs/validierung.md` 10).
+3. **M32 mit blossem Auge (Issue #136):** als kleiner Fleck sichtbar, 71 gegen 46 (Bortle 3), 74 gegen 54 (5), 78 gegen 70 (7). Als Punktquelle mit $V$ 8,1 laege M32 1,9 mag (Bortle 3) bzw. 2,9 mag (Bortle 7) unter der Grenzgroesse, gezeigte Deckkraft unter 0,03 (ber.), waere also unsichtbar. Er erbt die Deckkraft der Isophote von M31 (ADR-0004 Befund 4: die Schwelle entscheidet Objekt gegen Himmel, nicht Binnendetails). Mit Anzeige- oder Punktweiss nicht zu beheben.
+
 ## 2. Konstanten fuer Kriterium (i)
 
 Die Abbildung ist $\mathrm{Pixel} = q \cdot w(\mu_\mathrm{obj})$ mit $w(\mu) = 10^{-0{,}4\,n\,(\mu - \mu_\mathrm{weiss})}$ (`physik.md` 12.3), begrenzt je Pixel auf 1. Aus der Messung folgt $q_{99}$ je Fall ($q_{99} = P99_\mathrm{linear} / w_\mathrm{alt}$, ber.: Mond 0,70, Jupiter 0,83). Fuer neue Konstanten $(n', \mu'_\mathrm{weiss})$ wird jedes gemessene Pixel mit $w'/w$ skaliert (ber., Skript `konst.py` im Scratchpad der Session, nicht im Repo). $\mu'_\mathrm{weiss}$ ist so gewaehlt, dass P99 des Mondes bei AP 1 mm genau 1 wird.
