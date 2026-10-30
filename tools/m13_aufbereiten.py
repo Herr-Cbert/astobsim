@@ -26,21 +26,24 @@ Schritte:
        Bild danach weiter bearbeitet ist; L ist deshalb nur eine monotone Zwischenstufe.
     4. Ausrichten und skalieren wie deep_sky_aufbereiten.ausrichten (bilinear auf feinerem
        Gitter, blockweise gemittelt) auf 0,5"/px, Objektmitte auf die Leinwandmitte.
-    5. Sterne entfernen (sterne_entfernen_katalog): alle Mitglieder bis V 15 und alle
-       Nicht-Mitglieder mit Eigenbewegung (Feldsterne, A-X9) an ihrer Katalogposition; innerhalb
+    5. Sterne entfernen (sterne_entfernen_katalog): alle 3082 Gaia-Quellen an ihrer Katalogposition
+       (Mitglieder bis V 15, Feldsterne mit Eigenbewegung nach A-X9, schwaechere Mitglieder und
+       Quellen ohne Eigenbewegung, deren Licht zum Restlicht gehoert); innerhalb
        3' waechst die Maske vom Katalogort ueber die zusammenhaengenden Pixel mit Rest gegen den
        gleitenden Median ueber wachsen_sigma lokalen Streuungen, hoechstens bis zu einem Radius
        nach der Helligkeit, ausserhalb 3' ist es die ganze Kreisscheibe; maskierte Pixel bekommen
        den Median der unmaskierten Umgebung. Danach erkennt deep_sky_aufbereiten.sterne_entfernen
-       die schwaecheren Sterne (Mitglieder ab V 15, Quellen ohne Eigenbewegung, Gaia-Luecken).
-       Ihr Licht kommt ueber die Tonkurve als glattes Restlicht zurueck.
-    6. Himmelsgradient (himmel_gradient): Ebene aus Blockmedianen ausserhalb 6' nach Abzug der
-       Ringmittel, abgezogen. Dann radial abhaengig glaetten (glaetten, 1,5" innen, 7,5" aussen).
-    7. Tonkurve (physik.md 27.2, deep-sky.md 7.2 Punkt 2): monotone Abbildung L -> Flaeche,
-       so dass das Mittel jedes Rings bis 4,5' dem King-Profil (Harris 2010, auf V_t normiert)
-       minus dem Fluss der Katalogsterne im Ring folgt. Ab 3' wird linear in das glatte Modell
-       (King minus Sterne) uebergeblendet, ab 4,5' gilt nur das Modell: dort liegt der Haufen im
-       8-Bit-Pressebild nicht mehr ueber dem Himmelsrest (Messung in BILD_BIS_ARCSEC).
+       was Gaia nicht fuehrt (G ab 17, Luecken im Kern). Das Licht der entfernten schwachen Sterne
+       kommt ueber den Radialfaktor als glattes Restlicht zurueck.
+    6. Himmelsgradient (himmel_gradient, Ebene aus Blockmedianen ausserhalb 6' nach Abzug der
+       Ringmittel) und Himmelssockel (Median ab 8') abgezogen; radial abhaengig glaetten
+       (glaetten, Kasten 1,5" bis 1', 7,5" ab 2,5').
+    7. Restlicht (physik.md 27.2, deep-sky.md 7.2 Punkt 2): globale glatte Kennlinie L^1,85
+       (Exponent aus der Sternprobe 27.1) mal einem glatten radialen Faktor g(r), dessen Knoten an
+       den Ringmitten so iteriert werden, dass das Mittel jedes Rings bis 3' dem King-Profil
+       (Harris 2010, auf V_t normiert) minus dem Fluss der Katalogsterne folgt. Ab 2' linear in das
+       glatte Modell (King minus Sterne) uebergeblendet, ab 3' nur das Modell, das zwischen 8' und
+       10' mit cos^2 auf 0 auslaeuft (keine Stufe am Leinwandrand).
     8. Kodieren mit der log-Kennlinie (ADR-0003 Nachtrag V2) und Quellweiss eichen:
        Gesamtfluss des dekodierten Bilds = V_t minus Sterne (eichung "gesamt"); Abbruch, wenn
        Flaeche plus Sterne mehr als 0,1 mag von V_t abweichen.
@@ -134,27 +137,37 @@ FENSTER_PX = 15
 WACHSEN_SIGMA = 2.0
 RAND_PX = 2
 ERSATZ_PX = 21
-# Ringe der Tonkurve (Aussenradien in Bogensekunden; der letzte erfasst die Leinwandecken)
-# Glaettung des Restlichts vor der Tonkurve: Kastenfilter GLATT_KLEIN_PX innen, GLATT_GROSS_PX aussen,
-# linear uebergeblendet zwischen GLATT_UEBERGANG_ARCSEC (Rauschen des 8-Bit-Bilds im schwachen Halo).
+# Glaettung des Restlichts vor der Kennlinie: Kastenfilter GLATT_KLEIN_PX innen, GLATT_GROSS_PX aussen,
+# linear uebergeblendet zwischen GLATT_UEBERGANG_ARCSEC (Rauschen des 8-Bit-Bilds und Reste der zu 50 bis
+# 85 % ersetzten Pixel zwischen 1' und 3', sonst Restspitzen heller als V 15).
 GLATT_KLEIN_PX = 3
 GLATT_GROSS_PX = 15
-GLATT_UEBERGANG_ARCSEC = (120.0, 270.0)
+GLATT_UEBERGANG_ARCSEC = (60.0, 150.0)
 # Bild nur, wo der Haufen den Himmelsrest des Pressebilds klar ueberragt: bis BILD_BIS_ARCSEC[0] das Bild,
 # bis [1] linear in das glatte Modell (King minus Sterne) uebergeblendet, weiter aussen nur das Modell.
 # Gemessen am sternbereinigten Bild: Himmelsrest etwa 2,5 (Einheit von fl_linear je arcsec^2) mit
 # +-25 % zwischen acht Sektoren; der Haufen liegt im Ring 180" bis 240" bei 11, im Ring 240" bis 300"
-# nur noch bei 4,5, also kaum ueber dem Himmel.
-BILD_BIS_ARCSEC = (180.0, 270.0)
+# nur noch bei 4,5, also kaum ueber dem Himmel. Zwischen 2' und 3' sind schon 70 bis 85 % der Pixel
+# ersetzt; mit Bild bis 4,5' blieben 46 Restspitzen heller als V 15, mit Bild bis 3' zwei.
+# Ringe (Aussenradien in Bogensekunden; der letzte erfasst die Leinwandecken).
+BILD_BIS_ARCSEC = (120.0, 180.0)
 RINGE_ARCSEC = (8, 16, 24, 32, 40, 50, 60, 75, 90, 105, 120, 140, 160, 180, 210, 240, 270, 300, 340, 380,
                 420, 470, 520, 570, 600, 650, 700, 760, 850)
 ITERATIONEN = 12
+# Kennlinie des Bilds: L^EXPONENT (Sternprobe physik.md 27.1: Steigung 0,54, 1/0,54 = 1,85)
+EXPONENT = 1.85
+# Modell am Rand: zwischen 8' und 10' mit cos^2 auf 0 (sonst Stufe am Leinwandrand, im 80 mm als Quadrat sichtbar)
+AUSLAUF_ARCSEC = (480.0, 600.0)
+# Restspitzen: Aperturfluss 3" minus Ring 6" bis 10" zwischen diesen Radien
+RESTSPITZEN_R_ARCSEC = (20.0, 300.0)
 # Himmelsgradient: Ebene aus den Blockmedianen (BLOCK_PX) ausserhalb GRADIENT_R_MIN_ARCSEC, nach Abzug
 # der Ringmittel (20"-Ringe), damit die radiale Struktur des Haufens nicht in die Ebene geht.
 GRADIENT_R_MIN_ARCSEC = 360.0
 GRADIENT_RING_ARCSEC = 20.0
 BLOCK_PX = 40
-STEIGUNG_GRENZEN = (1.0, 3.0)
+# Himmelssockel: Median des vorlaeufig linearen Bilds ausserhalb dieses Radius (dort ist der Haufen im
+# Pressebild nicht vom Himmel zu trennen, physik.md 27.2), vor der Potenz abgezogen.
+HIMMEL_R_MIN_ARCSEC = 480.0
 
 BILDNACHWEIS = {
     "id": "m13_noirlab_mayall",
@@ -170,7 +183,7 @@ BILDNACHWEIS = {
     "lizenz_url": "https://noirlab.edu/public/copyright/",
     "namensnennung": "T.A. Rector (University of Alaska Anchorage) and H. Schweiker (WIYN and NOIRLab/NSF/AURA)",
     "aenderungsvermerk": ("gedreht (Norden oben), zugeschnitten, skaliert, Graustufe aus dem V-Kanal, Tonkurve "
-                          "auf ein Flaechenhelligkeitsprofil, Sterne entfernt, ausserhalb 3' durch ein Profilmodell ersetzt"),
+                          "auf ein Flaechenhelligkeitsprofil, Sterne entfernt, ausserhalb 2' bis 3' durch ein Profilmodell ersetzt"),
 }
 
 QUELLE = ("ESA Gaia DR3 (gaiadr3.gaia_source; Gaia Collaboration, Vallenari et al. 2023, A&A 674, A1), "
@@ -502,11 +515,11 @@ def gewicht_bild(r, grenzen=BILD_BIS_ARCSEC):
 
 def modell(r, soll, i0, grenzen=RINGE_ARCSEC):
     """Glattes Restlicht: King (auf V_t normiert) mal dem Verhaeltnis Soll / King, linear ueber die Ringmitten
-    interpoliert (aussen konstant fortgesetzt). Folgt der King-Form, traegt aber den Abzug der Sterne."""
-    innen = np.r_[0.0, np.asarray(grenzen[:-1], dtype=np.float64)]
-    mitten = 0.5 * (innen + np.asarray(grenzen, dtype=np.float64))
+    interpoliert (aussen konstant fortgesetzt), am Rand mit auslauf auf 0. Folgt der King-Form, traegt aber
+    den Abzug der Sterne."""
+    mitten = ringmitten(grenzen)
     king = i0 * king_relativ(mitten)
-    return i0 * king_relativ(r) * np.interp(r, mitten, soll / king)
+    return i0 * king_relativ(r) * np.interp(r, mitten, soll / king) * auslauf(r)
 
 
 def radien_leinwand(n, massstab):
@@ -546,67 +559,90 @@ def ziel_rest(ring, r, massstab, sterne_px, i0, anzahl):
     return soll, king, geglaettet
 
 
-def tonkurve_anwenden(werte, stuetz_x, stuetz_y):
-    """Monotone Abbildung in log-log zwischen den Stuetzstellen; aussen Geraden mit der Endsteigung
-    (begrenzt auf STEIGUNG_GRENZEN). Werte <= 0 bleiben 0."""
-    lx, ly = np.log10(stuetz_x), np.log10(stuetz_y)
-    unten = float(np.clip((ly[1] - ly[0]) / (lx[1] - lx[0]), *STEIGUNG_GRENZEN))
-    oben = float(np.clip((ly[-1] - ly[-2]) / (lx[-1] - lx[-2]), *STEIGUNG_GRENZEN))
-    positiv = werte > 0
-    lw = np.log10(np.where(positiv, werte, 1.0))
-    aus = np.interp(lw, lx, ly)
-    aus = np.where(lw < lx[0], ly[0] + unten * (lw - lx[0]), aus)
-    aus = np.where(lw > lx[-1], ly[-1] + oben * (lw - lx[-1]), aus)
-    return np.where(positiv, 10.0 ** aus, 0.0)
+def ringmitten(grenzen=RINGE_ARCSEC):
+    """Mittlerer Radius jedes Rings (halbe Summe von Innen- und Aussenradius)."""
+    innen = np.r_[0.0, np.asarray(grenzen[:-1], dtype=np.float64)]
+    return 0.5 * (innen + np.asarray(grenzen, dtype=np.float64))
 
 
-def gruppen_monoton(mittel, zahl):
-    """Benachbarte Ringe zusammenlegen (Pool Adjacent Violators), bis die pixelgewichteten Mittel nach aussen
-    streng fallen; Rueckgabe Gruppennummer je Ring. Noetig fuer die Leinwandecken, wo ein Rest von Himmel
-    oder Sternhoefen das Ringmittel leicht ueber das des inneren Nachbarn hebt."""
-    gruppen = [[i] for i in range(len(mittel))]
-
-    def m(g):
-        return sum(mittel[i] * zahl[i] for i in g) / sum(zahl[i] for i in g)
-
-    i = 0
-    while i < len(gruppen) - 1:
-        if m(gruppen[i + 1]) >= m(gruppen[i]):
-            gruppen[i] = gruppen[i] + gruppen.pop(i + 1)
-            i = max(i - 1, 0)
-        else:
-            i += 1
-    nummer = np.empty(len(mittel), dtype=np.int64)
-    for k, g in enumerate(gruppen):
-        nummer[g] = k
-    return nummer
+def kennlinie_bild(werte, exponent=EXPONENT):
+    """Globale, glatte Abbildung des vorlaeufig linearen Bilds: L^exponent, L <= 0 wird 0 (physik.md 27.2).
+    Der Exponent kommt aus der Sternprobe (Aperturfluss gegen V mit Steigung 0,54, 1/0,54 = 1,85)."""
+    return np.where(werte > 0, np.abs(werte) ** exponent, 0.0)
 
 
-def tonkurve_anpassen(bild, ring, soll, iterationen=ITERATIONEN):
-    """Stuetzstellen (x = Mittel des Bilds je Ringgruppe, y = Flaeche) so, dass die Mittel nach der Abbildung
-    das Soll treffen. Ringe, deren Bildmittel nach aussen nicht fallen, werden zu Gruppen zusammengelegt
-    (gruppen_monoton, Soll flaechengewichtet gemittelt); y wird in jeder Iteration mit Soll / Ist korrigiert
-    und monoton gehalten. Rueckgabe (x aufsteigend, y, Ist je Ring, Anzahl Gruppen)."""
+def radialfaktor(r, knoten_r, knoten_g):
+    """Glatter Faktor g(r): linear in log g ueber die Ringmitten interpoliert, aussen konstant."""
+    return 10.0 ** np.interp(r, knoten_r, np.log10(knoten_g))
+
+
+def restlicht_anpassen(bild, ring, r, soll, iterationen=ITERATIONEN, grenzen=RINGE_ARCSEC):
+    """Restlicht = g(r) * L^exponent mit einem glatten radialen Faktor g, dessen Knoten (Ringmitten) so
+    korrigiert werden, dass die Ringmittel das Soll treffen. Die Abbildung der Pixelwerte ist global und
+    streng monoton (keine flachen Stuecke); das Ringmittel traegt g. Rueckgabe (Restlicht, Knoten g, Ist je Ring).
+
+    ring: Ringnummer je Pixel, -1 ausserhalb der angepassten Ringe; soll je angepasstem Ring.
+    """
     anzahl = len(soll)
     innen = ring >= 0
     zahl = np.bincount(ring[innen], minlength=anzahl).astype(np.float64)
-    mittel = np.bincount(ring[innen], weights=bild[innen], minlength=anzahl) / zahl
-    nummer = gruppen_monoton(mittel, zahl)
-    gruppe = nummer[ring[innen]]
-    k = int(nummer.max()) + 1
-    g_zahl = np.bincount(gruppe, minlength=k).astype(np.float64)
-    g_mittel = np.bincount(gruppe, weights=bild[innen], minlength=k) / g_zahl
-    g_soll = np.bincount(gruppe, weights=soll[ring[innen]], minlength=k) / g_zahl
-    x = g_mittel[::-1].copy()
-    y = g_soll[::-1].copy()
+    f = kennlinie_bild(bild)
+    mittel = np.bincount(ring[innen], weights=f[innen], minlength=anzahl) / zahl
+    knoten_r = ringmitten(grenzen)[:anzahl]
+    knoten_g = soll / mittel
     for _ in range(iterationen):
-        abgebildet = tonkurve_anwenden(bild[innen], x, y)
-        g_ist = np.bincount(gruppe, weights=abgebildet, minlength=k) / g_zahl
-        y = y * (g_soll / g_ist)[::-1]
-        y = np.maximum.accumulate(y)
-    abgebildet = tonkurve_anwenden(bild[innen], x, y)
-    ist = np.bincount(ring[innen], weights=abgebildet, minlength=anzahl) / zahl
-    return x, y, ist, k
+        aus = radialfaktor(r, knoten_r, knoten_g) * f
+        ist = np.bincount(ring[innen], weights=aus[innen], minlength=anzahl) / zahl
+        knoten_g = knoten_g * soll / ist
+    aus = radialfaktor(r, knoten_r, knoten_g) * f
+    ist = np.bincount(ring[innen], weights=aus[innen], minlength=anzahl) / zahl
+    return aus, knoten_g, ist
+
+
+def auslauf(r, grenzen=AUSLAUF_ARCSEC):
+    """Faktor des Modells am Rand: 1 bis grenzen[0], cos^2 auf 0 bei grenzen[1] (keine Stufe am Leinwandrand)."""
+    x = np.clip((r - grenzen[0]) / (grenzen[1] - grenzen[0]), 0.0, 1.0)
+    return np.where(x >= 1.0, 0.0, np.cos(0.5 * math.pi * x) ** 2)
+
+
+def kodeanteil_je_ring(kodes, ring, anzahl):
+    """Groesster Anteil eines einzelnen Kodes (ohne Kode 0, kein Licht) an den Pixeln jedes Rings (Plateau-Pruefung)."""
+    aus = np.zeros(anzahl)
+    for i in range(anzahl):
+        werte = kodes[ring == i]
+        if werte.size:
+            aus[i] = np.bincount(werte, minlength=256)[1:].max() / werte.size
+    return aus
+
+
+def restspitzen(linear, massstab, r_bereich=RESTSPITZEN_R_ARCSEC, apertur=3.0, hintergrund=(6.0, 10.0),
+                grenze_v=V_GRENZE):
+    """Lokale Maxima der Flaeche (Fenster 2 Aperturradien) zwischen r_bereich, deren Aperturfluss (Radius
+    apertur, minus Median des Rings hintergrund mal Aperturflaeche) heller als grenze_v ist.
+    linear: Fluss je arcsec^2 (Einheit 10^(-0,4 m)). Rueckgabe [(V, r, x, y)], hellste zuerst."""
+    n = linear.shape[0]
+    rr = radien_leinwand(n, massstab)
+    k = int(math.ceil(hintergrund[1] / massstab))
+    yy, xx = np.mgrid[-k:k + 1, -k:k + 1]
+    d = np.hypot(xx, yy) * massstab
+    ap, ri = d <= apertur, (d >= hintergrund[0]) & (d <= hintergrund[1])
+    h = int(round(apertur / massstab))
+    g = np.pad(linear, h, mode="edge")
+    nachbar = np.full(linear.shape, -np.inf)
+    for oy in range(-h, h + 1):
+        for ox in range(-h, h + 1):
+            if (ox, oy) != (0, 0):
+                np.maximum(nachbar, g[h + oy:h + oy + n, h + ox:h + ox + n], out=nachbar)
+    kand = np.argwhere((linear > nachbar) & (rr >= r_bereich[0]) & (rr <= r_bereich[1]))
+    aus = []
+    for y, x in kand:
+        if not (k <= y < n - k and k <= x < n - k):
+            continue
+        fenster = linear[y - k:y + k + 1, x - k:x + k + 1]
+        f = (fenster[ap].sum() - np.median(fenster[ri]) * ap.sum()) * massstab ** 2
+        if f > 0 and -2.5 * math.log10(f) < grenze_v:
+            aus.append((-2.5 * math.log10(f), float(rr[y, x]), int(x), int(y)))
+    return sorted(aus)
 
 
 # ---------------------------------------------------------------------------
@@ -673,8 +709,6 @@ def verarbeite(args):
     n = LEINWAND
     orte, sterne_px = [], []
     for s in kat:
-        if s["art"] == "rest":
-            continue
         x, y = n / 2 + s["dx"] / MASSSTAB - 0.5, n / 2 - s["dy"] / MASSSTAB - 0.5
         orte.append((x, y, stern_radius_arcsec(s["g"]), math.hypot(s["dx"], s["dy"]) > VOLL_AB_ARCSEC))
     for s in liste["sterne"]:
@@ -682,17 +716,23 @@ def verarbeite(args):
                           fluss(s["magnitude"])))
     orte.sort(key=lambda o: -o[2])
     bereinigt, maske = sterne_entfernen_katalog(linear, orte, MASSSTAB)
-    print(f"Sterne entfernt: {len(orte)} Katalogorte ({len(liste['sterne'])} Mitglieder bis V 15, "
-          f"{len(orte) - len(liste['sterne'])} Feldsterne), {int(maske.sum())} Pixel ({maske.mean() * 100:.1f} %) maskiert")
+    n_feld = sum(1 for s in kat if s["art"] == "feld")
+    print(f"Sterne entfernt: {len(orte)} Katalogorte ({len(liste['sterne'])} Mitglieder bis V 15, {n_feld} Feldsterne, "
+          f"{len(orte) - len(liste['sterne']) - n_feld} weitere Gaia-Quellen: Mitglieder ab V 15 oder ohne V, Quellen "
+          f"ohne Eigenbewegung), {int(maske.sum())} Pixel ({maske.mean() * 100:.1f} %) maskiert")
 
-    # Die schwaecheren Sterne (Mitglieder ab V 15, Feldsterne ohne Eigenbewegung) erkennt sterne_entfernen; ihr
-    # Licht kommt ueber die Tonkurve als glattes Restlicht zurueck (physik.md 27.2).
+    # Was Gaia nicht fuehrt (G ab 17, Luecken im Kern), erkennt sterne_entfernen; das Licht der entfernten
+    # schwachen Sterne kommt ueber den Radialfaktor als glattes Restlicht zurueck (physik.md 27.2).
     bereinigt, punkt_maske, punkte = sterne_entfernen(bereinigt)
     print(f"Schwache Sterne erkannt und entfernt: {len(punkte)} Punktquellen, {int(punkt_maske.sum())} Pixel "
           f"({punkt_maske.mean() * 100:.1f} %)")
     maske |= punkt_maske
     ebene, gb, gc = himmel_gradient(bereinigt, MASSSTAB)
     bereinigt = bereinigt - ebene
+    r_tmp = radien_leinwand(n, MASSSTAB)
+    himmel = float(np.median(bereinigt[r_tmp >= HIMMEL_R_MIN_ARCSEC]))
+    bereinigt = bereinigt - himmel
+    print(f"Himmelssockel abgezogen: {himmel:.4f} (Median ab {HIMMEL_R_MIN_ARCSEC:.0f}\")")
     halbe = n / 2
     print(f"Himmelsgradient abgezogen: {gb * halbe:+.4f} am rechten, {gc * halbe:+.4f} am unteren Rand (Einheit wie "
           f"das vorlaeufig lineare Bild; Ringmittel bei 10': {bereinigt[n // 2, n - 10]:.4f})")
@@ -703,21 +743,23 @@ def verarbeite(args):
     bereinigt = glaetten(bereinigt, r)
     bild_ringe = sum(1 for g in RINGE_ARCSEC if g <= BILD_BIS_ARCSEC[1])
     ring_bild = np.where(ring < bild_ringe, ring, -1)
-    stuetz_x, stuetz_y, _, gruppen = tonkurve_anpassen(bereinigt, ring_bild, soll[:bild_ringe])
+    bildteil, knoten_g, _ = restlicht_anpassen(bereinigt, ring_bild, r, soll[:bild_ringe])
     gewicht = gewicht_bild(r)
-    flaeche = gewicht * tonkurve_anwenden(bereinigt, stuetz_x, stuetz_y) + (1.0 - gewicht) * modell(r, soll, i0)
+    flaeche = gewicht * bildteil + (1.0 - gewicht) * modell(r, soll, i0)
     zahl = np.bincount(ring[ring >= 0], minlength=len(RINGE_ARCSEC)).astype(np.float64)
     ist = np.bincount(ring[ring >= 0], weights=flaeche[ring >= 0], minlength=len(RINGE_ARCSEC)) / zahl
-    print(f"King normiert auf V_t: mu0 {-2.5 * math.log10(i0):.3f} (Harris {KING_MU0}); Tonkurve "
-          f"{len(stuetz_x)} Stuetzstellen aus {bild_ringe} Ringen bis {BILD_BIS_ARCSEC[1]:.0f}\", Ringmittel hoechstens "
-          f"{np.max(np.abs(2.5 * np.log10(ist / soll))):.3f} mag vom Soll")
+    ersetzt = np.bincount(ring[ring >= 0], weights=maske[ring >= 0], minlength=len(RINGE_ARCSEC)) / zahl
+    abw = np.abs(2.5 * np.log10(ist / soll))
+    print(f"King normiert auf V_t: mu0 {-2.5 * math.log10(i0):.3f} (Harris {KING_MU0}); Bild L^{EXPONENT} mal "
+          f"Radialfaktor aus {bild_ringe} Ringen bis {BILD_BIS_ARCSEC[1]:.0f}\"; Ringmittel bis 8' hoechstens "
+          f"{abw[np.asarray(RINGE_ARCSEC) <= AUSLAUF_ARCSEC[0]].max():.3f} mag vom Soll (aussen Auslauf auf 0)")
     if args.profil:
-        print("  Ring        mu King  mu Sterne  mu Soll  mu Flaeche  mu Flaeche+Sterne")
+        print("  Ring        mu King  mu Sterne  mu Soll  mu Flaeche  mu Flaeche+Sterne  ersetzt")
         innen = 0
         for i, aussen in enumerate(RINGE_ARCSEC):
             mu = lambda w: -2.5 * math.log10(w) if w > 0 else float("inf")
             print(f"  {innen:4d}-{aussen:4d}\"  {mu(king[i]):7.2f}  {mu(stern_ring[i]):9.2f}  {mu(soll[i]):7.2f}  "
-                  f"{mu(ist[i]):10.2f}  {mu(ist[i] + stern_ring[i]):10.2f}")
+                  f"{mu(ist[i]):10.2f}  {mu(ist[i] + stern_ring[i]):10.2f}  {ersetzt[i] * 100:6.1f} %")
             innen = aussen
 
     kodes = kodiere_relativ(linear_zu_mu_rel(flaeche), UMFANG_MAG)
@@ -737,6 +779,12 @@ def verarbeite(args):
           f"Summe V {m_summe:.3f} gegen V_t {V_T} ({m_summe - V_T:+.3f} mag)")
     if abs(m_summe - V_T) > 0.1:
         raise SystemExit("Summe aus Flaeche und Sternen weicht um mehr als 0,1 mag von V_t ab")
+    plateau = kodeanteil_je_ring(dekodiert, ring, len(RINGE_ARCSEC))
+    print("Groesster Anteil eines Kodes je Ring: " + ", ".join(f"{a * 100:.0f}" for a in plateau) + " %")
+    spitzen = restspitzen(log_tabelle(mag_hell, mag_dunkel).astype(np.float64)[dekodiert] * fluss(mag_hell), MASSSTAB)
+    print(f"Restspitzen heller als V {V_GRENZE:g} ({RESTSPITZEN_R_ARCSEC[0]:.0f}\" bis {RESTSPITZEN_R_ARCSEC[1]:.0f}\", "
+          f"Apertur 3\" minus Ring 6\" bis 10\"): {len(spitzen)}"
+          + (", hellste " + ", ".join(f"V {v:.2f} bei {rr:.0f}\"" for v, rr, _, _ in spitzen[:5]) if spitzen else ""))
 
     mu = kode_mu(dekodiert, mag_hell, mag_dunkel)
     tabelle = flaechentabelle(mu, MASSSTAB, mag_hell, mag_dunkel)
@@ -774,7 +822,7 @@ def verarbeite(args):
                  kode_max=kode_max, kode_median=kode_median, n255=round(anteil255 * n_kern), n_kern=n_kern,
                  punkte=len(punkte), orte=len(orte), sterne=len(liste["sterne"]),
                  maskiert=int(maske.sum()), m_rest=m_rest, mag_hell=mag_hell, mag_dunkel=mag_dunkel,
-                 i0=i0, stuetzstellen=len(stuetz_x))
+                 i0=i0, plateau=float(plateau.max()), spitzen=len(spitzen))
     schreibe_bildnachweis(args.bildnachweis, bildnachweis(werte, len(daten_webp)))
     print(f"Bildnachweis {BILDNACHWEIS['id']} in {args.bildnachweis} geschrieben")
 
@@ -791,15 +839,16 @@ def bildnachweis(w, datei_bytes):
         f"feinerem Gitter, blockweise gemittelt). Kern geprueft: im Umkreis von 1' {w['n255']} von {w['n_kern']} "
         f"Pixeln bei Kode 255 (Median {w['kode_median']:.0f}), die Kernsterne sind aufgeloest, der Kern ist nicht "
         "gesaettigt. Sterne plus Restlicht (Entscheidung Herbert 2026-10-29): die "
-        f"{w['sterne']} Gaia-Mitglieder bis V 15 (daten/sterne/m13.json) und {w['orte'] - w['sterne']} Feldsterne mit "
-        "Eigenbewegung aus Gaia DR3 an ihrer Katalogposition maskiert, danach die schwaecheren Sterne "
-        f"({w['punkte']} erkannte Punktquellen) wie bei M57; zusammen {w['maskiert']} Pixel durch den Median der "
-        "Umgebung ersetzt. Linearisierung: Umkehrung der Log-Streckung aus dem AVM-Kopf (FITS Liberator, physik.md "
-        "27.1), linearer Himmelsgradient abgezogen, geglaettet (Kasten 1,5\" innen bis 7,5\" ab 4,5'), dann eine "
-        "monotone Tonkurve, die das Ringmittel um die Mitte auf das King-Profil nach Harris 2010 (r_c 37,2\", r_t "
-        "1260\", auf V_t 5,78 normiert) minus den Fluss der Katalogsterne bringt (physik.md 27.2), weil das "
-        "Pressebild nicht linear ist. Ab 3' linear uebergeblendet, ab 4,5' ganz ersetzt durch das glatte Modell "
-        "(King minus Sterne), weil der Haufen dort im 8-Bit-Bild nicht ueber dem Himmelsrest liegt. Quellweiss "
+        f"{w['sterne']} Gaia-Mitglieder bis V 15 (daten/sterne/m13.json) und alle uebrigen {w['orte'] - w['sterne']} "
+        "Gaia-DR3-Quellen bis G 17 (Feldsterne, schwaechere Mitglieder) an ihrer Katalogposition maskiert, danach die "
+        f"schwaecheren Sterne ({w['punkte']} erkannte Punktquellen) wie bei M57; zusammen {w['maskiert']} Pixel durch "
+        "den Median der Umgebung ersetzt (im inneren 1' 70 bis 92 % je Ring, physik.md 27.4). Linearisierung: "
+        "Umkehrung der Log-Streckung aus dem AVM-Kopf (FITS Liberator, physik.md 27.1), Himmelsgradient und -sockel "
+        "abgezogen, geglaettet (Kasten 1,5\" bis 1', 7,5\" ab 2,5'), dann L^1,85 (Exponent aus einer Sternprobe) mal "
+        "einem glatten radialen Faktor, der das Ringmittel auf das King-Profil nach Harris 2010 (r_c 37,2\", r_t "
+        "1260\", auf V_t 5,78 normiert) minus den Fluss der Katalogsterne bringt (physik.md 27.2). Ab 2' linear "
+        "uebergeblendet, ab 3' ganz ersetzt durch das glatte Modell (King minus Sterne), das zwischen 8' und 10' auf 0 "
+        "auslaeuft; der Haufen liegt dort im 8-Bit-Bild nicht klar ueber dem Himmelsrest. Quellweiss "
         f"mag_hell so geeicht, dass der Gesamtfluss des dekodierten Bilds V = {komma(w['m_rest'], 3)} ergibt (V_t "
         "5,78 minus die Katalogsterne). Kodiert als 8-Bit-Grauwert mit log-Kennlinie (ADR-0003 Nachtrag Version 2): "
         f"Kode 255 = mag_hell {w['mag_hell']}, Kode 1 = mag_dunkel {w['mag_dunkel']}, Kode 0 Schwarz. Himmelsnorden "

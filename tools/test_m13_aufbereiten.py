@@ -136,12 +136,9 @@ class HimmelUndTonkurve(unittest.TestCase):
         self.assertAlmostEqual(c, -0.002, places=4)
         self.assertLess(float(np.abs(ebene - (0.003 * xx - 0.002 * yy)).max()), 0.01)
 
-    def test_ringgruppen_monoton(self):
-        nummer = m.gruppen_monoton(np.array([10.0, 8.0, 5.0, 6.0, 2.0]), np.array([1, 1, 1, 1, 1]))
-        self.assertEqual(nummer.tolist(), [0, 1, 2, 2, 3])
-
-    def test_tonkurve_trifft_das_soll_der_ringe(self):
-        # Bild = log-gestreckte Fassung eines Profils mit Textur; die Tonkurve soll die Ringmittel treffen.
+    def test_restlicht_trifft_das_soll_ohne_plateaus(self):
+        # Bild = log-gestreckte Fassung eines Profils mit Textur; L^1,85 mal g(r) soll die Ringmittel treffen,
+        # und die Abbildung der Pixelwerte bleibt streng monoton (keine flachen Stuecke wie die alte Tonkurve).
         n = 300
         r = m.radien_leinwand(n, 1.0)
         grenzen = (10, 20, 35, 50, 70, 90, 110, 140)
@@ -151,10 +148,30 @@ class HimmelUndTonkurve(unittest.TestCase):
         bild = np.log10(1 + 1000 * np.maximum(wahr, 0))
         zahl = np.bincount(ring[ring >= 0], minlength=len(grenzen))
         soll = np.bincount(ring[ring >= 0], weights=wahr[ring >= 0], minlength=len(grenzen)) / zahl
-        x, y, ist, gruppen = m.tonkurve_anpassen(bild, ring, soll)
-        self.assertEqual(gruppen, len(grenzen))
-        self.assertTrue((np.diff(y) >= 0).all())
+        aus, knoten, ist = m.restlicht_anpassen(bild, ring, r, soll, grenzen=grenzen)
         self.assertLess(float(np.max(np.abs(2.5 * np.log10(ist / soll)))), 0.02)
+        self.assertTrue((knoten > 0).all())
+        # Die Kennlinie der Pixelwerte ist global und streng steigend, mit fester Steigung in log-log.
+        x = np.geomspace(0.01, 1000.0, 50)
+        y = m.kennlinie_bild(x)
+        self.assertTrue((np.diff(y) > 0).all())
+        self.assertTrue(np.allclose(np.diff(np.log10(y)) / np.diff(np.log10(x)), m.EXPONENT))
+
+    def test_auslauf(self):
+        self.assertEqual(float(m.auslauf(100.0)), 1.0)
+        self.assertAlmostEqual(float(m.auslauf(540.0)), 0.5)
+        self.assertEqual(float(m.auslauf(700.0)), 0.0)
+
+    def test_restspitze_wird_gefunden(self):
+        n = 200
+        flaeche = np.full((n, n), 1e-6)
+        yy, xx = np.mgrid[0:n, 0:n]
+        # Stern V 14 (Fluss 10^-5,6) als Gauss mit sigma 1" bei 0,5"/px, 35" rechts der Mitte.
+        sigma = 2.0
+        flaeche += 10 ** -5.6 / (2 * math.pi * (sigma * 0.5) ** 2) * np.exp(-((xx - 170) ** 2 + (yy - 100) ** 2) / (2 * sigma ** 2))
+        spitzen = m.restspitzen(flaeche, 0.5, r_bereich=(20.0, 300.0))
+        self.assertEqual(len(spitzen), 1)
+        self.assertAlmostEqual(spitzen[0][0], 14.0, delta=0.05)
 
     def test_kasten_erhaelt_den_fluss_innen(self):
         bild = np.zeros((31, 31))
