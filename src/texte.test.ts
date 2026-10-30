@@ -75,6 +75,8 @@ describe("Hilfetexte Version 2 (Issue #110)", () => {
   it("Vergleichsbild bei Deep-Sky: ein Text je Abbildung", () => {
     expect(Object.keys(H.quellbildDeepSky).sort()).toEqual(["kubikwurzel", "kubikwurzelUeberBoden", "linear", "okularOhneSchwelle"]);
     expect(H.quellbildDeepSky.kubikwurzelUeberBoden).toContain("Hintergrund der Aufnahme erscheint schwarz");
+    expect(H.quellbildDeepSky.kubikwurzelUeberBoden).toContain("grauer Grund bis an den Bildrand ist schwaches Licht des Objekts selbst");
+    expect(H.quellbildDeepSky.kubikwurzelUeberBoden).not.toMatch(/M ?57|Ringnebel/);
     // Die Schwelle entfaellt nur fuer die Flaeche; Sterne behalten die Deckkraft des Anblicks (Review #129).
     for (const text of Object.values(H.quellbildDeepSky)) expect(text).toContain("Sterne erscheinen so blass wie im Anblick");
     expect(H.hinweis.unaufgeloest).toContain("ein bis zwei Bogenminuten");

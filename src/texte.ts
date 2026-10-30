@@ -224,6 +224,7 @@ export const TEXTE = {
       kubikwurzelUeberBoden:
         "Die Aufnahme, aus der der Anblick entsteht, im selben Maßstab und Ausschnitt, ohne Verschmierung; die Fläche ohne Wahrnehmungsschwelle. " +
         "Die Helligkeit ist gestreckt (Kubikwurzel, wie im Anblick), damit auch die schwachen äußeren Teile zu sehen sind; der dunkle Hintergrund der Aufnahme erscheint schwarz. " +
+        "Ein grauer Grund bis an den Bildrand ist schwaches Licht des Objekts selbst, etwa ein äußerer Halo; die Aufnahme endet dort. " +
         "Was hier zu sehen ist und im Anblick fehlt, liegt unter den eingestellten Bedingungen unter der Wahrnehmungsschwelle oder ist zu fein. Sterne erscheinen so blass wie im Anblick.",
       okularOhneSchwelle:
         "Die Aufnahme so hell, wie sie im Okular erscheint, mit demselben Himmel wie der Anblick, aber ohne Verschmierung; die Fläche ohne Wahrnehmungsschwelle. " +
