@@ -133,3 +133,13 @@ Ordner `m42/` (im Worktree eines Issues als Symlink auf `data/roh/m42/` des Haup
   Lizenz CC BY-NC 3.0 IGO (ESA Space Science Archives). Verarbeitet durch `tools/m42_sterne.py` nach `daten/sterne/m42.json` (Issue #107).
   Die zwei Dateien erzeugt `python3 tools/m42_sterne.py --abrufen`, den Eintrag hier `--liesmich`. Zwei Abrufe am 2026-10-29 lieferten byte-gleiche Dateien.
 - Orientierung (nicht abgelegt): ESO-Pressebild eso1103a, https://www.eso.org/public/images/eso1103a/ (CC BY 4.0, "ESO/Igor Chekalin").
+
+## M13 (Issue #108)
+
+Ordner `m13/` (im Worktree eines Issues als Symlink nach `data/roh/m13/` im Hauptrepo).
+
+- `m13/m13_gaiadr3.csv`: Gaia-Archiv (ESA), TAP https://gea.esac.esa.int/tap-server/tap/sync, HTTP-POST mit `REQUEST=doQuery`, `LANG=ADQL`, `FORMAT=csv`. Abgerufen 2026-10-29, 468998 Byte, SHA-256 `f4c625fdfe9b8094cab87b393fd2620016edbc02edef6c0f925aa46d3ef781b1`. ADQL:
+  `SELECT source_id, ra, dec, phot_g_mean_mag, bp_rp, parallax, parallax_error, pmra, pmdec, ruwe FROM gaiadr3.gaia_source WHERE 1 = CONTAINS(POINT('ICRS', ra, dec), CIRCLE('ICRS', 250.42183, 36.45986, 0.25)) AND phot_g_mean_mag < 17.0 ORDER BY phot_g_mean_mag`
+  Lizenz CC BY-NC 3.0 IGO (ESA Space Science Archives, https://www.cosmos.esa.int/web/gaia-users/license, gelesen 2026-10-29), Credit: ESA, Gaia DPAC. Verarbeitet durch `tools/m13_aufbereiten.py` nach `daten/sterne/m13.json` (Issue #108).
+- `m13/noao-m13kpno4m_publicationtiff.tif`: NOIRLab noao-m13kpno4m "M13, NGC 6205", Publication TIFF 4K, https://storage.noirlab.edu/media/archives/images/publicationtiff/noao-m13kpno4m.tif (Bildseite https://noirlab.edu/public/images/noao-m13kpno4m/). Abgerufen 2026-10-29, 36445644 Byte, SHA-256 `7e50eb187af2e281d905d70fdaa710ac15c99ed3e55a4301d865597171454522`, 4000 x 3999 px, 8 Bit RGB (I, V, B als Rot, Gruen, Blau), "North is left, East is down", AVM-Kopf mit FITS-Liberator-Streckung Log(x). Credit: T.A. Rector (University of Alaska Anchorage) and H. Schweiker (WIYN and NOIRLab/NSF/AURA). Lizenz CC BY 4.0 (https://noirlab.edu/public/copyright/, gelesen 2026-10-29). Verarbeitet durch `tools/m13_aufbereiten.py` nach `daten/bilder/m13/` (Issue #108).
+  Die Bildseite nennt "Field of view: 21.50 x 21.50 arcminutes", "Orientation: North is 89.9° left of vertical" und als Position den Bezugspunkt des AVM-Kopfs (16 42 10,58 +36 35 47,5, Pixel 586,6/1221,0 der Originalgroesse), nicht die Haufenmitte; die Lage ist deshalb ueber Gaia-Sterne bestimmt (Haufenmitte nach Harris 2010 bei Spalte 2084,7, Zeile 2001,6 des im Uhrzeigersinn gedrehten Bilds). Die Gaia-Antwort hat 3082 Zeilen.

@@ -291,3 +291,18 @@ Geprueft am 2026-10-30 (nach dem Review von PR #132) mit Screenshots aus dem Pro
 - **Nebel:** Huygens-Region, Fischmaul, M43 und der Ostfluegel sind ab 40-fach erkennbar; Beugungsspikes des Trapezes und Hoefe heller Feldsterne sind entfernt (Kreismasken, Kern um das Trapez dadurch flach).
 - **Grenze:** Das Quellbild endet 800" um das Trapez (26,7' x 26,7', das groesste Quadrat um C in den Daten). Der Nebel ist am Rand mit 19,5 bis 20 mag/arcsec$^2$ noch heller als der Himmel bei Bortle 5; der Rand ist bei 40- und 48-fach als Quadrat sichtbar (kein weicher Randabfall, Entscheidung Herbert; `hinweis_hilfe` nennt es).
 - **Gesamthelligkeit und Literatur:** Bild 2,55 mag (objekte.json 2,51); innerhalb 2,5' um das Trapez trifft das Bild die Umrechnung von O'Dell und Harris 2010 auf 0,02 mag, weiter aussen ist es 0,3 bis 0,7 mag schwaecher (physik.md 26, offen).
+
+## 12. M13 (Issue #108)
+
+Sterne plus Restlicht (`docs/recherche/physik.md` 27): 531 Gaia-Mitglieder bis V 15 als Punktquellen, das Quellbild (NOIRLab, Mayall 4 m, V-Kanal) traegt nur das Restlicht. Sichtpruefung am 2026-10-30 nach dem Review von PR #131 (Restlicht als L^1,85 mal Radialfaktor, alle Gaia-Quellen maskiert, Modell ab 2', Auslauf 8' bis 10', Fix von `sterne_entfernen` aus #106) mit einer Kopie von `scripts/validierung-bilder.mjs` (gleiche Mechanik, SwiftShader, eigene Faelle, Bortle 4 wie der Vorschlag 4 in `deep-sky.md` 8, M6 Bortle 8). Die Bilder sind nicht eingecheckt. T1 bis T6 und P1 bis P3 liefen mit demselben Bau ohne Konsolen- oder CSP-Fehler und waren byte-gleich mit den eingecheckten.
+
+| Fall | Suchteil (dazu `&t=klar&h=90`) | Befund |
+|---|---|---|
+| M1 | `?v=1&g=fernglas-10x50&z=m13&s=2&b=4` | kleiner, weicher Fleck mit hellerer Mitte im 5-Grad-Feld, keine Einzelsterne (Mitte 51 gegen Himmel 41) |
+| M2 | `?v=1&R(80,600,8)&z=m13&s=2&b=4` (75-fach) | schwacher runder Schimmer etwa 5' gross, darin einzelne Sterne; 50 Spitzen mindestens 8 Grauwerte ueber der Umgebung (vorher 66); keine Stufe am Rand der Leinwand |
+| M3 | `?v=1&g=newton-200-1200&ok=8&z=m13&s=1.5&b=4` (150-fach) | koerniger Haufen, Sterne bis in den Kern aufgeloest; 294 Spitzen (vorher 349) |
+| M4 | `?v=1&g=newton-300-1500&ok=7&z=m13&s=1.5&b=4` (214-fach) | dicht aufgeloest, 592 Spitzen (vorher 692); der Kern bleibt ein Gewimmel auf hellerem Grund |
+| M5 | `?v=1&g=auge&z=m13&s=2&b=4` | an der Grenze: ein sehr schwacher Fleck (Mitte 46 gegen Himmel 45) |
+| M6 | `?v=1&g=newton-200-1200&ok=8&z=m13&s=1.5&b=8` | wie M3, aber nur noch 59 Spitzen; der Schimmer hebt sich kaum vom hellen Himmel ab |
+
+Die Spitzen sind grob gezaehlt (lokale Maxima im Gesichtsfeld, mindestens 8 Grauwerte ueber dem Median im 15-px-Fenster) und zaehlen auch Sterne knapp ueber der Schwelle; sie sind kein Vergleich mit Beobachtungen. Vorschlag 4 in `deep-sky.md` 8 erwartet am 200 mm "einige Dutzend bis gut hundert" Sterne und am 80 mm "hoechstens eine Handvoll"; die Simulation zeigt in beiden Faellen mehr. Ob das an der Grenzgroesse des Modells (Abschnitt 19) oder an der Erwartung liegt, ist offen; die Daten (Lage, V) folgen `deep-sky.md` 3.3. Im Zoom ist das Quellbild (Vergleichsbild, linear) fast schwarz, weil es nur das Restlicht traegt; dort stehen die Katalogsterne als Punkte (`architektur.md` 5.7, Vergleichsbild bei Deep-Sky offen). Doppelte Sterne (Bildstern neben Katalogstern) sind in keinem Fall zu sehen; im Restlicht bleiben zwischen 20" und 300" zwei Spitzen heller als V 15 (V 14,6 und 14,7, physik.md 27.3).

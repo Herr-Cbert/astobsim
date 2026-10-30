@@ -440,5 +440,34 @@
       "mag_hell": 13.95,
       "mag_dunkel": 23.95
     }
+  },
+  {
+    "id": "m13_noirlab_mayall",
+    "objekt": "m13",
+    "zustand": "m13",
+    "datei": "m13/noirlab_mayall_v_rest.webp",
+    "quelle_url": "https://noirlab.edu/public/images/noao-m13kpno4m/",
+    "quelle_datei": "noao-m13kpno4m.tif, Publication TIFF 4K (https://storage.noirlab.edu/media/archives/images/publicationtiff/noao-m13kpno4m.tif)",
+    "mission": "NSF Nicholas U. Mayall 4-meter Telescope, Kitt Peak National Observatory",
+    "instrument": "Mosaic I, Filter B (436 nm), V (537 nm), I (805 nm); Kern aus vielen kurzen Belichtungen",
+    "aufnahmedatum": "nicht angegeben (Bildseite veroeffentlicht 2020-06-30)",
+    "lizenz": "CC BY 4.0 (NOIRLab)",
+    "lizenz_url": "https://noirlab.edu/public/copyright/",
+    "namensnennung": "T.A. Rector (University of Alaska Anchorage) and H. Schweiker (WIYN and NOIRLab/NSF/AURA); bearbeitet: gedreht (Norden oben), zugeschnitten, skaliert, Graustufe aus dem V-Kanal, Tonkurve auf ein Flaechenhelligkeitsprofil, Sterne entfernt, ausserhalb 2' bis 3' durch ein Profilmodell ersetzt",
+    "pixel_breite": 2400,
+    "pixel_hoehe": 2400,
+    "original_pixel": "4000x3999",
+    "winkelgroesse_arcsec": 1200.0,
+    "objekt_durchmesser_px": 2400,
+    "bogensekunden_pro_pixel": 0.5,
+    "norden_oben": true,
+    "datei_bytes": 267252,
+    "bearbeitung": "Graustufe aus dem V-Kanal (Gruen, 537 nm) des Pressebilds (Publication TIFF 4K, 8 Bit). Um 90 Grad im Uhrzeigersinn gedreht (Bildseite: \"North is left, East is down\"); Lage ueber eine affine Abbildung aus 79 Gaia-DR3-Sternen ausserhalb 4' (Restfehler Median 0,88 px, Drehung -0,084 Grad, 0,3224\"/px), Mitte nach Harris 2010 auf die Mitte einer Leinwand von 2400x2400 px bei 0,5\"/px (bilinear auf 3-fach feinerem Gitter, blockweise gemittelt). Kern geprueft: im Umkreis von 1' 8 von 108821 Pixeln bei Kode 255 (Median 215), die Kernsterne sind aufgeloest, der Kern ist nicht gesaettigt. Sterne plus Restlicht (Entscheidung Herbert 2026-10-29): die 531 Gaia-Mitglieder bis V 15 (daten/sterne/m13.json) und alle uebrigen 2551 Gaia-DR3-Quellen bis G 17 (Feldsterne, schwaechere Mitglieder) an ihrer Katalogposition maskiert, danach die schwaecheren Sterne (26626 erkannte Punktquellen) wie bei M57; zusammen 1933399 Pixel durch den Median der Umgebung ersetzt (im inneren 1' 70 bis 92 % je Ring, physik.md 27.4). Linearisierung: Umkehrung der Log-Streckung aus dem AVM-Kopf (FITS Liberator, physik.md 27.1), Himmelsgradient und -sockel abgezogen, geglaettet (Kasten 1,5\" bis 1', 7,5\" ab 2,5'), dann L^1,85 (Exponent aus einer Sternprobe) mal einem glatten radialen Faktor, der das Ringmittel auf das King-Profil nach Harris 2010 (r_c 37,2\", r_t 1260\", auf V_t 5,78 normiert) minus den Fluss der Katalogsterne bringt (physik.md 27.2). Ab 2' linear uebergeblendet, ab 3' ganz ersetzt durch das glatte Modell (King minus Sterne), das zwischen 8' und 10' auf 0 auslaeuft; der Haufen liegt dort im 8-Bit-Bild nicht klar ueber dem Himmelsrest. Quellweiss mag_hell so geeicht, dass der Gesamtfluss des dekodierten Bilds V = 6,223 ergibt (V_t 5,78 minus die Katalogsterne). Kodiert als 8-Bit-Grauwert mit log-Kennlinie (ADR-0003 Nachtrag Version 2): Kode 255 = mag_hell 16.68, Kode 1 = mag_dunkel 27.68, Kode 0 Schwarz. Himmelsnorden oben, Osten links (Gaia-Abgleich). WebP verlustfrei (tools/m13_aufbereiten.py).",
+    "hinweise": "Flaechentabelle in daten/objekte.json (m13, isophoten) aus demselben Lauf, gemessen am dekodierten Bild. Die Flaeche ist das Restlicht ohne die Katalogsterne, nicht das ganze Objekt. Rohdatei noao-m13kpno4m_publicationtiff.tif von https://storage.noirlab.edu/media/archives/images/publicationtiff/noao-m13kpno4m.tif: 36445644 Byte, SHA-256 7e50eb187af2e281d905d70fdaa710ac15c99ed3e55a4301d865597171454522, abgerufen 2026-10-29. Native Aufloesung 0,3224\"/px (Original 4929 px: 0,262\"/px), Repo-Datei 1,55-fach verkleinert.",
+    "kennlinie": {
+      "art": "log",
+      "mag_hell": 16.68,
+      "mag_dunkel": 27.68
+    }
   }
 ]
