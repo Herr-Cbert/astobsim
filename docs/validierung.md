@@ -152,6 +152,8 @@ Als Issues angelegt am 2026-10-27, Milestone M3 (Herbert, 2026-10-27):
 | Claude | 2026-10-29 | #36: Mondphasen P1 bis P3 (Abschnitt 9); `mond_ev` vereinheitlicht, T3 und T6a geaendert, uebrige T-Bilder byte-gleich mit main 15da6ee |
 | Herbert | 2026-10-29 | #36: Kriterium Maria des Vollmonds mit blossem Auge aufgegeben (Grenze des Modells) |
 | Claude | 2026-10-30 | #111: Anzeigeweiss 8,9 und Punktweiss 6,9 (Entscheidung Herbert), alle T- und P-Bilder neu, T12 erfuellt, T1 bis T6 weiter erfuellt (Abschnitt 13) |
+| Claude | 2026-10-30 | #112: T7 bis T11 und Sternzahl M13 (Abschnitt 14), Vorschlag: T7, T8a, T8c, T9a, T10b, T11a bis T11c bestanden, Abweichungen T8b, T9b/c (Farbe), T10a (Loch), T11d, M13; T1 bis T6, T12, P1 bis P3 bytegleich |
+| Herbert | | #112: Urteile T7 bis T11 und M13 (offen) |
 
 ## 7. Sicherheit (Issue #22)
 
@@ -370,3 +372,82 @@ Trabanten (hellstes Pixel ausserhalb der Scheibe): T1 119 (111), T4a 147 (138), 
 Die Kernwerte sind unveraendert (innen ist der Halokern bitgleich mit dem Kern). In den Ecken, wo vorher nur das Quadrat Licht hatte, liegt das Bild hoechstens 1 Kode ueber dem Himmel; der runde Halo laeuft auf der Achse ueber drei bis vier Pixel in Schritten von 9, 7, 3 und 1 Kodes auf den Himmel aus (T6b: 71, 62, 55, 52, 51). Am Rand der Achse liegt er noch im Ring des alten Quadrats, ist dort aber rund und ohne Stufe (Sichtpruefung der Uebersichten und Zooms von T6b, T12b bis T12d: kein Quadrat). **Erfuellt.**
 
 Geaendert sind ausserdem T5b (Mars 6'' bei 120-fach, $g$ = 0,0147) und T6c (Jupiter im 10x50): beide liegen im Fall unaufgeloest, der schwache Mischanteil im aeusseren Drittel des Kerns faellt weg. Alle geaenderten Pixel werden dunkler, um hoechstens 2 (T5b) bzw. 1 Kode (T6c) in der Uebersicht und 2 bzw. 3 Kodes im Zoom, ueberwiegend im schwachen Halo (Median der alten Helligkeit an den geaenderten Pixeln im Zoom 27 bzw. 74); Scheitel 163 und 212 unveraendert. Alle uebrigen Bilder (T1 bis T5a, T6a, P1 bis P3, T12a) sind bytegleich. Sichtpruefung T1 und T4a: unveraendert.
+
+## 14. Version 2: T7 bis T12 (Issue #112)
+
+Testfaelle aus `docs/recherche/README.md` (bestaetigt 2026-10-29, T11 mit $F$ = 1,4), dazu der Pruefpunkt Sternzahl M13 aus Abschnitt 12 und die Pruefpunkte aus `architektur.md` 5.7. T12 ist in Abschnitt 13 erledigt. **Stand:** Vorschlag Claude am 2026-10-30, Urteil Herbert offen. Modell und Konstanten sind unveraendert (main a096782).
+
+**Bilder:** `node scripts/validierung-bilder.mjs` wie Abschnitt 1 (SwiftShader, keine Konsolen- oder CSP-Fehler); T1 bis T6, T12 und P1 bis P3 sind bytegleich mit den eingecheckten Bildern. Fernrohre sind freie Refraktoren, M13 am 200 und 300 mm die Newtons der Liste wie in Abschnitt 12. Doppelsterne ohne Quellbild zeigen im Zoom 16 Arbeitspixel (Arbeitsmassstab Gesamt-FWHM / 2,5); das Detail startet auf dem hellsten Stern (bei T8 also auf Epsilon1).
+
+**Masszahlen:**
+- *Trennung* (T7 bis T9): Delle $\delta = 1 - I_\mathrm{min}/I_\mathrm{B}$ wie `doppelsterne.md` 4, aber an der Punktebene des Zooms, wie sie das Bild rechnet (Scheibchen von einem Arbeitspixel, gefaltet am Arbeitsmassstab, linear vor `tonwert`), entlang der Verbindungslinie der beiden Sterne. "Getrennt" bei $\delta >$ 0,125 (`SCHWELLE_ERKENNBAR`, Annahme aus `doppelsterne.md` 4). Im Bild wird die Delle durch die Kubikwurzel und die sRGB-Kennlinie stark gestaucht: $\delta$ = 0,14 bzw. 0,21 sind am Bildschirm 2 bis 4 Kodes (T7d 145 / 135 / 138, T7b 116 / 111 / 116, Mittel der Kanaele, gemessen am Zoom-PNG).
+- *Feines Modell* zum Vergleich (gerechnet): derselbe Kern mit etwa 12 Pixeln je Gesamt-FWHM, Sterne als Punkte; reproduziert `doppelsterne.md` 4 auf 0,02.
+- *Grenzgroesse, Isophote:* die Anzeigewerte aus `auswerten` (Infopanel). Ausdehnung von M31 als grosse Achse einer Ellipse mit $q$ = 0,27 und der Flaeche der Isophote (Abschnitt 10).
+- *Sternzahl:* Punktquellen mit $P' \ge$ 0,49 (Wert an der Grenzgroesse); dazu Spitzen im Bild wie Abschnitt 12 (lokale Maxima, mindestens 8 Kodes ueber dem Median im 15-px-Fenster, Gesichtsfeld ohne die aeusseren 5 %).
+
+| Fall | Suchteil (dazu `&t=klar`, Hoehe 90 Grad ausser T9c) | Bild |
+|---|---|---|
+| T7a | `?v=1&R(80,800,5)&z=pi_aql_2021&s=0.5&b=5` (160-fach) | [Uebersicht](validierung/T7a-uebersicht.png), [Zoom](validierung/T7a-zoom.png) |
+| T7b | `?v=1&R(150,1500,5)&z=pi_aql_2021&s=0.5&b=5` (300-fach) | [Uebersicht](validierung/T7b-uebersicht.png), [Zoom](validierung/T7b-zoom.png) |
+| T7c | `?v=1&R(80,800,5)&z=eps_ari_2027&s=0.5&b=5` | [Uebersicht](validierung/T7c-uebersicht.png), [Zoom](validierung/T7c-zoom.png) |
+| T7d | `?v=1&R(150,1500,5)&z=eps_ari_2027&s=0.5&b=5` | [Uebersicht](validierung/T7d-uebersicht.png), [Zoom](validierung/T7d-zoom.png) |
+| T8a | `?v=1&g=fernglas-10x50&z=eps_lyr_2027&s=2&b=5` | [Uebersicht](validierung/T8a-uebersicht.png), [Zoom](validierung/T8a-zoom.png) |
+| T8b | `?v=1&R(80,800,5)&z=eps_lyr_2027&s=0.5&b=5` (160-fach) | [Uebersicht](validierung/T8b-uebersicht.png), [Zoom](validierung/T8b-zoom.png), [Detail](validierung/T8b-detail.png) |
+| T8c | `?v=1&R(80,800,5)&z=eps_lyr_2027&s=2&b=5` | [Uebersicht](validierung/T8c-uebersicht.png), [Zoom](validierung/T8c-zoom.png), [Detail](validierung/T8c-detail.png) |
+| T9a | `?v=1&R(150,1200,6)&z=antares_2027&s=0.5&b=5` (200-fach) | [Uebersicht](validierung/T9a-uebersicht.png), [Zoom](validierung/T9a-zoom.png) |
+| T9b | `?v=1&R(150,1200,6)&z=antares_2027&s=1.5&b=5` | [Uebersicht](validierung/T9b-uebersicht.png), [Zoom](validierung/T9b-zoom.png) |
+| T9c | `?v=1&R(150,1200,6)&z=antares_2027&s=0.5&b=5&h=15` | [Uebersicht](validierung/T9c-uebersicht.png), [Zoom](validierung/T9c-zoom.png) |
+| T10a | `?v=1&R(80,800,10)&z=m57&s=2&b=5` (80-fach) | [Uebersicht](validierung/T10a-uebersicht.png), [Zoom](validierung/T10a-zoom.png) |
+| T10b | `?v=1&R(150,1200,10)&z=m57&s=2&b=5` (120-fach) | [Uebersicht](validierung/T10b-uebersicht.png), [Zoom](validierung/T10b-zoom.png) |
+| T11a | `?v=1&g=auge&z=m31&s=2&b=3` | [Uebersicht](validierung/T11a-uebersicht.png), [Zoom](validierung/T11a-zoom.png), [Detail](validierung/T11a-detail.png) |
+| T11b | `?v=1&g=auge&z=m31&s=2&b=7` | [Uebersicht](validierung/T11b-uebersicht.png), [Zoom](validierung/T11b-zoom.png), [Detail](validierung/T11b-detail.png) |
+| T11c | `?v=1&g=auge&z=m45&s=2&b=3` | [Uebersicht](validierung/T11c-uebersicht.png), [Zoom](validierung/T11c-zoom.png), [Detail](validierung/T11c-detail.png) |
+| T11d | `?v=1&g=auge&z=m45&s=2&b=7` | [Uebersicht](validierung/T11d-uebersicht.png), [Zoom](validierung/T11d-zoom.png), [Detail](validierung/T11d-detail.png) |
+| M13a | `?v=1&R(80,600,8)&z=m13&s=2&b=4` (75-fach) | [Uebersicht](validierung/M13a-uebersicht.png), [Zoom](validierung/M13a-zoom.png), [Detail](validierung/M13a-detail.png) |
+| M13b | `?v=1&g=newton-200-1200&ok=8&z=m13&s=1.5&b=4` (150-fach) | [Uebersicht](validierung/M13b-uebersicht.png), [Zoom](validierung/M13b-zoom.png), [Detail](validierung/M13b-detail.png) |
+| M13c | `?v=1&g=newton-300-1500&ok=7&z=m13&s=1.5&b=4` (214-fach) | [Uebersicht](validierung/M13c-uebersicht.png), [Zoom](validierung/M13c-zoom.png), [Detail](validierung/M13c-detail.png) |
+
+### 14.1 Ergebnisse
+
+| Fall | Erwartung | Messung (Bild: Delle der Punktebene; feines Modell; Anzeige) | Urteil (Vorschlag) | Urteil Herbert |
+|---|---|---|---|---|
+| T7a, T7c | 80 mm: Pi Aql und Epsilon Ari nicht getrennt, laenglich | $\delta$ = 0 und 0 (fein 0 und 0); ein laenglicher Fleck ohne Einsattelung. Pi Aql zeigt zwei Farben (A gelblich, B blaeulich) nebeneinander, Epsilon Ari ist einfarbig | bestanden (T7a: Farbe deutet die beiden Sterne an, Hinweis fuer Herbert) | |
+| T7b, T7d | 150 mm: beide getrennt | $\delta$ = 0,214 und 0,141 (fein 0,483 und 0,330); zwei Kerne mit flacher Einsattelung (Anzeige 116 / 111 / 116 und 145 / 135 / 138) | bestanden (Epsilon Ari knapp, 13 % ueber der Schwelle) | |
+| T8a | 10x50: zwei runde Sterne | Weites Paar getrennt ($\delta$ = 1), Epsilon1 und Epsilon2 je $\delta$ = 0; zwei runde Sterne (Uebersicht und Zoom) | bestanden | |
+| T8b | 80 mm, 0,5'': beide engen Paare getrennt | Epsilon2 $\delta$ = 0,515 (fein 0,623), zwei Kerne; Epsilon1 $\delta$ = 0 (fein 0,139): laenglich, zwei unterschiedlich gefaerbte Kerne, aber keine Einsattelung (Detail, Profil quer 96 / 105 / 106 / 106 / 107) | **Abweichung** (Epsilon1 nicht getrennt) | |
+| T8c | 80 mm, 2'': keines getrennt | $\delta$ = 0 und 0,002; zwei leicht laengliche Flecke | bestanden | |
+| T9a | 150 mm, 0,5'': B getrennt, Hinweis "Ueberstrahlung nicht simuliert" | $\delta$ = 0,303 (fein 0,527); B als blaeulicher Fleck am Rand des orangen Halos (Anzeige A 219, Sattel 143, B 155); Warnung `ueberstrahlung` mit 4,44 mag | bestanden | |
+| T9b, T9c | 1,5'' oder 15 Grad Hoehe: nicht getrennt | $\delta$ = 0 und 0; keine Einsattelung, aber am Ort von B eine blaeulich-graue Stelle im orangen Halo (T9b sRGB 158 / 136 / 132 gegen 184 / 141 / 94 am Spiegelpunkt, T9c 140 / 130 / 143 gegen 152 / 115 / 77) | bestanden nach der Delle; **Abweichung** im Farbeindruck (B an der Farbe erkennbar), siehe 14.2 | |
+| T10a | 80 mm, 80-fach: kleines Oval sichtbar, Loch hoechstens angedeutet | Isophote 20,30 mag/arcsec$^2$, 4373 arcsec$^2$ (Oval 88'' x 60'': 4147); Anzeige Himmel 25, Ring 40, Mitte 35 bis 36: ovaler Ring mit sichtbar dunklerer Mitte. Loch linear: Delle 0,556 nach der Faltung (Python am Quellbild, gerechnet) | Oval bestanden; **Abweichung** beim Loch (deutlich statt angedeutet; die Literatur ist uneins, `deep-sky.md` 8 Punkt 1) | |
+| T10b | 150 mm: Ring mit dunkler Mitte | Isophote 20,90, 4692 arcsec$^2$; Anzeige Himmel 28, Ring 44, Mitte 39; Loch linear 0,576 | bestanden; das Bild unterscheidet sich vom 80 mm kaum (etwas heller, gleicher Kontrast) | |
+| T11a | Bortle 3: M31 sichtbar, laenglich, 1,5 bis 3 Grad | $C/C_\mathrm{th}$ = 1 (Vorzeichenwechsel), Isophote 22,47, grosse Achse 101' (Prototyp 106'); laengliche Scheibe mit hellem Kern, an beiden Enden schwach die Stufen der Mosaikkante (Abschnitt 10) | bestanden | |
+| T11b | Bortle 7: M31 hoechstens Hauch des Kerns ($C/C_\mathrm{th}$ 0,42) | $C/C_\mathrm{th}$ = 0,422; nur der Kern als kleiner, schwacher Fleck (wie Abschnitt 10) | bestanden | |
+| T11c | Bortle 3: Plejaden 11 bis 14 Sterne | 12 Sterne ueber der Grenzgroesse, 22 mit $P' \ge$ 0,1; Bild 14 Spitzen ab 8 Kodes. Pleione (5,05) von Atlas getrennt (301'') | bestanden (Pleione getrennt, siehe T11d) | |
+| T11d | Bortle 7: sechs Sterne, Pleione mit Atlas verschmolzen | 7 Sterne ueber der Grenzgroesse (die sechs hellen und Pleione, $P'$ knapp ueber 0,5); Bild 9 Spitzen ab 8 Kodes, Pleione deutlich neben Atlas | **Abweichung** (sieben statt sechs, Pleione getrennt) | |
+| T11 Grenzgroesse | Infopanel etwa 6,2 bzw. 5,2 | 6,20 und 5,17 (Extinktion 0,20 mag) | bestanden | |
+| T12 | Abschnitt 13 | Abschnitt 13 | bestanden (Herbert 2026-10-30) | |
+
+**Gepruefte Bilder** (Read auf die PNG): die Zooms T7a, T7b, T8a, T8b, T8c, T10a, T10b und M13a einzeln, T7a bis T7d und T9a bis T9c als Kontaktabzug; die Uebersichten T10a, T11a bis T11d, M13a und M13b; das Detail T8b (vergroessert). Die Messwerte sind Mittel der sRGB-Kanaele an den PNG (Python, numpy, scipy).
+
+### 14.2 Pruefpunkte aus architektur.md 5.7
+
+- **Deckkraft am gefalteten $q$ bei M57 am 80 mm (T10a).** Gerechnet in Python: Quellbild nach der log-Kennlinie linear, flaechig auf den Arbeitsmassstab 2,20'' gemittelt, mit dem Kern aus `auswerten` (9 px, Gesamt-FWHM 2,59'') gefaltet; $q^*$ = 0,0370 aus der Tabelle des ungefalteten Bilds. Deckkraft ungefaltet gegen gefaltet: Mitte 1,000 / 1,000, Ring 1,000 / 1,000; Flaeche mit $P \ge$ 0,5 4471 / 4654 arcsec$^2$ (Tabelle 4373); grosse Achse 86,8'' / 87,9''; Delle des Lochs (linear) 0,576 / 0,556. Am 150 mm (1,47'', 11 px): Flaeche 4719 / 4867 (Tabelle 4692). Die Rechnung trifft die Anzeigewerte des Screenshots (Himmel 25, Ring 40, Mitte 35 bis 36). **Ergebnis:** Die Naeherung verschiebt die sichtbare Flaeche um 4 % und die Achse um 1''; bei M57 liegt $q^*$ auf der steilen Aussenkante und die Faltung (2,6'') ist klein gegen das Objekt (88''). Bestanden, kein Issue.
+- **Mischfarbe Antares B im Halo von A (T9).** Gerechnet mit `falteFaerbung` am Pixel von B: bei 0,5'' (getrennt) traegt B 88 % des Flusses, die Farbe ist 0,90 / 0,98 / 1,50 (linear sRGB, Y = 1) gegen B allein 0,80 / 0,99 / 1,65 und A 1,62 / 0,88 / 0,36: etwas weniger blau als B, als Fleck klar blaeulich (Bild 140 / 145 / 174). Bei 1,5'' (nicht getrennt) traegt B nur 24 %, die Farbe ist 1,42 / 0,91 / 0,67, also orange; trotzdem ist B im Bild als blaeulich-graue Stelle am Rand des Halos zu sehen (T9b, Zahlen in 14.1), weil der Halo von A dort orange und dunkler ist. **Ergebnis:** Die Mischung selbst ist plausibel und bleibt; offen ist, ob der Begleiter ohne Einsattelung an der Farbe erkennbar sein soll (Vorschlag 3 unten).
+
+### 14.3 Sternzahl M13 (Pruefpunkt aus Abschnitt 12)
+
+| Fall | Erwartung (`deep-sky.md` 8 Punkt 4) | Grenzgroesse | Sterne ueber der Grenze (ausserhalb 2') | Bild: Spitzen ab 8 Kodes |
+|---|---|---|---|---|
+| M13a, 80 mm 75-fach, Bortle 4 | hoechstens eine Handvoll am Rand, Grenze 12 bis 12,5 | 12,77 | 44 (16) | 39 |
+| M13b, 200 mm 150-fach | einige Dutzend bis gut hundert, Grenze 13,5 bis 14 | 14,39 | 281 (112) | 235 |
+| M13c, 300 mm 214-fach | (keine) | 15,17 | 531, die ganze Liste bis V 15 | 424 |
+
+Zum Vergleich (gerechnet aus `daten/sterne/m13.json`): bei 12,5 / 13,5 / 14,0 waeren es 22 / 115 / 190 Sterne. Die Zahlen liegen ueber der Erwartung, am 80 mm um eine Groessenordnung. Zwei Ursachen: die Grenzgroesse am Fernrohr liegt 0,3 bis 0,5 mag tiefer als die aus Bortle umgerechnete Erwartung (beides ist Annahme, `wahrnehmung.md` W3), und sie rechnet gegen den Himmel, nicht gegen das hellere Restlicht des Haufens, vor dem die Sterne stehen (vermutet). Am 300 mm schneidet die Liste bei V 15 ab. **Vorschlag: Abweichung** (Issue, Vorschlag 4). Im Bild sieht M13 am 80 mm wie ein schwacher Schimmer mit vielen feinen Punkten aus, am 200 mm wie ein koerniger, aufgeloester Haufen (Abschnitt 12).
+
+### 14.4 Vorgeschlagene Abweichungen (noch nicht angelegt)
+
+1. **T8b: Epsilon1 Lyrae am 80 mm bei 0,5'' nicht getrennt.** Das feine Modell trennt knapp ($\delta$ = 0,139), das Bild nicht: Am Arbeitsmassstab Gesamt-FWHM / 2,5 (0,64'') wird jeder Stern als Scheibchen von einem Arbeitspixel gemalt und gefaltet; das verbreitert den Stern und verschluckt die Einsattelung. Dieselbe Ursache halbiert die Delle bei T7b, T7d und T9a (0,214 / 0,141 / 0,303 statt 0,483 / 0,330 / 0,527). Moegliche Abhilfe: feinerer Arbeitsmassstab oder Punktquellen als Punkte (Subpixel) fuer Doppelsterne.
+2. **T11d: Pleione von Atlas getrennt, sieben statt sechs Plejaden bei Bortle 7.** Pleione liegt 301'' von Atlas, die Augenaufloesung von 1' (A-P2) trennt sie in jedem Fall; die Erwartung ("verschmolzen") setzt eine groebere Aufloesung des Auges fuer schwache Sterne voraus (vgl. `doppelsterne.md` 7 Punkt 5, Epsilon Lyrae mit blossem Auge). Die Zahl sieben folgt aus der Grenzgroesse 5,17 (Pleione 5,05). Entscheidung noetig: Modellgrenze dokumentieren oder Augenaufloesung fuer schwache Sterne einfuehren.
+3. **T9b, T9c: Antares B ohne Einsattelung an der Farbe erkennbar.** Die flussgewichtete Faerbung zeigt am Ort von B eine blaeulich-graue Stelle im orangen Halo von A, obwohl die Helligkeit keine Einsattelung hat. Zu klaeren: ist das der richtige Anblick (der Begleiter faellt in Wirklichkeit oft gerade durch die Farbe auf) oder soll die Farbe unter der Trennschwelle nicht als eigener Fleck erscheinen.
+4. **M13: Sternzahl am 80 und 200 mm ueber der Erwartung.** 44 statt hoechstens einer Handvoll und 281 statt einiger Dutzend bis gut hundert. Zu pruefen: Grenzgroesse am Fernrohr gegen Beobachtungsdaten (W3) und die Grenzgroesse vor dem Restlicht des Haufens statt vor dem Himmel.
+5. **T10a: Loch von M57 am 80 mm deutlich statt hoechstens angedeutet.** Das Bild zeigt am 80 mm denselben Ring wie am 150 mm (Mitte 35 gegen Ring 40 bzw. 39 gegen 44); die Deckkraft ist im ganzen Ring und in der Mitte 1, das Loch wird also mit vollem Kontrast gezeigt. Die Literatur ist uneins ("even a 7.5 cm telescope will reveal its elliptical ring shape" gegen "elongated hazy spot"), deshalb nur als Frage: Erwartung anpassen oder Kontrastschwelle fuer Strukturen innerhalb sichtbarer Objekte (bisher nur die Isophote am Rand).

@@ -244,8 +244,8 @@ Schluessel: Stufe 1 Objekt ohne Punktquellen (Bortle, Transparenz und Seeing aen
 
 - Vergleichsbild der Zoomansicht bei Deep-Sky: linear mit Quellweiss = Bildschirmweiss zeigt den schwachen Halo kaum; Vorschlag beim ui-Issue.
 - M13: Quellbild plus Katalogsterne zaehlt doppelt; Bild maskieren oder Sterne plus Restlicht (deep-sky.md 3.4), Entscheidung beim Daten-Issue. Entschieden (Herbert 2026-10-29, Issue #108): Sterne plus Restlicht, Umsetzung in physik.md 27.
-- Deckkraft auf das gefaltete q mit einer Tabelle aus dem ungefalteten Bild ist eine Naeherung; bei M57 am 80 mm (T10) pruefen.
-- Faerbung mischt ueberlappende Sterne flussgewichtet (Antares B im Halo von A bekommt eine Mischfarbe); hinnehmen oder beim Doppelstern-Issue pruefen.
+- Deckkraft auf das gefaltete q mit einer Tabelle aus dem ungefalteten Bild ist eine Naeherung; bei M57 am 80 mm (T10) pruefen. Geprueft in Issue #112: sichtbare Flaeche 4 % groesser, Achse 1'' laenger, Deckkraft in Ring und Mitte gleich; bestanden (`docs/validierung.md` 14.2).
+- Faerbung mischt ueberlappende Sterne flussgewichtet (Antares B im Halo von A bekommt eine Mischfarbe); hinnehmen oder beim Doppelstern-Issue pruefen. Geprueft in Issue #112: Mischung plausibel; ungetrennt bleibt B an der Farbe erkennbar, offen als Vorschlag 3 in `docs/validierung.md` 14.4.
 - Punktebene mit weichem Kernrand (Issue #109, physik.md Abschnitt 24): bild faltet Punktquellen und Faerbung mit dem Kern mal einem cos²-Fenster ueber das aeussere Drittel des Radius, neu normiert. Grund: Unter der Kubikwurzel des Tonwerts wurde der harte, quadratische Kernrand als Quadrat bzw. Farbkante sichtbar. Die Naht bleibt unveraendert.
 - Mischanteil im Fall unaufgeloest mit weichem Kernrand (Issue #135, physik.md Abschnitt 28): bild faltet das Objektraster ein zweites Mal mit dem Kern mal $w^{1/n}$ (dasselbe Fenster, nicht neu normiert) und nimmt das Ergebnis nur fuer `g * min(1, (aP * qH)^n)`; Zwischenspeicher `halo`. Grund: das Quadrat um Planeten mit blossem Auge. Die Naht bleibt unveraendert.
 
