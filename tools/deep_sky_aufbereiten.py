@@ -44,11 +44,16 @@ Schritte:
          mag_hell, s Massstab in "/px (wie objekte.md 5.3),
        - "flaeche": mittlere Flaechenhelligkeit eichung.mag_arcsec2 im Kreis
          eichung.radius_arcsec um die Mitte (Profilanker, z. B. M13 King mu0
-         in kleinem Radius): mag_hell = mu + 2,5 log10(Mittel q).
+         in kleinem Radius): mag_hell = mu + 2,5 log10(Mittel q),
+       - "nullpunkt": photometrischer Nullpunkt aus dem FITS-Kopf (Schluessel
+         eichung.fits_schluessel, V = ZP - 2,5 log10(Wert je Rohpixel), etwa
+         aus Feldsternen geeicht, M42 #107): mag_hell = ZP - 2,5 log10(L_max)
+         mit L_max dem hellsten Wert je Quadratbogensekunde; optional
+         eichung.vergleich_magnitude (Literatur, nur Ausgabe).
        mag_hell und mag_dunkel werden auf 0,01 mag gerundet.
     6. Pruefung am geschriebenen WebP (wieder eingelesen): Kodes gleich,
        Gesamthelligkeit aus dem dekodierten Bild gegen eichung.magnitude
-       (Toleranz 0,1 mag, Issue #105); bei "flaeche" nur Ausgabe.
+       (Toleranz 0,1 mag, Issue #105); bei "flaeche" und "nullpunkt" nur Ausgabe.
     7. Flaechentabelle (flaechentabelle) am dekodierten, sternbereinigten
        Bild in 0,1-mag-Schritten (ADR-0003 Nachtrag V2, ADR-0004): Isophote
        mu_i gegen die Flaeche aller Pixel mit mu <= mu_i (wie der Prototyp
@@ -721,8 +726,10 @@ def lade_parameter(pfad):
     if abs(d - round(d)) > 1e-6 or round(d) > p["leinwand_px"]:
         raise SystemExit(f"{pfad}: winkelgroesse_arcsec / bogensekunden_pro_pixel = {d} ist keine ganze Pixelzahl "
                          "bis leinwand_px (objekt_durchmesser_px)")
-    if p["eichung"].get("art") not in ("gesamt", "flaeche") + (("tonkurve",) if tiff else ()):
-        raise SystemExit(f"{pfad}: eichung.art muss gesamt oder flaeche sein (bei rohformat tiff_tonkurve auch tonkurve)")
+    if p["eichung"].get("art") not in ("gesamt", "flaeche", "nullpunkt") + (("tonkurve",) if tiff else ()):
+        raise SystemExit(f"{pfad}: eichung.art muss gesamt, flaeche oder nullpunkt sein (bei rohformat tiff_tonkurve auch tonkurve)")
+    if p["eichung"]["art"] == "nullpunkt" and not p["eichung"].get("fits_schluessel"):
+        raise SystemExit(f"{pfad}: eichung.art nullpunkt verlangt fits_schluessel")
     if tiff and p["tiff_kanal"] not in ("R", "G", "B"):
         raise SystemExit(f"{pfad}: tiff_kanal muss R, G oder B sein")
     umfang = p["kennlinie"].get("umfang_mag")
@@ -781,6 +788,9 @@ def bildnachweis(p, kopf, mag_hell, mag_dunkel, datei_bytes, sterne, ohne_daten,
                      f"{eichung['magnitude']} ergibt ({eichung['quelle']})")
     elif eichung["art"] == "tonkurve":
         eich_text = f"Quellweiss mag_hell aus der Tonkurve (absolute Flaechenhelligkeit des hellsten Pixels; {eichung['quelle']})"
+    elif eichung["art"] == "nullpunkt":
+        eich_text = (f"Quellweiss mag_hell aus dem photometrischen Nullpunkt {eichung['fits_schluessel']} = "
+                     f"{kopf[eichung['fits_schluessel']]} des FITS-Kopfs ({eichung['quelle']})")
     else:
         eich_text = (f"Quellweiss mag_hell so geeicht, dass das Mittel im Kreis {eichung['radius_arcsec']}\" um die Mitte "
                      f"{eichung['mag_arcsec2']} mag/arcsec^2 ergibt ({eichung['quelle']})")
@@ -806,7 +816,8 @@ def bildnachweis(p, kopf, mag_hell, mag_dunkel, datei_bytes, sterne, ohne_daten,
     else:
         herkunft = (
             f"{p['bearbeitung_kanal']} Lineare Werte ({kopf.get('BUNIT', 'Einheit unbekannt')}) aus der FITS-Erweiterung "
-            f"{p['fits_erweiterung']} ohne Tonkurve; Himmel nicht abgezogen ({p.get('hintergrund', 'kein Abzug')}). "
+            f"{p['fits_erweiterung']} ohne Tonkurve; Himmel {'vorher abgezogen' if p.get('himmel_abgezogen') else 'nicht abgezogen'} "
+            f"({p.get('hintergrund', 'kein Abzug')}). "
             f"Ausgerichtet ueber die CD-Matrix des FITS-Kopfs (Himmelsnorden {abs(nordwinkel):.2f} Grad "
             f"{'gegen den' if nordwinkel > 0 else 'im'} Uhrzeigersinn von oben im Rohbild, nicht gespiegelt), "
             f"Objektmitte (Pixel {p['roh_mitte_px'][0]}/{p['roh_mitte_px'][1]} im Rohbild, {p.get('mitte_beleg', '')}) "
@@ -908,6 +919,9 @@ def verarbeite(pfad, args):
     if p["eichung"]["art"] == "tonkurve":
         # Die Tonkurve gibt schon absolute Flaechenhelligkeiten; Kode 255 ist das hellste Pixel.
         mag_hell = round(-2.5 * math.log10(float(im_bild.max())), 2)
+    elif p["eichung"]["art"] == "nullpunkt":
+        # im_bild ist in Rohbild-Einheiten je Quadratbogensekunde; Kode 255 ist der hellste Wert.
+        mag_hell = round(float(kopf[p["eichung"]["fits_schluessel"]]) - 2.5 * math.log10(float(im_bild.max())), 2)
     else:
         mag_hell = round(eiche_mag_hell(kodes, umfang, s, p["eichung"]), 2)
     if tiff:
@@ -928,6 +942,9 @@ def verarbeite(pfad, args):
         print(f"  Soll {p['eichung']['magnitude']} ({p['eichung']['quelle']}), Abweichung {abweichung:+.3f} mag")
         if abs(abweichung) > TOLERANZ_GESAMT_MAG:
             raise SystemExit(f"Gesamthelligkeit weicht um mehr als {TOLERANZ_GESAMT_MAG} mag ab")
+    elif p["eichung"].get("vergleich_magnitude") is not None:
+        print(f"  Literatur {p['eichung']['vergleich_magnitude']} ({p['eichung'].get('vergleich_quelle', '')}), "
+              f"Bild minus Literatur {gesamt - p['eichung']['vergleich_magnitude']:+.3f} mag")
 
     # Flaechentabelle am dekodierten Bild, sternbereinigt (bei im_bild_entfernen ist es das schon).
     lin = log_tabelle(mag_hell, mag_dunkel).astype(np.float64)[dekodiert]

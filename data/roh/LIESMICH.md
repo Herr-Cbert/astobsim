@@ -81,3 +81,55 @@ Im Unterordner `m31/` (im Worktree ein Symlink auf `data/roh/m31/` des Hauptrepo
 - `m31/noao-m31lgs_ubvIha_10k.tif`: NOIRLab noao-m31lgs_ubvIha "Panorama of Spiral Galaxy, M31", Publication TIFF 10K. https://storage.noirlab.edu/media/archives/images/publicationtiff10k/noao-m31lgs_ubvIha.tif (Seite https://noirlab.edu/public/images/noao-m31lgs_ubvIha/), 10000x2521 RGB, 8 Bit, Kompression 5 (LZW), Farbprofil sRGB IEC61966-2.1, 31329224 Byte, SHA-256 `c37531e4123eaaf19c0fe8fdb0536c8ac8a6e83fe04fb1b80125195856ebd177`. Lizenz CC BY 4.0, Credit "Local Group Survey Team and T.A. Rector (University of Alaska Anchorage)". Feld 217,62' x 54,87' (1,3057"/px), "North is 125.8 deg right of vertical", "East to the left"; Filter U violett, B blau, V cyan, I orange, H-alpha rot (Bildseite). Kern in allen Kanaelen gesaettigt (Kode 255 innerhalb etwa 30"), Mosaikraender schwarz (alle Kanaele 0). Verarbeitet durch `tools/deep_sky_aufbereiten.py` mit `tools/parameter/m31_noirlab_lgs.json`.
 - `m31/seite.html`: Bildseite wie oben (Beschreibung, Credit, Koordinaten, Farbzuordnung), 88421 Byte, SHA-256 `fb1610f15d26aa04792b5eaf000c40b05d2951742744da5fbe86c5aeec447785`.
 - `m31/copyright.html`: https://noirlab.edu/public/copyright/ (CC BY 4.0, Bedingungen), 71196 Byte, SHA-256 `cfc65e64eb0dd14b11d485f4e51e51bab3a944287a59989591c8b9469b25ad25`.
+
+## M42 (Issue #107)
+
+Ordner `m42/` (im Worktree eines Issues als Symlink auf `data/roh/m42/` des Hauptrepos), abgerufen 2026-10-29.
+
+- `m42/wfi/WFI.<Zeit>.fits.Z`: Rohdaten des Wide Field Imager am MPG/ESO-2,2-m-Teleskop (La Silla) aus dem ESO Science Archive, je Datei `https://dataportal.eso.org/dataportal_new/file/<Name ohne .fits.Z>` (ohne Anmeldung, Unix-compress, Kopf unveraendert wie ausgeliefert). Gefunden ueber TAP `https://archive.eso.org/tap_obs/sync`, Tabelle `dbo.raw` (instrument WFI, Feld um RA 83,76, Dec -5,46 Grad, Filter `BB#V/89_ESO843`). Wissenschaft: Programm 273.C-5042(A), Ziel "Orion-Nebula", 02.01.2005 02:08 bis 02:52 UT und 03.01.2005 02:56 bis 04:07 UT, je Nacht 5 x 280 s, 5 x 30 s, 1 x 3 s, gedithert. Kalibration (Programm 60.A-9120(A)): 5 Bias vom 02.01.2005 15:13 UT, 5 Himmelsflats V vom 02. und 03.01.2005, das Standardfeld 02.01.2005 01:28 UT (30 s) nur fuer den Himmel.
+  Lizenz: ESO Data Access Policy (https://archive.eso.org/cms/eso-data-access-policy.html, Stand 07.11.2022, gelesen 2026-10-29): "All data in the ESO archive retain ESO's copyright, and are distributed according to the terms of the Creative Commons Attribution 4.0 International license (CC BY 4.0)"; Weitergabe durch Dritte: "Credit to the ESO provenance of the data must be acknowledged, and the file headers preserved." Danksagung: "Based on observations collected at the European Southern Observatory under ESO programme 273.C-5042(A)". Die Rohdateien werden nicht weitergegeben; das WebP unter `daten/` nennt die Herkunft in `bilder.json`.
+  - `m42/wfi/WFI.2005-01-02T00:11:13.218.fits.Z` (Himmelsflat V), 124048269 Byte, SHA-256 `4e23364b65bec7a5ffcc1d53693e70a2f9f868d09da98dc085a8b27874a95190`
+  - `m42/wfi/WFI.2005-01-02T00:12:26.911.fits.Z` (Himmelsflat V), 124004513 Byte, SHA-256 `ae3c36e9b5fcec3663a7d7493164c83359414768db06ad6a29fe79a6b20f4d4e`
+  - `m42/wfi/WFI.2005-01-02T00:13:41.592.fits.Z` (Himmelsflat V), 122801009 Byte, SHA-256 `d110bf552fb3e5b3db0f820c6a15a04183c67b5749094c4a77e4bc8d1b229d7b`
+  - `m42/wfi/WFI.2005-01-02T01:28:31.304.fits.Z` (Standardfeld (Himmel)), 47775589 Byte, SHA-256 `178152baa0cca680b0ddde0bef0c63bbc4ca948b8c17aecab3ee1b7ed06e4999`
+  - `m42/wfi/WFI.2005-01-02T02:08:08.288.fits.Z` (Wissenschaft), 112838427 Byte, SHA-256 `43b9ebf5f8cfca2ef1301844af381a62c437fc7f8fc3c4e01ed0f7d1d51a566c`
+  - `m42/wfi/WFI.2005-01-02T02:14:28.526.fits.Z` (Wissenschaft), 112105089 Byte, SHA-256 `eda95c8035a33d425ef7a8f41a8b50622b19f2b40fedec31cf04ec9362cf06ca`
+  - `m42/wfi/WFI.2005-01-02T02:20:51.950.fits.Z` (Wissenschaft), 112658783 Byte, SHA-256 `c53247dd6491c75180a6cf9f13ead917f2d279db995687360cafd48e54c6d374`
+  - `m42/wfi/WFI.2005-01-02T02:27:09.734.fits.Z` (Wissenschaft), 111733371 Byte, SHA-256 `3c4331194aae2173a1481f9cba6db3b2f431455f846e4ecfeb7be4f508ff350b`
+  - `m42/wfi/WFI.2005-01-02T02:33:29.967.fits.Z` (Wissenschaft), 113539537 Byte, SHA-256 `108d9ed6baee7e972389c2c237aaea641106478af084fade029cb42c869be978`
+  - `m42/wfi/WFI.2005-01-02T02:40:26.065.fits.Z` (Wissenschaft), 74410239 Byte, SHA-256 `5e8d7846815605318594d6c9d5af5c4ca7bdd6cc0a357fe396a46a1f8ee82e2c`
+  - `m42/wfi/WFI.2005-01-02T02:42:46.212.fits.Z` (Wissenschaft), 73067207 Byte, SHA-256 `923b94e6bf2e4819f5018bbbe848ae864691f524cda8ee1b88aa5045d06ab2fd`
+  - `m42/wfi/WFI.2005-01-02T02:45:02.002.fits.Z` (Wissenschaft), 74120261 Byte, SHA-256 `7318eda22e76b733c8c8a859fe6ef5ce7c6025b7cdfcf5de1f6f307a17f9d271`
+  - `m42/wfi/WFI.2005-01-02T02:47:11.736.fits.Z` (Wissenschaft), 72671929 Byte, SHA-256 `08a94ec2190e789f4cb7b9633d601856edf93e4493ec695a26d80c24b4faeb7d`
+  - `m42/wfi/WFI.2005-01-02T02:49:25.601.fits.Z` (Wissenschaft), 72455815 Byte, SHA-256 `070fbae072773a316fc11eec54e620332a3e1b0e9cd74a1824d523dca005bcfb`
+  - `m42/wfi/WFI.2005-01-02T02:51:57.913.fits.Z` (Wissenschaft), 49225685 Byte, SHA-256 `c1c97c4764470abbc5dcc9550340561e9cddf992f6806d78d404f9d7823bd746`
+  - `m42/wfi/WFI.2005-01-02T15:13:02.056.fits.Z` (Bias), 36293391 Byte, SHA-256 `98f20e93929d16faf05f6f04cd1f6b85f3fcdddf0848e6035ba08dc0bff0b557`
+  - `m42/wfi/WFI.2005-01-02T15:13:54.689.fits.Z` (Bias), 36146557 Byte, SHA-256 `f761641511cdf13f8cbc1fe19dac53c9058db8302857651ac0ef3e82f4507002`
+  - `m42/wfi/WFI.2005-01-02T15:14:46.162.fits.Z` (Bias), 36090193 Byte, SHA-256 `098ea3dde6f091ed94cac9f1c62efb102f8f47a2800e052a16daaa2f707cf7da`
+  - `m42/wfi/WFI.2005-01-02T15:15:42.948.fits.Z` (Bias), 36105687 Byte, SHA-256 `da6a9e9235640925a9b6d35c822d67aed0d4dd0e0fa4e43ac8553b734c4db617`
+  - `m42/wfi/WFI.2005-01-02T15:16:35.090.fits.Z` (Bias), 36147401 Byte, SHA-256 `1a64944b052fbad0c35a2e5f08d1436b3bce04fbbcb6b853e5cfc9b287eb9569`
+  - `m42/wfi/WFI.2005-01-03T00:16:42.580.fits.Z` (Himmelsflat V), 124876817 Byte, SHA-256 `b64227411340d2b94e9aa7ea6cf9007d38dd3bd8963625c39456ad931e9053a9`
+  - `m42/wfi/WFI.2005-01-03T00:18:18.244.fits.Z` (Himmelsflat V), 123930333 Byte, SHA-256 `980e531892efd990df3995156d9c03d55fd16087933a8de93a0e6c90060d3071`
+  - `m42/wfi/WFI.2005-01-03T02:56:08.559.fits.Z` (Wissenschaft), 111127521 Byte, SHA-256 `71ab3b589c51f6cdaa7137cec0901dc06935ae86d56873d448e4d3c93b7987d0`
+  - `m42/wfi/WFI.2005-01-03T03:02:32.514.fits.Z` (Wissenschaft), 112024595 Byte, SHA-256 `b529c00858d3b4dd1866478eb5003da6ade514af91961e0d5cbbd71916d0ca0c`
+  - `m42/wfi/WFI.2005-01-03T03:08:57.778.fits.Z` (Wissenschaft), 112301881 Byte, SHA-256 `6df2ca20a2dfd96548a3755b757f94fa97ea1eb7fdabdfc505d63718051af4ec`
+  - `m42/wfi/WFI.2005-01-03T03:15:17.572.fits.Z` (Wissenschaft), 112483207 Byte, SHA-256 `5434fe0570a0833f59d29f538648c3cdeb75be2a502706e4c3da7607c04c10ee`
+  - `m42/wfi/WFI.2005-01-03T03:21:42.893.fits.Z` (Wissenschaft), 110800235 Byte, SHA-256 `d2a82e0e6c835961fab1c82af1a04027a46c01fbdc4492c0dda57494dbd73d43`
+  - `m42/wfi/WFI.2005-01-03T03:54:57.622.fits.Z` (Wissenschaft), 74249027 Byte, SHA-256 `67d1319ae862f3ff7ed6560d7248ef2c46d01315cf37131f16bcdd505b423924`
+  - `m42/wfi/WFI.2005-01-03T03:57:12.104.fits.Z` (Wissenschaft), 72909697 Byte, SHA-256 `ecf423f3959bdd08d21fb28f74f259159face642ed197ae703465e02df4794a0`
+  - `m42/wfi/WFI.2005-01-03T03:59:30.082.fits.Z` (Wissenschaft), 73790055 Byte, SHA-256 `eefe6756c111b66030661360bed18ca3741914149050ead5772e43a91fba26ce`
+  - `m42/wfi/WFI.2005-01-03T04:01:46.493.fits.Z` (Wissenschaft), 73532521 Byte, SHA-256 `bf3994468b4c22ed93711b276431ea4180869c697f07c7dd287481408daf3af0`
+  - `m42/wfi/WFI.2005-01-03T04:03:54.292.fits.Z` (Wissenschaft), 72744749 Byte, SHA-256 `474a14a96fdea706f720dcb716111314022085cab4e4c86e3fb979be536027d4`
+  - `m42/wfi/WFI.2005-01-03T04:06:30.006.fits.Z` (Wissenschaft), 48563561 Byte, SHA-256 `4e212fa5112f071de4f2feaff8a8497188c37ad65e4256c00897769b28f69040`
+- `m42/m42_feld_gaiadr3.csv`: Gaia-Archiv (ESA), TAP https://gea.esac.esa.int/tap-server/tap/sync, HTTP-POST mit `REQUEST=doQuery`, `LANG=ADQL`, `FORMAT=csv`, 287700 Byte, SHA-256 `5604007a7468574a1c31ded1ecb1a4c35e10d538b106fd503121f6ca78048119`. ADQL:
+  `SELECT source_id, ra, dec, pmra, pmdec, phot_g_mean_mag, bp_rp, phot_bp_rp_excess_factor, ruwe FROM gaiadr3.gaia_source WHERE 1 = CONTAINS(POINT('ICRS', ra, dec), CIRCLE('ICRS', 83.76, -5.455, 0.36)) AND phot_g_mean_mag < 19.5 ORDER BY source_id`
+  Lizenz CC BY-NC 3.0 IGO. Nur fuer Astrometrie und Nullpunkt des Stapels, geht nicht nach `daten/`.
+- `m42/m42_wfi_v.fits`: erzeugt von `python3 tools/m42_wfi_stapeln.py` aus den Dateien oben (4800 x 4800 px, 0,5"/px, Tangentialebene um Theta1 Ori C, float32, Kopf mit CD-Matrix, MAGZP und HISTORY der Rohdateien), etwa 12 Minuten, bytegleich reproduzierbar mit denselben Versionen von numpy. Verarbeitet durch `tools/deep_sky_aufbereiten.py` mit `tools/parameter/m42_wfi_20050102.json` nach `daten/bilder/m42/wfi_2005-01-02_v.webp`; Bytes und SHA-256 stehen in der Parameterdatei. `m42_feld_gaiadr3.csv` liefert ausserdem NU Ori fuer `tools/m42_sterne.py`.
+- `m42/m42_trapez_gaiadr3.csv`: Gaia-Archiv (ESA), TAP https://gea.esac.esa.int/tap-server/tap/sync, HTTP-POST mit `REQUEST=doQuery`, `LANG=ADQL`, `FORMAT=csv`. Abgerufen 2026-10-29, 4804 Byte, SHA-256 `0163cfc6bd84604ac6f0f0d9bd3535fe50b186e67d8137ada08e8565ea17b1df`. ADQL:
+  `SELECT source_id, ra, dec, phot_g_mean_mag, bp_rp, phot_bp_rp_excess_factor, ruwe, pmra, pmdec FROM gaiadr3.gaia_source WHERE 1 = CONTAINS(POINT('ICRS', ra, dec), CIRCLE('ICRS', 83.81862, -5.389696, 0.06)) AND phot_g_mean_mag < 13.0 ORDER BY phot_g_mean_mag`
+  Lizenz CC BY-NC 3.0 IGO (ESA Space Science Archives). Verarbeitet durch `tools/m42_sterne.py` nach `daten/sterne/m42.json` (Issue #107).
+- `m42/m42_trapez_hipparcos.csv`: Gaia-Archiv (ESA), TAP https://gea.esac.esa.int/tap-server/tap/sync, HTTP-POST mit `REQUEST=doQuery`, `LANG=ADQL`, `FORMAT=csv`. Abgerufen 2026-10-29, 249 Byte, SHA-256 `9fdf62c4991f5b0e5f400776247f7990d1f9b147084dd8ee2d59dbff992f7ccb`. ADQL:
+  `SELECT hip, hd, ra, de, vmag, b_v, varflag, sptype FROM public.hipparcos WHERE 1 = CONTAINS(POINT('ICRS', ra, de), CIRCLE('ICRS', 83.81862, -5.389696, 0.1)) ORDER BY vmag`
+  Lizenz CC BY-NC 3.0 IGO (ESA Space Science Archives). Verarbeitet durch `tools/m42_sterne.py` nach `daten/sterne/m42.json` (Issue #107).
+  Die zwei Dateien erzeugt `python3 tools/m42_sterne.py --abrufen`, den Eintrag hier `--liesmich`. Zwei Abrufe am 2026-10-29 lieferten byte-gleiche Dateien.
+- Orientierung (nicht abgelegt): ESO-Pressebild eso1103a, https://www.eso.org/public/images/eso1103a/ (CC BY 4.0, "ESO/Igor Chekalin").
