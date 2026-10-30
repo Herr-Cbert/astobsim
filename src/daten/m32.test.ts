@@ -13,7 +13,7 @@ import { pruefeBildnachweise } from "./bildnachweise";
 import { DatenFehler } from "./fehler";
 import { pruefeGeraete } from "./geraete";
 import { pruefeObjekte, pruefeVerweise } from "./objekte";
-import { objektzustand } from "./objektzustand";
+import { begleiterMassstab, begleiterNachweise, findeZustand, objektzustand } from "./objektzustand";
 import { quelleBegleiter } from "./quelle_begleiter";
 
 const nachweise = pruefeBildnachweise(bilderJson);
@@ -82,12 +82,14 @@ describe("Begleiter in daten (Issue #136)", () => {
     const z = objektzustand(objekte, nachweise, "m31")!;
     expect(z.begleiter).toHaveLength(1);
     const b = z.begleiter![0]!;
-    expect([b.kennung, b.name, b.magnitude]).toEqual(["m32", "M32", 8.08]);
+    const eintrag = findeZustand(objekte, "m31")!.zustand.begleiter![0]!;
+    expect([eintrag.id, eintrag.name, eintrag.magnitude]).toEqual(["m32", "M32", 8.08]);
     // Mitte des Begleiterbilds auf dem Gitter der M31-Leinwand (4''/px), M32 etwa 24' suedlich.
     expect(b.dxArcsec).toBe(28);
     expect(b.dyArcsec).toBe(-1452);
-    expect(b.quelle).toEqual({ breitePx: 128, hoehePx: 128, massstabArcsecProPx: 4 });
-    expect(b.quelle.massstabArcsecProPx).toBe(z.quelle!.massstabArcsecProPx);
+    const nb = begleiterNachweise(objekte, nachweise, "m31");
+    expect(nb.map((n) => [n.id, n.pixelBreite, n.pixelHoehe, begleiterMassstab(n)])).toEqual([["m31_noirlab_lgs_m32", 128, 128, 4]]);
+    expect(begleiterMassstab(nb[0]!)).toBe(z.quelle!.massstabArcsecProPx);
     expect(b.isophoten.length).toBeGreaterThan(30);
   });
 

@@ -207,6 +207,33 @@ describe("rendere mit Begleitern", () => {
     expect(zaehler.aufrufe).toBe(4);
   });
 
+  it("Stufe 1 der Begleiter (Ausschnitt, mittele) haengt nicht am Kern: ein Seeing-Zug holt keinen neuen Ausschnitt", () => {
+    const zaehler = new FalterZaehlend();
+    const zw: Zwischenspeicher = {};
+    const h = helligkeit([{ schwelleRelativ: 0.5, sockel: 0 }]);
+    const innen = versetzt(4, -3);
+    let ausschnitte = 0;
+    const quelle = {
+      ausschnitt(m: { xArcsec: number; yArcsec: number }, b: number, s: number) {
+        ausschnitte++;
+        return innen.ausschnitt(m, b, s);
+      }
+    };
+    const erst = rendere(parameter(h), haupt, zaehler, zw, [quelle]);
+    expect(ausschnitte).toBe(1);
+    rendere(parameter(h, deltaKern(3)), haupt, zaehler, zw, [quelle]);
+    expect(ausschnitte).toBe(1);
+    // Zurueck zum ersten Kern: neu gefaltet, Ergebnis gleich dem ersten Lauf.
+    const wieder = rendere(parameter(h), haupt, zaehler, zw, [quelle]);
+    expect(ausschnitte).toBe(1);
+    expect(zaehler.aufrufe).toBe(6);
+    expect(Array.from(wieder.raster.daten)).toEqual(Array.from(erst.raster.daten));
+    // Neuer Ausschnitt (anderer Quellbildschluessel) holt ihn neu.
+    const p = parameter(h);
+    rendere({ ...p, quellbild: { ...p.quellbild, schluessel: "q|1|0" } }, haupt, zaehler, zw, [quelle]);
+    expect(ausschnitte).toBe(2);
+  });
+
   it("Begleiter ausserhalb des Fensters: keine Faltung, Anblick wie ohne Licht des Begleiters", () => {
     const zaehler = new FalterZaehlend();
     const h = helligkeit([{ schwelleRelativ: 0.5, sockel: 0.01 }]);

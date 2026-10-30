@@ -157,6 +157,8 @@ export const TEXTE = {
   fehler: {
     daten: "Die Daten konnten nicht geladen werden.",
     bild: "Das Bild des Objekts ist nicht erreichbar.",
+    /** Bild eines Begleiters (etwa M32 bei M31) laedt nicht; das Hauptbild allein wird nicht gezeigt. */
+    begleiterbild: "Das Bild eines Begleiters (etwa M32 bei M31) ist nicht erreichbar.",
     rechnen: "Der Anblick konnte nicht berechnet werden.",
     details: "Details:"
   },

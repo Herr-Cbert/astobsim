@@ -121,9 +121,15 @@ function zeigeStand(seite: Seite, stand: Readonly<Stand>, falter: Falterwahl): v
       zeigeStatus(seite, statusFertig(stand.ms ?? 0, falter));
       break;
     case "fehler":
-      zeigeFehler(seite, stand.fehler?.art === "bild" ? TEXTE.fehler.bild : TEXTE.fehler.rechnen, stand.fehler?.ursache);
+      zeigeFehler(seite, fehlermeldung(stand.fehler), stand.fehler?.ursache);
       break;
   }
+}
+
+/** Kurze Meldung zum Fehler der Steuerung; ein Begleiterbild, das nicht laedt, hat eine eigene (Issue #141). */
+function fehlermeldung(fehler: Stand["fehler"]): string {
+  if (fehler?.art !== "bild") return TEXTE.fehler.rechnen;
+  return fehler.ursache instanceof BegleiterbildFehler ? TEXTE.fehler.begleiterbild : TEXTE.fehler.bild;
 }
 
 function statusFertig(ms: number, falter: Falterwahl): string {
@@ -169,6 +175,14 @@ async function ladeKataloge(): Promise<Kataloge> {
   return { geraete, objekte, nachweise };
 }
 
+/** Ein Begleiterbild (Issue #136) laedt nicht; message ist die technische Meldung der Ursache. */
+class BegleiterbildFehler extends Error {
+  constructor(ursache: unknown) {
+    super(ursache instanceof Error ? ursache.message : String(ursache), { cause: ursache });
+    this.name = "BegleiterbildFehler";
+  }
+}
+
 /**
  * Bildquelle im Browser: Kachelpyramide, wenn der Nachweis eine hat, sonst ein Einzelbild. Zustaende
  * ohne Quellbild kommen nicht hierher, fuer sie nimmt die Steuerung QuelleLeer.
@@ -187,7 +201,9 @@ async function bildquelleBrowser(kataloge: Kataloge, objekt: Objektzustand): Pro
   const begleiter = objekt.begleiter ?? [];
   if (begleiter.length === 0 || weiss === undefined) return { quelle, lade: async () => {} };
   const nachweiseB = begleiterNachweise(kataloge.objekte, kataloge.nachweise, objekt.kennung);
-  const quellen = await Promise.all(begleiter.map((b, k) => quelleBegleiterBrowser(nachweiseB[k]!, weiss, b.dxArcsec, b.dyArcsec)));
+  const quellen = await Promise.all(begleiter.map((b, k) => quelleBegleiterBrowser(nachweiseB[k]!, weiss, b.dxArcsec, b.dyArcsec))).catch((e: unknown) => {
+    throw new BegleiterbildFehler(e);
+  });
   return { quelle, begleiter: quellen, lade: async () => {} };
 }
 

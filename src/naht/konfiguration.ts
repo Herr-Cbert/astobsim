@@ -105,16 +105,12 @@ export interface Isophote {
  * Feld des Hauptobjekts (M32 bei M31) mit eigenem Bild und eigener Flaechentabelle, damit sie eine
  * eigene Wahrnehmungsschwelle bekommt. dxArcsec, dyArcsec ist die Mitte des Begleiterbilds relativ
  * zur Objektmitte (+x rechts, +y Norden). Pixelwerte des Begleiterbilds sind wie die des Hauptbilds
- * relativ zum Quellweiss des Hauptobjekts (quelle.weissMagProArcsec2 des Zustands).
+ * relativ zum Quellweiss des Hauptobjekts (quelle.weissMagProArcsec2 des Zustands). Nur was physik
+ * und ui brauchen (Issue #141); Name, Magnitude und Bildnachweis stehen in daten (BegleiterEintrag).
  */
 export interface Begleiter {
-  /** id aus daten/objekte.json (z. B. "m32"). */
-  kennung: string;
-  name: string;
   dxArcsec: number;
   dyArcsec: number;
-  magnitude: number;
-  quelle: { breitePx: number; hoehePx: number; massstabArcsecProPx: number };
   /** mag aufsteigend, Flaeche steigend, wie Objektzustand.isophoten. */
   isophoten: Isophote[];
 }
