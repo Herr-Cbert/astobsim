@@ -176,6 +176,20 @@ class SterneTest(unittest.TestCase):
         self.assertLess(float((bereinigt - nebel)[stern > 3.0].max()), 12.0)
 
 
+    def test_ersatz_ohne_pixel_ausserhalb_der_daten(self):
+        # Stern 3 px vor der Mosaikkante, rechts davon keine Daten (0): mit ohne_daten zaehlen die Nullen
+        # nicht zum Ersatzmedian und werden nicht maskiert.
+        n = 100
+        yy, xx = np.mgrid[0:n, 0:n]
+        bild = 50.0 + np.random.default_rng(6).normal(0, 0.5, (n, n))
+        bild += 400.0 * np.exp(-((xx - 57) ** 2 + (yy - 50) ** 2) / 2.0)
+        ohne = xx >= 60
+        bild[ohne] = 0.0
+        bereinigt, maske, _ = ds.sterne_entfernen(bild, ohne_daten=ohne)
+        self.assertFalse(maske[ohne].any())
+        self.assertLess(abs(float(bereinigt[50, 57]) - 50.0), 2.0)
+
+
 class EichungTest(unittest.TestCase):
     def test_gesamthelligkeit_getroffen(self):
         # Gleichmaessige Scheibe: mag_hell aus der Eichung, dann Gesamthelligkeit aus den Kodes.

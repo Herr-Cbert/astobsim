@@ -267,7 +267,7 @@ def robuste_streuung(werte):
 
 
 def sterne_entfernen(bild, fenster_px=9, schwelle_sigma=6.0, kontrast=0.5, wachsen_sigma=3.0, max_radius_px=40,
-                     rand_px=2, ersatz_px=21, streuung_px=15, zusaetzlich=()):
+                     rand_px=2, ersatz_px=21, streuung_px=15, zusaetzlich=(), ohne_daten=None):
     """Punktquellen entfernen; Rueckgabe (bereinigt, maske, sterne) mit sterne = [(x, y, rest_spitze), ...].
 
     Ein Stern ist ein lokales Maximum, dessen Rest gegen den gleitenden Median (fenster_px) ueber
@@ -279,7 +279,8 @@ def sterne_entfernen(bild, fenster_px=9, schwelle_sigma=6.0, kontrast=0.5, wachs
     rand_px erweitert. Erkannt werden auch Reste kosmischer Strahlung und heisse Pixel (dort, wo
     nur eine Belichtung beitraegt); sie gehoeren ebenso wenig zum Objekt. Maskierte Pixel bekommen den Median der
     unmaskierten Pixel im Fenster ersatz_px. zusaetzlich: [(x, y, radius_px), ...] als Kreise
-    maskiert (z. B. ein ausgebrannter Kern).
+    maskiert (z. B. ein ausgebrannter Kern). ohne_daten (optional): Pixel ausserhalb der Daten
+    (Mosaik), sie werden nicht maskiert und zaehlen nicht zum Ersatzmedian.
     """
     med = median_filter(bild, fenster_px)
     rest = bild - med
@@ -321,12 +322,16 @@ def sterne_entfernen(bild, fenster_px=9, schwelle_sigma=6.0, kontrast=0.5, wachs
     yy, xx = np.mgrid[0:h, 0:w]
     for x, y, r in zusaetzlich:
         maske |= np.hypot(xx + 0.5 - x, yy + 0.5 - y) <= r
+    if ohne_daten is not None:
+        maske &= ~ohne_daten
     bereinigt = bild.copy()
     halb = ersatz_px // 2
     for y, x in np.argwhere(maske):
         for weite in (halb, 2 * halb, 4 * halb):
             y0, y1, x0, x1 = max(0, y - weite), min(h, y + weite + 1), max(0, x - weite), min(w, x + weite + 1)
             frei = ~maske[y0:y1, x0:x1]
+            if ohne_daten is not None:
+                frei = frei & ~ohne_daten[y0:y1, x0:x1]
             if frei.any():
                 bereinigt[y, x] = np.median(bild[y0:y1, x0:x1][frei])
                 break
@@ -522,7 +527,7 @@ def _pav_steigend(werte, gewichte):
 def tonkurve_anpassen(kodes_bins, mu_bins, gewichte):
     """Monotone Tonkurve Kode -> mu aus Paaren (Median-Kode, Modell-mu) je Radiusring.
 
-    Gleiche Kodes werden gemittelt (gewichtet mit der Pixelzahl), dann wird mu ueber fallendem Kode
+    Gleiche Kodes werden gemittelt (gewichtet mit gewichte; tonkurve_aus_profil gibt jedem Ring 1), dann wird mu ueber fallendem Kode
     isoton steigend gemacht; Kodes mit danach gleichem mu werden zu einem Knoten zusammengefasst.
     Rueckgabe: Knoten [(kode, mu)] mit steigendem Kode und streng fallendem mu.
     """
@@ -652,21 +657,42 @@ def lies_tiff_tonkurve(p, objekte_pfad):
     profil = lade_profil(objekte_pfad, p["objekt"], p["zustand"])
     tk = p["tonkurve"]
     knoten, tabelle, zeilen = tonkurve_aus_profil(kanal, ohne, osten, norden, profil, tk)
+    ausserhalb = ohne
+    ellipse = None
+    if p.get("ellipse"):
+        # Groesste Ellipse um die Mitte, die ganz im Mosaik liegt; ausserhalb gilt als ohne Daten, damit
+        # die Bildkante einer Isophote folgt statt der Treppe der Mosaikfelder (Issue #106, Review S1).
+        e = p["ellipse"]
+        pa = math.radians(e["positionswinkel_grad"])
+        u = osten * math.sin(pa) + norden * math.cos(pa)
+        v = osten * math.cos(pa) - norden * math.sin(pa)
+        a_ell = np.hypot(u, v / e["q"])
+        del u, v
+        grenze = ohne.copy()
+        grenze[0, :] = grenze[-1, :] = grenze[:, 0] = grenze[:, -1] = True
+        a_max = float(a_ell[grenze].min()) - e["rand_arcsec"]
+        ausserhalb = ohne | (a_ell > a_max)
+        ellipse = {"a_arcsec": a_max, "q": e["q"], "positionswinkel_grad": e["positionswinkel_grad"]}
+        del a_ell
     del osten, norden
     linear = tabelle[kanal] * s ** 2
-    linear[ohne] = np.nan
+    linear[ausserhalb] = np.nan
     h = kanal.shape[0]
     mitte = [p["roh_mitte_px"][0], h - 1 - p["roh_mitte_px"][1]]
     kopf = {"BUNIT": "10^(-0,4 mu) je Pixel aus der Tonkurve"}
     cd = tiff_cd_matrix(kanal.shape, s, p["roh_nordwinkel_rechts_grad"])
     kopf.update({"CD1_1": cd[0, 0], "CD1_2": cd[0, 1], "CD2_1": cd[1, 0], "CD2_2": cd[1, 1]})
     info = {"knoten": knoten, "zeilen": zeilen, "mitte_px": mitte, "ohne_roh": int(ohne.sum()),
-            "gesaettigt": int((kanal == KODE_MAX).sum())}
+            "gesaettigt": int((kanal == KODE_MAX).sum()), "ellipse": ellipse}
     return kopf, np.flipud(linear), info
 
 
 def drucke_tonkurve(info, profil_text):
     print(f"Tonkurve gegen das Profil ({profil_text}): {len(info['knoten'])} Knoten")
+    if info.get("ellipse"):
+        e = info["ellipse"]
+        print(f"  Ellipse im Mosaik: grosse Halbachse {e['a_arcsec']:.0f}\" ({e['a_arcsec'] / 60:.1f}'), "
+              f"q {e['q']}, PA {e['positionswinkel_grad']} Grad; ausserhalb ohne Daten")
     print("  Knoten Kode -> mu: " + ", ".join(f"{k:.1f}->{m:.2f}" for k, m in info["knoten"]))
     print("  Restfehler je Ring (mu Bild - mu Modell, Median im Ring):")
     print("     r0     r1  Modell  Bild   Abw.  NO-Abw  SW-Abw | klein Modell  Bild   Abw.  Pixel")
@@ -767,7 +793,11 @@ def bildnachweis(p, kopf, mag_hell, mag_dunkel, datei_bytes, sterne, ohne_daten,
             f"bis {tk['radius_max_arcsec']}\") Median des Kodes gegen Median des Modells, isoton geglaettet, "
             f"{len(tonkurve['knoten'])} Knoten, dazwischen linear in mag; unter dem dunkelsten Knoten linear in der "
             f"Helligkeit bis 0 bei Kode {tk['kode_himmel']} ({tk['kode_himmel_beleg']}). {tk.get('grenzen', '')} "
-            f"Himmel: {p.get('hintergrund', 'kein Abzug')}. "
+            + (f"Ausserhalb der groessten Ellipse um die Mitte, die ganz im Mosaik liegt (grosse Halbachse "
+               f"{tonkurve['ellipse']['a_arcsec'] / 60:.1f}', q {tonkurve['ellipse']['q']}, PA "
+               f"{tonkurve['ellipse']['positionswinkel_grad']} Grad), ohne Daten, damit die Bildkante einer Isophote "
+               f"folgt statt der Treppe der Mosaikfelder. " if tonkurve.get("ellipse") else "")
+            + f"Himmel: {p.get('hintergrund', 'kein Abzug')}. "
             f"Ausgerichtet ueber Massstab {p['roh_massstab_arcsec']}\"/px und Nordrichtung "
             f"{p['roh_nordwinkel_rechts_grad']} Grad im Uhrzeigersinn von der Senkrechten des Rohbilds "
             f"(nicht gespiegelt), Objektmitte (Pixel {p['roh_mitte_px'][0]}/{p['roh_mitte_px'][1]} im Rohbild, "
@@ -860,8 +890,14 @@ def verarbeite(pfad, args):
     stern_param = {k: st[k] for k in ("fenster_px", "schwelle_sigma", "kontrast", "wachsen_sigma", "max_radius_px",
                                       "rand_px", "ersatz_px", "streuung_px") if k in st}
     zusaetzlich = [tuple(z) for z in st.get("zusaetzlich_px", [])]
+    if tiff:
+        stern_param["ohne_daten"] = ohne_daten
     bereinigt, maske, sterne = sterne_entfernen(bild, zusaetzlich=zusaetzlich, **stern_param)
     print(f"Sterne: {len(sterne)} erkannt, {int(maske.sum())} Pixel maskiert")
+    if tiff:
+        daten_px = int((~ohne_daten).sum())
+        print(f"  ersetzt {maske.sum() / daten_px * 100:.1f} % der {daten_px} Datenpixel; Gesamthelligkeit vor der "
+              f"Sternentfernung {-2.5 * math.log10(float(bild.sum()) * s ** 2):.3f} mag")
     for x, y, spitze in sorted(sterne, key=lambda t: -t[2])[:args.sterne_liste]:
         print(f"  Stern bei dx {-(x + 0.5 - bild.shape[1] / 2) * s:+7.2f}\" dy {(bild.shape[0] / 2 - y - 0.5) * s:+7.2f}\", "
               f"Rest {spitze:.4g}")
