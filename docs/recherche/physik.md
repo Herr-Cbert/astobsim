@@ -1239,3 +1239,36 @@ Der Rest waechst bis zum Kreisrand weiter (bei 180'' traegt der aeusserste 30''-
 **Empfehlung:** D, als eigenes Issue mit ADR-0004-Nachtrag: B allein laesst bei Bortle 3 einen Rest stehen, C allein loest die Fernrohrkante nicht. Bis dahin A. Der Werkzeugteil (Befund 1, `untergrund_kappen`) ist fuer jede Variante mit M43 noetig.
 
 **Entscheidung Herbert (2026-10-30):** In #139 Variante A: nichts umgebaut, `hinweis_hilfe` von M42 nennt die Abweichung, `docs/validierung.md` 11 fuehrt sie als bekannte Abweichung. Variante D ist Issue #143 (Milestone "Spaeter"); die verworfene Umsetzung (Werkzeugoption `untergrund_kappen`, Kreis 180'', Ring 90'') ist dort im Kommentar beschrieben.
+
+## 31. Feinere Punktebene fuer knapp getrennte Doppelsterne (Issue #145)
+
+**Problem (gerechnet, Validierung #112, `docs/validierung.md` 14).** Die Punktebene (Abschnitt 14) lag im Arbeitsraster mit hoechstens 2,5 Pixeln je Gesamt-FWHM (ADR-0002). Jeder Stern wurde als Scheibchen von mindestens einem Arbeitspixel gemalt (Flaechenanteile, fuer einen Punkt praktisch die bilineare Verteilung auf die vier Nachbarn), mit dem gebinnten Kern gefaltet (Abschnitt 9: Binning auf Arbeitspixel) und fuer die Anzeige bilinear hochskaliert. Jeder dieser drei Schritte verbreitert den Stern um eine Varianz der Groessenordnung $s^2/12$ bis $s^2/6$ ($s$ Arbeitspixel; Rechteck $s^2/12$ wie in Abschnitt 9, Dreieck der linearen Interpolation $s^2/6$), zusammen etwa $s^2/3$ gegen $\sigma^2 = (2{,}5\,s/2{,}355)^2 = 1{,}13\,s^2$ des Kerns, also rund 30 % mehr Varianz (eig. Rechnung). Fuer weit getrennte Paare ist das unsichtbar, die flache Einsattelung knapp getrennter Paare verschwindet aber: Delle $\delta$ (doppelsterne.md 4) im Bild gegen das feine Modell (derselbe Kern mit etwa 12 Pixeln je FWHM, Sterne als Punkte): T7b 0,214 gegen 0,483, T7d 0,141 gegen 0,330, T8b $\varepsilon^1$ Lyr 0 gegen 0,139, T9a 0,303 gegen 0,527.
+
+**Verworfen: Sub-Pixel-Lage im Arbeitsraster.** Gerechnet (Python, eig. Rechnung) mit dem idealen Fall, die Gesamt-PSF exakt an der Sternlage in den Mitten der Arbeitspixel abgetastet (kein Scheibchen, kein Binning), und nur der bilinearen Abtastung entlang der Verbindungslinie: T7b 0,403, T8b $\varepsilon^1$ 0,009. Mit dem gebinnten Kern, der in `bild` allein vorliegt, um die Sub-Pixel-Lage verschoben (Lanczos-3, Keys-Kubik): T7b 0,32 bis 0,37, $\varepsilon^1$ 0. Bei 2,5 Pixeln je FWHM fehlt die Einsattelung also schon in der Abtastung; eine bessere Lage im Arbeitsraster hilft nicht.
+
+**Modellannahme.** Die Punktebene bekommt ein eigenes, feineres Raster mit dem Kern derselben Gesamt-PSF (Abschnitte 2 und 9, `baueKern`) an dessen Massstab:
+
+$$N_P = \min(N_\mathrm{Anzeige},\ 5\,N), \qquad s_P = \frac{B}{N_P},$$
+
+$N$ Arbeitsraster, $N_\mathrm{Anzeige}$ Pixel der Anzeige (`fenster.px`), $B$ Fensterbreite. Nur wenn $N_P > N$ (die Anzeige ist feiner als das Arbeitsraster) und ein Stern im Fenster liegt, liefert physik diesen Punktkern (`Simulationsparameter.punktkern`); sonst bleibt alles wie bisher. Bei FWHM = 2,5 $s$ hat die Punktebene mit $N_P = 5\,N$ 12,5 Pixel je FWHM, so fein wie das feine Modell; feiner als die Anzeige rechnet sie nicht. Der Kern hat dann hoechstens Radius $\lceil 3 \cdot 12{,}5 \rceil$ = 38, also 77 px (Grenze 81).
+
+- *Werte:* Die Punktebene bleibt relativ zu Quellweiss (eine Flaechenhelligkeit); der Fluss eines Sterns verteilt sich auf $(N_P/N)^2$ mal so viele, entsprechend kleinere Pixel (male.ts unveraendert mit $s_P$). Der Punktanteil $W = \min(1, (a\,p)^n)$ und die Faerbung $c_k/p$ (Abschnitt 14, ADR-0004) werden je Pixel der Punktebene gerechnet; Flaeche (je Arbeitspixel) und Punktanteil werden getrennt auf die Anzeige skaliert und dort addiert. Abweichung von 14.2 ("Ort der Kompression: je Arbeitspixel"): mit Punktkern je Pixel der Punktebene.
+- *Randfenster (Abschnitt 24):* endet wie am Arbeitsraster ein halbes Arbeitspixel ausserhalb des Kernradius, im feineren Raster also $0{,}5\,N_P/N$ Pixel. Mit 0,5 Pixeln des feineren Rasters schnitte das Fenster physikalisch frueher ab; bei T9a (Antares B im Fluegel von A, 2,6 FWHM entfernt) kostete das 0,005 in der Delle (gemessen mit dreifacher Punktebene).
+- *Vergleichsbild (Zoom):* ohne Punktkern, es rechnet ohnehin im Anzeigemassstab.
+
+**Ergebnis (gerechnet, `src/validierung_v2.test.ts`, Zoom 540 px, Delle der Punktebene linear vor tonwert):**
+
+| Fall | vorher | nachher | feines Modell |
+|---|---|---|---|
+| T7b $\pi$ Aql, 150 mm 300x | 0,214 | 0,476 | 0,483 |
+| T7d $\varepsilon$ Ari, 150 mm 300x | 0,141 | 0,331 | 0,327 |
+| T8b $\varepsilon^1$ Lyr, 80 mm 160x, Detail | 0 | 0,134 | 0,142 |
+| T8b $\varepsilon^1$ Lyr, Zoom (beide Paare) | 0 | 0,072 | 0,139 |
+| T8b $\varepsilon^2$ Lyr, Zoom | 0,515 | 0,523 | 0,623 |
+| T9a Antares, 150 mm 200x | 0,303 | 0,500 | 0,527 |
+
+Mit dreifacher statt fuenffacher Punktebene: T8b $\varepsilon^1$ im Detail 0,104 (unter der Schwelle 0,125), T9a 0,477 (0,050 neben dem feinen Modell); vierfach $\varepsilon^1$ 0,120. Im Zoom von T8b (beide Paare, 240'' auf 540 px) liegen die Sterne von $\varepsilon^1$ nur 4,5 Anzeigepixel auseinander; dort begrenzt die Anzeige selbst ($N_P = N_\mathrm{Anzeige}$, 3,5 Pixel je FWHM), die Einsattelung zeigt das Detail.
+
+**Rechenzeit (gemessen, Node, eine Messung je Fall, 1080 px).** Punktkernbau bis 22 ms (Kern 77 px, FFT 256), nur bei geaendertem Schluessel. Punktebene mit Faerbung: M13 am 300 mm im Zoom (531 Sterne) 26 statt 4 ms, M45 mit blossem Auge im Zoom 10 statt 1 ms, $\varepsilon$ Lyr im Zoom 3 statt 0,4 ms. Das Raster der Punktebene ist nie groesser als die Anzeige, der Speicher also nicht groesser als bei einer Punktebene im Anzeigemassstab.
+
+**Grenzen.** Die Delle bleibt bei Phasenlagen der Sterne zum Raster um einige Hundertstel unsicher (dreifach gegen vierfach gegen fuenffach oben). Die Flaeche bleibt im Arbeitsraster; Sterne vor einer Flaeche (M13, Trabanten vor dem Planeten) werden feiner gezeichnet als die Flaeche darunter, was dem Fernrohr entspricht (die Flaeche ist ohnehin durch das Quellbild oder den Arbeitsmassstab begrenzt).

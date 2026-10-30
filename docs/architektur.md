@@ -62,7 +62,8 @@ export interface Helligkeit {     // Stufe 3: Tonwert
   punktFaktor: number; punktExponent: number }          // Punktebene, Issue #72
 export interface Gesichtsfeld { form: "kreis" | "rechteck"; breiteArcsec: number; hoeheArcsec: number }
 export interface Simulationsparameter { quellbild: Quellbild; kern: Kern; helligkeit: Helligkeit;
-  gesichtsfeld: Gesichtsfeld; fenster: Fenster }        // Stufe 4: Anzeige
+  gesichtsfeld: Gesichtsfeld; fenster: Fenster;         // Stufe 4: Anzeige
+  punktkern?: Kern }                                    // feinere Punktebene, Issue #145
 ```
 
 ```ts
@@ -247,6 +248,7 @@ Schluessel: Stufe 1 Objekt ohne Punktquellen (Bortle, Transparenz und Seeing aen
 - Deckkraft auf das gefaltete q mit einer Tabelle aus dem ungefalteten Bild ist eine Naeherung; bei M57 am 80 mm (T10) pruefen. **Erledigt** (Issue #112, Herbert 2026-10-30): sichtbare Flaeche 4 % groesser, Achse 1'' laenger, Deckkraft in Ring und Mitte gleich (`docs/validierung.md` 14.2).
 - Faerbung mischt ueberlappende Sterne flussgewichtet (Antares B im Halo von A bekommt eine Mischfarbe); hinnehmen oder beim Doppelstern-Issue pruefen. Geprueft in Issue #112: Mischung plausibel; ungetrennt bleibt B an der Farbe erkennbar, weiter in #146 (`docs/validierung.md` 14.2, 14.4).
 - Punktebene mit weichem Kernrand (Issue #109, physik.md Abschnitt 24): bild faltet Punktquellen und Faerbung mit dem Kern mal einem cos²-Fenster ueber das aeussere Drittel des Radius, neu normiert. Grund: Unter der Kubikwurzel des Tonwerts wurde der harte, quadratische Kernrand als Quadrat bzw. Farbkante sichtbar. Die Naht bleibt unveraendert.
+- Feinere Punktebene (Issue #145, physik.md Abschnitt 31): ist die Anzeige feiner als das Arbeitsraster und liegt ein Stern im Fenster, liefert physik in `Simulationsparameter.punktkern` dieselbe Gesamt-PSF am Massstab `fenster.breiteArcsec / punktPx`, `punktPx = min(fenster.px, 5 * rasterPx)`. bild malt und faltet die Punktquellen (und die Faerbung) auf diesem Raster, rechnet den Punktanteil dort und skaliert Flaeche und Punktanteil getrennt auf die Anzeige. Grund: am Arbeitsmassstab (2,5 Pixel je FWHM) verschluckte die Abtastung die Einsattelung knapp getrennter Doppelsterne. Ohne `punktkern` rechnet bild wie vorher (bytegleich). Das Vergleichsbild hat keinen `punktkern`.
 - Mischanteil im Fall unaufgeloest mit weichem Kernrand (Issue #135, physik.md Abschnitt 28): bild faltet das Objektraster ein zweites Mal mit dem Kern mal $w^{1/n}$ (dasselbe Fenster, nicht neu normiert) und nimmt das Ergebnis nur fuer `g * min(1, (aP * qH)^n)`; Zwischenspeicher `halo`. Grund: das Quadrat um Planeten mit blossem Auge. Die Naht bleibt unveraendert.
 
 Reihenfolge fuer Phase 4: (1) Vorbereitungs-PR Naht-Typen und Konstanten (wie #46 in Version 1), (2) physik `schwelle.ts`, `mischung.ts`, `sternfarbe.ts`, `doppelstern.ts` parallel, (3) bild `tonwert` und Faerbung, daten Kennlinie und neue Typen parallel, (4) Daten und tools je Objekt (Doppelsterne, M45, Mondphasen zuerst, da ohne Kennlinie), (5) zustand und ui, (6) Validierung T1 bis T12 und Nachmessen der Konstanten.
