@@ -158,6 +158,23 @@ class SterneTest(unittest.TestCase):
         np.testing.assert_array_equal(bereinigt[~maske], (nebel + rauschen + stern)[~maske])
         self.assertLess(maske.sum(), 150)
 
+    def test_spitze_im_rand_des_nachbarn_waechst(self):
+        # Zwei Sterne 6 px auseinander, rand_px 4: die Spitze von B liegt im erweiterten Rand von A
+        # (Kern plus 4 px), aber nicht in dessen Kern. B muss trotzdem wachsen, sonst bleibt sein Fluegel
+        # jenseits des Rands von A stehen (Issue #106, Review M1).
+        n = 200
+        yy, xx = np.mgrid[0:n, 0:n]
+        nebel = 100.0 * np.exp(-((xx - 100) ** 2 + (yy - 100) ** 2) / (2 * 40.0 ** 2))
+        rauschen = np.random.default_rng(5).normal(0, 0.5, (n, n))
+        stern = (400.0 * np.exp(-((xx - 60) ** 2 + (yy - 100) ** 2) / (2 * 1.0 ** 2))
+                 + 400.0 * np.exp(-((xx - 66) ** 2 + (yy - 100) ** 2) / (2 * 1.0 ** 2)))
+        bereinigt, maske, sterne = ds.sterne_entfernen(nebel + rauschen + stern, rand_px=4)
+        self.assertEqual(sorted((x, y) for x, y, _ in sterne), [(60, 100), (66, 100)])
+        # Jedes Pixel mit mehr als 3 Einheiten Sternlicht (6 Rauschstufen) ist maskiert.
+        self.assertTrue(maske[stern > 3.0].all())
+        # Kein Sternrest: im Ersatz bleibt nur der Gradient des Nebels ueber dem Ersatzfenster (unter 12).
+        self.assertLess(float((bereinigt - nebel)[stern > 3.0].max()), 12.0)
+
 
 class EichungTest(unittest.TestCase):
     def test_gesamthelligkeit_getroffen(self):
