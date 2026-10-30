@@ -394,18 +394,18 @@ def bildnachweis(p, farbraum, faktor, datei_bytes):
     qualitaet = p.get("qualitaet", QUALITAET_STANDARD)
     if "kontrast_exponent" in p or "kontrast_kurve" in p:
         if "kontrast_exponent" in p:
-            kontrast = (f"Kontrast und Saettigung angeglichen: jeder Kanal in linearem Licht hoch "
+            kontrast = (f"Kontrast und Sättigung angeglichen: jeder Kanal in linearem Licht hoch "
                         f"{p['kontrast_exponent']} ({p['kontrast_begruendung']})")
         else:
             stuetz = ", ".join(f"{x}->{y}" for x, y in p["kontrast_kurve"])
             kontrast = (f"Kontrast angeglichen: Tonkurve auf die Leuchtdichte in linearem Licht durch {stuetz}, "
-                        f"Kanaele im Verhaeltnis skaliert ({p['kontrast_begruendung']})")
+                        f"Kanäle im Verhältnis skaliert ({p['kontrast_begruendung']})")
         farbe = (f"Farbraum {farbraum} farbmetrisch nach sRGB umgerechnet (relativ farbmetrisch); {kontrast}"
                  if "srgb" not in farbraum.lower() else f"Rohbild sRGB; {kontrast}")
     else:
         farbe = (f"Farbraum {farbraum} farbmetrisch nach sRGB umgerechnet (relativ farbmetrisch), sonst keine Farb- "
-                 f"oder Kontrastaenderung" if "srgb" not in farbraum.lower()
-                 else "keine Farb- oder Kontrastaenderung (Rohbild sRGB)")
+                 f"oder Kontraständerung" if "srgb" not in farbraum.lower()
+                 else "keine Farb- oder Kontraständerung (Rohbild sRGB)")
     skalierung = ("nicht skaliert" if abs(faktor - 1) < 1e-9
                   else f"in linearem Licht mit Lanczos um den Faktor {faktor:.4f} skaliert")
     rand = p.get("rand_px", RAND_PX_STANDARD)
@@ -423,19 +423,19 @@ def bildnachweis(p, farbraum, faktor, datei_bytes):
         vorher = "Scheibe"
         bezug = f"im Rohbild {p['original_pixel']}"
     if "roh_ring_aussen_px" in p:
-        ring = (f", aeusserer Ringrand {p['roh_ring_aussen_px']} x {p['roh_ring_aussen_klein_px']} px, "
-                f"Verhaeltnis zur Kugel {p['roh_ring_aussen_px'] / p['roh_durchmesser_px']:.3f} gegen 2,269 geprueft")
-        maske = f"ausserhalb der Scheibe und der Ringellipse plus je {rand} px Rand"
+        ring = (f", äußerer Ringrand {p['roh_ring_aussen_px']} x {p['roh_ring_aussen_klein_px']} px, "
+                f"Verhältnis zur Kugel {p['roh_ring_aussen_px'] / p['roh_durchmesser_px']:.3f} gegen 2,269 geprüft")
+        maske = f"außerhalb der Scheibe und der Ringellipse plus je {rand} px Rand"
     else:
         ring = ""
-        maske = f"ausserhalb der Scheibe plus {rand} px Rand"
+        maske = f"außerhalb der Scheibe plus {rand} px Rand"
     entfernt = f"; durch die Maske entfernt: {p['entfernt']}" if p.get("entfernt") else ""
     gedreht = "" if ausrichtung else "; nicht gedreht oder gespiegelt"
     bearbeitung = (
-        f"{vorher} (Mitte {p['roh_mitte_px'][0]}/{p['roh_mitte_px'][1]}, Aequatordurchmesser "
+        f"{vorher} (Mitte {p['roh_mitte_px'][0]}/{p['roh_mitte_px'][1]}, Äquatordurchmesser "
         f"{p['roh_durchmesser_px']} px {bezug}{ring}) auf die Mitte einer Leinwand von "
         f"{n}x{h} px gelegt und {skalierung} auf {d} px Scheibendurchmesser; {maske} auf Schwarz gesetzt; "
-        f"{farbe}{gedreht}{entfernt}. {p['orientierung']} WebP verlustbehaftet, Qualitaet {qualitaet} "
+        f"{farbe}{gedreht}{entfernt}. {p['orientierung']} WebP verlustbehaftet, Qualität {qualitaet} "
         f"(tools/bild_aufbereiten.py)."
     )
     hinweise = (

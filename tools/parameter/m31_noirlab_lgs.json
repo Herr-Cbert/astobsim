@@ -18,7 +18,7 @@
     5108.66,
     1392.16
   ],
-  "mitte_beleg": "Schwerpunkt der gesaettigten Kernpixel (Gruenkanal >= 250 im Kreis 40 px)",
+  "mitte_beleg": "Schwerpunkt der gesättigten Kernpixel (Grünkanal >= 250 im Kreis 40 px)",
   "bogensekunden_pro_pixel": 4.0,
   "ueberabtastung": 3,
   "leinwand_px": 3200,
@@ -54,8 +54,8 @@
     ],
     "masken_beleg": "M32 (SIMBAD ICRS 00 42 41.82 +40 51 54.6 gegen den M31-Kern 00 42 44.33 +41 16 07.5), Kreis 4'",
     "kode_himmel": 7,
-    "kode_himmel_beleg": "Median des Gruenkanals in den Ecken des Mosaiks ausserhalb 25' von der grossen Achse und 75' von der Mitte",
-    "grenzen": "Kern im Pressebild in allen Kanaelen gesaettigt (Kode 255 innerhalb etwa 30\" auf der grossen Achse), dort zeigt das Bild eine flache Kuppe auf der Hoehe des Profils bei etwa 25\" statt des Anstiegs zur Mitte."
+    "kode_himmel_beleg": "Median des Grünkanals in den Ecken des Mosaiks außerhalb 25' von der großen Achse und 75' von der Mitte",
+    "grenzen": "Kern im Pressebild in allen Kanälen gesättigt (Kode 255 innerhalb etwa 30\" auf der großen Achse), dort zeigt das Bild eine flache Kuppe auf der Höhe des Profils bei etwa 25\" statt des Anstiegs zur Mitte."
   },
   "eichung": {
     "art": "tonkurve",
@@ -66,7 +66,7 @@
   },
   "sterne": {
     "im_bild_entfernen": true,
-    "punktquellen": "Vordergrundsterne der Milchstrasse, helle Einzelobjekte in M31 (Kugelsternhaufen, Ueberriesen) und Rauschspitzen in der schwachen Aussenscheibe",
+    "punktquellen": "Vordergrundsterne der Milchstraße, helle Einzelobjekte in M31 (Kugelsternhaufen, Überriesen) und Rauschspitzen in der schwachen Außenscheibe",
     "fenster_px": 9,
     "schwelle_sigma": 10.0,
     "kontrast": 0.5,
@@ -119,19 +119,19 @@
         22
       ]
     ],
-    "zusaetzlich_beleg": "Kreise (Leinwandpixel) um die Hoefe von neun hellen Vordergrundsternen, deren Fluegel die Maske nicht ganz erfasst (am bereinigten Bild als Ringe sichtbar)"
+    "zusaetzlich_beleg": "Kreise (Leinwandpixel) um die Höfe von neun hellen Vordergrundsternen, deren Flügel die Maske nicht ganz erfasst (am bereinigten Bild als Ringe sichtbar)"
   },
   "hintergrund": "kein Abzug, der Schwarzpunkt des Pressebilds liegt auf dem Himmel (Kode 7 wird 0)",
   "quelle_url": "https://noirlab.edu/public/images/noao-m31lgs_ubvIha/",
   "quelle_datei": "noao-m31lgs_ubvIha.tif (Publication TIFF 10K, 10000x2521 RGB, 8 Bit, Farbprofil sRGB IEC61966-2.1)",
   "mission": "KPNO Mayall 4 m, Local Group Survey",
   "instrument": "Mosaic I, Filter U, B, V, I und H-alpha, zehn Felder; Farbzuordnung laut Bildseite U violett, B blau, V cyan, I orange, H-alpha rot",
-  "aufnahmedatum": "2000/2001 (Local Group Survey, bilder-v2.md 9; Bildseite: Veroeffentlichung 2020-06-30)",
+  "aufnahmedatum": "2000/2001 (Local Group Survey, bilder-v2.md 9; Bildseite: Veröffentlichung 2020-06-30)",
   "lizenz": "CC-BY-4.0",
   "lizenz_url": "https://noirlab.edu/public/copyright/",
   "namensnennung": "Local Group Survey Team and T.A. Rector (University of Alaska Anchorage)",
-  "aenderungsvermerk": "gedreht (Norden oben), Graustufe aus dem Gruenkanal, per Tonkurve gegen ein Flaechenhelligkeitsprofil linearisiert, skaliert, Sterne entfernt",
-  "orientierung": "Himmelsnorden oben, Osten links: AVM der Bildseite 'North is 125.8 deg right of vertical', Bildtext 'rotated CW 127 degrees from North is up, East to the left' (127 ist gerundet oder ungenau, M32 bestaetigt 125,8); geprueft an M32 (Abstand 1452,8\" bei PA 181,1 Grad aus SIMBAD; im Rohbild 1114,1 px bei 125,85 Grad, also 1,304\"/px gegen 1,3057 aus dem Feld 217,62') und an der grossen Achse (Flaechenmomente 37 bis 39 Grad, gespiegelt waeren es 142,5 Grad).",
-  "bearbeitung_kanal": "Graustufe aus dem Gruenkanal: nach der Farbzuordnung der Bildseite traegt er V (cyan) und einen Teil von I (orange), aber kein H-alpha (rot), sodass die HII-Knoten nicht hervortreten (bilder-v2.md 2).",
+  "aenderungsvermerk": "gedreht (Norden oben), Graustufe aus dem Grünkanal, per Tonkurve gegen ein Flächenhelligkeitsprofil linearisiert, skaliert, Sterne entfernt",
+  "orientierung": "Himmelsnorden oben, Osten links: AVM der Bildseite 'North is 125.8 deg right of vertical', Bildtext 'rotated CW 127 degrees from North is up, East to the left' (127 ist gerundet oder ungenau, M32 bestätigt 125,8); geprüft an M32 (Abstand 1452,8\" bei PA 181,1 Grad aus SIMBAD; im Rohbild 1114,1 px bei 125,85 Grad, also 1,304\"/px gegen 1,3057 aus dem Feld 217,62') und an der großen Achse (Flächenmomente 37 bis 39 Grad, gespiegelt wären es 142,5 Grad).",
+  "bearbeitung_kanal": "Graustufe aus dem Grünkanal: nach der Farbzuordnung der Bildseite trägt er V (cyan) und einen Teil von I (orange), aber kein H-alpha (rot), sodass die HII-Knoten nicht hervortreten (bilder-v2.md 2).",
   "hinweise": "Grobes Quellbild: 4\"/px (A-X11), Kern gesaettigt. Flaechentabelle in daten/objekte.json (m31, isophoten) aus demselben Lauf."
 }

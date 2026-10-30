@@ -120,7 +120,7 @@ def erzeuge(roh):
              kommentar="C (YY Gem, 70\") entfaellt (doppelsterne.md 2.2). B-V aus dem Bright Star Catalogue (HR 2891 fuer A, HR 2890 fuer B). " + KOMMENTAR_ORB6),
         dict(id="porrima", name="Porrima (Gamma Virginis)", wds="12417-0127", disc="STF1670", komp="AB", orb="Sca2007c",
              farben=[t("12417-0127", "A"), t("12417-0127", "B")],
-             hinweis="Die beiden Sterne von Porrima umlaufen einander in rund 169 Jahren; 2005 standen sie nur 0,4 Bogensekunden auseinander, gezeigt ist der Abstand fuer 2027.",
+             hinweis="Die beiden Sterne von Porrima umlaufen einander in rund 169 Jahren; 2005 standen sie nur 0,4 Bogensekunden auseinander, gezeigt ist der Abstand für 2027.",
              kommentar=KOMMENTAR_TDSC + " " + KOMMENTAR_ORB6),
         dict(id="zeta_aqr", name="Zeta Aquarii", wds="22288-0001", disc="STF2909", komp="AB", orb="Izm2019",
              farben=[t("22288-0001", "A"), t("22288-0001", "B")],

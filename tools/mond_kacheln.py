@@ -573,19 +573,19 @@ def bildnachweis(frame, geo, stufenliste, qualitaet, gesamt_bytes, nacht):
     pa = f["positionswinkel_achse_grad"]
     kacheltext = (
         f"in Kacheln von {KACHEL_PX} px mit {len(stufenliste)} Stufen zerlegt "
-        f"(WebP, Qualitaet {qualitaet}). Stufe n hat das 2^n-fache Pixelmass von Stufe 0 und ist "
-        f"das Flaechenmittel in linearer Helligkeit (sRGB-Kennlinie IEC 61966-2-1), nach sRGB 8 Bit "
-        f"zurueckkodiert."
+        f"(WebP, Qualität {qualitaet}). Stufe n hat das 2^n-fache Pixelmaß von Stufe 0 und ist "
+        f"das Flächenmittel in linearer Helligkeit (sRGB-Kennlinie IEC 61966-2-1), nach sRGB 8 Bit "
+        f"zurückkodiert."
     )
     rohtext = (f"Rohdatei moon.{frame}.tif: {f['roh_bytes']} Byte, SHA-256 {f['roh_sha256']}, "
                f"abgerufen {f['roh_abruf']}. ")
     komma = lambda x, n=1: f"{x:.{n}f}".replace(".", ",")
     nachttext = (
         f"Nachtseite auf Schwarz gesetzt (Erdlicht wird nicht simuliert, "
-        f"ADR-0003 Nachtrag V2): jedes Pixel mit Sonnenhoehe unter 0 Grad nach der Ephemeride "
+        f"ADR-0003 Nachtrag V2): jedes Pixel mit Sonnenhöhe unter 0 Grad nach der Ephemeride "
         f"(Kugel, Sub-Sonne {komma(f['sub_sonne_breite_grad'], 3)}/{komma(f['sub_sonne_laenge_grad'], 3)} "
-        f"Grad), ausser beleuchteten Gipfeln (lineare Leuchtdichte ab {komma(NACHT_SCHWELLE_Y, 2)}, "
-        f"hoechstens {komma(NACHT_GIPFEL_GRAD, 0)} Grad hinter dem Terminator, mit {NACHT_SAUM_PX} px "
+        f"Grad), außer beleuchteten Gipfeln (lineare Leuchtdichte ab {komma(NACHT_SCHWELLE_Y, 2)}, "
+        f"höchstens {komma(NACHT_GIPFEL_GRAD, 0)} Grad hinter dem Terminator, mit {NACHT_SAUM_PX} px "
         f"Saum); das sind {komma(100 * nacht['anteil_scheibe'])} Prozent der Scheibe und "
         f"{komma(100 * nacht['anteil_fluss'], 2)} Prozent ihres Flusses im Rendering. "
     )
@@ -599,11 +599,11 @@ def bildnachweis(frame, geo, stufenliste, qualitaet, gesamt_bytes, nacht):
         v = f["vorgabe"]
         bearbeitung = (
             f"Quadratischer Ausschnitt {LEINWAND_PX} px um die Scheibenmitte (Pixel {v['mitte_x']}/{v['mitte_y']} "
-            f"des Rohbilds), Alphakanal auf Schwarz gelegt, ausserhalb der Scheibe plus {RAND_PX} px Rand "
+            f"des Rohbilds), Alphakanal auf Schwarz gelegt, außerhalb der Scheibe plus {RAND_PX} px Rand "
             f"auf Schwarz gesetzt. " + nachttext +
             f"Nicht gedreht oder gespiegelt (Himmelsnorden oben laut SVS, "
             f"Positionswinkel der Achse {pa} Grad), Tagseite ohne Farb- oder "
-            f"Kontrastaenderung, " + kacheltext
+            f"Kontraständerung, " + kacheltext
         )
         hinweise = (
             "Rendering, zugelassen als Ausnahme A-X9 (ADR-0002). Winkelgroesse 1774,4\" ist die des "
@@ -617,11 +617,11 @@ def bildnachweis(frame, geo, stufenliste, qualitaet, gesamt_bytes, nacht):
         bearbeitung = (
             f"Quadratischer Ausschnitt {LEINWAND_PX} px um die gemessene Scheibenmitte (Schwerpunkt des "
             f"Alphakanals, Pixel {komma(geo['mess_x'])}/{komma(geo['mess_y'])} des Rohbilds, auf 0,5 px "
-            f"in der Leinwandmitte), Alphakanal auf Schwarz gelegt, ausserhalb der Scheibe plus {RAND_PX} px "
+            f"in der Leinwandmitte), Alphakanal auf Schwarz gelegt, außerhalb der Scheibe plus {RAND_PX} px "
             f"Rand auf Schwarz gesetzt. " + nachttext +
             f"Nicht gedreht "
             f"oder gespiegelt (Himmelsnorden oben laut SVS, Positionswinkel der Achse {pa} Grad), "
-            f"Tagseite ohne Farb- oder Kontrastaenderung, " + kacheltext
+            f"Tagseite ohne Farb- oder Kontraständerung, " + kacheltext
         )
         hinweise = (
             f"Rendering, zugelassen als Ausnahme A-X9 (ADR-0002). Winkelgroesse "
@@ -640,7 +640,7 @@ def bildnachweis(frame, geo, stufenliste, qualitaet, gesamt_bytes, nacht):
         "quelle_url": "https://svs.gsfc.nasa.gov/5587",
         "quelle_datei": f"frames/5760x3240_16x9_30p/plain/moon.{frame}.tif",
         "mission": "LRO / NASA SVS",
-        "instrument": "Rendering aus LOLA-Hoehenmodell und LROC-WAC-Farbmosaik, Ephemeride JPL DE421",
+        "instrument": "Rendering aus LOLA-Höhenmodell und LROC-WAC-Farbmosaik, Ephemeride JPL DE421",
         "aufnahmedatum": f["zeitpunkt_utc"],
         "lizenz": "Public Domain (NASA)",
         "lizenz_url": "https://svs.gsfc.nasa.gov/help/",
