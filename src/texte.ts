@@ -71,7 +71,7 @@ export const TEXTE = {
           titel: "Hipparcos- und Tycho-Kataloge, ESA",
           verwendet:
             "B-V und V von Albireo B aus dem Hipparcos-Hauptkatalog (ESA 1997) und dem Tycho Double Star Catalogue (Fabricius et al. 2002, A&A 384, 180), " +
-            "abgefragt im Hipparcos and Tycho Legacy Archive der ESA; V und B-V von 25 Plejaden-Sternen (M45), abgefragt im Gaia-Archiv",
+            "abgefragt im Hipparcos and Tycho Legacy Archive der ESA; V und B-V von 25 Plejaden-Sternen (M45) und von Theta1 Ori C und D und Theta2 Ori A im Orionnebel (M42), abgefragt im Gaia-Archiv",
           lizenz:
             "„The Hipparcos and Tycho Catalogues are distributed under the CC BY-NC 3.0 IGO licence and the Terms and Conditions " +
             "for the use of these data require users to acknowledge ESA using “Credit: ESA”.“",
@@ -81,7 +81,9 @@ export const TEXTE = {
         },
         {
           titel: "Gaia DR3, ESA",
-          verwendet: "Lage aller 44 Plejaden-Sterne (M45) und V und B-V der 19 Sterne ohne Hipparcos-Wert, umgerechnet nach der Gaia-DR3-Dokumentation 5.5.1",
+          verwendet:
+            "Lage aller 44 Plejaden-Sterne (M45) und V und B-V der 19 Sterne ohne Hipparcos-Wert; Lage der Trapezsterne und von NU Ori im Orionnebel (M42) " +
+            "und V und B-V der Sterne ohne Hipparcos-Wert; Lage, V und B-V von 531 Sternen des Herkuleshaufens (M13); umgerechnet nach der Gaia-DR3-Dokumentation 5.5.1",
           lizenz: "„Gaia data are distributed under the CC BY-NC 3.0 IGO license.“",
           lizenzUrl: "https://creativecommons.org/licenses/by-nc/3.0/igo/",
           danksagung:
