@@ -71,7 +71,7 @@
     "schwelle_sigma": 10.0,
     "kontrast": 0.5,
     "wachsen_sigma": 2.0,
-    "rand_px": 4,
+    "rand_px": 2,
     "zusaetzlich_px": [
       [
         1929.5,
@@ -131,7 +131,7 @@
   "lizenz_url": "https://noirlab.edu/public/copyright/",
   "namensnennung": "Local Group Survey Team and T.A. Rector (University of Alaska Anchorage)",
   "aenderungsvermerk": "gedreht (Norden oben), Graustufe aus dem Gruenkanal, per Tonkurve gegen ein Flaechenhelligkeitsprofil linearisiert, skaliert, Sterne entfernt",
-  "orientierung": "Himmelsnorden oben, Osten links: Bildseite 'North is 125.8 deg right of vertical', 'East to the left'; geprueft an M32 (Abstand 1452,8\" bei PA 181,1 Grad aus SIMBAD; im Rohbild 1114,1 px bei 125,85 Grad, also 1,304\"/px gegen 1,3057 aus dem Feld 217,62') und an der grossen Achse (Flaechenmomente 37 bis 39 Grad, gespiegelt waeren es 142,5 Grad).",
+  "orientierung": "Himmelsnorden oben, Osten links: AVM der Bildseite 'North is 125.8 deg right of vertical', Bildtext 'rotated CW 127 degrees from North is up, East to the left' (127 ist gerundet oder ungenau, M32 bestaetigt 125,8); geprueft an M32 (Abstand 1452,8\" bei PA 181,1 Grad aus SIMBAD; im Rohbild 1114,1 px bei 125,85 Grad, also 1,304\"/px gegen 1,3057 aus dem Feld 217,62') und an der grossen Achse (Flaechenmomente 37 bis 39 Grad, gespiegelt waeren es 142,5 Grad).",
   "bearbeitung_kanal": "Graustufe aus dem Gruenkanal: nach der Farbzuordnung der Bildseite traegt er V (cyan) und einen Teil von I (orange), aber kein H-alpha (rot), sodass die HII-Knoten nicht hervortreten (bilder-v2.md 2).",
   "hinweise": "Grobes Quellbild: 4\"/px (A-X11), Kern gesaettigt. Flaechentabelle in daten/objekte.json (m31, isophoten) aus demselben Lauf."
 }
