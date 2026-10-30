@@ -14,7 +14,7 @@
 import type { Konfiguration, Objektklasse, Objektzustand } from "../naht/konfiguration";
 import type { Fenster, Kern, Punktquelle, Quellbild, Simulationsparameter } from "../naht/simulationsparameter";
 import { arbeitsmassstab, kernbeschreibung, kernSchluessel } from "./arbeitsmassstab";
-import { atmosphaere, seeingstufe } from "./atmosphaere";
+import { type Atmosphaere, atmosphaere, seeingstufe } from "./atmosphaere";
 import { type Aufloesung, aufloesung } from "./aufloesung";
 import { ueberstrahlung } from "./doppelstern";
 import { PhysikFehler, pruefePositiv } from "./fehler";
@@ -158,6 +158,29 @@ function punkteFelder(p: Punktquelle): (number | string)[] {
 }
 
 /**
+ * Hoechstens so viele Pixel der Punktebene je Arbeitspixel und Achse (Issue #145, physik.md
+ * Abschnitt 31). Implementierungsparameter, keine Modellkonstante: mit 5 hat die Punktebene bei
+ * einer Gesamt-FWHM von 2,5 Arbeitspixeln 12,5 Pixel je FWHM, so fein wie das feine Modell der
+ * Validierung (validierung.md 14); der Kern bleibt mit Radius hoechstens 38 unter 81 px.
+ */
+const PUNKT_UEBERABTASTUNG_MAX = 5;
+
+/**
+ * Kern der Punktebene (Issue #145, physik.md Abschnitt 31): dieselbe Gesamt-PSF am Massstab
+ * fenster.breite / punktPx mit punktPx = min(fenster.px, PUNKT_UEBERABTASTUNG_MAX * rasterPx);
+ * undefined, wenn punktPx nicht ueber rasterPx liegt (die Anzeige ist nicht feiner als das
+ * Arbeitsraster). Wiederverwendet wie kern: vorher bei gleichem Schluessel.
+ */
+function punktkernFuer(o: Optik, a: Atmosphaere, aufl: Aufloesung, fenster: Fenster, rasterPx: number, vorher: Kern | undefined): Kern | undefined {
+  const punktPx = Math.min(fenster.px, PUNKT_UEBERABTASTUNG_MAX * rasterPx);
+  if (punktPx <= rasterPx) return undefined;
+  const massstabArcsecProPx = fenster.breiteArcsec / punktPx;
+  const beschreibung = kernbeschreibung(o, a, aufl, massstabArcsecProPx);
+  const gebaut = vorher !== undefined && vorher.schluessel === kernSchluessel(beschreibung) ? vorher : baueKern(beschreibung);
+  return gebaut.massstabArcsecProPx === massstabArcsecProPx ? gebaut : { ...gebaut, massstabArcsecProPx };
+}
+
+/**
  * Wertet eine begrenzte Konfiguration aus. Ist vorher gereicht und der Kernschluessel gleich,
  * wird vorher.kern wiederverwendet, sonst baueKern (1 bis 20 ms). Ohne Kernbau unter 0,1 ms.
  *
@@ -205,6 +228,7 @@ export function auswerten(k: Konfiguration, optionen: Auswertoptionen = {}): Aus
   // Punktquellen ganz ausserhalb des Fensters malt bild nicht, sie bleiben draussen.
   const punkte = punktquellen(k.objekt, o, a, grenzgroesseMag);
   const gemalt = punkte.filter((p) => p.sichtbar && imFenster(p, fenster, massstabArcsecProPx)).flatMap(punkteFelder);
+  const punktkern = gemalt.length > 0 ? punktkernFuer(o, a, aufl, fenster, rasterPx, optionen.vorher?.punktkern) : undefined;
   const quellbild: Quellbild = {
     schluessel: schluessel(
       "quellbild",
@@ -240,7 +264,7 @@ export function auswerten(k: Konfiguration, optionen: Auswertoptionen = {}): Aus
   }
   if (k.objekt.klasse === "sonnensystem") anzeige.mischgewicht = helligkeit.mischgewicht;
   return {
-    parameter: { quellbild, kern, helligkeit, gesichtsfeld: o.gesichtsfeld, fenster },
+    parameter: { quellbild, kern, ...(punktkern !== undefined ? { punktkern } : {}), helligkeit, gesichtsfeld: o.gesichtsfeld, fenster },
     anzeige,
     warnungen: warnungen(o, k.objekt)
   };

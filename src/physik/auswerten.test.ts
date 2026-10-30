@@ -305,6 +305,27 @@ describe("auswerten Version 2: Zustand ohne Quellbild (freies Paar)", () => {
     expect(parameter.quellbild.punkte.schluessel).toContain("farbe|1.09|0.9787|0.9468");
     expect(warnungen).toEqual([]);
   });
+  it("Issue #145: im Zoom ein Punktkern am feineren Massstab, hoechstens fuenffach und hoechstens so fein wie die Anzeige", () => {
+    // 10'' auf 1024 px, Raster 8 px: Punktebene 5 * 8 = 40 px; 10'' auf 20 px: die Anzeige begrenzt auf 20 px.
+    for (const [px, punktPx] of [[1024, 40], [20, 20]] as const) {
+      const p = auswerten(k, { fenster: fenster(10, px) }).parameter;
+      expect(p.quellbild.rasterPx).toBe(8);
+      const pk = p.punktkern!;
+      expect(pk.massstabArcsecProPx).toBe(10 / punktPx);
+      expect(pk.beschreibung).toEqual({ ...p.kern.beschreibung, massstabArcsecProPx: Number((10 / punktPx).toPrecision(4)) });
+      expect(pk.groesse).toBeLessThanOrEqual(81);
+    }
+  });
+  it("Issue #145: kein Punktkern, wenn die Anzeige nicht feiner ist als das Arbeitsraster oder kein Stern im Fenster liegt", () => {
+    expect(parameter.quellbild.rasterPx).toBe(parameter.fenster.px);
+    expect(parameter.punktkern).toBeUndefined();
+    expect(auswerten(k, { fenster: { ...fenster(10, 1024), mitteXArcsec: 500 } }).parameter.punktkern).toBeUndefined();
+  });
+  it("Issue #145: der Punktkern wird ueber vorher wiederverwendet wie der Kern", () => {
+    const erste = auswerten(k, { fenster: fenster(10, 1024) }).parameter;
+    const zweite = auswerten(ad9Mit(k.objekt, { bortle: 7 }), { fenster: fenster(10, 1024), vorher: erste }).parameter;
+    expect(zweite.punktkern).toBe(erste.punktkern);
+  });
   it("Grenzgroesse wie schwelle.ts mit dem Seeing am Objekt (2'' im Zenit, 2,46'' bei 45 Grad)", () => {
     const o = optik(k.geraet);
     const a = atmosphaere(k.bedingungen);
