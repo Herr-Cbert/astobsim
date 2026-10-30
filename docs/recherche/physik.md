@@ -1237,3 +1237,5 @@ Der Rest waechst bis zum Kreisrand weiter (bei 180'' traegt der aeusserste 30''-
 - **D. B und C zusammen.**
 
 **Empfehlung:** D, als eigenes Issue mit ADR-0004-Nachtrag: B allein laesst bei Bortle 3 einen Rest stehen, C allein loest die Fernrohrkante nicht. Bis dahin A. Der Werkzeugteil (Befund 1, `untergrund_kappen`) ist fuer jede Variante mit M43 noetig.
+
+**Entscheidung Herbert (2026-10-30):** In #139 Variante A: nichts umgebaut, `hinweis_hilfe` von M42 nennt die Abweichung, `docs/validierung.md` 11 fuehrt sie als bekannte Abweichung. Variante D ist Issue #143 (Milestone "Spaeter"); die verworfene Umsetzung (Werkzeugoption `untergrund_kappen`, Kreis 180'', Ring 90'') ist dort im Kommentar beschrieben.
