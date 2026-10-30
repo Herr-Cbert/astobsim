@@ -31,6 +31,10 @@ URL-Basis aller Faelle: `https://herr-cbert.github.io/astobsim/`, dahinter der S
 | T6a | `?v=1&g=auge&z=mond_ev&s=2&B` | 63,1'' | Mare 0,398 | [Uebersicht](validierung/T6a-uebersicht.png), [Zoom](validierung/T6a-zoom.png) |
 | T6b | `?v=1&g=auge&z=jup_47&s=2&B` | 63,1'' | - | [Uebersicht](validierung/T6b-uebersicht.png), [Zoom](validierung/T6b-zoom.png) |
 | T6c | `?v=1&g=fernglas-10x50&z=jup_47&s=2&B` | 6,74'' | Baender 0,080 | [Uebersicht](validierung/T6c-uebersicht.png), [Zoom](validierung/T6c-zoom.png) |
+| T12a | `?v=1&R(80,800,10)&z=mond_ev&s=2&B` | - | - | [Uebersicht](validierung/T12a-uebersicht.png), [Zoom](validierung/T12a-zoom.png), [Detail](validierung/T12a-detail.png) |
+| T12b | `?v=1&g=auge&z=jup_47&s=2&B` (wie T6b) | - | - | [Uebersicht](validierung/T12b-uebersicht.png), [Zoom](validierung/T12b-zoom.png) |
+| T12c | `?v=1&g=auge&z=mars_14&s=2&B` | - | - | [Uebersicht](validierung/T12c-uebersicht.png), [Zoom](validierung/T12c-zoom.png) |
+| T12d | `?v=1&g=auge&z=sat_20&s=2&B` | - | - | [Uebersicht](validierung/T12d-uebersicht.png), [Zoom](validierung/T12d-zoom.png) |
 
 T5b mit Seeing 1,5'' ist eine Annahme (A-Q2 nennt fuer Mars 6'' kein Seeing); fuer T4 ist die Vergroesserung 200-fach gewaehlt, fuer T5b 120-fach (1,5 D).
 
@@ -147,6 +151,7 @@ Als Issues angelegt am 2026-10-27, Milestone M3 (Herbert, 2026-10-27):
 | Herbert | 2026-10-28 | A-T3: Firefox funktioniert |
 | Claude | 2026-10-29 | #36: Mondphasen P1 bis P3 (Abschnitt 9); `mond_ev` vereinheitlicht, T3 und T6a geaendert, uebrige T-Bilder byte-gleich mit main 15da6ee |
 | Herbert | 2026-10-29 | #36: Kriterium Maria des Vollmonds mit blossem Auge aufgegeben (Grenze des Modells) |
+| Claude | 2026-10-30 | #111: Anzeigeweiss 8,9 und Punktweiss 6,9 (Entscheidung Herbert), alle T- und P-Bilder neu, T12 erfuellt, T1 bis T6 weiter erfuellt (Abschnitt 13) |
 
 ## 7. Sicherheit (Issue #22)
 
@@ -306,3 +311,35 @@ Sterne plus Restlicht (`docs/recherche/physik.md` 27): 531 Gaia-Mitglieder bis V
 | M6 | `?v=1&g=newton-200-1200&ok=8&z=m13&s=1.5&b=8` | wie M3, aber nur noch 59 Spitzen; der Schimmer hebt sich kaum vom hellen Himmel ab |
 
 Die Spitzen sind grob gezaehlt (lokale Maxima im Gesichtsfeld, mindestens 8 Grauwerte ueber dem Median im 15-px-Fenster) und zaehlen auch Sterne knapp ueber der Schwelle; sie sind kein Vergleich mit Beobachtungen. Vorschlag 4 in `deep-sky.md` 8 erwartet am 200 mm "einige Dutzend bis gut hundert" Sterne und am 80 mm "hoechstens eine Handvoll"; die Simulation zeigt in beiden Faellen mehr. Ob das an der Grenzgroesse des Modells (Abschnitt 19) oder an der Erwartung liegt, ist offen; die Daten (Lage, V) folgen `deep-sky.md` 3.3. Im Zoom ist das Quellbild (Vergleichsbild, linear) fast schwarz, weil es nur das Restlicht traegt; dort stehen die Katalogsterne als Punkte (`architektur.md` 5.7, Vergleichsbild bei Deep-Sky offen). Doppelte Sterne (Bildstern neben Katalogstern) sind in keinem Fall zu sehen; im Restlicht bleiben zwischen 20" und 300" zwei Spitzen heller als V 15 (V 14,6 und 14,7, physik.md 27.3).
+
+## 13. Helligkeit T12 (Issue #111)
+
+Konstanten seit #111: Anzeigeweiss 8,9, Punktweiss 6,9 mag/arcsec$^2$ (Entscheidung Herbert 2026-10-30, ADR-0004 Nachtrag, Varianten in `docs/recherche/helligkeit-v2.md` 1.1). Alle Bilder unter `docs/validierung/` (T1 bis T6, T12, P1 bis P3) sind damit neu erzeugt (SwiftShader, keine Konsolen- oder CSP-Fehler). Messung an der Uebersicht nach `helligkeit-v2.md` 1 (Mittel der sRGB-Kanaele; Himmel = Median der dunkelsten 30 % im Gesichtsfeld; Scheibe = mehr als 15 Kodes ueber dem Himmel; P99 = 99. Perzentil der Scheibe), T4a und T4c zusaetzlich im Zoom. In Klammern der Stand mit 9,2 und 6,4 (main ddeb87b).
+
+| Fall | Himmel | Scheibe Mittel | P99 | Max | auf Weiss begrenzt |
+|---|---|---|---|---|---|
+| T1 | 21 (23) | 124 (130) | 209 (218) | 211 | 0 |
+| T2a / T2b | 21 / 20 | 99 / 91 | 148 / 141 (154 / 148) | 149 / 142 | 0 |
+| T3 | 23 (24) | 145 (151) | 237 (247) | 255 | 0,15 % |
+| T4a | 30 (31) | 156 | 255 | 255 | Zoom 12 % (25 %) |
+| T4b / T4d | 18 (19) | 112 / 135 | 189 / 192 (197 / 199) | 191 / 194 | 0 |
+| T4c | 30 (31) | 191 | 255 | 255 | Zoom 16 % (28 %) |
+| T5a / T5b | 22 / 21 | 130 / 84 | 213 / 160 (222 / 166) | 221 / 163 | 0 |
+| T6a Mond, blosses Auge | 51 (54) | 211 | 255 | 255 | 46 % (49 %) |
+| T6b = T12b Jupiter, blosses Auge | 51 | 102 | 225 | 236 (224) | 0 |
+| T6c Jupiter, 10x50 | 46 (49) | 93 | 212 | 212 | 0 |
+| T12a Mond, 80 mm, 80-fach (AP 1 mm) | 25 (26) | 157 | **253** (255) | 255 | 0,7 % (1,7 %) |
+| T12c Mars 14'', blosses Auge | 51 | 97 | 202 | 212 (199) | 0 |
+| T12d Saturn 20'', blosses Auge | 51 | 86 | 168 | 175 (165) | 0 |
+
+Trabanten (hellstes Pixel ausserhalb der Scheibe): T1 119 (111), T4a 147 (138), T6c 106 (101). Zusatzfaelle aus einer Kopie des Skripts (nicht eingecheckt): Mars 25'' mit blossem Auge 241, Jupiter 35'' 220; Mond am 80 mm P99 182 / 255 / 255 / 255 bei AP 0,5 / 2 / 4 / 6 mm (begrenzt 0 / 16 / 37 / 44 %); M31 mit blossem Auge Kern gegen Himmel 84 / 40 (Bortle 3), 85 / 51 (5), 87 / 67 (7).
+
+**T12:**
+- Mond am 80 mm bei AP 1 mm: hellstes Perzentil 253, nahezu Bildschirmweiss (Lesart "nahezu", Entscheidung Herbert); die Zonen des Hochlands sind weiss, Struktur bleibt sichtbar. **Erfuellt.**
+- Jupiter mit blossem Auge im Kern 236, nahezu weiss; Mars 14'' 212 und Saturn 175 dunkler, die Abstufung folgt der Magnitude (Mars 25'' mit -3,0 mag 241, heller als Jupiter). Mars 14'' liegt 24 Kodes unter Jupiter; mehr laesst die Kubikwurzel bei 1,3 mag Unterschied nicht zu (linear hoechstens 0,67-fach, ber.). **Erfuellt.**
+- Himmel am Fernrohr bei Bortle 5: 18 (AP 0,5 mm) bis 30 (AP 1,5 mm), bei AP 1 mm 25; Prototyp 26 bis 28. Mit blossem Auge 40 / 51 / 67 bei Bortle 3 / 5 / 7 (Prototyp 42 / - / 70). **Erfuellt.**
+- Monotonie in der AP (A-P4): P99 und Mittel des Monds steigen mit der AP. **Erfuellt.**
+
+**T1 bis T6 mit den neuen Konstanten** (Sichtpruefung von T4a, T4c, T12a, T12b; die uebrigen Bilder sind nur heller oder dunkler, die Tabellen-Tests aus Abschnitt 3 haengen nicht an den Konstanten): T4a und T4c zeigen Baender, GRF in seiner Farbe und in T4c die weissen Ovale; in T4a sind die hellen Zonen teils auf Weiss begrenzt (etwa ein Achtel der Scheibe, ADR-0004 erwartete ein Fuenftel). Der Unterschied T4c gegen T4d (mehr Detail bei 300 mm) bleibt deutlich. Urteile wie in Abschnitt 2, alle **erfuellt**.
+
+**Offen, eigene Issues:** das helle Quadrat (etwa 28 x 28 Anzeigepixel, Kante 90 gegen Himmel 51) um unaufgeloeste Planeten mit blossem Auge in T6b und T12b bis T12d (#135); M32 mit blossem Auge als sichtbarer Fleck (#136). Beides haengt nicht an den Konstanten (`helligkeit-v2.md` 1.1, Nebenbefunde).
