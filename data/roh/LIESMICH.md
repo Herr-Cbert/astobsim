@@ -73,3 +73,11 @@ Drei weitere Frames derselben Bildfolge wie `svs5587_moon.6285.tif` (NASA SVS 55
 - `svs5587_moon.6615.tif`: Frame 6615, 03.10.2026 14:00 UT, letztes Viertel (Zustand mond_lv). Phase 49,85 %, Alter 22,44 d, Durchmesser 1936,4", Sub-Erde 1,63/-4,97, Sub-Sonne -88,641/-1,045, Positionswinkel 3,5 Grad. Scheibe gemessen: Mitte 2878,83/1620,08, Flaechendurchmesser 3004,3 px (0,6446"/px). 11993450 Byte, SHA-256 `3624dd84f049493d2a537264bf61b2dd9cd527b79f2bbd7b41d2eba105137d7f`. Nach `daten/bilder/mond_lv/`, Bildnachweis `mond_svs5587_6615`.
 
 Der Massstab des Renderings ist konstant: Durchmesser der Tabelle geteilt durch den gemessenen Flaechendurchmesser ergibt bei allen vier Frames 0,6443 bis 0,6445"/px (bei 6285: 1774,4 / 2753,8 = 0,6443; dort verwendet `mond_ev` weiter die Vorgabe 2758 px mit 0,643"/px).
+
+## M31 (Issue #106)
+
+Im Unterordner `m31/` (im Worktree ein Symlink auf `data/roh/m31/` des Hauptrepos), abgerufen 2026-10-29.
+
+- `m31/noao-m31lgs_ubvIha_10k.tif`: NOIRLab noao-m31lgs_ubvIha "Panorama of Spiral Galaxy, M31", Publication TIFF 10K. https://storage.noirlab.edu/media/archives/images/publicationtiff10k/noao-m31lgs_ubvIha.tif (Seite https://noirlab.edu/public/images/noao-m31lgs_ubvIha/), 10000x2521 RGB, 8 Bit, Kompression 5 (LZW), Farbprofil sRGB IEC61966-2.1, 31329224 Byte, SHA-256 `c37531e4123eaaf19c0fe8fdb0536c8ac8a6e83fe04fb1b80125195856ebd177`. Lizenz CC BY 4.0, Credit "Local Group Survey Team and T.A. Rector (University of Alaska Anchorage)". Feld 217,62' x 54,87' (1,3057"/px), "North is 125.8 deg right of vertical", "East to the left"; Filter U violett, B blau, V cyan, I orange, H-alpha rot (Bildseite). Kern in allen Kanaelen gesaettigt (Kode 255 innerhalb etwa 30"), Mosaikraender schwarz (alle Kanaele 0). Verarbeitet durch `tools/deep_sky_aufbereiten.py` mit `tools/parameter/m31_noirlab_lgs.json`.
+- `m31/seite.html`: Bildseite wie oben (Beschreibung, Credit, Koordinaten, Farbzuordnung), 88421 Byte, SHA-256 `fb1610f15d26aa04792b5eaf000c40b05d2951742744da5fbe86c5aeec447785`.
+- `m31/copyright.html`: https://noirlab.edu/public/copyright/ (CC BY 4.0, Bedingungen), 71196 Byte, SHA-256 `cfc65e64eb0dd14b11d485f4e51e51bab3a944287a59989591c8b9469b25ad25`.

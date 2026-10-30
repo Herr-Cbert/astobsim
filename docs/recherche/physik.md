@@ -979,3 +979,41 @@ Dabei ist $\rho$ der Abstand zur Kernmitte in Arbeitspixeln und $r$ der Kernradi
 **Warum ein cos²-Fenster.** Ein groesserer Radius allein verschiebt die Kante nur, weil die Kubikwurzel jeden Randwert sichtbar macht. Die Alternative $k' = \max(0, k - k_\text{Rand})$ geht nur linear gegen 0, unter der Kubikwurzel also wie $d^{1/3}$ (bei 10 % der Strecke noch 46 % des Werts). Das cos²-Fenster geht quadratisch gegen 0, also wie $d^{2/3}$ (bei 10 % noch 21 %). Der Halo laeuft damit sichtbar weich aus.
 
 **Grenzen.** Die Punktquellen verlieren Licht jenseits von etwa 2 Gesamt-FWHM an den Kern innen. Das ist dieselbe Groessenordnung, die der harte Schnitt bei 3 FWHM ohnehin abschneidet. Das Fenster ist ein Darstellungsfenster, keine Physik. Die Flaeche (Falter JS und WebGL2) faltet weiter mit dem unveraenderten Kern. Trabanten gehen ebenfalls durch die Punktebene; ihre Werte aendern sich deshalb in T1, T2, T4 und T6 geringfuegig (siehe PR #127).
+
+## 25. Tonkurve eines Pressebilds gegen ein Flaechenhelligkeitsprofil (Issue #106)
+
+**Zweck.** Fuer M31 gibt es kein lineares Archivbild mit belegter Lizenz (`bilder-v2.md` 2); Entscheidung 2 in `docs/recherche/README.md`: das NOIRLab-Pressebild (nichtlinear gestreckt) wird per Tonkurve gegen das Profil aus `deep-sky.md` 1.2 zurueckgerechnet. Umgesetzt in `tools/deep_sky_aufbereiten.py` (`tonkurve_aus_profil`, `tonkurve_anpassen`, `tonkurve_anwenden`), Parameter `tools/parameter/m31_noirlab_lgs.json`.
+
+**Modell.** Sersic-Bulge plus exponentielle Scheibe wie `deep-sky.md` 1.2, ausserhalb der grossen Achse mit eigenen Achsenverhaeltnissen (Annahme aus `deep-sky.md` 1.2: $q_b$ = 0,8, $q_d$ = 0,27):
+
+$$\mu(u, v) = -2{,}5\log_{10}\!\left[10^{-0{,}4\,\mu_e}\, e^{-b_n\left((r_b/R_e)^{1/n}-1\right)} + 10^{-0{,}4\,\mu_0}\, e^{-r_d/R_d}\right],\quad r_b = \sqrt{u^2 + (v/q_b)^2},\ r_d = \sqrt{u^2 + (v/q_d)^2}$$
+
+mit $u$, $v$ dem Abstand auf grosser und kleiner Achse und den Werten aus `daten/objekte.json` (`profil`, eine Quelle fuer Werkzeug und Daten). Auf der grossen Achse ($v$ = 0) trifft die Formel die Tabelle in `deep-sky.md` 1.2 auf 0,05 mag (Test `test_modell_wie_deep_sky_tabelle`).
+
+**Tonkurve (Rechenweg, eigene Festlegung).**
+1. Ringe auf der grossen Achse (PA 37,5 Grad, am Bild gemessen): Kanten 0 bis 200'' fest, dann 30 geometrische Ringe bis 6500''; Streifen $|v| < \max(10'', 0{,}03\,r_1)$, beide Seiten, M32 (Kreis 4') ausgenommen.
+2. Je Ring der Median des Kodes $g_i$ und der Median des Modells $\mu_i$ (Mediane, damit Sterne, Staubbaender und HII-Knoten das Paar nicht verschieben).
+3. Ringe mit gleichem Kode werden gemittelt; ueber fallendem Kode wird $\mu$ isoton steigend gemacht (Pool Adjacent Violators); Kodes mit danach gleichem $\mu$ werden ein Knoten. Ergebnis: Knoten $(g_k, \mu_k)$ mit streng fallendem $\mu$ (M31: 38 Knoten von Kode 10 bei 24,63 bis Kode 255 bei 16,22).
+4. Zwischen den Knoten ist $\mu$ linear in $g$; ueber dem hellsten Knoten gilt dessen $\mu$ (Saettigung); unter dem dunkelsten Knoten ist die Helligkeit linear in $g$ bis 0 beim Schwarzpunkt $g_0$ (Himmel des Pressebilds, M31: Kode 7, Median der Mosaikecken):
+$$L(g) = 10^{-0{,}4\,\mu_\mathrm{min}}\ \frac{g - g_0}{g_\mathrm{min} - g_0}\quad (g_0 < g < g_\mathrm{min}),\qquad L(g) = 0\quad (g \le g_0).$$
+5. Pixel $\to L(g)$ in absoluten Einheiten $10^{-0{,}4\mu}$, dann wie bei den FITS-Bildern ausrichten, auf 4''/px mitteln, Sterne entfernen, log-kodieren. Quellweiss `mag_hell` ist das hellste Pixel dieser Werte (`eichung.art` "tonkurve"); eine Eichung auf $V_T$ entfaellt, sie dient als Probe.
+
+**Restfehler (gerechnet, Lauf vom 2026-10-30, Sternentfernung nach Review M1 mit `rand_px` 2).** Am fertigen Bild (dekodiertes WebP, 4''/px, sternbereinigt), Streifen auf der grossen Achse bei PA 37,5 Grad mit halber Breite $\max(12'', 3\,\%\,r)$, Ring $\pm\max(6'', 5\,\%\,r)$ um $r$; Median beider Seiten, in Klammern das Mittel, darunter die Seiten einzeln (Median):
+
+| $r$ | 0,5' | 1' | 2' | 5' | 10' | 20' | 30' | 45' | 60' | 80' | 95' |
+|---|---|---|---|---|---|---|---|---|---|---|---|
+| Modell | 16,72 | 17,25 | 17,97 | 19,23 | 20,21 | 21,01 | 21,51 | 22,18 | 22,85 | 23,74 | 24,40 |
+| Bild - Modell | -0,50 (-0,39) | -0,12 (-0,08) | +0,02 (+0,02) | 0,00 (-0,02) | +0,01 (-0,01) | 0,00 (0,00) | +0,03 (+0,04) | -0,12 (-0,17) | +0,07 (+0,06) | -0,04 (-0,10) | -0,03 (+0,01) |
+| nur NO | -0,48 | -0,14 | +0,02 | -0,03 | +0,04 | -0,04 | -0,01 | -0,19 | 0,00 | -0,25 | -0,14 |
+| nur SW | -0,50 | -0,11 | +0,02 | 0,00 | -0,06 | +0,03 | +0,06 | -0,05 | +0,14 | +0,14 | +0,22 |
+
+Bei PA 35 Grad (RC3) dieselben Werte auf 0,08 mag. Innerhalb von 1' liegt der Fehler am gesaettigten Kern: alle drei Kanaele des Pressebilds stehen innerhalb etwa 30'' auf Kode 255, das Bild hat dort eine flache Kuppe bei 16,22 statt des Anstiegs auf 15,4 (Modell) bzw. 13 bis 14 (Kern, `deep-sky.md` 1.2). Die Ringe der Anpassung selbst (1,3''/px) treffen das Modell zwischen 40'' und 6500'' per Konstruktion (Abweichung 0,00). Je Seite liegt das fertige Bild ab 2' zwischen -0,25 (NO, 80') und +0,22 mag (SW, 95'); das Review mass mit anderer Ringbreite -0,26 (NO, 45') und +0,33 (SW, 95'). Die Seitenabweichung ist also bis etwa 0,3 mag.
+
+**Proben (gerechnet).**
+- Kleine Achse (nicht angepasst), gegen das 2D-Modell an denselben Pixeln: -0,51 bis +0,25 mag bis 283'' (Ring in Einheiten der grossen Achse, $|v| = r\,q_d$; das Bulge-Achsenverhaeltnis 0,8 ist angenommen), +0,04 bis +0,48 mag von 283'' bis 4086'' (die Scheibe ist auf der kleinen Achse schwaecher als mit $q$ = 0,27); darueber +0,65, +1,09 und dann kein Licht mehr (Mosaikkante und Schwarzpunkt).
+- Gesamthelligkeit, **Konsistenzprobe Modell gegen Bild, keine unabhaengige Probe**: $V_T$ steckt ueber $\mu_0$ = 20,2 schon im Profil (an RC3 angepasst, `deep-sky.md` 1.2). Bild vor der Sternentfernung 3,266 mag, nach der Sternentfernung (dekodiertes WebP) 3,422 mag; Modell 3,34, RC3 3,44. Die Sterne (Vordergrund und helle Objekte in M31) tragen also 0,16 mag; das Bild endet an der Mosaikkante und ist im Kern gesaettigt.
+- Flaechentabelle gegen das unverschmierte Modell bei 4''/px, alle Zeilen von 17,0 bis 22,5 mag/arcsec$^2$: Verhaeltnis der Flaechen 0,83 (20,8) bis 1,38 (17,2, Rand der gesaettigten Kuppe); unter 17,0 bis 3,2 (gesaettigter Kern). In der Zone, die fuer die Sichtbarkeit mit blossem Auge zaehlt (Scheitel der Reserve bei Bortle 3 und 5, `docs/validierung.md` 10), 21,3 / 21,4 / 21,5 / 21,6: 1,10 / 1,17 / 1,20 / 1,15 (Ring bei 10 kpc, im Modell nicht enthalten). Die Tabelle endet bei 22,7, vor der ersten Isophote, die mehr als 1 % der Mosaikkante erreicht (`flaechentabelle(..., rand_maske)`).
+
+**Mosaikkante (Review S1, offen).** Das Mosaik reicht auf der Seite mit negativem $v$ nur 12' bis 16' von der grossen Achse; im Anblick am 80 mm bei 16-fach und Bortle 3 ist die Treppe der Mosaikfelder sichtbar. Die groesste Ellipse um die Mitte mit $q$ = 0,27 und PA 37,5 Grad, die ganz im Mosaik liegt, hat nur 51,8' grosse Halbachse (Option `ellipse` im Werkzeug, gerechnet). Mit ihr endet die Flaechentabelle bei 21,4, die Gesamthelligkeit faellt auf 3,68, M32 (24' suedlich) faellt weg, und der Anblick zeigt eine harte Ellipse von 104' statt der Treppe. Deshalb ist die Option fuer M31 nicht eingeschaltet (Entscheidung Herbert 2026-10-30: Treppe bleibt, Hinweis ueber `hinweis_hilfe`).
+
+**Grenzen.** Die Tonkurve ist eine Funktion des Kodes allein. Wo das Pressebild lokal anders gestreckt ist (Mosaikfelder, lokale Kontrastverstaerkung), bleibt der Fehler; die Seitenunterschiede oben (bis etwa 0,3 mag) sind die Obergrenze dafuer zusammen mit echter Asymmetrie. Das Profil selbst ist auf Faktor 1,5 in der Ausdehnung unsicher (`deep-sky.md` 9 Punkt 1); die Tonkurve uebertraegt diese Unsicherheit unveraendert ins Bild.
