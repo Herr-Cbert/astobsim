@@ -32,7 +32,7 @@
         "weiss_mag_arcsec2": 3.99,
         "entfernung_au": 0.00257,
         "bild": "mond_svs5587_6173",
-        "hinweis_hilfe": "Die Nachtseite bleibt schwarz: das aschgraue Erdlicht, das man bei schmaler Sichel schon mit blossem Auge sieht, simuliert astobsim nicht.",
+        "hinweis_hilfe": "Die Nachtseite bleibt schwarz: das aschgraue Erdlicht, das man bei schmaler Sichel schon mit bloßem Auge sieht, simuliert astobsim nicht.",
         "kommentar": "Issue #36. Bild NASA SVS 5587 Frame 6173 (15.09.2026 04:00 UT, Alter 4,0 d, bilder-v2.md 8.2), Nachtseite geschwaerzt (bilder.json, bearbeitung). Winkelgroesse wie mond_ev der Jahrbuch-Mittelwert (Quellbild 1814,9 Bogensekunden). phase, phasenwinkel_grad (aus k = (1 + cos i) / 2, objekte.md 2.1) und kolongitude_grad gehoeren zum Bild. magnitude nach Krisciunas und Schaefer 1991, Gl. 9 (physik.md 23), weiss_mag_arcsec2 darauf geeicht (objekte.md 5.3, Nachtrag #36)."
       },
       {
@@ -62,7 +62,7 @@
         "weiss_mag_arcsec2": 3.48,
         "entfernung_au": 0.00257,
         "bild": "mond_svs5587_6615",
-        "hinweis_hilfe": "Im letzten Viertel ist bei Norden oben die linke Haelfte beleuchtet, die Seite zur Sonne; der Mond geht etwa um Mitternacht auf und steht bei Sonnenaufgang im Sueden.",
+        "hinweis_hilfe": "Im letzten Viertel ist bei Norden oben die linke Hälfte beleuchtet, die Seite zur Sonne; der Mond geht etwa um Mitternacht auf und steht bei Sonnenaufgang im Süden.",
         "kommentar": "Issue #36. Bild NASA SVS 5587 Frame 6615 (03.10.2026 14:00 UT, erste Stunde unter 50 Prozent nach Vollmond, bilder-v2.md 8.2), Nachtseite geschwaerzt (bilder.json, bearbeitung). Winkelgroesse wie mond_ev der Jahrbuch-Mittelwert (Quellbild 1936,4 Bogensekunden). phase, phasenwinkel_grad und kolongitude_grad gehoeren zum Bild. magnitude nach Krisciunas und Schaefer 1991, Gl. 9 (physik.md 23), weiss_mag_arcsec2 darauf geeicht (objekte.md 5.3, Nachtrag #36)."
       }
     ]
@@ -162,7 +162,7 @@
             "magnitude": 6.3
           }
         ],
-        "hinweis_hilfe": "Jupiter steht bei 35 Bogensekunden fern der Opposition, etwa vier Monate davor oder danach; so zeigt er sich den groessten Teil des Jahres.",
+        "hinweis_hilfe": "Jupiter steht bei 35 Bogensekunden fern der Opposition, etwa vier Monate davor oder danach; so zeigt er sich den größten Teil des Jahres.",
         "kommentar": "Werte aus objekte.md 6.1, Phasenwinkel 10 Grad aus 5.1 (Phaseneffekt vernachlaessigbar). Trabanten aus 3.3: Stellung von jup_47 linear mit 35/47 skaliert, Durchmesser aus objekte.md 3.2, Magnituden +0,6 mag Entfernungskorrektur (3.1). Kein eigenes Bild: nutzt das Bild von jup_47 (Hubble 2019, 45,65\", bilder.json); die Anwendung skaliert die Scheibe auf 35\". weiss_mag_arcsec2 auf den Pixelwert 1,0 geeicht (objekte.md 5.3, bis #71: 5,4 aus 5.2)."
       },
       {
@@ -517,7 +517,7 @@
             "quelle_farbe": "TDSC"
           }
         ],
-        "hinweis_hilfe": "Die beiden Sterne von Porrima umlaufen einander in rund 169 Jahren; 2005 standen sie nur 0,4 Bogensekunden auseinander, gezeigt ist der Abstand fuer 2027.",
+        "hinweis_hilfe": "Die beiden Sterne von Porrima umlaufen einander in rund 169 Jahren; 2005 standen sie nur 0,4 Bogensekunden auseinander, gezeigt ist der Abstand für 2027.",
         "kommentar": "B-V aus dem TDSC (Fabricius et al. 2002) umgerechnet mit B-V = 0,850 (BT - VT), ESA 1997 Bd. 1 Gl. 1.3.20 (physik.md 21). Credit: ESA. Trennung und Positionswinkel aus der ORB6-Ephemeride 2027,0 (USNO), Magnituden aus dem WDS, Abruf 2026-10-29. Lage nach A-Z9: Mitte im Ursprung, A bei -rho/2 (links, bei Norden oben Osten), B bei +rho/2 (rechts, Westen), dy = 0."
       }
     ]
@@ -1193,7 +1193,7 @@
           { "mag_arcsec2": 22.6, "flaeche_arcsec2": 8907040.0 },
           { "mag_arcsec2": 22.7, "flaeche_arcsec2": 9515600.0 }
         ],
-        "hinweis_hilfe": "Die Bildvorlage ist ein Mosaik aus zehn Feldern und endet an einer gestuften Kante; ausserhalb fehlt die schwache Aussenscheibe. Bei kleiner Vergroesserung und dunklem Himmel kann diese Kante als Treppe sichtbar sein. Der Kern ist in der Vorlage ueberbelichtet und erscheint deshalb flach.",
+        "hinweis_hilfe": "Die Bildvorlage ist ein Mosaik aus zehn Feldern und endet an einer gestuften Kante; außerhalb fehlt die schwache Außenscheibe. Bei kleiner Vergrößerung und dunklem Himmel kann diese Kante als Treppe sichtbar sein. Der Kern ist in der Vorlage überbelichtet und erscheint deshalb flach.",
         "kommentar": "Grosse Achse D25 aus RC3 log D25 = 3,28 (11432\"), kleine Achse aus log R25 = 0,49 (3700\"), Positionswinkel 35 Grad und V_T 3,44 aus RC3 (deep-sky.md 1.1); im Quellbild liegt die grosse Achse bei 37 bis 39 Grad, der Wert bleibt bei RC3 (Entscheidung Herbert 2026-10-30). Quellbild NOIRLab-Pressebild (Local Group Survey), Gruenkanal, per Tonkurve gegen profil zurueckgerechnet (tools/deep_sky_aufbereiten.py, Restfehler docs/recherche/physik.md 25); Quellweiss ist kennlinie.mag_hell in bilder.json. Die Gesamthelligkeit des dekodierten Bilds (3,42) folgt aus Profil und Tonkurve, ist aber keine unabhaengige Probe: mu0 = 20,2 ist an RC3 angepasst (deep-sky.md 1.2). Kern im Pressebild gesaettigt (flache Kuppe innerhalb etwa 30\"). isophoten aus demselben Lauf am dekodierten, sternbereinigten Bild; die Tabelle endet vor der ersten Isophote, die mehr als 1 Prozent der Mosaikkante erreicht (22,7). M32 bleibt im Bild (deep-sky.md 1.3), M110 liegt ausserhalb des Mosaiks."
       }
     ]
@@ -1272,7 +1272,7 @@
           { "mag_arcsec2": 19.5, "flaeche_arcsec2": 1037021.0 }
         ],
         "sterne_datei": "m42.json",
-        "hinweis_hilfe": "Die Bildvorlage des Orionnebels hat 1 Bogensekunde pro Pixel und zeigt 27 Bogenminuten um das Trapez. Der Nebel reicht ueber diesen Ausschnitt hinaus; bei kleiner Vergroesserung kann seine Kante als helleres Quadrat sichtbar sein, bei hoher Vergroesserung begrenzt die Vorlage die Detailtiefe.",
+        "hinweis_hilfe": "Die Bildvorlage des Orionnebels hat 1 Bogensekunde pro Pixel und zeigt 27 Bogenminuten um das Trapez. Der Nebel reicht über diesen Ausschnitt hinaus; bei kleiner Vergrößerung kann seine Kante als helleres Quadrat sichtbar sein, bei hoher Vergrößerung begrenzt die Vorlage die Detailtiefe.",
         "kommentar": "Quellbild: lineares V-Bild aus 22 WFI-Rohaufnahmen des ESO-Archivs (MPG/ESO 2,2 m, 02. und 03.01.2005), gestapelt von tools/m42_wfi_stapeln.py, Ausschnitt 1600\" x 1600\" (26,7') um Theta1 Ori C bei 1\"/px; das ist das groesste Quadrat um C, das ganz in den Daten liegt (nach Norden und Osten endet das WFI-Feld 800\" von C). Verworfen (PR #132): Leinwand und Objektmitte auf der Mitte des WFI-Felds (32'), weil das Trapez bei 150-fach am Rand stand und die App keinen Bildversatz kennt. winkelgroesse_arcsec und polar_arcsec sind dieser Ausschnitt, nicht die Ausdehnung 65' x 60' der Literatur (deep-sky.md 2.1). Quellweiss kennlinie.mag_hell aus dem photometrischen Nullpunkt des Stapels (168 Gaia-Feldsterne, Apertur 8\", physik.md 26), nicht aus der Gesamthelligkeit. magnitude 2,26 ist wie bei M45 und M13 die Gesamthelligkeit aus Bild und Katalogsternen (Entscheidung Herbert 2026-10-30, vorher 2,51); der Gesamtfluss des dekodierten, sternbereinigten Bilds ist 2,55 (tools/quellweiss_eichen.py, innerhalb 0,05 mag), mit den neun Sternen 2,26. Die Literatur nennt V 4,0 fuer 65' x 60' (Sekundaerquelle); die Gegenprobe mit O'Dell und Harris 2010 trifft innerhalb 2,5' um das Trapez auf 0,02 mag, weiter aussen ist das Bild 0,3 bis 0,7 mag schwaecher (offen, physik.md 26). Das Trapez samt Beugungsspikes ist im Bild durch einen Kreis von 20\" aus der Umgebung ersetzt, der Kern dort also flach (etwa 14,7 mag/arcsec^2; akzeptiert). isophoten aus demselben Lauf, Ende bei 19,5 mag/arcsec^2, weil die naechste Isophote den Bildrand erreicht. Sterne: Theta1 Ori A bis F, Theta2 Ori A, B und NU Ori aus Gaia DR3 und Hipparcos (daten/sterne/m42.json, tools/m42_sterne.py, CC BY-NC 3.0 IGO); E und F bis 1,5 mag unsicher."
       }
     ]
