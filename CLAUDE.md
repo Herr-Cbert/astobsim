@@ -4,7 +4,7 @@ Simulation des Anblicks von Himmelsobjekten durch ein Fernrohr unter gegebenen B
 
 ## Arbeitsweise
 
-- Antworten, Kommentare, Bezeichner, Dokumente und Commit-Messages auf Deutsch. Keine Umlaute im Code und in Dateinamen (ae, oe, ue, ss). Ausnahme: Oberflaechentexte in `src/texte.ts` mit echten Umlauten (UTF-8); Bezeichner, Kommentare und Dateinamen bleiben ASCII.
+- Antworten, Kommentare, Bezeichner, Dokumente und Commit-Messages auf Deutsch. Keine Umlaute im Code und in Dateinamen (ae, oe, ue, ss). Ausnahme: Oberflaechentexte mit echten Umlauten (UTF-8), und zwar in `src/texte.ts` und die in der Oberflaeche sichtbaren Datentexte: Namen (Objekte, Zustaende, Geraete), `hinweis_hilfe` in `daten/objekte.json`, in `daten/bilder.json` `mission`, `instrument`, `aufnahmedatum`, `bearbeitung` und der Bearbeitungsvermerk hinter "; bearbeitet:" in `namensnennung` (die Credit-Zeile Dritter davor bleibt woertlich), dazu die String-Literale in `tools/` und `tools/parameter/`, aus denen diese Texte entstehen. Bezeichner, Schluessel, Kommentare, Dateinamen und nicht angezeigte Felder (`kommentar`, `hinweise`) bleiben ASCII. Pruefung: `src/daten/umlaute.test.ts`.
 - Das Projekt folgt dem Phasenplan in `docs/prozess.md`. Vor dem Umsetzen pruefen, in welcher Phase das Projekt steht (siehe `README.md`, Abschnitt Stand).
 - Jede Phase beginnt im Plan-Modus. Ergebnis jeder Phase ist eine Datei in `docs/`.
 - Anforderungen: `docs/anforderungen.md`. Begriffe: `GLOSSARY.md` (verbindlich fuer Bezeichner). Architekturentscheidungen: `docs/adr/`. Modulschnitt: `docs/architektur.md`. Recherche mit Formeln und Quellen: `docs/recherche/`.
