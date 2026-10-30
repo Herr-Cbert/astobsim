@@ -8,7 +8,8 @@ docs/recherche/physik.md 22 (V und B-V aus Gaia). Zwei Abfragen im Gaia-Archiv (
     - Hipparcos (ESA 1997, public.hipparcos) im Kegel 0,1 Grad.
 
 Sterne: Theta1 Ori A bis F (Trapez) und Theta2 Ori A und B (deep-sky.md 2.2: "Theta2 B
-ergaenzen, wenn das Quellbild die Gegend zeigt"; das WFI-Bild zeigt sie). Zuordnung fest ueber
+ergaenzen, wenn das Quellbild die Gegend zeigt"; das WFI-Bild zeigt sie), dazu NU Ori, der
+ionisierende Stern von M43 (aus den Gaia-Feldsternen von m42_wfi_stapeln.py, V aus Gaia). Zuordnung fest ueber
 die Gaia-Kennung (STERNE), geprueft gegen die WDS-Abstaende (WDS_PROBE, 0,5''). Helligkeit:
 Hipparcos fuer C, D und Theta2 A; Gaia (G, BP-RP, physik.md 22) fuer A (Hipparcos zaehlt dort
 C mit), B, F und Theta2 B; E aus dem WDS (11,1; Gaia ergaebe 10,06, deep-sky.md 2.2). B-V aus
@@ -17,7 +18,8 @@ und die hellen Nachbarn in 4,5'' gestoert (BP/RP-Ueberschuss 1,43), beide sind b
 unsicher.
 
 Lage: dx positiv nach Westen (Norden oben, Osten links wie im Bild, Naht +x rechts), dy nach
-Norden, relativ zu Theta1 Ori C (Gaia DR3, Epoche 2016,0); die Tabelle in deep-sky.md 2.2 hat
+Norden, in der Tangentialebene um die Objektmitte (Mitte des WFI-Felds, MITTE_*; Gaia DR3,
+Epoche 2016,0); die Tabelle in deep-sky.md 2.2 hat
 dx noch mit dem alten Vorzeichen (Osten positiv) und wird hier nicht uebernommen.
 
 Aufruf aus dem Repo-Root:
@@ -40,8 +42,12 @@ import urllib.request
 
 from m45_sterne import LIZENZ, TAP_URL, bv_aus_bprp, lies_csv, mit_komma, v_aus_gaia
 
-MITTE_RA_GRAD = 83.81861966629604   # Theta1 Ori C, Gaia DR3 3017364063330718080
-MITTE_DEC_GRAD = -5.389696084726389
+# Objektmitte = Mitte der Leinwand: Mitte des WFI-Felds (Mittel der Pointierungen der 280-s-Aufnahmen,
+# auf 0,0005 Grad gerundet), nicht Theta1 Ori C, damit das Bild das ganze WFI-Feld nutzt (Entscheidung
+# Herbert zu PR #132). tools/m42_wfi_stapeln.py nimmt dieselbe Mitte.
+MITTE_RA_GRAD = 83.7585
+MITTE_DEC_GRAD = -5.4580
+FELD_DATEI = "m42_feld_gaiadr3.csv"  # Gaia-DR3-Feldsterne aus tools/m42_wfi_stapeln.py (NU Ori)
 
 ABFRAGEN = {
     "m42_trapez_gaiadr3.csv": (
@@ -56,6 +62,8 @@ ABFRAGEN = {
 }
 
 ROHDATEN = {
+    FELD_DATEI: {"bytes": 287700, "abruf": "2026-10-29",
+                 "sha256": "5604007a7468574a1c31ded1ecb1a4c35e10d538b106fd503121f6ca78048119"},
     "m42_trapez_gaiadr3.csv": {"bytes": 4804, "abruf": "2026-10-29",
                                "sha256": "0163cfc6bd84604ac6f0f0d9bd3535fe50b186e67d8137ada08e8565ea17b1df"},
     "m42_trapez_hipparcos.csv": {"bytes": 249, "abruf": "2026-10-29",
@@ -72,6 +80,8 @@ STERNE = [
     ("Theta1 Ori F", "3017364063331140224", None, "GDR3"),
     ("Theta2 Ori A", "3017360936587007616", "26235", "HIP"),
     ("Theta2 Ori B", "3017360833515044480", None, "GDR3"),
+    # NU Ori (HD 37061): ionisierender Stern von M43, Mitglied des Orionnebelhaufens; nur in den Feldsternen
+    ("NU Ori", "3017367396223983616", None, "GDR3"),
 ]
 
 # WDS 05353-0523 (STF 748), Datei wdsweb_summ2.txt (Stand 13.10.2026, Abruf 2026-10-29 fuer #103,
@@ -90,10 +100,14 @@ QUELLE = ("ESA Gaia DR3 (gaiadr3.gaia_source; Gaia Collaboration, Vallenari et a
 
 
 def lage_arcsec(ra, dec):
-    """Offset zu Theta1 Ori C: dx positiv nach Westen, dy nach Norden (deep-sky.md, Kopf)."""
-    dx = -(ra - MITTE_RA_GRAD) * math.cos(math.radians(MITTE_DEC_GRAD)) * 3600.0
-    dy = (dec - MITTE_DEC_GRAD) * 3600.0
-    return dx, dy
+    """Offset zur Objektmitte in der Tangentialebene (wie das Bild, physik.md 26): dx positiv nach Westen
+    (dx = -xi), dy nach Norden (eta)."""
+    a, d = math.radians(ra), math.radians(dec)
+    a0, d0 = math.radians(MITTE_RA_GRAD), math.radians(MITTE_DEC_GRAD)
+    cosc = math.sin(d0) * math.sin(d) + math.cos(d0) * math.cos(d) * math.cos(a - a0)
+    xi = math.cos(d) * math.sin(a - a0) / cosc
+    eta = (math.cos(d0) * math.sin(d) - math.sin(d0) * math.cos(d) * math.cos(a - a0)) / cosc
+    return -math.degrees(xi) * 3600.0, math.degrees(eta) * 3600.0
 
 
 def lade_rohdaten(ordner, pruefen=True):
@@ -106,6 +120,8 @@ def lade_rohdaten(ordner, pruefen=True):
             raise SystemExit(f"{pfad}: Bytes oder SHA-256 weichen von ROHDATEN ab (neu abgerufen?)")
         texte[datei] = roh.decode("utf-8")
     gaia = lies_csv(texte["m42_trapez_gaiadr3.csv"], felder_text=("source_id",))
+    bekannt = {z["source_id"] for z in gaia}
+    gaia += [z for z in lies_csv(texte[FELD_DATEI], felder_text=("source_id",)) if z["source_id"] not in bekannt]
     hip = lies_csv(texte["m42_trapez_hipparcos.csv"], felder_text=("hip", "varflag", "sptype"))
     return gaia, hip
 
@@ -163,18 +179,23 @@ def sternliste(gaia, hip):
     e = next(s for s in sterne if s["name"] == "Theta1 Ori E")
     f = next(s for s in sterne if s["name"] == "Theta1 Ori F")
     gesamt = -2.5 * math.log10(sum(10 ** (-0.4 * round(s["v"], 2)) for s in sterne))
+    c = next(s for s in sterne if s["name"] == "Theta1 Ori C")
     kommentar = (
-        f"Erzeugt von tools/m42_sterne.py aus zwei Abfragen im Gaia-Archiv (Abruf {abrufe}, ADQL und SHA-256 in "
-        "data/roh/LIESMICH.md): Theta1 Ori A bis F (Trapez) und Theta2 Ori A und B (deep-sky.md 2.2). Lage aus "
-        "Gaia DR3 (Epoche 2016,0) relativ zu Theta1 Ori C, dx nach Westen (Norden oben, Osten links), dy nach Norden; "
-        "Probe gegen die WDS-Abstaende von STF 748 auf 0,5''. katalog nennt die Herkunft von V: HIP = Hipparcos (C, D, "
-        "Theta2 A), Gaia DR3 = V aus G und BP-RP (physik.md 22; A, weil Hipparcos dort C mitzaehlt, B, F, Theta2 B), "
-        "WDS fuer E. quelle_farbe: HIP oder GDR3 (BP-RP = f(B-V), Tabelle 5.9, invertiert). Unsicher: E und F bis "
-        f"1,5 mag. E: WDS {mit_komma(e['v'])}, Gaia ergaebe {e['v_gaia']:.2f}".replace(".", ",")
-        + f"; F: Gaia {f['v']:.2f}, WDS 11,5".replace(".", ",")
-        + ". Beide stehen 4,5'' neben A bzw. C im hellsten Nebel; Gaia-BP/RP-Ueberschuss 1,43, also Fremdlicht in "
-        "BP und RP. A (V1016 Ori) und B (BM Ori) sind Bedeckungsveraenderliche, C ist ein enges Paar. "
-        "Summe der Sterne V " + f"{gesamt:.2f}".replace(".", ",") + "."
+        f"Erzeugt von tools/m42_sterne.py aus zwei Abfragen im Gaia-Archiv und den Gaia-Feldsternen von "
+        f"tools/m42_wfi_stapeln.py (Abruf {abrufe}, ADQL und SHA-256 in data/roh/LIESMICH.md): Theta1 Ori A bis F "
+        "(Trapez), Theta2 Ori A und B (deep-sky.md 2.2) und NU Ori (ionisierender Stern von M43, Mitglied des "
+        "Orionnebelhaufens). Lage aus Gaia DR3 (Epoche 2016,0) in der Tangentialebene um die Objektmitte RA "
+        f"{mit_komma(MITTE_RA_GRAD)}, Dec {mit_komma(MITTE_DEC_GRAD)} Grad (Mitte des WFI-Felds und des Bilds; "
+        f"Theta1 Ori C liegt bei dx {mit_komma(round(c['lage'][0], 1))}'', dy {mit_komma(round(c['lage'][1], 1))}''), "
+        "dx nach Westen (Norden oben, Osten links), dy nach Norden; Probe gegen die WDS-Abstaende von STF 748 auf "
+        "0,5''. katalog nennt die Herkunft von V: HIP = Hipparcos (C, D, Theta2 A), Gaia DR3 = V aus G und BP-RP "
+        "(physik.md 22; A, weil Hipparcos dort C mitzaehlt, B, F, Theta2 B, NU Ori), WDS fuer E. quelle_farbe: HIP "
+        f"oder GDR3 (BP-RP = f(B-V), Tabelle 5.9 der Gaia-DR3-Dokumentation, invertiert). Unsicher: E und F bis "
+        f"1,5 mag. E: WDS {mit_komma(round(e['v'], 2))}, Gaia ergaebe {mit_komma(round(e['v_gaia'], 2))}; "
+        f"F: Gaia {mit_komma(round(f['v'], 2))}, WDS 11,5. Beide stehen 4,5'' neben A bzw. C im hellsten Nebel; "
+        "Gaia-BP/RP-Ueberschuss 1,43, also Fremdlicht in BP und RP. A (V1016 Ori) und B (BM Ori) sind "
+        "Bedeckungsveraenderliche, C ist ein enges Paar. Im Bild sind alle Sterne entfernt (keine Doppelzaehlung). "
+        f"Summe der Sterne V {mit_komma(round(gesamt, 2))}."
     )
     return {"objekt": "m42", "quelle": QUELLE, "lizenz": LIZENZ, "kommentar": kommentar,
             "sterne": [eintrag(s) for s in sterne]}

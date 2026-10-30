@@ -97,19 +97,30 @@ class Trapez(unittest.TestCase):
         self.assertGreater(dx, 0)
         self.assertGreater(dy, 0)
 
-    @unittest.skipUnless(os.path.isfile(os.path.join(ROH, "m42_trapez_gaiadr3.csv")), "Rohdaten fehlen")
+    @unittest.skipUnless(os.path.isfile(os.path.join(ROH, "m42_trapez_gaiadr3.csv"))
+                         and os.path.isfile(os.path.join(ROH, "m42_feld_gaiadr3.csv")), "Rohdaten fehlen")
     def test_sternliste_aus_den_rohdaten(self):
         gaia, hip = s.lade_rohdaten(ROH)
         liste = s.sternliste(gaia, hip)
         sterne = {x["name"]: x for x in liste["sterne"]}
-        self.assertEqual(len(sterne), 8)
-        self.assertEqual((sterne["Theta1 Ori C"]["dx_arcsec"], sterne["Theta1 Ori C"]["dy_arcsec"]), (0.0, 0.0))
-        # A liegt nordwestlich von C (WDS AC: PA 132 Grad), D oestlich, Theta2 A suedoestlich
-        self.assertGreater(sterne["Theta1 Ori A"]["dx_arcsec"], 0)
-        self.assertGreater(sterne["Theta1 Ori A"]["dy_arcsec"], 0)
-        self.assertLess(sterne["Theta1 Ori D"]["dx_arcsec"], 0)
-        self.assertLess(sterne["Theta2 Ori A"]["dx_arcsec"], 0)
-        self.assertLess(sterne["Theta2 Ori A"]["dy_arcsec"], 0)
+        self.assertEqual(len(sterne), 9)
+        c = sterne["Theta1 Ori C"]
+        # Objektmitte ist die Mitte des WFI-Felds: C liegt 215" oestlich (dx < 0) und 246" noerdlich
+        self.assertAlmostEqual(c["dx_arcsec"], -215.5, delta=0.5)
+        self.assertAlmostEqual(c["dy_arcsec"], 245.9, delta=0.5)
+
+        def rel(name):
+            return sterne[name]["dx_arcsec"] - c["dx_arcsec"], sterne[name]["dy_arcsec"] - c["dy_arcsec"]
+        # A liegt nordwestlich von C (WDS AC: PA 132 Grad), D oestlich, Theta2 A suedoestlich, NU Ori noerdlich
+        self.assertGreater(rel("Theta1 Ori A")[0], 0)
+        self.assertGreater(rel("Theta1 Ori A")[1], 0)
+        self.assertLess(rel("Theta1 Ori D")[0], 0)
+        self.assertLess(rel("Theta2 Ori A")[0], 0)
+        self.assertLess(rel("Theta2 Ori A")[1], 0)
+        self.assertGreater(rel("NU Ori")[1], 400)
+        # Kommentar ohne Dezimalkomma in Dateinamen (Review PR #132)
+        self.assertIn("tools/m42_sterne.py", liste["kommentar"])
+        self.assertIn("physik.md 22", liste["kommentar"])
         self.assertEqual(sterne["Theta1 Ori C"]["magnitude"], 5.13)
         self.assertEqual(sterne["Theta1 Ori E"]["magnitude"], 11.1)
 

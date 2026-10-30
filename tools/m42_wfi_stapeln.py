@@ -11,9 +11,10 @@ Eingang (data/roh/m42/, gitignored, Herkunft in data/roh/LIESMICH.md):
     - m42_feld_gaiadr3.csv: Gaia DR3 im Kegel 0,36 Grad um die Feldmitte bis G 19,5
       (Astrometrie und Nullpunkt; Abfrage in ABFRAGE_FELD).
 
-Ausgabe: data/roh/m42/m42_wfi_v.fits (float32, eine HDU), Tangentialebene um Theta1 Ori C,
-Norden oben, Osten links, MASSSTAB "/px, Werte ADU/s je Ausgabepixel nach Flat (Einheit wie
-Chip 1), Himmel abgezogen, Kopf mit CD-Matrix und MAGZP (V = MAGZP - 2,5 log10(ADU/s)).
+Ausgabe: data/roh/m42/m42_wfi_v.fits (float32, eine HDU), Tangentialebene um die Mitte des
+WFI-Felds (MITTE_* aus m42_sterne.py), Norden oben, Osten links, MASSSTAB "/px, Werte ADU/s je
+Ausgabepixel nach Flat (Einheit: ADU eines Chips, dessen Flat dem Median ueber alle 8 Chips
+entspricht), Himmel abgezogen, Kopf mit CD-Matrix und MAGZP (V = MAGZP - 2,5 log10(ADU/s)).
 Daraus macht tools/deep_sky_aufbereiten.py mit tools/parameter/m42_wfi_20050102.json das
 WebP (eichung.art "nullpunkt").
 
@@ -33,11 +34,14 @@ Schritte:
        mal Jacobi-Determinante (Chippixel je Quadratbogensekunde) -> ADU/s je
        Quadratbogensekunde; ein ungueltiger Unterpunkt macht das Ausgabepixel ungueltig.
     6. Stapeln je Belichtungszeit (Median, gegen kosmische Strahlung und Chipluecken),
+       beim 3-s-Stapel aus zwei Aufnahmen das Mittel (ein kosmischer Treffer bleibt zur Haelfte;
+       3 s traegt nur die Kerne der hellsten Sterne, die ohnehin entfernt werden),
        dann zusammensetzen: 280 s, wo keine 280-s-Aufnahme gesaettigt ist, sonst 30 s,
        sonst 3 s. Die kuerzeren Stapel werden ueber ihr gemessenes Verhaeltnis im gemeinsamen
        hellen, ungesaettigten Bereich auf den 280-s-Stapel bezogen. Loecher, die in allen
        Belichtungen gesaettigt sind (Kerne der hellsten Sterne), werden aus der Umgebung gefuellt.
-    7. Nullpunkt: Aperturphotometrie (Radius 4", Ring 6" bis 9") an isolierten Gaia-Sternen
+    7. Nullpunkt: Aperturphotometrie (Radius 8", Ring 10" bis 14", ohne Blendenverlust ueber
+       0,005 mag) an isolierten Gaia-Sternen
        mit 14 < V < 17,5 im 280-s-Stapel, V aus G und BP-RP (physik.md 22); Median.
     8. Himmel: Median der Standardsternaufnahme (alle Chips, Sterne ueber Sigma-Clipping
        verworfen; Sonne 19 Grad unter dem Horizont, Mond unter dem Horizont), gleich kalibriert,
@@ -65,6 +69,7 @@ import warnings
 import numpy as np
 
 from deep_sky_aufbereiten import FITS_BLOCK, FITS_KARTE, FITS_TYPEN, _datenbytes, _kopf_lesen
+from m42_sterne import MITTE_DEC_GRAD, MITTE_RA_GRAD
 from m45_sterne import TAP_URL, v_aus_gaia
 
 ROH_STANDARD = "data/roh/m42"
@@ -73,11 +78,10 @@ ESO_DATEI_URL = "https://dataportal.eso.org/dataportal_new/file/"
 PROGRAMM = "273.C-5042(A)"
 FILTER = "BB#V/89_ESO843"
 
-# Mitte: Theta1 Ori C, Gaia DR3 (deep-sky.md 2.2)
-MITTE_RA_GRAD = 83.818620
-MITTE_DEC_GRAD = -5.389696
+# Mitte der Tangentialebene und des Bilds: MITTE_RA_GRAD, MITTE_DEC_GRAD aus m42_sterne.py
+# (Mitte des WFI-Felds, gleich der Objektmitte der Sternliste)
 MASSSTAB = 0.5          # "/px des Stapels
-AUSGABE_PX = 3600       # 30' x 30'
+AUSGABE_PX = 4320       # 36' x 36' (WFI-Feld 34' x 33' plus Dithern)
 UNTERPUNKTE = 2
 EPOCHE = 2005.0
 SAETTIGUNG_ADU = 55000.0
@@ -579,17 +583,17 @@ def nullpunkt(stapel, gaia):
     v = np.array([x if x is not None else np.nan for x in v], float)
     sp = (AUSGABE_PX / 2 - 0.5) - gaia["xi"] / MASSSTAB
     ze = (AUSGABE_PX / 2 - 0.5) - gaia["eta"] / MASSSTAB
-    # Isoliert: kein Gaia-Stern bis 2 mag schwaecher innerhalb 10".
+    # Isoliert: kein Gaia-Stern bis 2 mag schwaecher innerhalb 16".
     isoliert = np.ones(len(v), bool)
     for i in range(len(v)):
         d = np.hypot(gaia["xi"] - gaia["xi"][i], gaia["eta"] - gaia["eta"][i])
-        nah = (d > 0) & (d < 10.0) & (gaia["phot_g_mean_mag"] < gaia["phot_g_mean_mag"][i] + 2.0)
+        nah = (d > 0) & (d < 16.0) & (gaia["phot_g_mean_mag"] < gaia["phot_g_mean_mag"][i] + 2.0)
         isoliert[i] = not nah.any()
     # Saubere Farbe: BP/RP-Ueberschuss nahe am Erwartungswert (Riello et al. 2021, grob), RUWE < 1,4.
     x = gaia["bp_rp"]
     sauber = (gaia["phot_bp_rp_excess_factor"] < 1.3 + 0.06 * x ** 2) & (gaia["ruwe"] < 1.4)
     wahl = np.isfinite(v) & (v > 14.0) & (v < 17.5) & isoliert & sauber
-    fluss, hg = aperturphotometrie(stapel, sp[wahl], ze[wahl], 4.0 / MASSSTAB, 6.0 / MASSSTAB, 9.0 / MASSSTAB)
+    fluss, hg = aperturphotometrie(stapel, sp[wahl], ze[wahl], 8.0 / MASSSTAB, 10.0 / MASSSTAB, 14.0 / MASSSTAB)
     ok = np.isfinite(fluss) & (fluss > 0)
     zp = v[wahl][ok] + 2.5 * np.log10(fluss[ok])
     med = float(np.median(zp))
@@ -784,7 +788,7 @@ def stapeln(ordner, ausgabe, pruefen=True):
     karten = [
         fits_karte("BUNIT", "ADU/s", "je Pixel, nach Flat, Himmel abgezogen"),
         fits_karte("CTYPE1", "RA---TAN"), fits_karte("CTYPE2", "DEC--TAN"),
-        fits_karte("CRVAL1", MITTE_RA_GRAD, "Theta1 Ori C (Gaia DR3)"), fits_karte("CRVAL2", MITTE_DEC_GRAD),
+        fits_karte("CRVAL1", MITTE_RA_GRAD, "Mitte des WFI-Felds"), fits_karte("CRVAL2", MITTE_DEC_GRAD),
         fits_karte("CRPIX1", AUSGABE_PX / 2 + 0.5), fits_karte("CRPIX2", AUSGABE_PX / 2 + 0.5),
         fits_karte("CD1_1", -MASSSTAB / 3600.0), fits_karte("CD1_2", 0.0),
         fits_karte("CD2_1", 0.0), fits_karte("CD2_2", MASSSTAB / 3600.0),
