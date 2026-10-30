@@ -199,10 +199,21 @@ function vergleichshelligkeit(h: Helligkeit, abbildung: Vergleichsabbildung, bod
       schluessel: `${VERGLEICH}|${abbildung}|${b}`,
       punktExponent: h.punktExponent,
       // himmel -(b * faktor): am Boden ist faktor * q + himmel genau 0 (gleiches Produkt).
-      deepSky: { faktor: 1 / (1 - b), himmel: b > 0 ? -(b * (1 / (1 - b))) : 0, schwelleRelativ: OHNE_SCHWELLE, breite: ds.breite, sockel: 0 }
+      deepSky: ohneSchwelle({ faktor: 1 / (1 - b), himmel: b > 0 ? -(b * (1 / (1 - b))) : 0, schwelleRelativ: OHNE_SCHWELLE, breite: ds.breite, sockel: 0 }, ds)
     };
   }
-  return { ...h, schluessel: `${VERGLEICH}|${abbildung}|${h.schluessel}`, deepSky: { ...ds, schwelleRelativ: OHNE_SCHWELLE, sockel: 0 } };
+  return { ...h, schluessel: `${VERGLEICH}|${abbildung}|${h.schluessel}`, deepSky: ohneSchwelle({ ...ds, schwelleRelativ: OHNE_SCHWELLE, sockel: 0 }, ds) };
+}
+
+/**
+ * Begleiter im Vergleichsbild (Issue #136): wie das Hauptobjekt ohne Schwelle und Sockel, also
+ * Deckkraft 1 fuer jedes Licht; ohne Begleiter bleibt deepSky ohne das Feld (Schluessel und Werte
+ * wie vorher).
+ */
+function ohneSchwelle(neu: NonNullable<Helligkeit["deepSky"]>, alt: NonNullable<Helligkeit["deepSky"]>): NonNullable<Helligkeit["deepSky"]> {
+  const { begleiter: _weg, ...ohne } = neu;
+  if (alt.begleiter === undefined) return ohne;
+  return { ...ohne, begleiter: alt.begleiter.map(() => ({ schwelleRelativ: OHNE_SCHWELLE, sockel: 0 })) };
 }
 
 /**

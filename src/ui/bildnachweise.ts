@@ -29,14 +29,17 @@ export interface NachweisImFuss {
 
 /**
  * Alle Bilder in der Reihenfolge von bilder.json. Die Ueberschrift nennt das Objekt und die
- * Zustaende, deren Feld bild auf den Nachweis zeigt (Mars 14" und 6" teilen ein Bild); ein Bild
+ * Zustaende, deren Feld bild auf den Nachweis zeigt (Mars 14" und 6" teilen ein Bild), bei
+ * Begleiterbildern Zustand und Begleiter (Issue #136); ein Bild
  * ohne Zustand faellt auf objekt und zustand des Nachweises zurueck.
  */
 export function nachweiseImFuss(kataloge: Pick<Kataloge, "objekte" | "nachweise">): NachweisImFuss[] {
   const T = TEXTE.fuss;
   return kataloge.nachweise.map((n: Bildnachweis) => {
     const objekt = kataloge.objekte.find((o) => o.id === n.objekt);
-    const zustaende = objekt?.zustaende.filter((z) => z.bild === n.id).map((z) => z.name) ?? [];
+    // Begleiterbilder (Issue #136) stehen unter "Zustand: Begleiter", etwa "M31: M32".
+    const zustaende =
+      objekt?.zustaende.flatMap((z) => [...(z.bild === n.id ? [z.name] : []), ...(z.begleiter ?? []).filter((b) => b.bild === n.id).map((b) => `${z.name}: ${b.name}`)]) ?? [];
     const titel = zustaende.length > 0 ? zustaende.join(", ") : `${objekt?.name ?? n.objekt} (${n.zustand})`;
     return {
       id: n.id,

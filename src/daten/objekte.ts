@@ -60,13 +60,14 @@ const FELDER_ZUSTAND: Record<Objektklasse, readonly string[]> = {
   doppelstern: ["id", "name", "magnitude", "katalog", "sterne", "hinweis_hilfe", "kommentar"],
   deep_sky: [
     "id", "name", "winkelgroesse_arcsec", "polar_arcsec", "positionswinkel_grad", "magnitude", "bild", "profil",
-    "isophoten", "sterne", "sterne_datei", "hinweis_hilfe", "kommentar"
+    "isophoten", "begleiter", "sterne", "sterne_datei", "hinweis_hilfe", "kommentar"
   ]
 };
 const FELDER_TRABANT = ["name", "dx_arcsec", "dy_arcsec", "durchmesser_arcsec", "magnitude"] as const;
 const FELDER_STERN = ["name", "dx_arcsec", "dy_arcsec", "magnitude", "b_v", "katalog", "quelle_farbe"] as const;
 const FELDER_PAAR = ["wds", "komponenten", "sterne", "trennung_arcsec", "positionswinkel_grad", "epoche", "quelle"] as const;
 const FELDER_ISOPHOTE = ["mag_arcsec2", "flaeche_arcsec2"] as const;
+const FELDER_BEGLEITER = ["id", "name", "dx_arcsec", "dy_arcsec", "magnitude", "bild", "isophoten", "kommentar"] as const;
 const FELDER_STERNLISTE = ["objekt", "quelle", "lizenz", "kommentar", "sterne"] as const;
 /** Profile je art mit ihren Zahlenfeldern (deep-sky.md 7.3); nur tools/ rechnet damit. */
 const PROFILFELDER = {
@@ -161,6 +162,8 @@ export interface ZustandEintrag {
   profil?: Profil;
   /** Nur Deep-Sky mit bild: Flaechentabelle, mag aufsteigend, Flaeche streng steigend (ADR-0004). */
   isophoten?: Isophote[];
+  /** Nur Deep-Sky mit bild, optional: Begleiter mit eigenem Bild und eigener Flaechentabelle (Issue #136). */
+  begleiter?: BegleiterEintrag[];
   /** Nur Deep-Sky: Sternliste unter daten/sterne/, relativ zu diesem Verzeichnis. */
   sterneDatei?: string;
   /**
@@ -168,6 +171,22 @@ export interface ZustandEintrag {
    * A-X1); ui zeigt ihn an. kommentar dagegen ist nur Dokumentation der Datei.
    */
   hinweisHilfe?: string;
+  kommentar?: string;
+}
+
+/**
+ * Begleiter eines Deep-Sky-Zustands mit Bild (Issue #136): eigenes Bild (Bildnachweis bild desselben
+ * Objekts) mit Mitte dx/dy relativ zur Objektmitte und eigener Flaechentabelle (ADR-0004 Nachtrag).
+ */
+export interface BegleiterEintrag {
+  id: string;
+  name: string;
+  dxArcsec: number;
+  dyArcsec: number;
+  /** V-Gesamthelligkeit (Literatur), Probe fuer tools/quellweiss_eichen.py. */
+  magnitude: number;
+  bild: string;
+  isophoten: Isophote[];
   kommentar?: string;
 }
 
@@ -366,9 +385,12 @@ function pruefeDeepSky(obj: Record<string, unknown>, zustand: ZustandEintrag, or
   if (bild !== undefined) {
     zustand.bild = bild;
     zustand.isophoten = pruefeIsophoten(alsListe(obj["isophoten"], ort, "isophoten"), ort);
+    const begleiter = optional(obj, "begleiter", (o, f) => alsListe(o[f], ort, f));
+    if (begleiter !== undefined) zustand.begleiter = pruefeBegleiter(begleiter, ort);
   } else {
-    // Ohne Bild gibt es keine Flaechentabelle (M45, ADR-0003 Nachtrag V2).
+    // Ohne Bild gibt es keine Flaechentabelle (M45, ADR-0003 Nachtrag V2) und keine Begleiter.
     if (obj["isophoten"] !== undefined) throw new DatenFehler(OBJEKTE_DATEI, id, "isophoten", "nur mit bild");
+    if (obj["begleiter"] !== undefined) throw new DatenFehler(OBJEKTE_DATEI, id, "begleiter", "nur mit bild");
   }
 
   const sterneDatei = optional(obj, "sterne_datei", (o, f) => text(o, f, ort));
@@ -447,6 +469,32 @@ function pruefePaarnachweis(wert: unknown, ort: Ort): Paarnachweis {
     epoche: zahl(obj, "epoche", ort, 1700, 2200),
     quelle: text(obj, "quelle", ort)
   };
+}
+
+/** Begleiter: ids im Zustand eindeutig, Lage wie Sterne, eigene Flaechentabelle (Issue #136). */
+function pruefeBegleiter(liste: unknown[], ort: Ort): BegleiterEintrag[] {
+  if (liste.length === 0) throw new DatenFehler(ort.datei, ort.eintrag, "begleiter", "leer; weglassen statt leerer Liste");
+  const ids = new Set<string>();
+  return liste.map((roh, n) => {
+    const ortB: Ort = { datei: ort.datei, eintrag: `${ort.eintrag}, begleiter[${n}]` };
+    const obj = alsObjekt(roh, ortB, "Begleiter");
+    nurBekannteFelder(obj, ortB, FELDER_BEGLEITER);
+    const id = text(obj, "id", ortB);
+    if (ids.has(id)) throw new DatenFehler(ortB.datei, ortB.eintrag, "id", `"${id}" doppelt vergeben`);
+    ids.add(id);
+    const eintrag: BegleiterEintrag = {
+      id,
+      name: text(obj, "name", ortB),
+      dxArcsec: zahl(obj, "dx_arcsec", ortB, -LAGE_MAX_ARCSEC, LAGE_MAX_ARCSEC),
+      dyArcsec: zahl(obj, "dy_arcsec", ortB, -LAGE_MAX_ARCSEC, LAGE_MAX_ARCSEC),
+      magnitude: zahl(obj, "magnitude", ortB, ...MAGNITUDE_GRENZEN.deep_sky),
+      bild: text(obj, "bild", ortB),
+      isophoten: pruefeIsophoten(alsListe(obj["isophoten"], ortB, "isophoten"), ortB)
+    };
+    const kommentar = optional(obj, "kommentar", (o, f) => text(o, f, ortB));
+    if (kommentar !== undefined) eintrag.kommentar = kommentar;
+    return eintrag;
+  });
 }
 
 /** Flaechentabelle: mindestens zwei Zeilen, mag streng aufsteigend, Flaeche streng steigend. */
@@ -534,10 +582,33 @@ export function pruefeVerweise(objekte: readonly Objekt[], nachweise: readonly B
       }
       pruefeKennlinieZuKlasse(objekt, zustand, nachweis);
       genutzt.add(nachweis.id);
+      for (const begleiter of zustand.begleiter ?? []) {
+        pruefeBegleiterbild(objekt, zustand, begleiter, nachId.get(begleiter.bild));
+        genutzt.add(begleiter.bild);
+      }
     }
   }
   for (const nachweis of nachweise) {
     if (!genutzt.has(nachweis.id)) throw new DatenFehler(BILDER_DATEI, nachweis.id, "id", `von keinem Zustand in ${OBJEKTE_DATEI} verwendet`);
+  }
+}
+
+/**
+ * Bild eines Begleiters (Issue #136): Nachweis desselben Objekts mit log-Kennlinie, die Isophoten
+ * des Begleiters im Umfang dieser Kennlinie, Massstab wie das Hauptbild (beide auf demselben Gitter,
+ * tools/deep_sky_aufbereiten.py begleiter_trennen).
+ */
+function pruefeBegleiterbild(objekt: Objekt, zustand: ZustandEintrag, begleiter: BegleiterEintrag, nachweis: Bildnachweis | undefined): void {
+  const ort = `${zustand.id}, begleiter ${begleiter.id}`;
+  if (nachweis === undefined) throw new DatenFehler(OBJEKTE_DATEI, ort, "bild", `kein Bildnachweis "${begleiter.bild}" in ${BILDER_DATEI}`);
+  if (nachweis.objekt !== objekt.id) throw new DatenFehler(BILDER_DATEI, nachweis.id, "objekt", `"${nachweis.objekt}", verwendet von Objekt "${objekt.id}"`);
+  if (nachweis.kacheln !== undefined) throw new DatenFehler(BILDER_DATEI, nachweis.id, "kacheln", "Begleiterbilder sind Einzelbilder");
+  const kennlinie = nachweis.kennlinie;
+  if (kennlinie === undefined) throw new DatenFehler(BILDER_DATEI, nachweis.id, "kennlinie", "Begleiterbilder brauchen die log-Kennlinie");
+  for (const [n, iso] of begleiter.isophoten.entries()) {
+    if (iso.magProArcsec2 < kennlinie.magHell || iso.magProArcsec2 > kennlinie.magDunkel) {
+      throw new DatenFehler(OBJEKTE_DATEI, `${ort}, isophoten[${n}]`, "mag_arcsec2", `${iso.magProArcsec2} ausserhalb der Kennlinie von "${nachweis.id}"`);
+    }
   }
 }
 

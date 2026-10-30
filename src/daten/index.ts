@@ -6,7 +6,7 @@
 // den Test-Adapter QuelleRaster aus testkacheln.ts.
 export { ladeBildnachweise, pruefeBildnachweise, type Bildnachweis, type Kachelpyramide, type Kachelstufe } from "./bildnachweise";
 export { DatenFehler } from "./fehler";
-export { quelleEinzelbildBrowser, quelleKachelnBrowser } from "./kachellader";
+export { quelleBegleiterBrowser, quelleEinzelbildBrowser, quelleKachelnBrowser } from "./kachellader";
 export { QuelleKacheln } from "./kacheln";
 export { type Kennlinie, kodetabelle, logTabelle } from "./kennlinie";
 export {
@@ -18,11 +18,13 @@ export {
   pruefeVerweise,
   type Objekt,
   type Paarnachweis,
+  type BegleiterEintrag,
   type Profil,
   type SternEintrag,
   type ZustandEintrag
 } from "./objekte";
-export { findeZustand, nachweisZu, objektzustand } from "./objektzustand";
+export { begleiterMassstab, begleiterNachweise, findeZustand, nachweisZu, objektzustand } from "./objektzustand";
+export { quelleBegleiter, QuelleVersetzt } from "./quelle_begleiter";
 export { QuelleEinzelbild } from "./quelle_einzelbild";
 export { QuelleLeer } from "./quelle_leer";
 export * from "./geraete";

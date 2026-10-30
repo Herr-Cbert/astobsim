@@ -7,7 +7,7 @@
 import { BILDER_DATEI, type Bildnachweis } from "./bildnachweise";
 import { DatenFehler } from "./fehler";
 import { OBJEKTE_DATEI, type Objekt, type ZustandEintrag } from "./objekte";
-import type { Objektzustand, Stern } from "../naht/konfiguration";
+import type { Begleiter, Objektzustand, Stern } from "../naht/konfiguration";
 
 /** Zustand mit seinem Objekt, gesucht ueber die global eindeutige Zustands-id. */
 export function findeZustand(objekte: readonly Objekt[], zustandId: string): { objekt: Objekt; zustand: ZustandEintrag } | undefined {
@@ -53,8 +53,42 @@ export function objektzustand(objekte: readonly Objekt[], nachweise: readonly Bi
       weissMagProArcsec2: weiss
     };
     if (zustand.isophoten !== undefined) ergebnis.isophoten = zustand.isophoten.map((i) => ({ ...i }));
+    if (zustand.begleiter !== undefined) {
+      ergebnis.begleiter = zustand.begleiter.map((b): Begleiter => {
+        const nb = nachweise.find((n) => n.id === b.bild);
+        if (nb === undefined) throw new DatenFehler(OBJEKTE_DATEI, `${zustand.id}, begleiter ${b.id}`, "bild", `kein Bildnachweis "${b.bild}" in ${BILDER_DATEI}`);
+        return {
+          kennung: b.id,
+          name: b.name,
+          dxArcsec: b.dxArcsec,
+          dyArcsec: b.dyArcsec,
+          magnitude: b.magnitude,
+          quelle: { breitePx: nb.pixelBreite, hoehePx: nb.pixelHoehe, massstabArcsecProPx: begleiterMassstab(nb) },
+          isophoten: b.isophoten.map((i) => ({ ...i }))
+        };
+      });
+    }
   }
   return ergebnis;
+}
+
+/**
+ * Massstab eines Begleiterbilds (Issue #136): der des Bilds selbst, winkelgroesse_arcsec /
+ * objekt_durchmesser_px des Nachweises (tools/ legt den Ausschnitt auf das Gitter des Hauptbilds);
+ * er haengt nicht an der Winkelgroesse des Zustands.
+ */
+export function begleiterMassstab(nachweis: Bildnachweis): number {
+  return nachweis.winkelgroesseArcsec / nachweis.objektDurchmesserPx;
+}
+
+/** Bildnachweise der Begleiter des Zustands kennung, in der Reihenfolge von begleiter; leer ohne Begleiter. */
+export function begleiterNachweise(objekte: readonly Objekt[], nachweise: readonly Bildnachweis[], kennung: string): Bildnachweis[] {
+  const begleiter = findeZustand(objekte, kennung)?.zustand.begleiter ?? [];
+  return begleiter.map((b) => {
+    const n = nachweise.find((x) => x.id === b.bild);
+    if (n === undefined) throw new DatenFehler(OBJEKTE_DATEI, `${kennung}, begleiter ${b.id}`, "bild", `kein Bildnachweis "${b.bild}" in ${BILDER_DATEI}`);
+    return n;
+  });
 }
 
 /** Wert, den pruefeObjekte fuer die Klasse schon verlangt; fehlt er doch, DatenFehler statt undefined. */

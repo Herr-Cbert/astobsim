@@ -315,6 +315,15 @@ describe("Vergleichsbild bei Deep-Sky (Issue #110, Vorschlag)", () => {
     expect(halo).toBeCloseTo(Math.min(1, Math.pow(ds.faktor * 1e-3 + ds.himmel, 1 / 3)), 4);
   });
 
+  it("Begleiter (Issue #136): im Vergleichsbild ohne Schwelle und Sockel, ohne Begleiter kein Feld", () => {
+    const mitB: typeof anblick = { ...anblick, helligkeit: { ...anblick.helligkeit, deepSky: { ...anblick.helligkeit.deepSky!, begleiter: [{ schwelleRelativ: 0.3, sockel: 0.01 }] } } };
+    for (const a of ["kubikwurzel", "kubikwurzelUeberBoden", "okularOhneSchwelle"] as const) {
+      expect(vergleichsparameter(mitB, massstab, a, 1e-4).helligkeit.deepSky!.begleiter).toEqual([{ schwelleRelativ: 1e-30, sockel: 0 }]);
+      expect(vergleichsparameter(anblick, massstab, a, 1e-4).helligkeit.deepSky).not.toHaveProperty("begleiter");
+    }
+    expect(vergleichsparameter(mitB, massstab, "linear").helligkeit.deepSky).toBeUndefined();
+  });
+
   it("jede Abbildung hat einen eigenen Helligkeitsschluessel, Planeten bleiben wie bisher", () => {
     const schluessel = (["linear", "kubikwurzel", "kubikwurzelUeberBoden", "okularOhneSchwelle"] as const).map((a) => vergleichsparameter(anblick, massstab, a, 1e-4).helligkeit.schluessel);
     expect(new Set(schluessel).size).toBe(4);

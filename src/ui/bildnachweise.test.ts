@@ -31,7 +31,11 @@ describe("nachweiseImFuss (A-X4, #23)", () => {
 
   it("nennt in der Ueberschrift alle Zustaende, die ein Bild teilen", () => {
     for (const e of eintraege) {
-      const namen = objekte.flatMap((o) => o.zustaende).filter((z) => z.bild === e.id).map((z) => z.name);
+      const zustaende = objekte.flatMap((o) => o.zustaende);
+      const namen = [
+        ...zustaende.filter((z) => z.bild === e.id).map((z) => z.name),
+        ...zustaende.flatMap((z) => (z.begleiter ?? []).filter((b) => b.bild === e.id).map((b) => `${z.name}: ${b.name}`))
+      ];
       expect(namen.length).toBeGreaterThan(0);
       expect(e.titel).toBe(namen.join(", "));
     }

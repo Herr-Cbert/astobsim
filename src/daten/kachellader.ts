@@ -13,12 +13,14 @@
 // Einzelbild und Kacheln bleiben als Kodewerte mit einem Kanal (rgbaZuKodes, Rot-Kanal des
 // Grauwerts) und werden im Ausschnitt ueber die Tabelle der Kennlinie dekodiert.
 
+import type { Quelle } from "../naht/quelle";
 import type { Kanaele, Raster } from "../naht/raster";
 import type { Bildnachweis } from "./bildnachweise";
 import { DatenFehler } from "./fehler";
 import { kachelPfad, type KachelLader, type KachelSrgb, pyramidengeometrie, QuelleKacheln } from "./kacheln";
 import { kodetabelle } from "./kennlinie";
 import { holeDaten } from "./pruefe";
+import { quelleBegleiter } from "./quelle_begleiter";
 import { quelleEinzelbild, type QuelleEinzelbild } from "./quelle_einzelbild";
 
 import { LINEAR_8BIT } from "./srgb";
@@ -129,6 +131,16 @@ export async function quelleEinzelbildBrowser(nachweis: Bildnachweis, winkelgroe
   }
   const { rgba, breite, hoehe } = await ladeRgbaBrowser(nachweis.datei, nachweis.id);
   return quelleEinzelbild(nachweis, winkelgroesseArcsec, rgbaZuKodes(rgba, breite, hoehe, 1));
+}
+
+/**
+ * Quelle eines Begleiters im Browser (Issue #136): laedt das Begleiterbild einmal (8-Bit-Kodes,
+ * log-Kennlinie) und legt es mit dem Versatz dx/dy relativ zum Quellweiss des Hauptobjekts an
+ * (quelleBegleiter).
+ */
+export async function quelleBegleiterBrowser(nachweis: Bildnachweis, weissHauptMagProArcsec2: number, dxArcsec: number, dyArcsec: number): Promise<Quelle> {
+  const { rgba, breite, hoehe } = await ladeRgbaBrowser(nachweis.datei, nachweis.id);
+  return quelleBegleiter(nachweis, weissHauptMagProArcsec2, dxArcsec, dyArcsec, rgbaZuKodes(rgba, breite, hoehe, 1));
 }
 
 /** 2D-Kontext zum Auslesen der Pixel: OffscreenCanvas (auch im Worker), sonst ein DOM-Canvas. */
