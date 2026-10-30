@@ -121,6 +121,24 @@
     ],
     "zusaetzlich_beleg": "Kreise (Leinwandpixel) um die Höfe von neun hellen Vordergrundsternen, deren Flügel die Maske nicht ganz erfasst (am bereinigten Bild als Ringe sichtbar)"
   },
+  "begleiter": [
+    {
+      "id": "m31_noirlab_lgs_m32",
+      "name": "M32",
+      "datei": "m31/noirlab_lgs_m32_g.webp",
+      "mitte_arcsec": [
+        -28.2,
+        -1452.5
+      ],
+      "mitte_beleg": "M32 (SIMBAD ICRS 00 42 41.82 +40 51 54.6 gegen den M31-Kern 00 42 44.33 +41 16 07.5)",
+      "suche_arcsec": 60,
+      "radius_arcsec": 240,
+      "ring_arcsec": 180,
+      "leinwand_px": 128,
+      "magnitude": 8.08,
+      "magnitude_quelle": "V 8,08 nach Wikipedia (Messier 32, Abruf 2026-10-30, Sekundärquelle mit Verweis auf SIMBAD und Gil de Paz et al. 2007, ApJS 173, 185), docs/recherche/physik.md 29"
+    }
+  ],
   "hintergrund": "kein Abzug, der Schwarzpunkt des Pressebilds liegt auf dem Himmel (Kode 7 wird 0)",
   "quelle_url": "https://noirlab.edu/public/images/noao-m31lgs_ubvIha/",
   "quelle_datei": "noao-m31lgs_ubvIha.tif (Publication TIFF 10K, 10000x2521 RGB, 8 Bit, Farbprofil sRGB IEC61966-2.1)",

@@ -33,7 +33,9 @@ der Vorschlag ist dann der Wert fuer mag_hell. Zustaende ohne bild
 Sternen (sterne_datei oder sterne, "Sterne plus Restlicht" wie M13, Issue #108)
 tragen im Bild nur das Restlicht: geprueft wird Bild plus Sterne gegen
 magnitude, der Vorschlag gilt fuer das Bild allein (magnitude minus Sterne);
-eine Zusatzzeile nennt Sterne und Flaeche einzeln.
+eine Zusatzzeile nennt Sterne und Flaeche einzeln. Begleiter (Feld begleiter, Issue #136,
+M32 bei M31) zaehlen wie Sterne zum Zustand (Fluss des Begleiterbilds) und werden in einer
+eigenen Zeile gegen ihre magnitude geprueft.
 
 Exit-Code 0, wenn alle Zustaende die Probe bestehen, sonst 1.
 
@@ -141,6 +143,20 @@ def main():
             massstab = z["winkelgroesse_arcsec"] / nachweis["objekt_durchmesser_px"]
             fluss = cache[z["bild"]] * massstab ** 2
             stern_fluss = sternfluss(z, args.sterne) if objekt["typ"] == "deep_sky" else 0.0
+            # Begleiter (Issue #136): eigene Bilder, Fluss relativ zum Quellweiss des Hauptobjekts;
+            # das Hauptbild plus die Begleiter muss magnitude treffen, jeder Begleiter seine eigene.
+            begleiter_fluss = 0.0
+            for b in z.get("begleiter", []):
+                nb = nachweise[b["bild"]]
+                fb = float(leuchtdichte(nb, args.bilder).sum()) * (nb["winkelgroesse_arcsec"] / nb["objekt_durchmesser_px"]) ** 2
+                m_b = nb["kennlinie"]["mag_hell"] - 2.5 * math.log10(fb)
+                ok_b = abs(m_b - b["magnitude"]) <= TOLERANZ_MAG
+                fehler += 0 if ok_b else 1
+                print(f"{z['id'] + ':' + b['id']:<9} {b['bild']:<22} {'':>9} {'':>11} {b['magnitude']:>6.2f} "
+                      f"{nb['kennlinie']['mag_hell']:>6.2f} {'':>9} {m_b:>7.3f} {m_b - b['magnitude']:>+6.3f}  "
+                      f"{'ok' if ok_b else 'FEHLER'}  (Begleiter)")
+                begleiter_fluss += 10 ** (-0.4 * m_b)
+            stern_fluss += begleiter_fluss
             if stern_fluss > 0:
                 # Sterne plus Restlicht: das Bild traegt magnitude minus die Sterne.
                 m_flaeche = weiss - 2.5 * math.log10(fluss)
@@ -157,7 +173,7 @@ def main():
                   f"{weiss:>6.2f} {vorschlag:>9.2f} {m_bild:>7.3f} {abweichung:>+6.3f}  "
                   f"{'ok' if ok else 'FEHLER'}")
             if stern_fluss > 0:
-                print(f"          Sterne plus Restlicht: Flaeche V {m_flaeche:.3f} (Soll {m_soll:.3f}), Sterne V "
+                print(f"          Sterne plus Restlicht: Flaeche V {m_flaeche:.3f} (Soll {m_soll:.3f}), Sterne und Begleiter V "
                       f"{-2.5 * math.log10(stern_fluss):.3f}, Summe V {m_bild:.3f}")
             if objekt["typ"] == "mond":
                 m_ks = mond_magnitude_ks(z["phasenwinkel_grad"])

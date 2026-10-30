@@ -33,6 +33,12 @@ Schritte:
        gehoeren, kommen als Katalogsterne (sterne in objekte.json). Mit
        sterne.im_bild_entfernen = false bleibt das Bild unveraendert und nur
        die Flaechentabelle wird am bereinigten Bild gemessen (M13, #108).
+    3b. Begleiter (optional, Liste begleiter, Issue #136): ein kompakter Begleiter im Bild (M32 in
+       M31) wird abgetrennt (begleiter_trennen, physik.md 29): das Hauptbild bekommt unter ihm das
+       aus einem Ring angepasste Hauptobjekt, der Rest wird ein eigenes kleines Bild mit eigener
+       Kennlinie, eigenem Bildnachweis und eigener Flaechentabelle (Ende am Kreisrand), damit die
+       Anwendung ihm eine eigene Wahrnehmungsschwelle gibt (ADR-0004 Nachtrag #136). Die
+       Gesamthelligkeit des Rests wird gegen begleiter.magnitude geprueft (0,1 mag).
     4. Kennlinie: mag_hell ist die Flaechenhelligkeit des hellsten Pixels,
        mag_dunkel = mag_hell + kennlinie.umfang_mag. Kodiert wird relativ zum
        hellsten Pixel; erst danach wird die Lage in mag geeicht, weil eine
@@ -453,6 +459,82 @@ def flaechentabelle(mu, massstab, mag_hell, mag_dunkel, schritt=ISOPHOTEN_SCHRIT
             continue
         zeilen.append((mu_i, flaeche))
     return zeilen
+
+
+# ---------------------------------------------------------------------------
+# Begleiter (Issue #136): kompakter Begleiter im Bild des Hauptobjekts, z. B. M32 in M31
+
+BEGLEITER_PFLICHT = ["id", "name", "datei", "mitte_arcsec", "mitte_beleg", "suche_arcsec", "radius_arcsec",
+                     "ring_arcsec", "leinwand_px", "magnitude", "magnitude_quelle"]
+
+
+def begleiter_trennen(bild, ohne_daten, massstab, b):
+    """Trennt einen Begleiter vom Hauptobjekt (docs/recherche/physik.md 29).
+
+    bild: lineare Leinwand (Objektmitte auf der Leinwandmitte, Norden oben, Osten links), ohne_daten
+    die Pixel ohne Daten. b: Parameter des Begleiters (BEGLEITER_PFLICHT). Schritte:
+      1. Mitte: Schwerpunkt des Lichts im Kreis suche_arcsec um mitte_arcsec ([Ost, Nord]).
+      2. Hintergrund (Hauptobjekt unter dem Begleiter): log L im Ring radius_arcsec bis
+         radius_arcsec + ring_arcsec um die Mitte als quadratisches Polynom in x, y (kleinste
+         Quadrate, nur Datenpixel mit L > 0), im Kreis radius_arcsec eingesetzt.
+      3. Hauptbild = bild mit dem Hintergrund im Kreis; Rest = max(0, bild - Hintergrund) im Kreis.
+      4. Ausschnitt leinwand_px x leinwand_px um die Mitte, auf ganze Pixel der Leinwand gerundet
+         (kein Neuabtasten: Hauptbild und Begleiter liegen auf demselben Gitter).
+    Gibt (hauptbild, rest_ausschnitt, info) zurueck; info mit dx_arcsec, dy_arcsec (Mitte des
+    Ausschnitts, dx nach Westen, dy nach Norden wie die Naht), Schwerpunkt [Ost, Nord], Streuung
+    des Ringfits in mag und randmaske (Pixel des Ausschnitts am Kreisrand, fuer flaechentabelle).
+    """
+    fehlt = [k for k in BEGLEITER_PFLICHT if k not in b]
+    if fehlt:
+        raise SystemExit(f"Begleiter {b.get('id')}: Pflichtfelder fehlen: {', '.join(fehlt)}")
+    n_y, n_x = bild.shape
+    m = b["leinwand_px"]
+    if m % 2:
+        raise SystemExit(f"Begleiter {b['id']}: leinwand_px muss gerade sein")
+    if b["radius_arcsec"] / massstab > m / 2 - 1:
+        raise SystemExit(f"Begleiter {b['id']}: Kreis passt nicht in den Ausschnitt (leinwand_px zu klein)")
+    yy, xx = np.mgrid[0:n_y, 0:n_x]
+    ost, nord = b["mitte_arcsec"]
+    x_soll, y_soll = n_x / 2 - ost / massstab, n_y / 2 - nord / massstab
+    gueltig = (~ohne_daten) & (bild > 0)
+    r = np.hypot(xx + 0.5 - x_soll, yy + 0.5 - y_soll) * massstab
+    fenster = (r < b["suche_arcsec"]) & gueltig
+    if not fenster.any():
+        raise SystemExit(f"Begleiter {b['id']}: kein Licht im Suchkreis")
+    w = np.where(fenster, bild, 0.0)
+    xc = float((w * (xx + 0.5)).sum() / w.sum())
+    yc = float((w * (yy + 0.5)).sum() / w.sum())
+    r = np.hypot(xx + 0.5 - xc, yy + 0.5 - yc) * massstab
+    innen = r < b["radius_arcsec"]
+    ring = (r >= b["radius_arcsec"]) & (r < b["radius_arcsec"] + b["ring_arcsec"]) & gueltig
+    if ring.sum() < 50 or (innen & ohne_daten).any():
+        raise SystemExit(f"Begleiter {b['id']}: Ring zu klein oder Kreis reicht ueber die Datenkante")
+    dx, dy = (xx + 0.5 - xc) * massstab / 60.0, (yy + 0.5 - yc) * massstab / 60.0
+
+    def basis(maske):
+        x, y = dx[maske], dy[maske]
+        return np.stack([np.ones_like(x), x, y, x * x, x * y, y * y], axis=1)
+
+    koef, *_ = np.linalg.lstsq(basis(ring), np.log(bild[ring]), rcond=None)
+    streuung = float(2.5 / math.log(10) * np.std(np.log(bild[ring]) - basis(ring) @ koef))
+    hintergrund = np.exp(basis(innen) @ koef)
+    haupt = bild.copy()
+    haupt[innen] = hintergrund
+    rest = np.zeros_like(bild)
+    rest[innen] = np.clip(bild[innen] - hintergrund, 0.0, None)
+    x0, y0 = int(round(xc)) - m // 2, int(round(yc)) - m // 2
+    if x0 < 0 or y0 < 0 or x0 + m > n_x or y0 + m > n_y:
+        raise SystemExit(f"Begleiter {b['id']}: Ausschnitt ragt ueber die Leinwand")
+    teil = rest[y0:y0 + m, x0:x0 + m].copy()
+    r_teil = r[y0:y0 + m, x0:x0 + m]
+    info = {
+        "dx_arcsec": round((x0 + m / 2 - n_x / 2) * massstab, 3),
+        "dy_arcsec": round((n_y / 2 - (y0 + m / 2)) * massstab, 3),
+        "schwerpunkt_ost_nord": [round(-(xc - n_x / 2) * massstab, 1), round(-(yc - n_y / 2) * massstab, 1)],
+        "streuung_mag": streuung,
+        "randmaske": (r_teil < b["radius_arcsec"]) & (r_teil >= b["radius_arcsec"] - massstab),
+    }
+    return haupt, teil, info
 
 
 # ---------------------------------------------------------------------------
@@ -913,6 +995,17 @@ def verarbeite(pfad, args):
         print(f"  Stern bei dx {-(x + 0.5 - bild.shape[1] / 2) * s:+7.2f}\" dy {(bild.shape[0] / 2 - y - 0.5) * s:+7.2f}\", "
               f"Rest {spitze:.4g}")
     im_bild = bereinigt if st.get("im_bild_entfernen", True) else bild
+    begleiter = []
+    for b in p.get("begleiter", []):
+        gesamt_vorher = float(im_bild.sum())
+        im_bild, teil, info = begleiter_trennen(im_bild, ohne_daten, s, b)
+        begleiter.append((b, teil, info))
+        print(f"Begleiter {b['name']}: Schwerpunkt Ost {info['schwerpunkt_ost_nord'][0]}\" Nord "
+              f"{info['schwerpunkt_ost_nord'][1]}\", Ausschnitt {b['leinwand_px']} px mit Mitte dx "
+              f"{info['dx_arcsec']}\" dy {info['dy_arcsec']}\", Ringfit Streuung {info['streuung_mag']:.3f} mag; "
+              f"Fluss Begleiter {float(teil.sum()) / gesamt_vorher * 100:.2f} % des Bilds")
+    if not st.get("im_bild_entfernen", True) and begleiter:
+        raise SystemExit("begleiter nur mit sterne.im_bild_entfernen (sonst misst die Tabelle ein anderes Bild)")
 
     umfang = float(p["kennlinie"]["umfang_mag"])
     kodes = kodiere_relativ(linear_zu_mu_rel(im_bild), umfang)
@@ -975,15 +1068,96 @@ def verarbeite(pfad, args):
         print(f"Flaechentabelle nach {args.tabelle} (von Hand in daten/objekte.json als isophoten uebernehmen)")
     if args.messen:
         print(f"WebP verlustfrei: {len(daten_webp)} Byte (nicht geschrieben)")
+        for b, teil, info in begleiter:
+            verarbeite_begleiter(p, b, teil, info, None, mag_hell, float(im_bild.max()), umfang, s, args)
         return
     ziel = os.path.join(args.ziel, p["datei"])
     os.makedirs(os.path.dirname(ziel), exist_ok=True)
     with open(ziel, "wb") as f:
         f.write(daten_webp)
     print(f"{ziel}: {kodes.shape[1]}x{kodes.shape[0]} px, {len(daten_webp)} Byte")
-    schreibe_bildnachweis(args.bildnachweis, bildnachweis(p, kopf, mag_hell, mag_dunkel, len(daten_webp), sterne,
-                                                          ohne_daten, nordwinkel, tonkurve))
+    eintrag = bildnachweis(p, kopf, mag_hell, mag_dunkel, len(daten_webp), sterne, ohne_daten, nordwinkel, tonkurve)
+    if begleiter:
+        eintrag["bearbeitung"] += " " + " ".join(begleiter_vermerk(b, info, s) for b, _, info in begleiter)
+    schreibe_bildnachweis(args.bildnachweis, eintrag)
     print(f"Bildnachweis {p['id']} in {args.bildnachweis} geschrieben")
+    for b, teil, info in begleiter:
+        verarbeite_begleiter(p, b, teil, info, eintrag, mag_hell, float(im_bild.max()), umfang, s, args)
+
+
+def begleiter_vermerk(b, info, s):
+    """Satz fuer bearbeitung des Hauptbilds und des Begleiterbilds (Rechenweg physik.md 29)."""
+    return (f"{b['name']} als Begleiter getrennt (Issue #136, physik.md 29): Schwerpunkt im Kreis "
+            f"{b['suche_arcsec']}\" um {b['mitte_beleg']}; das Hauptobjekt unter {b['name']} im Kreis "
+            f"{b['radius_arcsec']}\" aus einem quadratischen Polynom in log L ergänzt, angepasst im Ring "
+            f"{b['radius_arcsec']}\" bis {b['radius_arcsec'] + b['ring_arcsec']}\" (Streuung "
+            f"{info['streuung_mag']:.2f} mag); der Rest (Bild minus Polynom, nicht negativ) ist das Begleiterbild.")
+
+
+def begleiter_bildnachweis(eintrag_haupt, b, info, mag_hell, mag_dunkel, datei_bytes, s):
+    """Bildnachweis des Begleiterbilds: Herkunft, Lizenz und Namensnennung wie das Hauptbild."""
+    m = b["leinwand_px"]
+    eintrag = {k: eintrag_haupt[k] for k in eintrag_haupt}
+    eintrag.update({
+        "id": b["id"],
+        "datei": b["datei"],
+        "pixel_breite": m,
+        "pixel_hoehe": m,
+        "winkelgroesse_arcsec": m * s,
+        "objekt_durchmesser_px": m,
+        "bogensekunden_pro_pixel": s,
+        "datei_bytes": datei_bytes,
+        "bearbeitung": (f"Ausschnitt {m}x{m} px aus dem Bild {eintrag_haupt['id']} vor dessen Kodierung, Mitte "
+                        f"dx {info['dx_arcsec']}\" (Westen) dy {info['dy_arcsec']}\" (Norden) von der Objektmitte; "
+                        f"{begleiter_vermerk(b, info, s)} Kodiert mit log-Kennlinie: Kode 255 = mag_hell "
+                        f"{mag_hell}, Kode 1 = mag_dunkel {mag_dunkel}, Kode 0 Schwarz. WebP verlustfrei "
+                        f"(tools/deep_sky_aufbereiten.py). Bearbeitung des Hauptbilds: {eintrag_haupt['bearbeitung']}"),
+        "kennlinie": {"art": "log", "mag_hell": mag_hell, "mag_dunkel": mag_dunkel},
+    })
+    eintrag["hinweise"] = (f"Begleiter {b['name']} von {eintrag_haupt['objekt']} (Feld begleiter in daten/objekte.json). "
+                           + eintrag_haupt.get("hinweise", ""))
+    return eintrag
+
+
+def verarbeite_begleiter(p, b, teil, info, eintrag_haupt, mag_hell_haupt, l_max_haupt, umfang, s, args):
+    """Kodiert, prueft und schreibt das Begleiterbild; Flaechentabelle mit dem Kreisrand als Rand."""
+    mag_hell = round(mag_hell_haupt - 2.5 * math.log10(float(teil.max()) / l_max_haupt), 2)
+    mag_dunkel = round(mag_hell + umfang, 2)
+    kodes = kodiere_relativ(linear_zu_mu_rel(teil), umfang)
+    daten_webp = webp_bytes(kodes)
+    dekodiert = webp_kodes(daten_webp)
+    if not np.array_equal(dekodiert, kodes):
+        raise SystemExit("WebP des Begleiters: dekodierte Kodes weichen ab")
+    gesamt = gesamtmagnitude(dekodiert, mag_hell, mag_dunkel, s)
+    abweichung = gesamt - b["magnitude"]
+    print(f"Begleiter {b['name']}: mag_hell {mag_hell}, Gesamthelligkeit {gesamt:.3f} mag, Soll {b['magnitude']} "
+          f"({b['magnitude_quelle']}), Abweichung {abweichung:+.3f} mag")
+    if abs(abweichung) > TOLERANZ_GESAMT_MAG:
+        raise SystemExit(f"Begleiter {b['name']}: Gesamthelligkeit weicht um mehr als {TOLERANZ_GESAMT_MAG} mag ab")
+    lin = log_tabelle(mag_hell, mag_dunkel).astype(np.float64)[dekodiert]
+    with np.errstate(divide="ignore"):
+        mu = np.where(lin > 0, mag_hell - 2.5 * np.log10(np.where(lin > 0, lin, 1.0)), np.inf)
+    tabelle = flaechentabelle(mu, s, mag_hell, mag_dunkel, rand_maske=info["randmaske"])
+    isophoten = [{"mag_arcsec2": round(m, 1), "flaeche_arcsec2": round(a, 2)} for m, a in tabelle]
+    print(f"  Flaechentabelle {b['name']}: {len(isophoten)} Zeilen von {isophoten[0]['mag_arcsec2']} bis "
+          f"{isophoten[-1]['mag_arcsec2']} mag/arcsec^2; Mitte dx {info['dx_arcsec']} dy {info['dy_arcsec']}")
+    if args.tabelle:
+        stamm, endung = os.path.splitext(args.tabelle)
+        with open(f"{stamm}_{b['id']}{endung or '.json'}", "w", encoding="utf-8") as f:
+            json.dump({"dx_arcsec": info["dx_arcsec"], "dy_arcsec": info["dy_arcsec"], "isophoten": isophoten}, f,
+                      ensure_ascii=False, indent=2)
+            f.write("\n")
+    if args.messen or eintrag_haupt is None:
+        print(f"  WebP {len(daten_webp)} Byte (nicht geschrieben)")
+        return
+    ziel = os.path.join(args.ziel, b["datei"])
+    os.makedirs(os.path.dirname(ziel), exist_ok=True)
+    with open(ziel, "wb") as f:
+        f.write(daten_webp)
+    print(f"  {ziel}: {kodes.shape[1]}x{kodes.shape[0]} px, {len(daten_webp)} Byte")
+    schreibe_bildnachweis(args.bildnachweis, begleiter_bildnachweis(eintrag_haupt, b, info, mag_hell, mag_dunkel,
+                                                                    len(daten_webp), s))
+    print(f"  Bildnachweis {b['id']} in {args.bildnachweis} geschrieben")
 
 
 def main(argv=None):
