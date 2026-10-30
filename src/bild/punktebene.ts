@@ -13,6 +13,8 @@
 // ausgeblendetKern: der Kern mal einem cos^2-Fenster ueber das aeussere Drittel des Radius (etwa
 // die aeussere Gesamt-FWHM), rund statt quadratisch, neu auf Summe 1 normiert (Fluss bleibt).
 // Begruendung und Grenzen: docs/recherche/physik.md Abschnitt 24.
+// Dasselbe Fenster, hoch 1/n, liefert halokern fuer den Mischanteil des Falls unaufgeloest in
+// tonwert (Issue #135, physik.md Abschnitt 28).
 
 import type { Kern } from "../naht/simulationsparameter";
 import { pruefeKern } from "./falter";
@@ -59,6 +61,17 @@ const FENSTER_ENDE_ZUSATZ_PX = 0.5;
 const ausgeblendet = new WeakMap<Kern, Float32Array>();
 
 /**
+ * Randfenster w(rho) aus physik.md Abschnitt 24: 1 bis rho0 = 2/3 Radius, dann
+ * cos^2(pi/2 * (rho - rho0) / (rhoE - rho0)) bis rhoE = Radius + 0,5 px, darueber 0 (rho Abstand
+ * zur Kernmitte in Pixeln).
+ */
+function randfenster(rho: number, r: number): number {
+  const rho0 = FENSTER_ANFANG_PRO_RADIUS * r;
+  const rhoE = r + FENSTER_ENDE_ZUSATZ_PX;
+  return rho <= rho0 ? 1 : rho >= rhoE ? 0 : Math.cos(((Math.PI / 2) * (rho - rho0)) / (rhoE - rho0)) ** 2;
+}
+
+/**
  * Kerndaten fuer die Punktebene: kern.daten mal w(rho), w = 1 bis rho0 = 2/3 Radius, dann
  * cos^2(pi/2 * (rho - rho0) / (rhoE - rho0)) bis rhoE = Radius + 0,5 px, darueber 0 (rho Abstand
  * zur Kernmitte in Pixeln); danach auf die Summe der urspruenglichen Daten normiert, so dass der
@@ -69,8 +82,6 @@ export function ausgeblendetKern(kern: Kern): Float32Array {
   if (fertig !== undefined) return fertig;
   const r = kern.radius | 0;
   const g = kern.groesse | 0;
-  const rho0 = FENSTER_ANFANG_PRO_RADIUS * r;
-  const rhoE = r + FENSTER_ENDE_ZUSATZ_PX;
   const daten = new Float32Array(kern.daten.length);
   let vorher = 0;
   let nachher = 0;
@@ -78,8 +89,7 @@ export function ausgeblendetKern(kern: Kern): Float32Array {
     for (let a = 0; a < g; a++) {
       const i = b * g + a;
       const wert = kern.daten[i] as number;
-      const rho = Math.hypot(a - r, b - r);
-      const w = rho <= rho0 ? 1 : rho >= rhoE ? 0 : Math.cos(((Math.PI / 2) * (rho - rho0)) / (rhoE - rho0)) ** 2;
+      const w = randfenster(Math.hypot(a - r, b - r), r);
       vorher += wert;
       nachher += wert * w;
       daten[i] = wert * w;
@@ -93,6 +103,35 @@ export function ausgeblendetKern(kern: Kern): Float32Array {
   }
   ausgeblendet.set(kern, daten);
   return daten;
+}
+
+const halokerne = new WeakMap<Kern, { exponent: number; kern: Kern }>();
+
+/**
+ * Kern fuer den Mischanteil g min(1, (aP q)^n) des Falls unaufgeloest (Issue #135, physik.md
+ * Abschnitt 28): kern.daten mal w(rho)^(1/n) mit dem Randfenster aus Abschnitt 24, nicht neu
+ * normiert. Fuer einen Punkt ist dann (aP (k w^(1/n)))^n = (aP k)^n w: das Fenster wirkt auf den
+ * angezeigten Halo, der so weich bis auf den Himmel auslaeuft. Innen (rho <= 2/3 Radius) bleiben
+ * die Werte bitgleich, der Scheitel aendert sich also nicht. Schluessel kern.schluessel plus
+ * "|halo|" plus n. Zwischengespeichert je Kern (fuer den letzten Exponenten).
+ */
+export function halokern(kern: Kern, n: number): Kern {
+  const fertig = halokerne.get(kern);
+  if (fertig !== undefined && fertig.exponent === n) return fertig.kern;
+  const r = kern.radius | 0;
+  const g = kern.groesse | 0;
+  const p = 1 / n;
+  const daten = new Float32Array(kern.daten.length);
+  for (let b = 0; b < g; b++) {
+    for (let a = 0; a < g; a++) {
+      const i = b * g + a;
+      const w = randfenster(Math.hypot(a - r, b - r), r);
+      daten[i] = w === 1 ? (kern.daten[i] as number) : (kern.daten[i] as number) * w ** p;
+    }
+  }
+  const ergebnis: Kern = { ...kern, schluessel: `${kern.schluessel}|halo|${n}`, daten };
+  halokerne.set(kern, { exponent: n, kern: ergebnis });
+  return ergebnis;
 }
 
 function falteInEbene(scheibchen: readonly Scheibchen[], kern: Kern, rasterPx: number, kanaele: 1 | 3): Raster | undefined {

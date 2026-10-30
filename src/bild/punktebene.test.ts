@@ -3,7 +3,7 @@ import type { Helligkeit, Punktquelle, Quellbild } from "../naht/simulationspara
 import { FalterJs } from "./falter";
 import { BildFehler } from "./fehler";
 import { malePunktquellen } from "./male";
-import { ausgeblendetKern, faltePunkte } from "./punktebene";
+import { ausgeblendetKern, faltePunkte, halokern } from "./punktebene";
 import { neuesRaster, pixelIndex, summe, type Raster } from "./raster";
 import { tonwert } from "./rendere";
 import { deltaKern, kastenKern, kernAusDaten, verschobenerDeltaKern } from "./testkerne";
@@ -102,6 +102,33 @@ describe("faltePunkte", () => {
     for (let a = r; a < 2 * r; a++) expect(k[r * g + a + 1] as number).toBeLessThan(k[r * g + a] as number);
     // Ein Delta bleibt ein Delta (Vergleichsbild).
     expect(Array.from(ausgeblendetKern(deltaKern(1)))).toEqual([1]);
+  });
+
+  it("halokern (Issue #135): innen bitgleich, Rand mal w^(1/n), Ecken 0, nicht neu normiert, eigener Schluessel", () => {
+    const g = 17;
+    const r = 8;
+    const roh = new Float32Array(g * g);
+    let s = 0;
+    for (let j = 0; j < g; j++) for (let i = 0; i < g; i++) s += roh[j * g + i] = Math.exp(-((i - r) ** 2 + (j - r) ** 2) / (2 * 4 ** 2));
+    for (let k = 0; k < roh.length; k++) roh[k] = (roh[k] as number) / s;
+    const kern = kernAusDaten(g, roh, "breit");
+    const halo = halokern(kern, 1 / 3);
+    expect(halokern(kern, 1 / 3)).toBe(halo);
+    expect(halo.schluessel).toBe("breit|halo|0.3333333333333333");
+    expect([halo.groesse, halo.radius, halo.massstabArcsecProPx]).toEqual([g, r, kern.massstabArcsecProPx]);
+    // Innen (rho <= 2/3 r) dieselben Werte, der Scheitel einer Faltung bleibt also gleich.
+    for (let a = r; a <= r + 5; a++) expect(halo.daten[r * g + a]).toBe(roh[r * g + a]);
+    // Am Rand der Achse w^3 mit dem Fenster aus Abschnitt 24 (w(r) = sin^2(pi/2 * 0,5 / (r + 0,5 - 2r/3))).
+    const w = Math.sin(((Math.PI / 2) * 0.5) / (r + 0.5 - (2 * r) / 3)) ** 2;
+    expect(halo.daten[r * g + 2 * r]).toBeCloseTo((roh[r * g + 2 * r] as number) * w ** 3, 12);
+    expect(halo.daten[0]).toBe(0);
+    expect(halo.daten.reduce((x, y) => x + y, 0)).toBeLessThan(1);
+    for (let a = r; a < 2 * r; a++) expect(halo.daten[r * g + a + 1] as number).toBeLessThan(halo.daten[r * g + a] as number);
+    // Exponent 1: dasselbe Fenster wie ausgeblendetKern, nur ohne Normierung.
+    const linear = halokern(kern, 1);
+    const faktor = (ausgeblendetKern(kern)[r * g + r] as number) / (roh[r * g + r] as number);
+    for (let i = 0; i < roh.length; i++) expect(ausgeblendetKern(kern)[i]).toBeCloseTo((linear.daten[i] as number) * faktor, 8);
+    expect(Array.from(halokern(deltaKern(1), 1 / 3).daten)).toEqual([1]);
   });
 
   it("wirft BildFehler bei unstimmigem Kern oder Scheibchen", () => {
