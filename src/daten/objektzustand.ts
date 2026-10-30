@@ -54,19 +54,8 @@ export function objektzustand(objekte: readonly Objekt[], nachweise: readonly Bi
     };
     if (zustand.isophoten !== undefined) ergebnis.isophoten = zustand.isophoten.map((i) => ({ ...i }));
     if (zustand.begleiter !== undefined) {
-      ergebnis.begleiter = zustand.begleiter.map((b): Begleiter => {
-        const nb = nachweise.find((n) => n.id === b.bild);
-        if (nb === undefined) throw new DatenFehler(OBJEKTE_DATEI, `${zustand.id}, begleiter ${b.id}`, "bild", `kein Bildnachweis "${b.bild}" in ${BILDER_DATEI}`);
-        return {
-          kennung: b.id,
-          name: b.name,
-          dxArcsec: b.dxArcsec,
-          dyArcsec: b.dyArcsec,
-          magnitude: b.magnitude,
-          quelle: { breitePx: nb.pixelBreite, hoehePx: nb.pixelHoehe, massstabArcsecProPx: begleiterMassstab(nb) },
-          isophoten: b.isophoten.map((i) => ({ ...i }))
-        };
-      });
+      // Den Bildnachweis loest erst begleiterNachweise auf (ui, beim Laden des Bilds), einmal (Issue #141).
+      ergebnis.begleiter = zustand.begleiter.map((b): Begleiter => ({ dxArcsec: b.dxArcsec, dyArcsec: b.dyArcsec, isophoten: b.isophoten.map((i) => ({ ...i })) }));
     }
   }
   return ergebnis;

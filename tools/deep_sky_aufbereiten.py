@@ -1003,7 +1003,9 @@ def verarbeite(pfad, args):
         print(f"Begleiter {b['name']}: Schwerpunkt Ost {info['schwerpunkt_ost_nord'][0]}\" Nord "
               f"{info['schwerpunkt_ost_nord'][1]}\", Ausschnitt {b['leinwand_px']} px mit Mitte dx "
               f"{info['dx_arcsec']}\" dy {info['dy_arcsec']}\", Ringfit Streuung {info['streuung_mag']:.3f} mag; "
-              f"Fluss Begleiter {float(teil.sum()) / gesamt_vorher * 100:.2f} % des Bilds")
+              f"Fluss Begleiter {float(teil.sum()) / gesamt_vorher * 100:.2f} % des Bilds, Hauptbild plus Begleiter "
+              f"gegen vorher {-2.5 * math.log10((float(im_bild.sum()) + float(teil.sum())) / gesamt_vorher):+.5f} mag "
+              f"(Abschneiden des Rests bei 0)")
     if not st.get("im_bild_entfernen", True) and begleiter:
         raise SystemExit("begleiter nur mit sterne.im_bild_entfernen (sonst misst die Tabelle ein anderes Bild)")
 
@@ -1094,10 +1096,17 @@ def begleiter_vermerk(b, info, s):
             f"{info['streuung_mag']:.2f} mag); der Rest (Bild minus Polynom, nicht negativ) ist das Begleiterbild.")
 
 
-def begleiter_bildnachweis(eintrag_haupt, b, info, mag_hell, mag_dunkel, datei_bytes, s):
-    """Bildnachweis des Begleiterbilds: Herkunft, Lizenz und Namensnennung wie das Hauptbild."""
+def begleiter_bildnachweis(p, eintrag_haupt, b, info, mag_hell, mag_dunkel, datei_bytes, s):
+    """Bildnachweis des Begleiterbilds: Herkunft, Lizenz und Namensnennung wie das Hauptbild.
+
+    bearbeitung und hinweise sind auf den Begleiter zugeschnitten (Issue #141): die Schritte bis zur
+    Trennung nur kurz mit Verweis auf den Bildnachweis des Hauptbilds, ohne dessen Einzelheiten (Kern,
+    Leinwand, Eichung); optional b["hinweise"] statt p["hinweise"].
+    """
     m = b["leinwand_px"]
     eintrag = {k: eintrag_haupt[k] for k in eintrag_haupt}
+    tonkurve = ("Pressebild per Tonkurve gegen das Profil des Hauptobjekts zurückgerechnet, "
+                if p.get("rohformat") == "tiff_tonkurve" else "")
     eintrag.update({
         "id": b["id"],
         "datei": b["datei"],
@@ -1108,14 +1117,22 @@ def begleiter_bildnachweis(eintrag_haupt, b, info, mag_hell, mag_dunkel, datei_b
         "bogensekunden_pro_pixel": s,
         "datei_bytes": datei_bytes,
         "bearbeitung": (f"Ausschnitt {m}x{m} px aus dem Bild {eintrag_haupt['id']} vor dessen Kodierung, Mitte "
-                        f"dx {info['dx_arcsec']}\" (Westen) dy {info['dy_arcsec']}\" (Norden) von der Objektmitte; "
-                        f"{begleiter_vermerk(b, info, s)} Kodiert mit log-Kennlinie: Kode 255 = mag_hell "
-                        f"{mag_hell}, Kode 1 = mag_dunkel {mag_dunkel}, Kode 0 Schwarz. WebP verlustfrei "
-                        f"(tools/deep_sky_aufbereiten.py). Bearbeitung des Hauptbilds: {eintrag_haupt['bearbeitung']}"),
+                        f"dx {info['dx_arcsec']}\" (Westen) dy {info['dy_arcsec']}\" (Norden) von der Objektmitte, auf "
+                        f"dessen Gitter ({s}\"/px, kein Neuabtasten). Bis dahin wie das Hauptbild bearbeitet "
+                        f"(Einzelheiten im Bildnachweis {eintrag_haupt['id']}): {p['bearbeitung_kanal']} {tonkurve}"
+                        f"auf Himmelsnorden oben, Osten links ausgerichtet, auf {s}\"/px abgetastet, Punktquellen "
+                        f"entfernt. {begleiter_vermerk(b, info, s)} Kodiert mit log-Kennlinie: Kode 255 = mag_hell "
+                        f"{mag_hell} (hellstes Pixel des Begleiterbilds), Kode 1 = mag_dunkel {mag_dunkel}, Kode 0 "
+                        f"Schwarz. WebP verlustfrei (tools/deep_sky_aufbereiten.py)."),
         "kennlinie": {"art": "log", "mag_hell": mag_hell, "mag_dunkel": mag_dunkel},
     })
-    eintrag["hinweise"] = (f"Begleiter {b['name']} von {eintrag_haupt['objekt']} (Feld begleiter in daten/objekte.json). "
-                           + eintrag_haupt.get("hinweise", ""))
+    # Rohdatei und Abtastung aus den hinweise des Hauptbilds, ohne dessen eigene Hinweise (p["hinweise"]).
+    roh = eintrag_haupt.get("hinweise", "")
+    if p.get("hinweise"):
+        roh = roh.removeprefix(p["hinweise"] + " ")
+    eintrag["hinweise"] = (f"Begleiter {b['name']} im Bild {eintrag_haupt['id']} (Objekt {eintrag_haupt['objekt']}); "
+                           f"Flächentabelle in daten/objekte.json ({eintrag_haupt['objekt']}, begleiter) aus demselben "
+                           f"Lauf. " + (b["hinweise"] + " " if b.get("hinweise") else "") + roh)
     return eintrag
 
 
@@ -1155,7 +1172,7 @@ def verarbeite_begleiter(p, b, teil, info, eintrag_haupt, mag_hell_haupt, l_max_
     with open(ziel, "wb") as f:
         f.write(daten_webp)
     print(f"  {ziel}: {kodes.shape[1]}x{kodes.shape[0]} px, {len(daten_webp)} Byte")
-    schreibe_bildnachweis(args.bildnachweis, begleiter_bildnachweis(eintrag_haupt, b, info, mag_hell, mag_dunkel,
+    schreibe_bildnachweis(args.bildnachweis, begleiter_bildnachweis(p, eintrag_haupt, b, info, mag_hell, mag_dunkel,
                                                                     len(daten_webp), s))
     print(f"  Bildnachweis {b['id']} in {args.bildnachweis} geschrieben")
 

@@ -91,6 +91,29 @@ describe("tonwert mit Begleitern", () => {
     expect(mit.daten[0]).toBeCloseTo(leer + p * (z(h, 2) - z(h, 0)), 6);
   });
 
+  it("zwei Begleiter: Q_k kumuliert in der Reihenfolge von deepSky.begleiter (physik.md 29)", () => {
+    const s1 = { schwelleRelativ: 0.5, sockel: 0.003 };
+    const s2 = { schwelleRelativ: 0.08, sockel: 0.006 };
+    const h = helligkeit([s1, s2]);
+    const ds = h.deepSky!;
+    const q = [0.02, 0.02, 0.3, 0];
+    const q1 = [0, 0.4, 0.9, 0.6];
+    const q2 = [0.1, 0, 0.2, 0.05];
+    const mit = tonwert(raster1(q), undefined, h, { begleiter: [raster1(q1), raster1(q2)] });
+    const ohne = tonwert(raster1(q), undefined, helligkeit());
+    const p0 = phi(-1 / ds.breite);
+    const deck = (qk: number, s: { schwelleRelativ: number }) => Math.max(0, (phi((qk / s.schwelleRelativ - 1) / ds.breite) - p0) / (1 - p0));
+    for (let i = 0; i < q.length; i++) {
+      // Q_0 = q, Q_1 = q + q1, Q_2 = q + q1 + q2; ein Begleiter ohne Licht (q_k = 0) zaehlt nicht.
+      const zu1 = q1[i]! > 0 ? deck(q1[i]!, s1) * (z(h, q[i]! + q1[i]!) - z(h, q[i]!) + s1.sockel) : 0;
+      const zu2 = q2[i]! > 0 ? deck(q2[i]!, s2) * (z(h, q[i]! + q1[i]! + q2[i]!) - z(h, q[i]! + q1[i]!) + s2.sockel) : 0;
+      expect(mit.daten[i]).toBeCloseTo((ohne.daten[i] as number) + zu1 + zu2, 6);
+    }
+    // Die Reihenfolge zaehlt: vertauscht bekommt der zweite Begleiter den Zuwachs am Fuss von Z.
+    const getauscht = tonwert(raster1(q), undefined, helligkeit([s2, s1]), { begleiter: [raster1(q2), raster1(q1)] });
+    expect(Math.abs((getauscht.daten[2] as number) - (mit.daten[2] as number))).toBeGreaterThan(1e-4);
+  });
+
   it("wirft bei falscher Anzahl, falschen Massen und Begleitern ohne Schwelle", () => {
     expect(() => tonwert(raster1([0]), undefined, helligkeit([{ schwelleRelativ: 1, sockel: 0 }]), { begleiter: [] })).toThrow(BildFehler);
     expect(() => tonwert(raster1([0, 0]), undefined, helligkeit([{ schwelleRelativ: 1, sockel: 0 }]), { begleiter: [raster1([0])] })).toThrow(BildFehler);
@@ -111,6 +134,17 @@ describe("falteTeilfenster", () => {
     r.daten[pixelIndex(r, x, y)] = 3;
     r.daten[pixelIndex(r, Math.min(39, x + 2), y)] = 1.5;
     const teil = falteTeilfenster(r, kern, falter)!;
+    expect(Array.from(teil.daten)).toEqual(Array.from(falter.falte(r, kern).daten));
+  });
+
+  it("gleicht bitgenau der Faltung des ganzen Rasters bei 3 Kanaelen (Licht in einzelnen Kanaelen)", () => {
+    const r = neuesRaster(40, 30, 3, 0);
+    // Rechteck des Lichts aus verschiedenen Kanaelen: Kanal 0 links oben, Kanal 2 rechts unten, Kanal 1 am Rand.
+    r.daten[pixelIndex(r, 12, 9)] = 2;
+    r.daten[pixelIndex(r, 25, 17) + 2] = 1.25;
+    r.daten[pixelIndex(r, 18, 29) + 1] = 0.5;
+    const teil = falteTeilfenster(r, kern, falter)!;
+    expect(teil.kanaele).toBe(3);
     expect(Array.from(teil.daten)).toEqual(Array.from(falter.falte(r, kern).daten));
   });
 
@@ -173,6 +207,33 @@ describe("rendere mit Begleitern", () => {
     expect(zaehler.aufrufe).toBe(4);
   });
 
+  it("Stufe 1 der Begleiter (Ausschnitt, mittele) haengt nicht am Kern: ein Seeing-Zug holt keinen neuen Ausschnitt", () => {
+    const zaehler = new FalterZaehlend();
+    const zw: Zwischenspeicher = {};
+    const h = helligkeit([{ schwelleRelativ: 0.5, sockel: 0 }]);
+    const innen = versetzt(4, -3);
+    let ausschnitte = 0;
+    const quelle = {
+      ausschnitt(m: { xArcsec: number; yArcsec: number }, b: number, s: number) {
+        ausschnitte++;
+        return innen.ausschnitt(m, b, s);
+      }
+    };
+    const erst = rendere(parameter(h), haupt, zaehler, zw, [quelle]);
+    expect(ausschnitte).toBe(1);
+    rendere(parameter(h, deltaKern(3)), haupt, zaehler, zw, [quelle]);
+    expect(ausschnitte).toBe(1);
+    // Zurueck zum ersten Kern: neu gefaltet, Ergebnis gleich dem ersten Lauf.
+    const wieder = rendere(parameter(h), haupt, zaehler, zw, [quelle]);
+    expect(ausschnitte).toBe(1);
+    expect(zaehler.aufrufe).toBe(6);
+    expect(Array.from(wieder.raster.daten)).toEqual(Array.from(erst.raster.daten));
+    // Neuer Ausschnitt (anderer Quellbildschluessel) holt ihn neu.
+    const p = parameter(h);
+    rendere({ ...p, quellbild: { ...p.quellbild, schluessel: "q|1|0" } }, haupt, zaehler, zw, [quelle]);
+    expect(ausschnitte).toBe(2);
+  });
+
   it("Begleiter ausserhalb des Fensters: keine Faltung, Anblick wie ohne Licht des Begleiters", () => {
     const zaehler = new FalterZaehlend();
     const h = helligkeit([{ schwelleRelativ: 0.5, sockel: 0.01 }]);
@@ -180,6 +241,17 @@ describe("rendere mit Begleitern", () => {
     expect(zaehler.aufrufe).toBe(1);
     const ohne = rendere(parameter(helligkeit()), haupt, new FalterJs());
     expect(Array.from(mit.raster.daten)).toEqual(Array.from(ohne.raster.daten));
+  });
+
+  it.each([
+    ["schwelleRelativ NaN", { schwelleRelativ: Number.NaN, sockel: 0 }],
+    ["schwelleRelativ 0", { schwelleRelativ: 0, sockel: 0 }],
+    ["schwelleRelativ negativ", { schwelleRelativ: -0.5, sockel: 0 }],
+    ["schwelleRelativ unendlich", { schwelleRelativ: Number.POSITIVE_INFINITY, sockel: 0 }],
+    ["sockel negativ", { schwelleRelativ: 0.5, sockel: -0.01 }],
+    ["sockel NaN", { schwelleRelativ: 0.5, sockel: Number.NaN }]
+  ])("pruefeParameter wirft BildFehler bei deepSky.begleiter mit %s", (_name, schwelle) => {
+    expect(() => rendere(parameter(helligkeit([schwelle])), haupt, new FalterJs(), {}, [versetzt(4, -3)])).toThrow(BildFehler);
   });
 
   it("wirft, wenn deepSky Begleiter nennt, rendere aber keine Quelle dazu bekommt", () => {

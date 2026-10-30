@@ -136,7 +136,8 @@
       "ring_arcsec": 180,
       "leinwand_px": 128,
       "magnitude": 8.08,
-      "magnitude_quelle": "V 8,08 nach Wikipedia (Messier 32, Abruf 2026-10-30, Sekundärquelle mit Verweis auf SIMBAD und Gil de Paz et al. 2007, ApJS 173, 185), docs/recherche/physik.md 29"
+      "magnitude_quelle": "V 8,08 +- 0,05 nach SIMBAD (M32, Fluss V aus 2007ApJS..173..185G = Gil de Paz et al. 2007, ApJS 173, 185; geprüft 2026-10-30 über den Harvard-Spiegel von SIMBAD), docs/recherche/physik.md 29",
+      "hinweise": "Grobes Quellbild: 4\"/px (A-X11); Kern von M32 im Pressebild gesättigt (Spitze 16,22 mag/arcsec^2 statt etwa 12 bis 13, docs/recherche/physik.md 29)."
     }
   ],
   "hintergrund": "kein Abzug, der Schwarzpunkt des Pressebilds liegt auf dem Himmel (Kode 7 wird 0)",

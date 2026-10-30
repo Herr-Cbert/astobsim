@@ -45,7 +45,9 @@ export interface Zwischenspeicher {
   gefaltet?: { schluessel: string; raster: Raster | undefined };
   /** Stufe 2, nur im Fall unaufgeloest: Objektraster mit halokern gefaltet (Issue #135). */
   halo?: { schluessel: string; raster: Raster };
-  /** Stufen 1 und 2 je Begleiter (Issue #136): gemittelt und gefaltet, undefined ohne Licht im Fenster. */
+  /** Stufe 1 je Begleiter (Issue #136, #141): gemittelt, undefined ohne Licht im Fenster; unabhaengig vom Kern. */
+  begleiterGemittelt?: { schluessel: string; raster: Raster | undefined }[];
+  /** Stufe 2 je Begleiter (Issue #136): gefaltet (im Teilfenster), undefined ohne Licht im Fenster. */
   begleiter?: { schluessel: string; raster: Raster | undefined }[];
   /**
    * Stufe 2: gefaltete Punktebene (undefined ohne Punktquelle im Raster) und Faerbung (undefined,
@@ -95,6 +97,12 @@ function pruefeParameter(p: Simulationsparameter): void {
     }
     if (!(ds.schwelleRelativ > 0) || !(ds.breite > 0) || !Number.isFinite(ds.schwelleRelativ) || !Number.isFinite(ds.breite)) {
       throw new BildFehler(`Helligkeit.deepSky: schwelleRelativ ${ds.schwelleRelativ} und breite ${ds.breite} muessen positiv sein`);
+    }
+    // Begleiter (Issue #141): dieselben Bedingungen wie fuer das Hauptobjekt, sonst rechnet tonwert NaN.
+    for (const [k, b] of (ds.begleiter ?? []).entries()) {
+      if (!(b.schwelleRelativ > 0) || !Number.isFinite(b.schwelleRelativ) || !(b.sockel >= 0) || !Number.isFinite(b.sockel)) {
+        throw new BildFehler(`Helligkeit.deepSky.begleiter[${k}]: schwelleRelativ ${b.schwelleRelativ} muss positiv, sockel ${b.sockel} >= 0 sein, beide endlich`);
+      }
     }
   }
 }
@@ -444,8 +452,9 @@ function maskiereAn(raster: Raster, gesichtsfeld: Gesichtsfeld, fenster: Fenster
  * unaufgeloest (mischgewicht > 0, ohne deepSky, mit Objektraster, Kern kein Delta) faltet der Falter das Objekt
  * zusaetzlich mit halokern, unter dessen Schluessel plus Objektschluessel (Issue #135).
  * begleiter (Issue #136): je Begleiter des Zustands seine Quelle, in der Reihenfolge von
- * helligkeit.deepSky.begleiter; Ausschnitt, mittele und Faltung im Teilfenster (falteTeilfenster)
- * unter kern.schluessel plus Objektschluessel plus Index.
+ * helligkeit.deepSky.begleiter; Ausschnitt und mittele unter Objektschluessel plus Index (Stufe 1,
+ * unabhaengig vom Kern, Issue #141), die Faltung im Teilfenster (falteTeilfenster) unter
+ * kern.schluessel plus diesem Schluessel.
  * Wer den Zwischenspeicher weglaesst, rechnet alles neu. Der Zwischenspeicher gehoert zu genau
  * einer Quelle; bei Wechsel der Quelle einen neuen anlegen.
  */
@@ -506,20 +515,27 @@ export function rendere(
     zusatz.halo = halo.raster;
   }
   if (begleiter.length > 0) {
+    const gemittelt = zwischen.begleiterGemittelt ?? [];
     const gespeichert = zwischen.begleiter ?? [];
     zusatz.begleiter = begleiter.map((b, k) => {
-      const schluessel = `${kern.schluessel}|${objekt.schluessel}|begleiter ${k}`;
-      let eintrag = gespeichert[k];
-      if (!eintrag || eintrag.schluessel !== schluessel) {
+      const schluesselGemittelt = `${objekt.schluessel}|begleiter ${k}`;
+      let stufe1 = gemittelt[k];
+      if (!stufe1 || stufe1.schluessel !== schluesselGemittelt) {
         const mitte = { xArcsec: quellbild.mitteXArcsec, yArcsec: quellbild.mitteYArcsec };
         const ausschnitt = b.ausschnitt(mitte, quellbild.rasterPx * quellbild.massstabArcsecProPx, quellbild.massstabArcsecProPx);
         pruefeRaster(ausschnitt.raster, "Begleiterausschnitt");
-        const raster = istSchwarz(ausschnitt.raster) ? undefined : falteTeilfenster(mittele(ausschnitt, quellbild), kern, falter);
-        eintrag = { schluessel, raster };
+        stufe1 = { schluessel: schluesselGemittelt, raster: istSchwarz(ausschnitt.raster) ? undefined : mittele(ausschnitt, quellbild) };
+        gemittelt[k] = stufe1;
+      }
+      const schluessel = `${kern.schluessel}|${schluesselGemittelt}`;
+      let eintrag = gespeichert[k];
+      if (!eintrag || eintrag.schluessel !== schluessel) {
+        eintrag = { schluessel, raster: stufe1.raster === undefined ? undefined : falteTeilfenster(stufe1.raster, kern, falter) };
         gespeichert[k] = eintrag;
       }
       return eintrag.raster;
     });
+    zwischen.begleiterGemittelt = gemittelt;
     zwischen.begleiter = gespeichert;
   }
   const getont = tonwert(gefaltet.raster, punktebene.raster, helligkeit, zusatz);

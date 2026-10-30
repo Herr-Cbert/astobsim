@@ -7,6 +7,7 @@ import type { Kern } from "../../src/naht/simulationsparameter";
 import { FalterJs, type Falter } from "../../src/bild/falter";
 import { FalterWebgl2, waehleFalter, type Falterwahl } from "../../src/bild/falter_webgl2";
 import { neuesRaster, pixelIndex, type Kanaele, type Raster } from "../../src/bild/raster";
+import { falteTeilfenster } from "../../src/bild/rendere";
 import { deltaKern, kastenKern, kernAusDaten, verschobenerDeltaKern } from "../../src/bild/testkerne";
 
 interface Vergleich {
@@ -62,6 +63,18 @@ function zufallsRaster(breite: number, hoehe: number, kanaele: Kanaele, saat = 1
 function kantenRaster(breite: number, hoehe: number, kante: number): Raster {
   const raster = neuesRaster(breite, hoehe);
   for (let y = 0; y < hoehe; y++) for (let x = kante; x < breite; x++) raster.daten[pixelIndex(raster, x, y)] = 1;
+  return raster;
+}
+
+/** Nullraster mit einem Zufallsfleck 9 x 7 px ab (x0, y0), auf das Raster begrenzt (Begleiter, Teilfenster). */
+function lichtfleck(breite: number, hoehe: number, kanaele: Kanaele, x0: number, y0: number): Raster {
+  const fleck = zufallsRaster(9, 7, kanaele, 4242);
+  const raster = neuesRaster(breite, hoehe, kanaele);
+  for (let y = 0; y < 7 && y0 + y < hoehe; y++) {
+    for (let x = 0; x < 9 && x0 + x < breite; x++) {
+      for (let c = 0; c < kanaele; c++) raster.daten[pixelIndex(raster, x0 + x, y0 + y) + c] = fleck.daten[pixelIndex(fleck, x, y) + c] as number;
+    }
+  }
   return raster;
 }
 
@@ -155,6 +168,19 @@ function lauf(): void {
     ["Ausgerollt: Delta (3, -5) Kern 25, 33x21, 3 Kanaele", zufallsRaster(33, 21, 3), verschobenerDeltaKern(3, -5, 25)]
   ];
   for (const [name, raster, kern] of faelle) ergebnis.vergleiche.push(vergleiche(name, gl.falte(raster, kern), js.falte(raster, kern)));
+
+  // Begleiter (Issue #136, #141): Faltung im Teilfenster mit WebGL2 gegen die ganze Faltung in JS, Licht
+  // in der Mitte und am Rasterrand, ein und drei Kanaele.
+  const teilfaelle: [string, Raster, Kern][] = [
+    ["Teilfenster Gauss 17, Licht Mitte, 120x90, 1 Kanal", lichtfleck(120, 90, 1, 50, 40), gaussKern(17, 2.5)],
+    ["Teilfenster Gauss 17, Licht am Rand, 120x90, 3 Kanaele", lichtfleck(120, 90, 3, 2, 85), gaussKern(17, 2.5)],
+    ["Teilfenster Schleife Delta (3, -5) Kern 27, 64x64, 3 Kanaele", lichtfleck(64, 64, 3, 30, 20), verschobenerDeltaKern(3, -5, 27)]
+  ];
+  for (const [name, raster, kern] of teilfaelle) {
+    const teil = falteTeilfenster(raster, kern, gl);
+    if (!teil) ergebnis.fehler.push(`${name}: falteTeilfenster lieferte kein Raster`);
+    else ergebnis.vergleiche.push(vergleiche(name, teil, js.falte(raster, kern)));
+  }
 
   // Hauptfall des Issues: 1024 px, Kern 25 px, Kasten und Gauss, ein und drei Kanaele.
   const bild1 = zufallsRaster(1024, 1024, 1);

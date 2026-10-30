@@ -440,12 +440,8 @@ describe("auswerten Version 2: Deep-Sky mit Quellbild (ADR-0004 Ebene b)", () =>
 describe("auswerten: Begleiter mit eigener Schwelle (Issue #136, ADR-0004 Nachtrag)", () => {
   // Kompakter Begleiter: kleine Flaechen, also strenge Schwelle (Ricco-Bereich).
   const begleiter: Begleiter = {
-    kennung: "b",
-    name: "Begleiter",
     dxArcsec: 30,
     dyArcsec: -20,
-    magnitude: 12,
-    quelle: { breitePx: 16, hoehePx: 16, massstabArcsecProPx: 1 },
     isophoten: [
       { magProArcsec2: 17, flaecheArcsec2: 4 },
       { magProArcsec2: 18, flaecheArcsec2: 20 },
