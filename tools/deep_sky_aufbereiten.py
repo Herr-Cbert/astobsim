@@ -283,10 +283,13 @@ def sterne_entfernen(bild, fenster_px=9, schwelle_sigma=6.0, kontrast=0.5, wachs
                                 for oy in (-1, 0, 1) for ox in (-1, 0, 1) if (ox, oy) != (0, 0)]), axis=0)
     spitzen = np.argwhere(kandidat & (bild > nachbarn))
     maske = np.zeros(bild.shape, bool)
+    # Kern: gewachsene Masken ohne Randerweiterung. Nur eine Spitze in einem schon gewachsenen Stern
+    # wird uebersprungen; liegt sie nur im Rand eines Nachbarn, waechst sie selbst (Issue #106, M1).
+    kern = np.zeros(bild.shape, bool)
     sterne = []
     wachsen = rest > wachsen_sigma * sigma
     for y, x in spitzen:
-        if maske[y, x]:
+        if kern[y, x]:
             continue
         y0, y1 = max(0, y - max_radius_px), min(h, y + max_radius_px + 1)
         x0, x1 = max(0, x - max_radius_px), min(w, x + max_radius_px + 1)
@@ -299,6 +302,7 @@ def sterne_entfernen(bild, fenster_px=9, schwelle_sigma=6.0, kontrast=0.5, wachs
             if (neu == teil).all():
                 break
             teil = neu
+        kern[y0:y1, x0:x1] |= teil
         for _ in range(rand_px):
             teil = _dehnen(teil)
         maske[y0:y1, x0:x1] |= teil
