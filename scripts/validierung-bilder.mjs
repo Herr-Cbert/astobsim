@@ -32,15 +32,16 @@ const PIXELFAKTOR = 2;
 const RUHE_MS = 2000;
 const ZEITLIMIT_FALL_MS = 120_000;
 
-// Bedingungen aller Faelle: Bortle 5, klar, Zenit (das Seeing gilt dort ohne Hoehenfaktor).
+// Bedingungen der Faelle ohne eigene Angabe: Bortle 5, klar, Zenit (das Seeing gilt dort ohne Hoehenfaktor).
 const B = "b=5&t=klar&h=90";
 /** Freier Refraktor ohne Obstruktion, Okular 50 Grad. */
 const refraktor = (d, f, ok) => `a=fernrohr&ba=refraktor&d=${d}&f=${f}&o=0&ok=${ok}&sg=50`;
 
 /**
- * Die Faelle aus docs/validierung.md (T1 bis T6, Mondphasen P1 bis P3, Helligkeit T12): Name, Suchteil der URL,
+ * Die Faelle aus docs/validierung.md (T1 bis T12, Mondphasen P1 bis P3, Sternzahl M13): Name, Suchteil der URL,
  * optional die Pfeiltaste und Anzahl der Schritte mit Umschalt (je 25 % der Detailbreite), die das
- * Detail an die gepruefte Stelle schieben (T3: knapp rechts vom Terminator, Issue #77).
+ * Detail an die gepruefte Stelle schieben (T3: knapp rechts vom Terminator, Issue #77), optional
+ * Bedingungen statt B.
  */
 export const FAELLE = [
   ["T1", `${refraktor(70, 700, 7)}&z=jup_47&s=2`],
@@ -68,8 +69,31 @@ export const FAELLE = [
   ["T12a", `${refraktor(80, 800, 10)}&z=mond_ev&s=2`],
   ["T12b", `g=auge&z=jup_47&s=2`],
   ["T12c", `g=auge&z=mars_14&s=2`],
-  ["T12d", `g=auge&z=sat_20&s=2`]
-].map(([name, such, detail]) => ({ name, such: `?v=1&${such}&${B}`, detail }));
+  ["T12d", `g=auge&z=sat_20&s=2`],
+  // Version 2, T7 bis T11 (Issue #112, docs/recherche/README.md): Doppelsterne bei Seeing 0,5'' im Zenit,
+  // M57 am 80 und 150 mm, blosses Auge bei Bortle 3 und 7. Abweichende Bedingungen als viertes Element.
+  ["T7a", `${refraktor(80, 800, 5)}&z=pi_aql_2021&s=0.5`],
+  ["T7b", `${refraktor(150, 1500, 5)}&z=pi_aql_2021&s=0.5`],
+  ["T7c", `${refraktor(80, 800, 5)}&z=eps_ari_2027&s=0.5`],
+  ["T7d", `${refraktor(150, 1500, 5)}&z=eps_ari_2027&s=0.5`],
+  ["T8a", `g=fernglas-10x50&z=eps_lyr_2027&s=2`],
+  ["T8b", `${refraktor(80, 800, 5)}&z=eps_lyr_2027&s=0.5`],
+  ["T8c", `${refraktor(80, 800, 5)}&z=eps_lyr_2027&s=2`],
+  ["T9a", `${refraktor(150, 1200, 6)}&z=antares_2027&s=0.5`],
+  ["T9b", `${refraktor(150, 1200, 6)}&z=antares_2027&s=1.5`],
+  ["T9c", `${refraktor(150, 1200, 6)}&z=antares_2027&s=0.5`, undefined, "b=5&t=klar&h=15"],
+  ["T10a", `${refraktor(80, 800, 10)}&z=m57&s=2`],
+  ["T10b", `${refraktor(150, 1200, 10)}&z=m57&s=2`],
+  ["T11a", `g=auge&z=m31&s=2`, undefined, "b=3&t=klar&h=90"],
+  ["T11b", `g=auge&z=m31&s=2`, undefined, "b=7&t=klar&h=90"],
+  ["T11c", `g=auge&z=m45&s=2`, undefined, "b=3&t=klar&h=90"],
+  ["T11d", `g=auge&z=m45&s=2`, undefined, "b=7&t=klar&h=90"],
+  // Sternzahl M13 (Pruefpunkt aus Issue #108, deep-sky.md 8 Punkt 4): Bortle 4 wie dort, 80 mm 75-fach,
+  // 200 mm 150-fach, 300 mm 214-fach.
+  ["M13a", `${refraktor(80, 600, 8)}&z=m13&s=2`, undefined, "b=4&t=klar&h=90"],
+  ["M13b", `g=newton-200-1200&ok=8&z=m13&s=1.5`, undefined, "b=4&t=klar&h=90"],
+  ["M13c", `g=newton-300-1500&ok=7&z=m13&s=1.5`, undefined, "b=4&t=klar&h=90"]
+].map(([name, such, detail, bedingungen = B]) => ({ name, such: `?v=1&${such}&${bedingungen}`, detail }));
 
 if (!existsSync(join(bau, "index.html"))) {
   console.error("validierung-bilder: dist/index.html fehlt, vorher npm run build");
