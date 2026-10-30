@@ -13,6 +13,14 @@ export interface Sterndatenquelle {
   url: string;
 }
 
+/**
+ * Seeing als Langzeitmittel bei engen Doppelsternen (Entscheidung 3 in docs/recherche/README.md,
+ * docs/recherche/doppelsterne.md 4): im Hilfetext zum Seeing und zum Seeing am Objekt bei Doppelsternen.
+ */
+const SEEING_PAARE =
+  "Bei engen Doppelsternen heißt das: Paare nahe der Beugungsgrenze trennen Beobachter oft nur in kurzen ruhigen Momenten, " +
+  "im Bild erscheinen sie erst bei ausgezeichnetem Seeing (etwa 0,5″) getrennt.";
+
 export const TEXTE = {
   titel: "astobsim",
   untertitel: "Wie sieht ein Himmelsobjekt durch ein Fernrohr aus?",
@@ -174,12 +182,13 @@ export const TEXTE = {
       "Angegeben wird, wie breit ein Stern im Zenit verschmiert erscheint (Halbwertsbreite in Bogensekunden); kleiner ist besser. " +
       "Unter 1″ ist ausgezeichnet, 1 bis 2″ gut, 2 bis 3″ mittel, darüber schlecht. Bei Hobbybeobachtern sind 2 bis 5″ üblich, 2″ ist ein durchschnittlicher Abend. " +
       "Die Pickering-Stufe (1 bis 10, 10 ist am ruhigsten) ist eine Schätzskala von Beobachtern; die Zuordnung zu Bogensekunden ist nur ungefähr. " +
-      "Gezeigt wird der Anblick über längere Zeit, nicht der beste ruhige Moment.",
+      "Gezeigt wird der Anblick über längere Zeit, nicht der beste ruhige Moment. " +
+      SEEING_PAARE,
     bortle:
       "Die Bortle-Skala beschreibt, wie hell der Nachthimmel ist: 1 ist ein ausgezeichneter dunkler Himmel fern jeder Stadt, 9 der Himmel einer Innenstadt. " +
       "Daneben steht die Himmelshelligkeit in Magnituden je Quadratbogensekunde (größer ist dunkler). " +
-      "In dieser Version wirkt die Stufe nur auf die Helligkeit des Hintergrunds im Gesichtsfeld: Mond und Planeten sind so viel heller als der Himmel, dass sie sich kaum ändern. " +
-      "Ihre volle Wirkung hätte die Stufe erst bei lichtschwachen Objekten wie Nebeln und Galaxien. " +
+      "Die Stufe bestimmt die Helligkeit des Hintergrunds im Gesichtsfeld und die Wahrnehmungsschwelle: Je heller der Himmel, desto weniger schwache Sterne sind zu sehen (Grenzgröße) " +
+      "und desto weniger bleibt von Nebeln, Galaxien und Sternhaufen übrig (sichtbare Isophote). Mond und Planeten sind so viel heller als der Himmel, dass sie sich kaum ändern. " +
       "Die Werte für Stufe 8 und 9 sind Schätzungen.",
     transparenz:
       "Wie klar die Luft ist. Dunst und Feuchtigkeit schlucken Licht: Das Objekt wird dunkler, je diesiger die Luft und je tiefer es steht. " +
@@ -200,6 +209,27 @@ export const TEXTE = {
     quellbildOhneAufnahme:
       "Für dieses Objekt gibt es keine Aufnahme. Das Feld zeigt die Sterne als berechnete, ideale Punkte an ihren Katalogpositionen, im selben Maßstab und Ausschnitt wie der Anblick, " +
       "ohne Beugung, Seeing und Augenauflösung. Liegen hier zwei Punkte getrennt, im Anblick aber nicht, trennen Fernrohr und Bedingungen das Paar nicht.",
+    /**
+     * Statt quellbild bei Deep-Sky-Objekten mit Aufnahme (Issue #110), je Abbildung des
+     * Vergleichsbilds (Vergleichsabbildung in src/ui/zoom.ts; entschieden: kubikwurzelUeberBoden).
+     */
+    quellbildDeepSky: {
+      linear:
+        "Die Aufnahme, aus der der Anblick entsteht, im selben Maßstab und Ausschnitt, ohne Verschmierung und ohne Anpassung der Helligkeit: Weiß im Quellbild ist Weiß auf dem Bildschirm. " +
+        "Schwache äußere Teile des Objekts sind so kaum zu sehen, obwohl sie in der Aufnahme stecken. Sterne erscheinen so blass wie im Anblick.",
+      kubikwurzel:
+        "Die Aufnahme, aus der der Anblick entsteht, im selben Maßstab und Ausschnitt, ohne Verschmierung; die Fläche ohne Wahrnehmungsschwelle. " +
+        "Die Helligkeit ist gestreckt (Kubikwurzel, wie im Anblick), damit auch die schwachen äußeren Teile zu sehen sind: Ein Tausendstel der hellsten Stelle erscheint noch als dunkles Grau. " +
+        "Was hier zu sehen ist und im Anblick fehlt, liegt unter den eingestellten Bedingungen unter der Wahrnehmungsschwelle oder ist zu fein. Sterne erscheinen so blass wie im Anblick.",
+      kubikwurzelUeberBoden:
+        "Die Aufnahme, aus der der Anblick entsteht, im selben Maßstab und Ausschnitt, ohne Verschmierung; die Fläche ohne Wahrnehmungsschwelle. " +
+        "Die Helligkeit ist gestreckt (Kubikwurzel, wie im Anblick), damit auch die schwachen äußeren Teile zu sehen sind; der dunkle Hintergrund der Aufnahme erscheint schwarz. " +
+        "Ein grauer Grund bis an den Bildrand ist schwaches Licht des Objekts selbst, etwa ein äußerer Halo; die Aufnahme endet dort. " +
+        "Was hier zu sehen ist und im Anblick fehlt, liegt unter den eingestellten Bedingungen unter der Wahrnehmungsschwelle oder ist zu fein. Sterne erscheinen so blass wie im Anblick.",
+      okularOhneSchwelle:
+        "Die Aufnahme so hell, wie sie im Okular erscheint, mit demselben Himmel wie der Anblick, aber ohne Verschmierung; die Fläche ohne Wahrnehmungsschwelle. " +
+        "Was hier zu sehen ist und im Anblick fehlt, kann das Auge unter den eingestellten Bedingungen nicht wahrnehmen oder es ist zu fein. Sterne erscheinen so blass wie im Anblick."
+    },
 
     /** Hilfetexte zu den Zahlen des Infopanels (A-D6), Schluessel wie in TEXTE.info. */
     anzeige: {
@@ -228,7 +258,44 @@ export const TEXTE = {
         "Feine, kontrastarme Einzelheiten auf Planeten braucht das Auge eher zwei- bis dreimal so groß; deshalb lohnt mehr Vergrößerung, als die Beugung allein verlangt.",
       dominant:
         "Welche der drei Grenzen (Beugung, Seeing, Auge) das Bild am stärksten verschmiert. " +
-        "Sie zeigt, was am meisten bringt: mehr Öffnung bei der Beugung, ruhigere Luft bei Seeing, mehr Vergrößerung beim Auge."
+        "Sie zeigt, was am meisten bringt: mehr Öffnung bei der Beugung, ruhigere Luft bei Seeing, mehr Vergrößerung beim Auge.",
+      /** Zusatz zu seeing bei Doppelsternen. */
+      seeingPaare: `Gezeigt wird das Mittel über längere Zeit. ${SEEING_PAARE}`,
+      // Beobachtermodell: ADR-0004 (Feldfaktor 1,4), docs/recherche/wahrnehmung.md 7 Punkt 2.
+      grenzgroesse:
+        "Die Helligkeit des schwächsten Sterns, den man unter den eingestellten Bedingungen gerade noch sieht, in Magnituden (größer ist schwächer). " +
+        "Das Bild zeigt Sterne nahe der Grenzgröße blass und deutlich schwächere gar nicht. " +
+        "astobsim rechnet mit einem festen Beobachter: voll an die Dunkelheit gewöhnt und mit etwas Übung (Feldfaktor 1,4 nach Crumey); am Fernrohr sieht er mit einem Auge, das kostet etwas. " +
+        "Sehr geübte Beobachter erreichen bei dunklem Himmel bis etwa 1 mag mehr, ungeübte weniger. Alter, Blendung und die Zeit der Gewöhnung an die Dunkelheit sind keine Eingaben.",
+      isophote:
+        "Nebel und Galaxien werden nach außen immer schwächer. Die sichtbare Isophote ist die schwächste Flächenhelligkeit (Magnituden je Quadratbogensekunde, größer ist schwächer), " +
+        "die sich unter den eingestellten Bedingungen noch vom Himmel abhebt; was schwächer ist, verblasst im Bild in den Himmel. " +
+        "„Unter der Schwelle“ heißt: Kein Teil des Objekts hebt sich sicher ab, das Bild zeigt es höchstens als Hauch. Ein dunklerer Himmel oder mehr Öffnung helfen. " +
+        "Die Schwelle gilt für denselben festen Beobachter wie die Grenzgröße.",
+      ausdehnung:
+        "Wie groß der sichtbare Teil des Objekts ist: der Durchmesser eines Kreises mit derselben Fläche wie alles innerhalb der sichtbaren Isophote. " +
+        "Bei länglichen Objekten ist die längste Ausdehnung größer. „Mindestens“ heißt, dass auch die schwächsten in der Aufnahme gemessenen Teile sichtbar sind."
+    },
+
+    /** Hilfetexte zu den Hinweisen unter den Kennwerten (src/ui/infopanel.ts, Issue #110). */
+    hinweis: {
+      // A-P10; Uebergang nach docs/recherche/wahrnehmung.md 3.2.
+      unaufgeloest:
+        "Erscheint ein Objekt im Okular kleiner als etwa ein bis zwei Bogenminuten (Größe mal Vergrößerung), kann das Auge es nicht als Scheibe auflösen: " +
+        "Es sieht einen Punkt wie bei einem Stern, so wie Jupiter mit bloßem Auge. Der Übergang ist gleitend; mehr Vergrößerung zeigt wieder die Scheibe.",
+      // grund "unter_schwelle" (docs/architektur.md 5.3), Schnitt 5 mag unter der Grenzgroesse (physik.md Abschnitt 20).
+      unterSchwelle:
+        "Sterne und Monde, die schwächer als die Grenzgröße sind, liegen unter der Wahrnehmungsschwelle: Das Bild zeigt sie umso blasser, je schwächer sie sind, " +
+        "und etwa 5 mag unter der Grenzgröße gar nicht mehr. Ein dunklerer Himmel und mehr Öffnung heben die Grenzgröße, oft auch mehr Vergrößerung, weil sie den Himmel im Okular dunkler macht.",
+      // A-Z9, A-P9: Ueberstrahlung ab 4 mag Unterschied unter 10'' (docs/recherche/doppelsterne.md 5).
+      ueberstrahlung:
+        "Neben einem viel helleren Stern ist ein schwacher Begleiter in Wirklichkeit schwerer zu sehen, als das Bild zeigt: Das Licht des hellen Sterns streut im Auge und im Fernrohr und überstrahlt seine Umgebung. " +
+        "astobsim simuliert diese Blendung nicht; bei engen Paaren (unter 10″) mit mehr als etwa 4 mag Unterschied erscheint der Begleiter im Bild daher zu leicht.",
+      // A-X11: grobe Quellbilder grosser Deep-Sky-Objekte; Kriterium wie der Arbeitsmassstab (ADR-0002).
+      quellbildGrenze:
+        "Jede Aufnahme besteht aus Pixeln. Bei großen Objekten ist sie nur so fein, wie es für kleine Vergrößerungen nötig ist, sonst würde die Datei zu groß. " +
+        "Bei hoher Vergrößerung begrenzt dann die Aufnahme und nicht Fernrohr, Luft oder Auge die Schärfe: Einzelheiten feiner als einige Pixel fehlen im Anblick, auch wenn das Fernrohr sie zeigen könnte. " +
+        "Das ist eine Grenze von astobsim, nicht des Fernrohrs."
     }
   },
 
@@ -366,7 +433,33 @@ export const TEXTE = {
     dawes: "Beugungsgrenze (Dawes)",
     seeing: "Seeing am Objekt",
     auge: "Augengrenze",
-    dominant: "Dominante Grenze"
+    dominant: "Dominante Grenze",
+    grenzgroesse: "Grenzgröße",
+    isophote: "Sichtbare Isophote",
+    ausdehnung: "Sichtbare Ausdehnung",
+    /** Wert der Isophote, wenn kein Teil des Objekts die Schwelle erreicht. */
+    unterSchwelle: "unter der Schwelle",
+    /** Wert der Isophote, wenn auch die schwaechste Zeile der Flaechentabelle sichtbar ist. */
+    isophoteOderSchwaecher: (mu: string): string => `${mu} oder schwächer`,
+    ausdehnungEtwa: (winkel: string): string => `etwa ${winkel}`,
+    ausdehnungMindestens: (winkel: string): string => `mindestens ${winkel}`,
+    /** Saetze unter den Kennwerten (Issue #110); Hilfetexte unter TEXTE.hilfe.hinweis. */
+    hinweise: "Hinweise",
+    unaufgeloest: (v: string, scheinbar: string): string =>
+      `Unaufgelöst: Bei ${v} erscheint das Objekt nur ${scheinbar} groß, das Auge sieht es als Punkt wie einen Stern.`,
+    unaufgeloestThema: "unaufgelöst",
+    /** Namen bis zu drei Punktquellen unter der Grenzgroesse, sonst nur die Anzahl. */
+    unterGrenzgroesseNamen: (namen: readonly string[]): string => `Schwächer als die Grenzgröße, im Bild blass oder unsichtbar: ${namen.join(", ")}.`,
+    unterGrenzgroesseAnzahl: (anzahl: number, gesamt: number): string =>
+      `${anzahl} von ${gesamt} Sternen sind schwächer als die Grenzgröße, im Bild blass oder unsichtbar.`,
+    unterGrenzgroesseThema: "Sternen unter der Grenzgröße",
+    ueberstrahlung: (a: string, b: string, deltaMag: string): string =>
+      `Überstrahlung nicht simuliert: ${a} und ${b} unterscheiden sich um ${deltaMag} mag, der schwächere Stern ist in Wirklichkeit schwerer zu sehen.`,
+    ueberstrahlungThema: "Überstrahlung",
+    /** Komponente eines Doppelsterns in den Saetzen; die Daten nennen nur den Buchstaben ("B", "eps1 A"). */
+    komponente: (name: string): string => `Stern ${name}`,
+    quellbildGrenze: (massstab: string): string => `Grenze des Quellbilds: Die Aufnahme hat ${massstab} je Pixel; feinere Einzelheiten fehlen im Anblick.`,
+    quellbildGrenzeThema: "Grenze des Quellbilds"
   },
   grenzen: {
     beugung: "Beugung",
@@ -378,6 +471,8 @@ export const TEXTE = {
     grad: "°",
     bogenminute: "′",
     bogensekunde: "″",
-    mm: "mm"
+    mm: "mm",
+    mag: "mag",
+    magProBogensekunde2: "mag/″²"
   }
 } as const;

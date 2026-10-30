@@ -12,7 +12,7 @@ import type { Anblick } from "../bild";
 import type { Auswertung } from "../physik";
 import { TEXTE } from "../texte";
 import type { Kataloge } from "../zustand";
-import { infozeilen, zeigeInfozeilen } from "./infopanel";
+import { infohinweise, infozeilen, zeigeInfozeilen } from "./infopanel";
 import type { Steuerung } from "./steuerung";
 import { sollMitte } from "./verschieben";
 import { warnzeilen, zeigeWarnzeilen } from "./warnungen";
@@ -51,7 +51,9 @@ export function baueGesichtsfeld(plaetze: GesichtsfeldPlaetze, steuerung: Steuer
     }
     if (stand.auswertung !== undefined && stand.auswertung !== auswertung) {
       auswertung = stand.auswertung;
-      zeigeInfozeilen(plaetze.info, infozeilen(stand.auswertung.anzeige));
+      // Die Auswertung kommt im selben Stand wie ihre Konfiguration (Steuerung.rechne setzt sie
+      // ohne Warten nach dem Lesen der Konfiguration); Hinweise und Isophote brauchen beide.
+      zeigeInfozeilen(plaetze.info, infozeilen(stand.auswertung.anzeige, stand.konfiguration), infohinweise(stand.auswertung, stand.konfiguration));
       zeigeWarnzeilen(plaetze.warnungen, warnzeilen(stand.auswertung.warnungen));
     }
     if (stand.konfiguration.objekt.kennung !== kennung) {

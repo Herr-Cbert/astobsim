@@ -9,6 +9,7 @@ import type { Konfiguration } from "../naht/konfiguration";
 import { atmosphaere, aufloesung, auswerten, freiesPaar, optik } from "../physik";
 import { TEXTE } from "../texte";
 import { type Kataloge, voreinstellung } from "../zustand";
+import { linearZuSrgb8 } from "./zeichne";
 import { quellbildHilfe } from "./zoomansicht";
 import { arbeitsmassstabOhneFenster } from "../physik";
 import {
@@ -17,6 +18,8 @@ import {
   detailstart,
   objektausdehnungArcsec,
   STERN_RAND_PRO_FWHM,
+  bodenRelativ,
+  VERGLEICH_DEEP_SKY,
   vergleichsparameter,
   verschiebelage,
   ZOOM_ARBEITSPIXEL_MIN,
@@ -205,12 +208,122 @@ describe("Zoom ohne Quellbild (Doppelsterne, M45, Issue #109)", () => {
   });
 });
 
-describe("Hilfetext zum Vergleichsbild (Issue #109)", () => {
-  it("ohne Aufnahme der Text zu den berechneten Sternpunkten, sonst der zum Quellbild", () => {
+describe("Hilfetext zum Vergleichsbild (Issue #109, #110)", () => {
+  it("ohne Aufnahme der Text zu den berechneten Sternpunkten, bei Deep-Sky der zur Abbildung, sonst der zum Quellbild", () => {
     expect(quellbildHilfe(mit("albireo_2025").objekt)).toBe(TEXTE.hilfe.quellbildOhneAufnahme);
     expect(quellbildHilfe(mit("m45").objekt)).toBe(TEXTE.hilfe.quellbildOhneAufnahme);
     expect(quellbildHilfe(mit("jup_47").objekt)).toBe(TEXTE.hilfe.quellbild);
-    expect(quellbildHilfe(mit("m57").objekt)).toBe(TEXTE.hilfe.quellbild);
+    expect(quellbildHilfe(mit("m57").objekt)).toBe(TEXTE.hilfe.quellbildDeepSky[VERGLEICH_DEEP_SKY]);
+    for (const art of ["linear", "kubikwurzel", "kubikwurzelUeberBoden", "okularOhneSchwelle"] as const) {
+      expect(quellbildHilfe(mit("m57").objekt, art)).toBe(TEXTE.hilfe.quellbildDeepSky[art]);
+      expect(quellbildHilfe(mit("jup_47").objekt, art)).toBe(TEXTE.hilfe.quellbild);
+    }
+  });
+});
+
+describe("Vergleichsbild bei Deep-Sky (Issue #110, Vorschlag)", () => {
+  // M57 am 80/600 bei 60x mit Testquelle: Stufen 1, 1e-3 und 0 (Werte relativ zu Quellweiss).
+  const k = mit("m57");
+  const n = 64;
+  const raster = neuesRaster(n, n, 1, 0);
+  for (let i = 0; i < n * n; i++) raster.daten[i] = i % n < 16 ? 1 : i % n < 32 ? 1e-3 : 0;
+  const massstab = 2;
+  const kk: Konfiguration = { ...k, objekt: { ...k.objekt, durchmesserArcsec: n * massstab, quelle: { ...k.objekt.quelle!, breitePx: n, hoehePx: n, massstabArcsecProPx: massstab } } };
+  const quelle = new QuelleAusRaster(raster, massstab);
+  const anblick = auswerten(kk, { fenster: { breiteArcsec: n * massstab, mitteXArcsec: 0, mitteYArcsec: 0, px: n } }).parameter;
+  const zeile = (v: ReturnType<typeof vergleichsparameter>): number[] => {
+    const d = rendere(v, quelle, new FalterJs()).raster.daten;
+    const mitte = Math.floor(n / 2) * n;
+    return [d[mitte + 8]!, d[mitte + 24]!, d[mitte + 48]!];
+  };
+
+  it("Standard ist die Kubikwurzel ueber dem Boden (Entscheidung Herbert, Review #129)", () => {
+    expect(VERGLEICH_DEEP_SKY).toBe("kubikwurzelUeberBoden");
+    expect(vergleichsparameter(anblick, massstab, undefined, 1e-4).helligkeit).toEqual(vergleichsparameter(anblick, massstab, "kubikwurzelUeberBoden", 1e-4).helligkeit);
+  });
+
+  it("linear: Quellweiss = Bildschirmweiss, ohne deepSky; der Halo bei 1e-3 bleibt fast schwarz", () => {
+    const v = vergleichsparameter(anblick, massstab, "linear");
+    expect(v.helligkeit.deepSky).toBeUndefined();
+    const [weiss, halo, himmel] = zeile(v);
+    expect(weiss).toBeCloseTo(1, 5);
+    expect(halo).toBeCloseTo(1e-3, 6);
+    expect(himmel).toBe(0);
+  });
+
+  it("kubikwurzel: Quellweiss = Bildschirmweiss, 1e-3 wird 0,1, Himmel schwarz, keine Schwelle", () => {
+    const v = vergleichsparameter(anblick, massstab, "kubikwurzel");
+    expect(v.helligkeit.deepSky).toMatchObject({ faktor: 1, himmel: 0, sockel: 0 });
+    expect(v.helligkeit.punktExponent).toBe(anblick.helligkeit.punktExponent);
+    const [weiss, halo, himmel] = zeile(v);
+    expect(weiss).toBeCloseTo(1, 5);
+    expect(halo).toBeCloseTo(0.1, 5);
+    expect(himmel).toBe(0);
+  });
+
+  it("kubikwurzelUeberBoden: Boden schwarz, darueber ((q - b) / (1 - b))^(1/3), Quellweiss = Bildschirmweiss", () => {
+    const b = 1e-4;
+    const v = vergleichsparameter(anblick, massstab, "kubikwurzelUeberBoden", b);
+    const [weiss, halo, himmel] = zeile(v);
+    expect(weiss).toBeCloseTo(1, 5);
+    expect(halo).toBeCloseTo(Math.cbrt((1e-3 - b) / (1 - b)), 5);
+    expect(himmel).toBe(0);
+    // Ein Pixel genau am Boden (Kode 1 der Kennlinie) wird schwarz statt grau wie bei "kubikwurzel".
+    // Mit dem Zuschlag aus bodenRelativ (1e-6), denn das Raster speichert 1e-3 als Float32 etwas groesser.
+    const amBoden = vergleichsparameter(anblick, massstab, "kubikwurzelUeberBoden", 1e-3 * (1 + 1e-6));
+    expect(zeile(amBoden)[1]).toBe(0);
+    expect(zeile(vergleichsparameter(anblick, massstab, "kubikwurzel"))[1]).toBeCloseTo(0.1, 5);
+    // Ohne Boden (0) gleich "kubikwurzel".
+    expect(zeile(vergleichsparameter(anblick, massstab, "kubikwurzelUeberBoden", 0))).toEqual(zeile(vergleichsparameter(anblick, massstab, "kubikwurzel")));
+  });
+
+  it("bodenRelativ: 10^(-0,4 (mag_dunkel - Quellweiss)) bei log-Kennlinie, sonst 0", () => {
+    // M57: Kennlinie 16,72 bis 25,72 mag/arcsec^2, Quellweiss = mag_hell.
+    expect(bodenRelativ(KATALOGE, k.objekt) / 10 ** (-0.4 * 9)).toBeCloseTo(1, 5);
+    expect(bodenRelativ(KATALOGE, mit("jup_47").objekt)).toBe(0);
+    expect(bodenRelativ(KATALOGE, mit("m45").objekt)).toBe(0);
+  });
+
+  it("helles Quellweiss (Testdaten wie M42: Kern 13,7, Boden 25 mag/arcsec^2): Nebel bei 20 und 22 mag sichtbar, linear fast schwarz", () => {
+    const b = 10 ** (-0.4 * (25 - 13.7));
+    const q20 = 10 ** (-0.4 * (20 - 13.7));
+    const q22 = 10 ** (-0.4 * (22 - 13.7));
+    const r = neuesRaster(n, n, 1, 0);
+    for (let i = 0; i < n * n; i++) r.daten[i] = i % n < 16 ? q20 : i % n < 32 ? q22 : b;
+    const q = new QuelleAusRaster(r, massstab);
+    const werte = (v: ReturnType<typeof vergleichsparameter>): number[] => {
+      const d = rendere(v, q, new FalterJs()).raster.daten;
+      const mitte = Math.floor(n / 2) * n;
+      return [d[mitte + 8]!, d[mitte + 24]!, d[mitte + 48]!];
+    };
+    const [n20, n22, boden] = werte(vergleichsparameter(anblick, massstab, "kubikwurzelUeberBoden", b));
+    // Linear 0,14 und 0,075 sind in sRGB etwa Kode 105 und 77; der Boden bleibt schwarz.
+    expect(linearZuSrgb8(n20!)).toBeGreaterThan(95);
+    expect(linearZuSrgb8(n22!)).toBeGreaterThan(65);
+    expect(boden).toBe(0);
+    // Linear: Kode unter 15, also fast schwarz (so wie es #107 bei M42 meldet).
+    expect(linearZuSrgb8(werte(vergleichsparameter(anblick, massstab, "linear"))[0]!)).toBeLessThan(15);
+  });
+
+  it("okularOhneSchwelle: Helligkeit und Himmel wie im Anblick, ohne Schwelle und Sockel", () => {
+    const v = vergleichsparameter(anblick, massstab, "okularOhneSchwelle");
+    const ds = anblick.helligkeit.deepSky!;
+    expect(v.helligkeit.deepSky).toMatchObject({ faktor: ds.faktor, himmel: ds.himmel, sockel: 0 });
+    expect(v.helligkeit.punktFaktor).toBe(anblick.helligkeit.punktFaktor);
+    const [weiss, halo] = zeile(v);
+    expect(weiss).toBeCloseTo(Math.min(1, Math.pow(ds.faktor + ds.himmel, 1 / 3)), 4);
+    expect(halo).toBeCloseTo(Math.min(1, Math.pow(ds.faktor * 1e-3 + ds.himmel, 1 / 3)), 4);
+  });
+
+  it("jede Abbildung hat einen eigenen Helligkeitsschluessel, Planeten bleiben wie bisher", () => {
+    const schluessel = (["linear", "kubikwurzel", "kubikwurzelUeberBoden", "okularOhneSchwelle"] as const).map((a) => vergleichsparameter(anblick, massstab, a, 1e-4).helligkeit.schluessel);
+    expect(new Set(schluessel).size).toBe(4);
+    expect(vergleichsparameter(anblick, massstab, "kubikwurzelUeberBoden", 2e-4).helligkeit.schluessel).not.toBe(schluessel[2]);
+    const jup = mit("jup_47");
+    const p = auswerten(jup, { fenster: zoomfenster(jup, { xArcsec: 0, yArcsec: 0 }, 200) }).parameter;
+    for (const a of ["linear", "kubikwurzel", "kubikwurzelUeberBoden", "okularOhneSchwelle"] as const) {
+      expect(vergleichsparameter(p, jup.objekt.quelle!.massstabArcsecProPx, a).helligkeit).toEqual(vergleichsparameter(p, jup.objekt.quelle!.massstabArcsecProPx, "linear").helligkeit);
+    }
   });
 });
 

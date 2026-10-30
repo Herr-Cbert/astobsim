@@ -26,7 +26,7 @@ import { type Auswertung, auswerten, begrenze, type Hinweis, type Konfiguration,
 import { inUrl, type Kataloge } from "../zustand";
 import { type Ausschnittsanfrage, ausschnittsanfrage } from "./fenster";
 import { sollMitte } from "./verschieben";
-import { detailstart, vergleichsparameter, verschiebelage, zoomfenster } from "./zoom";
+import { bodenRelativ, detailstart, VERGLEICH_DEEP_SKY, vergleichsparameter, verschiebelage, zoomfenster } from "./zoom";
 
 /** Quelle eines Objektzustands mit dem asynchronen Vorladen, das rendere voraussetzt. */
 export interface Bildquelle {
@@ -338,7 +338,7 @@ export class Steuerung {
       // Der Kern der letzten Auswertung wird bei gleichem Schluessel wiederverwendet (auswerten, vorher).
       auswertung = auswerten(k, { fenster, vorher: this.zustand.auswertung?.parameter });
       // Ohne Quellbild gibt es keinen Quellmassstab; das Vergleichsbild nimmt dann den der Anzeige.
-      if (zoom) vergleich = vergleichsparameter(auswertung.parameter, k.objekt.quelle?.massstabArcsecProPx ?? 0);
+      if (zoom) vergleich = vergleichsparameter(auswertung.parameter, k.objekt.quelle?.massstabArcsecProPx ?? 0, VERGLEICH_DEEP_SKY, bodenRelativ(this.umgebung.kataloge, k.objekt));
     } catch (e) {
       this.setze({ phase: "fehler", fehler: { art: "rechnen", ursache: e } });
       return;
