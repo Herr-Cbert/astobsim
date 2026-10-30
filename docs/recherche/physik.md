@@ -1018,6 +1018,8 @@ Bei PA 35 Grad (RC3) dieselben Werte auf 0,08 mag. Innerhalb von 1' liegt der Fe
 
 **Grenzen.** Die Tonkurve ist eine Funktion des Kodes allein. Wo das Pressebild lokal anders gestreckt ist (Mosaikfelder, lokale Kontrastverstaerkung), bleibt der Fehler; die Seitenunterschiede oben (bis etwa 0,3 mag) sind die Obergrenze dafuer zusammen mit echter Asymmetrie. Das Profil selbst ist auf Faktor 1,5 in der Ausdehnung unsicher (`deep-sky.md` 9 Punkt 1); die Tonkurve uebertraegt diese Unsicherheit unveraendert ins Bild.
 
+**Nachtrag 2026-10-30 (Issue #136, M32 als Begleiter).** M32 ist aus dem Hauptbild getrennt (Abschnitt 29); die Tonkurve bleibt unveraendert (M32 war dort schon ausgenommen), ebenso alle Pixel ausserhalb 4' um M32. Das Hauptbild hat jetzt 3,437 mag (mit M32 3,422 wie oben). Die Flaechentabelle von M31 ist ohne M32 neu gemessen: in den Zeilen 16,3 bis 17,5 (gesaettigte Kuppe, M32 traegt dort mit) 4,6 bis 8,6 % weniger Flaeche, von 18,0 bis 22,0 1 bis 3,5 %, ab 22,5 unter 0,4 %; $C/C_\mathrm{th}$ mit blossem Auge aendert sich um hoechstens 0,01 (Bortle 5: 0,85 -> 0,84, Bortle 7: 0,43 -> 0,42). Die Tabelle endet weiter bei 22,7.
+
 ## 26. M42: Stapeln, Nullpunkt und Himmel der WFI-Rohdaten (Issue #107)
 
 `tools/m42_wfi_stapeln.py` macht aus 22 WFI-Rohaufnahmen im V-Band (ESO-Archiv, Programm 273.C-5042(A), 10 x 280 s, 10 x 30 s, 2 x 3 s) ein lineares, geeichtes Bild; `tools/deep_sky_aufbereiten.py` kodiert es wie M57 (log-Kennlinie, ADR-0003 Nachtrag V2). Werte unten: Lauf vom 2026-10-30 (Mitte Theta1 Ori C, Apertur 8").
@@ -1159,3 +1161,40 @@ $w$ ist das Fenster aus Abschnitt 24 ($\rho_0 = \tfrac23 r$, $\rho_E = r + 0{,}5
 **Kosten.** Eine zweite Faltung des Objektrasters, nur im Fall unaufgeloest ($g > 0$, ohne Deep-Sky). Sie wird wie die erste nach Kern- und Objektschluessel wiederverwendet; ein Zug an Bortle oder Transparenz faltet nicht neu. Mit FalterJs bei T6b (713 x 713, Kern 17, drei Kanaele) braucht `rendere` 370 statt 230 ms (gemessen in Node); WebGL2 mit SwiftShader faltet 1024 x 1024 mit Kern 17 und drei Kanaelen in 126 ms (Browsertest).
 
 **Grenzen.** Das Fenster ist ein Darstellungsfenster, keine Physik (wie Abschnitt 24). Der Halo endet jetzt bei etwa $r$ statt in den Ecken bei $\sqrt2\,r$. Bei $g > 0$ mit aufgeloester Scheibe (T5b Mars 6'' bei 120-fach, $g$ = 0,0147; T6c Jupiter im 10x50) faellt nur der schwache Mischanteil im aeusseren Drittel des Kerns weg: die Bilder werden dort um hoechstens 3 Kodes dunkler (Messung `docs/validierung.md` 13).
+
+## 29. Begleiter mit eigener Wahrnehmungsschwelle (Issue #136)
+
+**Problem (geprueft am Bild und im Code, 2026-10-30).** M32 war Teil des M31-Bilds und bekam dessen Schwelle $q^*$ (ADR-0004 Befund 4). $q^*$ gehoert zur sichtbaren Isophote von M31, einer Flaeche von mehreren Millionen arcsec$^2$ mit niedriger Schwelle; die kompakten, hellen Pixel von M32 liegen weit darueber. Mit blossem Auge (Arbeitsmassstab 25,2'') hat M32 nach der Faltung in der Spitze 18,24 mag/arcsec$^2$, $q/q^*$ = 49 / 16 / 1,8 bei Bortle 3 / 5 / 7, Deckkraft 1,00 / 1,00 / 0,95; am Bild sRGB 68 / 70 / 75 gegen 43 / 51 / 67 in der Umgebung. Als Punktquelle laege M32 ($V$ 8,08) 1,9 / 2,4 / 2,9 mag unter der Grenzgroesse (6,20 / 5,67 / 5,17), gezeigte Deckkraft unter 0,03 (gerechnet).
+
+**Trennung im Werkzeug (eigene Festlegung, `tools/deep_sky_aufbereiten.py`, `begleiter_trennen`).** Auf der linearen, sternbereinigten Leinwand (4''/px):
+1. Mitte: Schwerpunkt des Lichts im Kreis 60'' um die SIMBAD-Lage (Ost $-28{,}2''$, Nord $-1452{,}5''$); Ergebnis Ost $-27{,}9''$, Nord $-1453{,}8''$.
+2. Untergrund (M31 unter M32): $\ln L$ im Ring 240'' bis 420'' als quadratisches Polynom in $x$, $y$ (kleinste Quadrate), im Kreis 240'' eingesetzt. Streuung des Fits im Ring 0,15 mag.
+3. Hauptbild = Leinwand mit dem Polynom im Kreis; Begleiter = $\max(0, L - \text{Polynom})$ im Kreis, Ausschnitt 128 x 128 px auf dem Gitter der Leinwand (Mitte $dx$ = +28'', $dy$ = $-1452''$, kein Neuabtasten), eigene log-Kennlinie (mag_hell 16,22).
+4. Flaechentabelle des Begleiters wie Abschnitt 25 am dekodierten Begleiterbild; sie endet vor der ersten Isophote, die mehr als 1 % der Pixel am Kreisrand (240'') erreicht (`flaechentabelle(..., rand_maske)`).
+
+**Probe (gerechnet).** Gesamthelligkeit des dekodierten Begleiterbilds 8,115 mag gegen $V$ = 8,08 [Wikipedia "Messier 32", Abruf 2026-10-30, Infobox mit Verweis auf SIMBAD und Gil de Paz et al. 2007, ApJS 173, 185; Sekundaerquelle wie bei M57 in `deep-sky.md` 5]; Hauptbild ohne M32 3,437 mag, beide zusammen 3,422 mag wie vorher (der Fluss bleibt, `tools/quellweiss_eichen.py`). Die Uebereinstimmung auf 0,04 mag ist keine unabhaengige Probe des Pressebilds: die Tonkurve ist gegen das M31-Profil angepasst, und der Kern von M32 ist im Pressebild wie der von M31 gesaettigt (Spitze 16,22 mag/arcsec$^2$ statt etwa 12 bis 13).
+
+**Schwelle (Crumey wie Abschnitt "Wahrnehmungsschwelle", kein neues Modell).** Je Begleiter $k$ liefert `sichtbareIsophote` aus seiner eigenen Flaechentabelle $\mu^*_k$ und daraus $q^*_k = 10^{-0{,}4(\mu^*_k - \mu_\mathrm{Quellweiss})}$ mit dem Quellweiss des Hauptobjekts (die Werte des Begleiterbilds rechnet `daten` beim Laden auf dieses Quellweiss um); Sockel $\sigma_k$ wie beim Hauptobjekt (`mischung.ts`). Die Schwelle rechnet gegen den Himmel allein, nicht gegen Himmel plus M31-Scheibe unter M32 (22,35 mag/arcsec$^2$); sie waere damit eher noch strenger (vermutet).
+
+**Formel in bild (eigene Festlegung, ADR-0004 Nachtrag 2026-10-30).** Mit $Z(x) = \min\big(1, (a\,x + s)^n\big)$, $q$ dem gefalteten Hauptbild und $q_k$ dem gefalteten Begleiter:
+$$F = h + P\,\big(Z(q) - h + \sigma\big) + \sum_k P'_k\,\big(Z(Q_k) - Z(Q_{k-1}) + \sigma_k\big),\quad Q_0 = q,\ Q_k = Q_{k-1} + q_k,$$
+$$P = \Phi\!\left(\frac{q/q^* - 1}{0{,}484}\right),\qquad P'_k = \max\!\left(0, \frac{P_k - P_0}{1 - P_0}\right),\ P_k = \Phi\!\left(\frac{q_k/q^*_k - 1}{0{,}484}\right),\ P_0 = \Phi(-1/0{,}484).$$
+Der Zuwachs des Begleiters ueber dem Hauptobjekt bekommt die Deckkraft nach seiner eigenen Schwelle; $P'$ wie bei Sternen (ADR-0004 Nachtrag #100), damit ein Begleiter ohne Licht ($q_k$ = 0) nichts beitraegt, auch keinen Sockel. Ohne Begleiter ist $F$ der Ausdruck aus ADR-0004 Ebene b, Zeichen fuer Zeichen. Ohne Schwelle (Vergleichsbild, $q^*\to 0$, Sockel 0) ist $F = Z(q + \sum q_k)$, also gleich dem Bild mit M32 im Hauptbild.
+
+**Werte (gerechnet, Zenit, klar).** $\mu^*$ als Flaechenhelligkeit von $q^*$:
+
+| Fall | M31 $C/C_\mathrm{th}$ | M31 $\mu^*$ | M32 $C/C_\mathrm{th}$ | M32 $\mu^*$ | Grenzgroesse |
+|---|---|---|---|---|---|
+| Auge, Bortle 3 | 1,00 | 22,47 | 0,035 | 15,57 | 6,20 |
+| Auge, Bortle 5 | 0,84 | 21,25 | 0,022 | 15,05 | 5,67 |
+| Auge, Bortle 7 | 0,42 | 18,85 | 0,014 | 14,53 | 5,17 |
+| 10x50, Bortle 5 | 1,08 | 22,78 | 1,00 | 19,91 | 10,30 |
+| 80 mm 16-fach, Bortle 3 | 2,01 | 23,46 | 1,00 | 21,99 | 11,52 |
+| 80 mm 16-fach, Bortle 7 | 1,00 | 21,27 | 1,00 | 18,68 | 10,41 |
+| 80 mm 40-fach, Bortle 5 | 1,00 | 21,94 | 1,00 | 20,90 | 11,74 |
+
+Mit blossem Auge liegt die Spitze von M32 (0,156 relativ zu Quellweiss, 18,24 mag/arcsec$^2$) 2,7 bis 3,7 mag unter $\mu^*$: $P'$ = 0,010 / 0,006 / 0,004 bei Bortle 3 / 5 / 7, am Bild unter einem Kode. Im Fernglas und Fernrohr ist $P'$ in der Spitze 1. M31 aendert sich durch die neue Flaechentabelle (ohne M32) um hoechstens 0,01 in $C/C_\mathrm{th}$.
+
+**Kosten.** Je Begleiter eine Faltung, aber nur im Teilfenster um sein Licht, erweitert um den Kernradius (`falteTeilfenster`, bitgleich mit der Faltung des ganzen Rasters): M31 mit blossem Auge 36 x 36 gegen 713 x 713 Arbeitspixel, 80 mm bei 40-fach 114 x 115 gegen 1024 x 1024 (gemessen mit FalterJs in Node, unter 1 % der Faltungszeit). Ausserhalb des Fensters keine Faltung.
+
+**Grenzen.** Der Untergrund unter M32 ist ein Polynom, keine Messung; Struktur der M31-Scheibe im Kreis 4' (Staubband) geht verloren (im Bild unter 1 Kode ausserhalb 5', innerhalb glatt). Licht von M32 ausserhalb 4' (D25 8,7' x 6,5') bleibt im Hauptbild und im Ringfit (nicht abgeschaetzt; innerhalb 3' bis 4' waechst der Begleiter noch um 0,02 mag). Die Schwelle gilt je Begleiter als Ganzes gegen den Himmel; Binnendetails bleiben wie bei allen Deep-Sky-Objekten ungeprueft (ADR-0004 Befund 4). Ein zweiter Begleiter (M43 in M42, Issue #139) braucht nur Parameter und Daten.

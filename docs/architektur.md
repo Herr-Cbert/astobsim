@@ -193,6 +193,7 @@ export interface Warnung {
 | d fehlt, g = 0 | `f * q_k + h` (Version 1, gleicher Ausdruck, gleiche Reihenfolge) |
 | d fehlt, g > 0 | `(1 - g) * f * q_k + h + g * min(1, (aP * qH_k)^n)`; qH ist das Objektraster mit `halokern` gefaltet (Issue #135, physik.md 28; ohne qH gilt q) |
 | d vorhanden | `P = Phi((q / d.schwelleRelativ - 1) / d.breite)`; `F = h + P * (min(1, (d.faktor * q + d.himmel)^n) - h + d.sockel)` |
+| d mit Begleitern (Issue #136, physik.md 29) | wie oben, dazu je Begleiter k mit q_k > 0: `+ P'_k * (Z(Q_k) - Z(Q_(k-1)) + d.begleiter[k].sockel)`, `Z(x) = min(1, (d.faktor * x + d.himmel)^n)`, `Q_0 = q`, `Q_k = Q_(k-1) + q_k`, `P'_k = max(0, (P_k - P0) / (1 - P0))` mit `P_k` nach `d.begleiter[k].schwelleRelativ`; q_k ist das gefaltete Begleiterbild (eigene `Quelle`, `rendere(..., begleiter)`, Faltung im Teilfenster). Ohne d werden die Begleiter zu q addiert (Vergleichsbild linear) |
 
 Punktanteil, nur wo p > 0: `W = min(1, (aP * p)^n)`; `Pixel_k = F_k + (c ? c_k / p : 1) * W`. Ohne c (alle Punktquellen grau, Deckkraft 1) ist das der Ausdruck aus Version 1. Gibt es c, hat das Ergebnis 3 Kanaele. Phi (Normalverteilung) ist Mathematik in bild, alle physikalischen Konstanten kommen ueber die Naht. Begrenzt wird wie bisher erst das Pixel beim Zeichnen.
 

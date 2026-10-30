@@ -72,6 +72,10 @@ _Vermeiden_: Vierfachstern, Doppel-Doppelstern
 Ein Objekt ausserhalb des Sonnensystems mit eigener Flaechenhelligkeit (Nebel, Galaxie, Sternhaufen), z. B. M31, M42, M13, M45, M57. Kann Sterne enthalten.
 _Vermeiden_: DSO, Nebel (fuer alle)
 
+**Begleiter**:
+Eine kompakte Flaeche im Feld eines Deep-Sky-Objekts mit eigenem Bild, eigener Flaechentabelle und eigener Wahrnehmungsschwelle, z. B. M32 bei M31 (Issue #136, ADR-0004 Nachtrag). Kein Stern und kein eigenes Objekt in der Auswahl; nur fuer Deep-Sky-Zustaende mit Quellbild.
+_Vermeiden_: Trabant, Satellitengalaxie, Unterobjekt
+
 **Zustand**:
 Eine feste, repraesentative Erscheinung eines Objekts mit Winkelgroesse, Phase, Ringoeffnung, Magnitude und zugeordnetem Quellbild, z. B. "Jupiter 47 Bogensekunden".
 _Vermeiden_: Variante, Preset, Ephemeride
@@ -82,7 +86,7 @@ _Vermeiden_: Luna; und nie fuer Planetenmonde
 
 **Trabant**:
 Ein Mond eines Planeten (Io, Europa, Ganymed, Kallisto, Titan, Rhea). Wird als Punktquelle mit Winkeldurchmesser und Magnitude an fester Position relativ zum Planeten dargestellt.
-_Vermeiden_: Mond, Satellit, Begleiter
+_Vermeiden_: Mond, Satellit, Begleiter (Begleiter ist ein Deep-Sky-Begriff, siehe dort)
 
 **Punktquelle**:
 Etwas, dessen Winkeldurchmesser unter der Aufloesungsgrenze liegt und das durch Magnitude statt Flaechenhelligkeit beschrieben wird: ein Trabant, ein Stern oder ein unaufgeloester Zustand.

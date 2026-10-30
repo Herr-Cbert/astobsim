@@ -276,16 +276,30 @@ Das Modell reproduziert den Prototyp genau; das Bild weicht um +0,07 (Bortle 5),
 - Bortle 5: Kern und innere Scheibe schwach, Aussenscheibe kaum vom Himmel zu trennen; 85 / 56 / 54.
 - Bortle 7: nur der Kern als kleiner, undeutlicher Fleck, Scheibe gleich Himmel; 88 / 70 / 70.
 
-Der Kern bleibt bei Bortle 7 als Fleck sichtbar, obwohl $C/C_\mathrm{th}$ = 0,43 ist: die Deckkraft $P = \Phi((0{,}43-1)/0{,}484)$ = 0,12 wirkt auf den grossen Kernkontrast (ADR-0004, gleitender Rand). Das entspricht Bortles Beschreibung fuer Klasse 7 ("may be glimpsed ... very indistinct", `deep-sky.md` 8 Punkt 2) und ist kein Fehler des Quellbilds.
+Der Kern bleibt bei Bortle 7 als Fleck sichtbar, obwohl $C/C_\mathrm{th}$ = 0,43 ist. **Berichtigt 2026-10-30 (Issue #136):** Hier stand, die Deckkraft $P = \Phi((0{,}43-1)/0{,}484)$ = 0,12 wirke auf den Kernkontrast. Das ist falsch: $C/C_\mathrm{th}$ der Isophote legt nur $q^*$ fest (18,85 mag/arcsec$^2$ bei Bortle 7), die Deckkraft gilt je Pixel. Der gefaltete Kern hat 16,67 mag/arcsec$^2$, $q/q^*$ = 7,6, also $P$ = 1,0 (gerechnet). Der Kern erscheint nur deshalb als schwacher Hauch (sRGB 87 gegen 67), weil die Kubikwurzel der gemeinsamen Abbildung den Kontrast gegen den hellen Himmel staucht. Das entspricht Bortles Beschreibung fuer Klasse 7 ("may be glimpsed ... very indistinct", `deep-sky.md` 8 Punkt 2) und ist kein Fehler des Quellbilds.
 
 **Entscheidungen Herbert (2026-10-30, Review PR #130):**
 - Der im Pressebild gesaettigte Kern (flache Kuppe innerhalb etwa 30'', `physik.md` 25) wird **nicht** aus dem Modell aufgefuellt; den Hinweis fuer Benutzer bringt der Hilfetext aus #110.
 - Der Kern als Hauch bei Bortle 7 ist gewollt (T11).
-- M32 erscheint mit blossem Auge als kleiner Fleck suedlich des Kerns (Bortle 3: deutlich, Bortle 5: schwach). Ob er als Punktquelle gelten soll, ist ein Thema fuer #111, nicht fuer das Quellbild.
+- M32 erscheint mit blossem Auge als kleiner Fleck suedlich des Kerns (Bortle 3: deutlich, Bortle 5: schwach). Ob er als Punktquelle gelten soll, ist ein Thema fuer #111, nicht fuer das Quellbild. (Behoben in #136: M32 ist ein Begleiter mit eigener Schwelle, siehe Nachtrag unten.)
 
 **Offen (Review S1):** Am 80 mm bei 16-fach und Bortle 3 (`?v=1&a=fernrohr&ba=refraktor&d=80&f=400&o=0&ok=25&sg=50&z=m31&s=2&b=3&t=klar&h=90`) ist auf der Westseite die Treppe der Mosaikfelder als Kante der Aussenscheibe zu sehen. Der vorgeschlagene Schnitt an der groessten Ellipse im Mosaik ($q$ = 0,27, PA 37,5 Grad) ergibt nur 51,8' grosse Halbachse; am Bild (nur in `dist/` geprueft) zeigt er eine harte Ellipse von 104', M32 faellt weg, die Flaechentabelle endet bei 21,4, die Gesamthelligkeit faellt auf 3,68. Er ist deshalb im Werkzeug vorhanden (`ellipse`), fuer M31 aber nicht eingeschaltet (`physik.md` 25). **Entscheidung Herbert (2026-10-30):** Treppe bleibt, Ellipsenschnitt bleibt aus; M31 traegt dafuer `hinweis_hilfe` in `daten/objekte.json` (Mosaik mit gestufter Kante, Aussenscheibe fehlt ausserhalb, Kante bei kleiner Vergroesserung und dunklem Himmel sichtbar, Kern flach).
 
 **Urteil:** erfuellt; M31 ist bei Bortle 3 sichtbar, bei 5 knapp darunter, bei 7 nicht (Scheibe), wie ADR-0004 Befund 2.
+
+**Nachtrag 2026-10-30: M32 als Begleiter (Issue #136).** M32 bekam als Teil des M31-Bilds dessen Schwelle (ADR-0004 Befund 4) und war mit blossem Auge sichtbar. Jetzt ist er ein Begleiter mit eigenem Bild, eigener Flaechentabelle und eigener Deckkraft (ADR-0004 und ADR-0003 Nachtrag #136, `physik.md` 29). **Geprueft** am Produktionsbau (SwiftShader, Zenit, klar), vorher `origin/main` 29ef8c8, nachher Branch `issue-136-m32`; Uebersicht, sRGB (Mittel der Kanaele), M32 = hellstes Pixel im Kreis um M32, Umgebung = Median im Ring 5' bis 6' um M32, Kern = Mittel 5 x 5 px in der Bildmitte:
+
+| Fall | M32 / Umgebung vorher | M32 / Umgebung nachher | Kern vorher / nachher |
+|---|---|---|---|
+| Auge, Bortle 3 | 68 / 43 | 45 / 43 | 82 / 82 |
+| Auge, Bortle 5 | 70 / 51 | 52 / 51 | 82 / 82 |
+| Auge, Bortle 7 | 75 / 67 | 67 / 67 | 84 / 84 |
+| 10x50, Bortle 5 | 73 / 50 | 73 / 50 | 74 / 74 |
+| 80 mm 16-fach, Bortle 3 | 81 / 44 | 83 / 44 | 81 / 81 |
+| 80 mm 16-fach, Bortle 7 | 86 / 62 | 83 / 62 | 87 / 87 |
+| 80 mm 40-fach, Bortle 5 | 64 / 34 | 63 / 34 | 64 / 64 |
+
+Mit blossem Auge ist M32 bei Bortle 3, 5 und 7 verschwunden (45 gegen 43 bei Bortle 3 ist der Anstieg der M31-Scheibe zum Kern hin, kein Fleck); im 10x50 und am 80 mm bleibt er als ovaler Nebel mit hellem Kern sichtbar. Bei 40-fach und bei 16-fach unter Bortle 7 ist sein schwacher Hof kleiner als vorher, weil die eigene Schwelle von M32 strenger ist als die von M31 (gewollt). Ausserhalb 5' um M32 aendern sich die Uebersichten um hoechstens 1 Kode (neue Flaechentabelle von M31 ohne M32); der Kern bei Bortle 7 bleibt als Hauch (T11). Die Validierungsbilder T1 bis T6, T12 und P1 bis P3 sind bytegleich. Die Bilder liegen nicht im Repo (Faelle wie in Abschnitt 10, mit `scripts/validierung-bilder.mjs` und eigenen Suchteilen erzeugt).
 
 ## 11. M42 (Issue #107)
 
@@ -342,7 +356,7 @@ Trabanten (hellstes Pixel ausserhalb der Scheibe): T1 119 (111), T4a 147 (138), 
 
 **T1 bis T6 mit den neuen Konstanten** (Sichtpruefung von T4a, T4c, T12a, T12b; die uebrigen Bilder sind nur heller oder dunkler, die Tabellen-Tests aus Abschnitt 3 haengen nicht an den Konstanten): T4a und T4c zeigen Baender, GRF in seiner Farbe und in T4c die weissen Ovale; in T4a sind die hellen Zonen teils auf Weiss begrenzt (etwa ein Achtel der Scheibe, ADR-0004 erwartete ein Fuenftel). Der Unterschied T4c gegen T4d (mehr Detail bei 300 mm) bleibt deutlich. Urteile wie in Abschnitt 2, alle **erfuellt**.
 
-**Offen, eigene Issues:** das helle Quadrat (etwa 28 x 28 Anzeigepixel, Kante 90 gegen Himmel 51) um unaufgeloeste Planeten mit blossem Auge in T6b und T12b bis T12d (#135, behoben, siehe unten); M32 mit blossem Auge als sichtbarer Fleck (#136). Beides haengt nicht an den Konstanten (`helligkeit-v2.md` 1.1, Nebenbefunde).
+**Offen, eigene Issues:** das helle Quadrat (etwa 28 x 28 Anzeigepixel, Kante 90 gegen Himmel 51) um unaufgeloeste Planeten mit blossem Auge in T6b und T12b bis T12d (#135, behoben, siehe unten); M32 mit blossem Auge als sichtbarer Fleck (#136, behoben, Abschnitt 10 Nachtrag). Beides haengt nicht an den Konstanten (`helligkeit-v2.md` 1.1, Nebenbefunde).
 
 **Quadrat um unaufgeloeste Planeten (Issue #135).** Ursache und Abhilfe in `physik.md` 28: der Mischanteil nimmt das Objekt, gefaltet mit dem Kern mal $w^{1/n}$. Messung an der Uebersicht wie oben (Mittel der Kanaele, Himmel 51), vorher = main 0c6fd21, nachher = dieser Stand, beide SwiftShader:
 
