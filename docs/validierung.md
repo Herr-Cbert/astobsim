@@ -260,17 +260,24 @@ Pruefung des Quellbilds `m31_noirlab_lgs` (Pressebild, per Tonkurve gegen das Pr
 
 | Bortle (Himmel) | Bild: $C/C_\mathrm{th}$, sichtbar bis | Modell: $C/C_\mathrm{th}$, sichtbar bis | Prototyp (ADR-0004) |
 |---|---|---|---|
-| 3 (21,4) | 1,58, 22,48 mag/arcsec$^2$, 102' | 1,42, 22,57, 110' | sichtbar, 106' |
-| 5 (20,0) | 0,84 (Scheitel bei 21,4) | 0,78 (bei 21,0) | 0,78 |
+| 3 (21,4) | 1,58, 22,47 mag/arcsec$^2$, 102' | 1,42, 22,57, 110' | sichtbar, 106' |
+| 5 (20,0) | 0,85 (Scheitel bei 21,4) | 0,78 (bei 21,0) | 0,78 |
 | 7 (18,3) | 0,43 (bei 19,8) | 0,42 (bei 20,2) | 0,42 |
 
-Das Modell reproduziert den Prototyp genau; das Bild weicht um +0,06 (Bortle 5), +0,01 (Bortle 7) und -4 % in der Ausdehnung (Bortle 3) ab. **Toleranz:** $C/C_\mathrm{th}$ auf 10 % und die Ausdehnung auf 10 %, begruendet mit der Flaechentabelle: das Bild hat bei 21,4 bis 21,5 mag/arcsec$^2$ (Ring bei 10 kpc, im Modell nicht enthalten) bis 19 % mehr Flaeche als das Modell; bei der flachen Reserve $d(\mu)$ von M31 aendert das $C/C_\mathrm{th}$ um wenige Prozent. Das Profil selbst ist in der Ausdehnung auf Faktor 1,5 unsicher (`deep-sky.md` 9 Punkt 1), die Toleranz ist also deutlich enger als die Unsicherheit der Vorlage. Ohne Extinktion (Zenit ohne Atmosphaere) liegt Bortle 5 beim Bild mit 1,01 knapp auf der Schwelle, beim Modell mit 0,94 knapp darunter; die Aussage "knapp" gilt in beiden Faellen.
+Das Modell reproduziert den Prototyp genau; das Bild weicht um +0,07 (Bortle 5), +0,01 (Bortle 7) und -4 % in der Ausdehnung (Bortle 3) ab. **Toleranz:** $C/C_\mathrm{th}$ auf 10 % und die Ausdehnung auf 10 %, begruendet mit der Flaechentabelle: das Bild hat in der Zone 21,3 bis 21,6 mag/arcsec$^2$, in der die Reserve bei Bortle 3 und 5 ihren Scheitel hat (Ring bei 10 kpc, im Modell nicht enthalten), 10 bis 20 % mehr Flaeche als das Modell (ueber alle Zeilen von 17,0 bis 22,5: 0,83 bis 1,38, `physik.md` 25); bei der flachen Reserve $d(\mu)$ von M31 aendert das $C/C_\mathrm{th}$ um wenige Prozent. Das Profil selbst ist in der Ausdehnung auf Faktor 1,5 unsicher (`deep-sky.md` 9 Punkt 1), die Toleranz ist also deutlich enger als die Unsicherheit der Vorlage. Ohne Extinktion (Zenit ohne Atmosphaere) liegt Bortle 5 beim Bild mit 1,01 knapp auf der Schwelle, beim Modell mit 0,94 knapp darunter; die Aussage "knapp" gilt in beiden Faellen.
 
-**Geprueft (Sichtpruefung, Screenshots nicht eingecheckt)** mit einer Kopie von `scripts/validierung-bilder.mjs` und den Suchteilen `?v=1&g=auge&z=m31&s=2&b=3|5|7&t=klar&h=90` (SwiftShader, 2026-10-29). Grauwerte (Mittel der sRGB-Kanaele) in der Uebersicht, Kern / Scheibe nordoestlich der Mitte / Himmel:
+**Geprueft (Sichtpruefung, Screenshots nicht eingecheckt)** mit einer Kopie von `scripts/validierung-bilder.mjs` und den Suchteilen `?v=1&g=auge&z=m31&s=2&b=3|5|7&t=klar&h=90` (SwiftShader; 2026-10-29, nach dem Review am 2026-10-30 mit der berichtigten Sternentfernung wiederholt, Grauwerte gleich bis auf 1 Kode). Grauwerte (Mittel der sRGB-Kanaele) in der Uebersicht, Kern / Scheibe nordoestlich der Mitte / Himmel:
 - Bortle 3: laengliche Scheibe von oben links nach unten rechts (PA etwa 38 Grad, Norden oben, Osten links), M32 als Fleck suedlich des Kerns; 84 / 51 / 43.
-- Bortle 5: Kern und innere Scheibe schwach, Aussenscheibe kaum vom Himmel zu trennen; 85 / 55 / 54.
+- Bortle 5: Kern und innere Scheibe schwach, Aussenscheibe kaum vom Himmel zu trennen; 85 / 56 / 54.
 - Bortle 7: nur der Kern als kleiner, undeutlicher Fleck, Scheibe gleich Himmel; 88 / 70 / 70.
 
 Der Kern bleibt bei Bortle 7 als Fleck sichtbar, obwohl $C/C_\mathrm{th}$ = 0,43 ist: die Deckkraft $P = \Phi((0{,}43-1)/0{,}484)$ = 0,12 wirkt auf den grossen Kernkontrast (ADR-0004, gleitender Rand). Das entspricht Bortles Beschreibung fuer Klasse 7 ("may be glimpsed ... very indistinct", `deep-sky.md` 8 Punkt 2) und ist kein Fehler des Quellbilds.
+
+**Entscheidungen Herbert (2026-10-30, Review PR #130):**
+- Der im Pressebild gesaettigte Kern (flache Kuppe innerhalb etwa 30'', `physik.md` 25) wird **nicht** aus dem Modell aufgefuellt; den Hinweis fuer Benutzer bringt der Hilfetext aus #110.
+- Der Kern als Hauch bei Bortle 7 ist gewollt (T11).
+- M32 erscheint mit blossem Auge als kleiner Fleck suedlich des Kerns (Bortle 3: deutlich, Bortle 5: schwach). Ob er als Punktquelle gelten soll, ist ein Thema fuer #111, nicht fuer das Quellbild.
+
+**Offen (Review S1):** Am 80 mm bei 16-fach und Bortle 3 (`?v=1&a=fernrohr&ba=refraktor&d=80&f=400&o=0&ok=25&sg=50&z=m31&s=2&b=3&t=klar&h=90`) ist auf der Westseite die Treppe der Mosaikfelder als Kante der Aussenscheibe zu sehen. Der vorgeschlagene Schnitt an der groessten Ellipse im Mosaik ($q$ = 0,27, PA 37,5 Grad) ergibt nur 51,8' grosse Halbachse; am Bild (nur in `dist/` geprueft) zeigt er eine harte Ellipse von 104', M32 faellt weg, die Flaechentabelle endet bei 21,4, die Gesamthelligkeit faellt auf 3,68. Er ist deshalb im Werkzeug vorhanden (`ellipse`), fuer M31 aber nicht eingeschaltet (`physik.md` 25).
 
 **Urteil:** erfuellt; M31 ist bei Bortle 3 sichtbar, bei 5 knapp darunter, bei 7 nicht (Scheibe), wie ADR-0004 Befund 2.
