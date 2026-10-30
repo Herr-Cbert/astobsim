@@ -178,12 +178,12 @@ BILDNACHWEIS = {
     "quelle_datei": "noao-m13kpno4m.tif, Publication TIFF 4K (" + BILD_URL + ")",
     "mission": "NSF Nicholas U. Mayall 4-meter Telescope, Kitt Peak National Observatory",
     "instrument": "Mosaic I, Filter B (436 nm), V (537 nm), I (805 nm); Kern aus vielen kurzen Belichtungen",
-    "aufnahmedatum": "nicht angegeben (Bildseite veroeffentlicht 2020-06-30)",
+    "aufnahmedatum": "nicht angegeben (Bildseite veröffentlicht 2020-06-30)",
     "lizenz": "CC BY 4.0 (NOIRLab)",
     "lizenz_url": "https://noirlab.edu/public/copyright/",
     "namensnennung": "T.A. Rector (University of Alaska Anchorage) and H. Schweiker (WIYN and NOIRLab/NSF/AURA)",
     "aenderungsvermerk": ("gedreht (Norden oben), zugeschnitten, skaliert, Graustufe aus dem V-Kanal, Tonkurve "
-                          "auf ein Flaechenhelligkeitsprofil, Sterne entfernt, ausserhalb 2' bis 3' durch ein Profilmodell ersetzt"),
+                          "auf ein Flächenhelligkeitsprofil, Sterne entfernt, außerhalb 2' bis 3' durch ein Profilmodell ersetzt"),
 }
 
 QUELLE = ("ESA Gaia DR3 (gaiadr3.gaia_source; Gaia Collaboration, Vallenari et al. 2023, A&A 674, A1), "
@@ -831,24 +831,24 @@ def bildnachweis(w, datei_bytes):
     b = BILDNACHWEIS
     komma = lambda x, stellen=2: f"{x:.{stellen}f}".replace(".", ",")
     bearbeitung = (
-        "Graustufe aus dem V-Kanal (Gruen, 537 nm) des Pressebilds (Publication TIFF 4K, 8 Bit). Um 90 Grad im "
-        "Uhrzeigersinn gedreht (Bildseite: \"North is left, East is down\"); Lage ueber eine affine Abbildung aus "
-        f"{w['anzahl']} Gaia-DR3-Sternen ausserhalb 4' (Restfehler Median {komma(w['rest_px'])} px, Drehung "
+        "Graustufe aus dem V-Kanal (Grün, 537 nm) des Pressebilds (Publication TIFF 4K, 8 Bit). Um 90 Grad im "
+        "Uhrzeigersinn gedreht (Bildseite: \"North is left, East is down\"); Lage über eine affine Abbildung aus "
+        f"{w['anzahl']} Gaia-DR3-Sternen außerhalb 4' (Restfehler Median {komma(w['rest_px'])} px, Drehung "
         f"{komma(w['drehung'], 3)} Grad, {komma(w['massstab_nativ'], 4)}\"/px), Mitte nach Harris 2010 auf die Mitte "
         f"einer Leinwand von {LEINWAND}x{LEINWAND} px bei {komma(MASSSTAB, 1)}\"/px (bilinear auf {UEBERABTASTUNG}-fach "
-        f"feinerem Gitter, blockweise gemittelt). Kern geprueft: im Umkreis von 1' {w['n255']} von {w['n_kern']} "
-        f"Pixeln bei Kode 255 (Median {w['kode_median']:.0f}), die Kernsterne sind aufgeloest, der Kern ist nicht "
-        "gesaettigt. Sterne plus Restlicht (Entscheidung Herbert 2026-10-29): die "
-        f"{w['sterne']} Gaia-Mitglieder bis V 15 (daten/sterne/m13.json) und alle uebrigen {w['orte'] - w['sterne']} "
-        "Gaia-DR3-Quellen bis G 17 (Feldsterne, schwaechere Mitglieder) an ihrer Katalogposition maskiert, danach die "
-        f"schwaecheren Sterne ({w['punkte']} erkannte Punktquellen) wie bei M57; zusammen {w['maskiert']} Pixel durch "
+        f"feinerem Gitter, blockweise gemittelt). Kern geprüft: im Umkreis von 1' {w['n255']} von {w['n_kern']} "
+        f"Pixeln bei Kode 255 (Median {w['kode_median']:.0f}), die Kernsterne sind aufgelöst, der Kern ist nicht "
+        "gesättigt. Sterne plus Restlicht (Entscheidung Herbert 2026-10-29): die "
+        f"{w['sterne']} Gaia-Mitglieder bis V 15 (daten/sterne/m13.json) und alle übrigen {w['orte'] - w['sterne']} "
+        "Gaia-DR3-Quellen bis G 17 (Feldsterne, schwächere Mitglieder) an ihrer Katalogposition maskiert, danach die "
+        f"schwächeren Sterne ({w['punkte']} erkannte Punktquellen) wie bei M57; zusammen {w['maskiert']} Pixel durch "
         "den Median der Umgebung ersetzt (im inneren 1' 70 bis 92 % je Ring, physik.md 27.4). Linearisierung: "
         "Umkehrung der Log-Streckung aus dem AVM-Kopf (FITS Liberator, physik.md 27.1), Himmelsgradient und -sockel "
-        "abgezogen, geglaettet (Kasten 1,5\" bis 1', 7,5\" ab 2,5'), dann L^1,85 (Exponent aus einer Sternprobe) mal "
+        "abgezogen, geglättet (Kasten 1,5\" bis 1', 7,5\" ab 2,5'), dann L^1,85 (Exponent aus einer Sternprobe) mal "
         "einem glatten radialen Faktor, der das Ringmittel auf das King-Profil nach Harris 2010 (r_c 37,2\", r_t "
         "1260\", auf V_t 5,78 normiert) minus den Fluss der Katalogsterne bringt (physik.md 27.2). Ab 2' linear "
-        "uebergeblendet, ab 3' ganz ersetzt durch das glatte Modell (King minus Sterne), das zwischen 8' und 10' auf 0 "
-        "auslaeuft; der Haufen liegt dort im 8-Bit-Bild nicht klar ueber dem Himmelsrest. Quellweiss "
+        "übergeblendet, ab 3' ganz ersetzt durch das glatte Modell (King minus Sterne), das zwischen 8' und 10' auf 0 "
+        "ausläuft; der Haufen liegt dort im 8-Bit-Bild nicht klar über dem Himmelsrest. Quellweiß "
         f"mag_hell so geeicht, dass der Gesamtfluss des dekodierten Bilds V = {komma(w['m_rest'], 3)} ergibt (V_t "
         "5,78 minus die Katalogsterne). Kodiert als 8-Bit-Grauwert mit log-Kennlinie (ADR-0003 Nachtrag Version 2): "
         f"Kode 255 = mag_hell {w['mag_hell']}, Kode 1 = mag_dunkel {w['mag_dunkel']}, Kode 0 Schwarz. Himmelsnorden "

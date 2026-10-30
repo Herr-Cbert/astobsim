@@ -84,7 +84,7 @@
         5
       ]
     ],
-    "zusaetzlich_beleg": "Kreise in Leinwandpixeln (Lage aus Gaia DR3 in der Tangentialebene um Theta1 Ori C): Trapez (Theta1 Ori C, A, D, B samt ihren Beugungsspikes in Ost-West-Richtung, Mitte 800,6/792,3, 20 px; der Kern dort ist aus der Umgebung ersetzt, also flach); Hoefe und Spikes der Feldsterne mit V 6,8 bis 9,0, deren Fluegel die Maske nicht erfasst: NU Ori in M43 (25 px), V 7,9 bei 953/133 (45 px), V 8,0 bei 1240/1452 (75 px), V 8,3 bei 577/914, V 8,4 bei 899/1070 (je 25 px), V 9,0 bei 1116/1219 und 172/749 (je 20 px); dazu 14 Pixel ohne Daten am Ostrand (11/1051, 5 px)"
+    "zusaetzlich_beleg": "Kreise in Leinwandpixeln (Lage aus Gaia DR3 in der Tangentialebene um Theta1 Ori C): Trapez (Theta1 Ori C, A, D, B samt ihren Beugungsspikes in Ost-West-Richtung, Mitte 800,6/792,3, 20 px; der Kern dort ist aus der Umgebung ersetzt, also flach); Höfe und Spikes der Feldsterne mit V 6,8 bis 9,0, deren Flügel die Maske nicht erfasst: NU Ori in M43 (25 px), V 7,9 bei 953/133 (45 px), V 8,0 bei 1240/1452 (75 px), V 8,3 bei 577/914, V 8,4 bei 899/1070 (je 25 px), V 9,0 bei 1116/1219 und 172/749 (je 20 px); dazu 14 Pixel ohne Daten am Ostrand (11/1051, 5 px)"
   },
   "hintergrund": "in tools/m42_wfi_stapeln.py: Median der Standardsternaufnahme WFI.2005-01-02T01:28:31.304, 21,16 mag/arcsec^2, mit Krisciunas und Schaefer 1991 auf die Luftmasse der M42-Aufnahmen umgerechnet, 21,54 mag/arcsec^2 (physik.md 26); das Bildfeld hat keine nebelfreie Stelle",
   "himmel_abgezogen": true,
@@ -98,6 +98,6 @@
   "namensnennung": "Based on observations collected at the European Southern Observatory under ESO programme 273.C-5042(A); ESO Science Archive Facility",
   "aenderungsvermerk": "aus den Rohdaten kalibriert, gestapelt, Himmel abgezogen, auf 1\"/px gebracht, Sterne entfernt, log-kodiert (astobsim)",
   "orientierung": "Himmelsnorden oben, Osten links: Stapel in der Tangentialebene um Theta1 Ori C, je Chip und Aufnahme astrometrisch an Gaia DR3 angeschlossen (Polynom 3. Grades, Rest 0,02 bis 0,15\").",
-  "bearbeitung_kanal": "Graustufe aus dem Johnson-V-Breitbandfilter (ESO843, 539 nm), photometrisch in V geeicht; wie bei M57 ist das V-Band nur eine Naeherung an den Eindruck des dunkeladaptierten Auges (deep-sky.md 2.1).",
+  "bearbeitung_kanal": "Graustufe aus dem Johnson-V-Breitbandfilter (ESO843, 539 nm), photometrisch in V geeicht; wie bei M57 ist das V-Band nur eine Näherung an den Eindruck des dunkeladaptierten Auges (deep-sky.md 2.1).",
   "hinweise": "Lineare Rohdaten statt des Pressebilds eso1103a (gestreckt). Der Stapel hat 0,5\"/px aus WFI-Pixeln zu 0,238\"/px; Seeing im Stapel etwa 1,5\" FWHM. Das Bild zeigt 26,7' um das Trapez, nicht die ganze Ausdehnung des Nebels (65' x 60')."
 }

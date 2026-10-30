@@ -776,39 +776,39 @@ def bildnachweis(p, kopf, mag_hell, mag_dunkel, datei_bytes, sterne, ohne_daten,
     st = p["sterne"]
     if st.get("im_bild_entfernen", True):
         sterne_text = (f"{len(sterne)} Punktquellen ({st.get('punktquellen', 'Feldsterne')}) erkannt und durch den "
-                       f"Median der Umgebung ersetzt (Rest gegen Median {st.get('fenster_px', 9)} px ueber "
+                       f"Median der Umgebung ersetzt (Rest gegen Median {st.get('fenster_px', 9)} px über "
                        f"{st.get('schwelle_sigma', 6.0)} lokalen Streuungen)")
         if st.get("zusaetzlich_px"):
-            sterne_text += f"; zusaetzlich maskiert: {st['zusaetzlich_beleg']}"
+            sterne_text += f"; zusätzlich maskiert: {st['zusaetzlich_beleg']}"
     else:
-        sterne_text = "Sterne im Bild belassen, nur fuer die Flaechentabelle entfernt"
+        sterne_text = "Sterne im Bild belassen, nur für die Flächentabelle entfernt"
     eichung = p["eichung"]
     if eichung["art"] == "gesamt":
-        eich_text = (f"Quellweiss mag_hell so geeicht, dass der Gesamtfluss des dekodierten Bilds V = "
+        eich_text = (f"Quellweiß mag_hell so geeicht, dass der Gesamtfluss des dekodierten Bilds V = "
                      f"{eichung['magnitude']} ergibt ({eichung['quelle']})")
     elif eichung["art"] == "tonkurve":
-        eich_text = f"Quellweiss mag_hell aus der Tonkurve (absolute Flaechenhelligkeit des hellsten Pixels; {eichung['quelle']})"
+        eich_text = f"Quellweiß mag_hell aus der Tonkurve (absolute Flächenhelligkeit des hellsten Pixels; {eichung['quelle']})"
     elif eichung["art"] == "nullpunkt":
-        eich_text = (f"Quellweiss mag_hell aus dem photometrischen Nullpunkt {eichung['fits_schluessel']} = "
+        eich_text = (f"Quellweiß mag_hell aus dem photometrischen Nullpunkt {eichung['fits_schluessel']} = "
                      f"{kopf[eichung['fits_schluessel']]} des FITS-Kopfs ({eichung['quelle']})")
     else:
-        eich_text = (f"Quellweiss mag_hell so geeicht, dass das Mittel im Kreis {eichung['radius_arcsec']}\" um die Mitte "
+        eich_text = (f"Quellweiß mag_hell so geeicht, dass das Mittel im Kreis {eichung['radius_arcsec']}\" um die Mitte "
                      f"{eichung['mag_arcsec2']} mag/arcsec^2 ergibt ({eichung['quelle']})")
     if tonkurve is not None:
         tk = p["tonkurve"]
         herkunft = (
-            f"{p['bearbeitung_kanal']} Pressebild nichtlinear gestreckt; zurueckgerechnet mit einer monotonen "
+            f"{p['bearbeitung_kanal']} Pressebild nichtlinear gestreckt; zurückgerechnet mit einer monotonen "
             f"Tonkurve Kode -> mag/arcsec^2 gegen das Profil des Zustands (daten/objekte.json, profil): je Ring auf "
-            f"der grossen Achse (Positionswinkel {tk['positionswinkel_grad']} Grad, {len(tonkurve['zeilen'])} Ringe "
-            f"bis {tk['radius_max_arcsec']}\") Median des Kodes gegen Median des Modells, isoton geglaettet, "
+            f"der großen Achse (Positionswinkel {tk['positionswinkel_grad']} Grad, {len(tonkurve['zeilen'])} Ringe "
+            f"bis {tk['radius_max_arcsec']}\") Median des Kodes gegen Median des Modells, isoton geglättet, "
             f"{len(tonkurve['knoten'])} Knoten, dazwischen linear in mag; unter dem dunkelsten Knoten linear in der "
             f"Helligkeit bis 0 bei Kode {tk['kode_himmel']} ({tk['kode_himmel_beleg']}). {tk.get('grenzen', '')} "
-            + (f"Ausserhalb der groessten Ellipse um die Mitte, die ganz im Mosaik liegt (grosse Halbachse "
+            + (f"Außerhalb der größten Ellipse um die Mitte, die ganz im Mosaik liegt (große Halbachse "
                f"{tonkurve['ellipse']['a_arcsec'] / 60:.1f}', q {tonkurve['ellipse']['q']}, PA "
                f"{tonkurve['ellipse']['positionswinkel_grad']} Grad), ohne Daten, damit die Bildkante einer Isophote "
                f"folgt statt der Treppe der Mosaikfelder. " if tonkurve.get("ellipse") else "")
             + f"Himmel: {p.get('hintergrund', 'kein Abzug')}. "
-            f"Ausgerichtet ueber Massstab {p['roh_massstab_arcsec']}\"/px und Nordrichtung "
+            f"Ausgerichtet über Maßstab {p['roh_massstab_arcsec']}\"/px und Nordrichtung "
             f"{p['roh_nordwinkel_rechts_grad']} Grad im Uhrzeigersinn von der Senkrechten des Rohbilds "
             f"(nicht gespiegelt), Objektmitte (Pixel {p['roh_mitte_px'][0]}/{p['roh_mitte_px'][1]} im Rohbild, "
             f"Zeile 0 oben, {p.get('mitte_beleg', '')}) "
@@ -818,7 +818,7 @@ def bildnachweis(p, kopf, mag_hell, mag_dunkel, datei_bytes, sterne, ohne_daten,
             f"{p['bearbeitung_kanal']} Lineare Werte ({kopf.get('BUNIT', 'Einheit unbekannt')}) aus der FITS-Erweiterung "
             f"{p['fits_erweiterung']} ohne Tonkurve; Himmel {'vorher abgezogen' if p.get('himmel_abgezogen') else 'nicht abgezogen'} "
             f"({p.get('hintergrund', 'kein Abzug')}). "
-            f"Ausgerichtet ueber die CD-Matrix des FITS-Kopfs (Himmelsnorden {abs(nordwinkel):.2f} Grad "
+            f"Ausgerichtet über die CD-Matrix des FITS-Kopfs (Himmelsnorden {abs(nordwinkel):.2f} Grad "
             f"{'gegen den' if nordwinkel > 0 else 'im'} Uhrzeigersinn von oben im Rohbild, nicht gespiegelt), "
             f"Objektmitte (Pixel {p['roh_mitte_px'][0]}/{p['roh_mitte_px'][1]} im Rohbild, {p.get('mitte_beleg', '')}) "
         )
