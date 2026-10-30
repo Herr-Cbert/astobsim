@@ -54,7 +54,8 @@ export interface Anzeigewerte {
   luftmasse: number;
   extinktionMag: number;
   grenzgroesseMag: number;
-  isophote?: { magProArcsec2: number; flaecheArcsec2: number; alleSichtbar: boolean };
+  /** verhaeltnis: C/C_th an der Stelle (sichtbareIsophote); unter 1 liegt kein Teil des Objekts ueber der Schwelle (Issue #110). */
+  isophote?: { magProArcsec2: number; flaecheArcsec2: number; alleSichtbar: boolean; verhaeltnis: number };
   mischgewicht?: number;
 }
 
@@ -235,7 +236,7 @@ export function auswerten(k: Konfiguration, optionen: Auswertoptionen = {}): Aus
     grenzgroesseMag
   };
   if (isophote !== undefined) {
-    anzeige.isophote = { magProArcsec2: isophote.magProArcsec2, flaecheArcsec2: isophote.flaecheArcsec2, alleSichtbar: isophote.alleSichtbar };
+    anzeige.isophote = { magProArcsec2: isophote.magProArcsec2, flaecheArcsec2: isophote.flaecheArcsec2, alleSichtbar: isophote.alleSichtbar, verhaeltnis: isophote.verhaeltnis };
   }
   if (k.objekt.klasse === "sonnensystem") anzeige.mischgewicht = helligkeit.mischgewicht;
   return {

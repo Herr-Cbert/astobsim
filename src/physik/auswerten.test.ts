@@ -415,7 +415,7 @@ describe("auswerten Version 2: Deep-Sky mit Quellbild (ADR-0004 Ebene b)", () =>
     expect((ds.faktor * ds.schwelleRelativ) / ds.himmel).toBeCloseTo(kontrast, 10);
   });
   it("Anzeigewerte.isophote aus sichtbareIsophote; Schluessel traegt die deepSky-Felder; Bortle aendert ihn", () => {
-    expect(anzeige.isophote).toEqual({ magProArcsec2: iso.magProArcsec2, flaecheArcsec2: iso.flaecheArcsec2, alleSichtbar: iso.alleSichtbar });
+    expect(anzeige.isophote).toEqual({ magProArcsec2: iso.magProArcsec2, flaecheArcsec2: iso.flaecheArcsec2, alleSichtbar: iso.alleSichtbar, verhaeltnis: iso.verhaeltnis });
     expect(parameter.helligkeit.schluessel).toContain("|deepSky|");
     const b8 = auswerten(ad9Mit(DEEP_SKY_RING, { bortle: 8 })).parameter;
     expect(b8.helligkeit.deepSky!.schwelleRelativ).toBeGreaterThan(ds.schwelleRelativ);
