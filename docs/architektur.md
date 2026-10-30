@@ -191,7 +191,7 @@ export interface Warnung {
 | Fall | Flaechenanteil F_k |
 |---|---|
 | d fehlt, g = 0 | `f * q_k + h` (Version 1, gleicher Ausdruck, gleiche Reihenfolge) |
-| d fehlt, g > 0 | `(1 - g) * f * q_k + h + g * min(1, (aP * q_k)^n)` |
+| d fehlt, g > 0 | `(1 - g) * f * q_k + h + g * min(1, (aP * qH_k)^n)`; qH ist das Objektraster mit `halokern` gefaltet (Issue #135, physik.md 28; ohne qH gilt q) |
 | d vorhanden | `P = Phi((q / d.schwelleRelativ - 1) / d.breite)`; `F = h + P * (min(1, (d.faktor * q + d.himmel)^n) - h + d.sockel)` |
 
 Punktanteil, nur wo p > 0: `W = min(1, (aP * p)^n)`; `Pixel_k = F_k + (c ? c_k / p : 1) * W`. Ohne c (alle Punktquellen grau, Deckkraft 1) ist das der Ausdruck aus Version 1. Gibt es c, hat das Ergebnis 3 Kanaele. Phi (Normalverteilung) ist Mathematik in bild, alle physikalischen Konstanten kommen ueber die Naht. Begrenzt wird wie bisher erst das Pixel beim Zeichnen.
@@ -246,5 +246,6 @@ Schluessel: Stufe 1 Objekt ohne Punktquellen (Bortle, Transparenz und Seeing aen
 - Deckkraft auf das gefaltete q mit einer Tabelle aus dem ungefalteten Bild ist eine Naeherung; bei M57 am 80 mm (T10) pruefen.
 - Faerbung mischt ueberlappende Sterne flussgewichtet (Antares B im Halo von A bekommt eine Mischfarbe); hinnehmen oder beim Doppelstern-Issue pruefen.
 - Punktebene mit weichem Kernrand (Issue #109, physik.md Abschnitt 24): bild faltet Punktquellen und Faerbung mit dem Kern mal einem cos²-Fenster ueber das aeussere Drittel des Radius, neu normiert. Grund: Unter der Kubikwurzel des Tonwerts wurde der harte, quadratische Kernrand als Quadrat bzw. Farbkante sichtbar. Die Naht bleibt unveraendert.
+- Mischanteil im Fall unaufgeloest mit weichem Kernrand (Issue #135, physik.md Abschnitt 28): bild faltet das Objektraster ein zweites Mal mit dem Kern mal $w^{1/n}$ (dasselbe Fenster, nicht neu normiert) und nimmt das Ergebnis nur fuer `g * min(1, (aP * qH)^n)`; Zwischenspeicher `halo`. Grund: das Quadrat um Planeten mit blossem Auge. Die Naht bleibt unveraendert.
 
 Reihenfolge fuer Phase 4: (1) Vorbereitungs-PR Naht-Typen und Konstanten (wie #46 in Version 1), (2) physik `schwelle.ts`, `mischung.ts`, `sternfarbe.ts`, `doppelstern.ts` parallel, (3) bild `tonwert` und Faerbung, daten Kennlinie und neue Typen parallel, (4) Daten und tools je Objekt (Doppelsterne, M45, Mondphasen zuerst, da ohne Kennlinie), (5) zustand und ui, (6) Validierung T1 bis T12 und Nachmessen der Konstanten.
