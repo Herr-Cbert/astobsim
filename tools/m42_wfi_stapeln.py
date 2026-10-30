@@ -12,7 +12,7 @@ Eingang (data/roh/m42/, gitignored, Herkunft in data/roh/LIESMICH.md):
       (Astrometrie und Nullpunkt; Abfrage in ABFRAGE_FELD).
 
 Ausgabe: data/roh/m42/m42_wfi_v.fits (float32, eine HDU), Tangentialebene um die Mitte des
-WFI-Felds (MITTE_* aus m42_sterne.py), Norden oben, Osten links, MASSSTAB "/px, Werte ADU/s je
+Theta1 Ori C (MITTE_* aus m42_sterne.py), Norden oben, Osten links, MASSSTAB "/px, Werte ADU/s je
 Ausgabepixel nach Flat (Einheit: ADU eines Chips, dessen Flat dem Median ueber alle 8 Chips
 entspricht), Himmel abgezogen, Kopf mit CD-Matrix und MAGZP (V = MAGZP - 2,5 log10(ADU/s)).
 Daraus macht tools/deep_sky_aufbereiten.py mit tools/parameter/m42_wfi_20050102.json das
@@ -79,9 +79,9 @@ PROGRAMM = "273.C-5042(A)"
 FILTER = "BB#V/89_ESO843"
 
 # Mitte der Tangentialebene und des Bilds: MITTE_RA_GRAD, MITTE_DEC_GRAD aus m42_sterne.py
-# (Mitte des WFI-Felds, gleich der Objektmitte der Sternliste)
+# (Theta1 Ori C, gleich der Objektmitte der Sternliste)
 MASSSTAB = 0.5          # "/px des Stapels
-AUSGABE_PX = 4320       # 36' x 36' (WFI-Feld 34' x 33' plus Dithern)
+AUSGABE_PX = 4800       # 40' x 40': deckt das WFI-Feld um Theta1 Ori C (4' noerdlich, 3,5' oestlich der Feldmitte) ab
 UNTERPUNKTE = 2
 EPOCHE = 2005.0
 SAETTIGUNG_ADU = 55000.0
@@ -788,7 +788,7 @@ def stapeln(ordner, ausgabe, pruefen=True):
     karten = [
         fits_karte("BUNIT", "ADU/s", "je Pixel, nach Flat, Himmel abgezogen"),
         fits_karte("CTYPE1", "RA---TAN"), fits_karte("CTYPE2", "DEC--TAN"),
-        fits_karte("CRVAL1", MITTE_RA_GRAD, "Mitte des WFI-Felds"), fits_karte("CRVAL2", MITTE_DEC_GRAD),
+        fits_karte("CRVAL1", MITTE_RA_GRAD, "Theta1 Ori C (Gaia DR3)"), fits_karte("CRVAL2", MITTE_DEC_GRAD),
         fits_karte("CRPIX1", AUSGABE_PX / 2 + 0.5), fits_karte("CRPIX2", AUSGABE_PX / 2 + 0.5),
         fits_karte("CD1_1", -MASSSTAB / 3600.0), fits_karte("CD1_2", 0.0),
         fits_karte("CD2_1", 0.0), fits_karte("CD2_2", MASSSTAB / 3600.0),

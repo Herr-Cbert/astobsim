@@ -18,7 +18,7 @@ und die hellen Nachbarn in 4,5'' gestoert (BP/RP-Ueberschuss 1,43), beide sind b
 unsicher.
 
 Lage: dx positiv nach Westen (Norden oben, Osten links wie im Bild, Naht +x rechts), dy nach
-Norden, in der Tangentialebene um die Objektmitte (Mitte des WFI-Felds, MITTE_*; Gaia DR3,
+Norden, in der Tangentialebene um die Objektmitte Theta1 Ori C (MITTE_*; Gaia DR3,
 Epoche 2016,0); die Tabelle in deep-sky.md 2.2 hat
 dx noch mit dem alten Vorzeichen (Osten positiv) und wird hier nicht uebernommen.
 
@@ -42,11 +42,11 @@ import urllib.request
 
 from m45_sterne import LIZENZ, TAP_URL, bv_aus_bprp, lies_csv, mit_komma, v_aus_gaia
 
-# Objektmitte = Mitte der Leinwand: Mitte des WFI-Felds (Mittel der Pointierungen der 280-s-Aufnahmen,
-# auf 0,0005 Grad gerundet), nicht Theta1 Ori C, damit das Bild das ganze WFI-Feld nutzt (Entscheidung
-# Herbert zu PR #132). tools/m42_wfi_stapeln.py nimmt dieselbe Mitte.
-MITTE_RA_GRAD = 83.7585
-MITTE_DEC_GRAD = -5.4580
+# Objektmitte = Mitte der Leinwand: Theta1 Ori C (Gaia DR3 3017364063330718080). Die Variante mit der Mitte
+# des WFI-Felds ist verworfen (PR #132: Trapez bei 150-fach am Rand, die App kennt keinen Bildversatz).
+# tools/m42_wfi_stapeln.py nimmt dieselbe Mitte.
+MITTE_RA_GRAD = 83.81861966629604
+MITTE_DEC_GRAD = -5.389696084726389
 FELD_DATEI = "m42_feld_gaiadr3.csv"  # Gaia-DR3-Feldsterne aus tools/m42_wfi_stapeln.py (NU Ori)
 
 ABFRAGEN = {
@@ -179,14 +179,12 @@ def sternliste(gaia, hip):
     e = next(s for s in sterne if s["name"] == "Theta1 Ori E")
     f = next(s for s in sterne if s["name"] == "Theta1 Ori F")
     gesamt = -2.5 * math.log10(sum(10 ** (-0.4 * round(s["v"], 2)) for s in sterne))
-    c = next(s for s in sterne if s["name"] == "Theta1 Ori C")
     kommentar = (
         f"Erzeugt von tools/m42_sterne.py aus zwei Abfragen im Gaia-Archiv und den Gaia-Feldsternen von "
         f"tools/m42_wfi_stapeln.py (Abruf {abrufe}, ADQL und SHA-256 in data/roh/LIESMICH.md): Theta1 Ori A bis F "
         "(Trapez), Theta2 Ori A und B (deep-sky.md 2.2) und NU Ori (ionisierender Stern von M43, Mitglied des "
-        "Orionnebelhaufens). Lage aus Gaia DR3 (Epoche 2016,0) in der Tangentialebene um die Objektmitte RA "
-        f"{mit_komma(MITTE_RA_GRAD)}, Dec {mit_komma(MITTE_DEC_GRAD)} Grad (Mitte des WFI-Felds und des Bilds; "
-        f"Theta1 Ori C liegt bei dx {mit_komma(round(c['lage'][0], 1))}'', dy {mit_komma(round(c['lage'][1], 1))}''), "
+        "Orionnebelhaufens). Lage aus Gaia DR3 (Epoche 2016,0) in der Tangentialebene um Theta1 Ori C (Objektmitte, "
+        "wie das Bild), "
         "dx nach Westen (Norden oben, Osten links), dy nach Norden; Probe gegen die WDS-Abstaende von STF 748 auf "
         "0,5''. katalog nennt die Herkunft von V: HIP = Hipparcos (C, D, Theta2 A), Gaia DR3 = V aus G und BP-RP "
         "(physik.md 22; A, weil Hipparcos dort C mitzaehlt, B, F, Theta2 B, NU Ori), WDS fuer E. quelle_farbe: HIP "

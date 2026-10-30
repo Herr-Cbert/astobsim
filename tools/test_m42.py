@@ -105,9 +105,8 @@ class Trapez(unittest.TestCase):
         sterne = {x["name"]: x for x in liste["sterne"]}
         self.assertEqual(len(sterne), 9)
         c = sterne["Theta1 Ori C"]
-        # Objektmitte ist die Mitte des WFI-Felds: C liegt 215" oestlich (dx < 0) und 246" noerdlich
-        self.assertAlmostEqual(c["dx_arcsec"], -215.5, delta=0.5)
-        self.assertAlmostEqual(c["dy_arcsec"], 245.9, delta=0.5)
+        # Objektmitte ist Theta1 Ori C
+        self.assertEqual((c["dx_arcsec"], c["dy_arcsec"]), (0.0, 0.0))
 
         def rel(name):
             return sterne[name]["dx_arcsec"] - c["dx_arcsec"], sterne[name]["dy_arcsec"] - c["dy_arcsec"]
