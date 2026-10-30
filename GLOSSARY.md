@@ -224,7 +224,7 @@ Das schmalere Fenster der Zoomansicht (Schaltflaeche "Detail", Issue #77): 120 A
 _Vermeiden_: Zoomstufe (ist eine Stufe der Kachelpyramide), Detailzoom
 
 **Vergleichsbild**:
-Das Quellbild rechts in der Zoomansicht: dasselbe Zoomfenster, dieselbe Maske und dieselben Punktquellen wie der Anblick, aber ohne Faltung (1x1-Delta-Kern) und ohne Helligkeitsanpassung (Quellweiss = Bildschirmweiss), auf einem Raster so fein wie Quelle und Anzeige es hergeben. Technisch ein `Anblick` aus `rendere`, inhaltlich kein Anblick. Bei Deep-Sky-Objekten mit Quellbild ist die Helligkeit gestreckt (Kubikwurzel, Quellweiss bleibt Bildschirmweiss, `Vergleichsabbildung` in `src/ui/zoom.ts`; Vorschlag aus #110, Entscheidung Herbert offen).
+Das Quellbild rechts in der Zoomansicht: dasselbe Zoomfenster, dieselbe Maske und dieselben Punktquellen wie der Anblick, aber ohne Faltung (1x1-Delta-Kern) und ohne Helligkeitsanpassung (Quellweiss = Bildschirmweiss), auf einem Raster so fein wie Quelle und Anzeige es hergeben. Technisch ein `Anblick` aus `rendere`, inhaltlich kein Anblick. Bei Deep-Sky-Objekten mit Quellbild ist die Flaeche gestreckt: Kubikwurzel erst ueber dem Boden der log-Kennlinie (Bildhintergrund schwarz, Quellweiss bleibt Bildschirmweiss), ohne Wahrnehmungsschwelle; Sterne behalten die Deckkraft des Anblicks (entschieden von Herbert, #110, `src/ui/zoom.ts`).
 _Vermeiden_: Originalbild, Referenzbild
 
 ### Daten
