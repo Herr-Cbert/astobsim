@@ -7,13 +7,15 @@
 // Punkte getrennt (docs/architektur.md 5.3 und 5.4); der Aufrufer haelt dazu einen Zwischenspeicher.
 // Version 2 (Issue #101): tonwert mit den drei Faellen der Flaechenformel und optionaler Faerbung der
 // Punktebene; ohne Quellbild (schwarzer Ausschnitt, etwa QuelleLeer) weder mittele noch falte.
+// Issue #135: im Fall unaufgeloest geht der Mischanteil durch eine zweite Faltung mit halokern
+// (Randfenster, docs/recherche/physik.md Abschnitt 28), sonst stuende der Planet in einem Quadrat.
 
 import type { Fenster, Gesichtsfeld, Helligkeit, Simulationsparameter } from "../naht/simulationsparameter";
 import { pruefeKern, type Falter } from "./falter";
 import { BildFehler, pruefePositivGanz } from "./fehler";
 import { malePunktquellen, type Scheibchen } from "./male";
 import { mittele, skaliere } from "./mittele";
-import { brauchtFaerbung, falteFaerbung, faltePunkte } from "./punktebene";
+import { brauchtFaerbung, falteFaerbung, faltePunkte, halokern } from "./punktebene";
 import type { Quelle } from "./quelle";
 import { pruefeRaster, type Kanaele, type Raster } from "./raster";
 
@@ -38,6 +40,8 @@ export interface Zwischenspeicher {
   punkte?: { schluessel: string; scheibchen: Scheibchen[] };
   /** Stufe 2: gefaltetes Objektraster (undefined ohne Quellbild). */
   gefaltet?: { schluessel: string; raster: Raster | undefined };
+  /** Stufe 2, nur im Fall unaufgeloest: Objektraster mit halokern gefaltet (Issue #135). */
+  halo?: { schluessel: string; raster: Raster };
   /**
    * Stufe 2: gefaltete Punktebene (undefined ohne Punktquelle im Raster) und Faerbung (undefined,
    * wenn alle Punktquellen grau mit Deckkraft 1 sind).
@@ -105,6 +109,11 @@ export interface TonwertZusatz {
   rasterPx?: number;
   /** Kanaele des fehlenden Objektrasters (Standard 1); mit Objektraster ohne Bedeutung. */
   kanaele?: Kanaele;
+  /**
+   * Objektraster mit halokern gefaltet (Issue #135), Masse wie das Objektraster; nur im Fall
+   * unaufgeloest genutzt, dort fuer den Mischanteil. Fehlt es, gilt q (wie vor #135).
+   */
+  halo?: Raster;
 }
 
 /**
@@ -114,7 +123,8 @@ export interface TonwertZusatz {
  * Flaechenanteil F_k mit f = faktorObjekt, h = hintergrundRelativ, aP = punktFaktor,
  * n = punktExponent, g = mischgewicht, d = deepSky:
  * - d fehlt, g = 0: f * q_k + h (Version 1, gleicher Ausdruck, gleiche Reihenfolge);
- * - d fehlt, g > 0: (1 - g) * f * q_k + h + g * min(1, (aP * q_k)^n) (unaufgeloest, A-P10);
+ * - d fehlt, g > 0: (1 - g) * f * q_k + h + g * min(1, (aP * qH_k)^n) (unaufgeloest, A-P10), qH das
+ *   Objektraster mit halokern gefaltet (zusatz.halo, Issue #135), ohne zusatz.halo qH = q;
  * - d vorhanden (hat Vorrang vor g): P = Phi((q / d.schwelleRelativ - 1) / d.breite),
  *   F = h + P * (min(1, (d.faktor * q + d.himmel)^n) - h + d.sockel) (ADR-0004 Ebene b).
  * Punktanteil, nur wo p > 0: W = min(1, (aP * p)^n), Pixel_k = F_k + (c ? c_k / p : 1) * W. Ohne c
@@ -135,7 +145,11 @@ export function tonwert(raster: Raster | undefined, punktebene: Raster | undefin
     throw new BildFehler(`Faerbung ${faerbung.breite}x${faerbung.hoehe}x${faerbung.kanaele} braucht eine Punktebene und muss ${breite}x${hoehe}x3 sein`);
   }
   const kanaeleFlaeche = raster !== undefined ? raster.kanaele : (zusatz.kanaele ?? 1);
-  const flaeche = flaechenanteil(raster, breite * hoehe * kanaeleFlaeche, helligkeit);
+  const halo = zusatz.halo;
+  if (halo !== undefined && (raster === undefined || halo.breite !== breite || halo.hoehe !== hoehe || halo.kanaele !== raster.kanaele)) {
+    throw new BildFehler(`Halo ${halo.breite}x${halo.hoehe}x${halo.kanaele} braucht ein Objektraster gleicher Masse`);
+  }
+  const flaeche = flaechenanteil(raster, breite * hoehe * kanaeleFlaeche, helligkeit, halo);
   const kanaele = faerbung !== undefined ? 3 : kanaeleFlaeche;
   const ergebnis = kanaele === kanaeleFlaeche ? flaeche : verbreitere(flaeche);
   const ergebnisRaster: Raster = { breite, hoehe, kanaele, daten: ergebnis };
@@ -168,9 +182,10 @@ export function tonwert(raster: Raster | undefined, punktebene: Raster | undefin
  * Werte F(0). Jeder Fall hat seine eigene Schleife, damit der Fall aus Version 1 Zeichen fuer
  * Zeichen derselbe Ausdruck bleibt. In Fall 2 und 3 nimmt q = 0 den vorab gerechneten Wert F(0)
  * (bitgleich, derselbe Ausdruck; spart pow und exp im leeren Himmel). Die Basis von pow ist mit
- * max(0, ...) abgesichert: ein leicht negatives q aus der Faltung gaebe sonst NaN.
+ * max(0, ...) abgesichert: ein leicht negatives q aus der Faltung gaebe sonst NaN. halo ist qH aus
+ * Fall 2 (fehlt es, qH = q); der schnelle Weg gilt dort nur, wenn q und qH beide 0 sind.
  */
-function flaechenanteil(raster: Raster | undefined, anzahl: number, helligkeit: Helligkeit): Float32Array {
+function flaechenanteil(raster: Raster | undefined, anzahl: number, helligkeit: Helligkeit, halo?: Raster): Float32Array {
   const f = helligkeit.faktorObjekt;
   const h = helligkeit.hintergrundRelativ;
   const g = helligkeit.mischgewicht;
@@ -178,7 +193,7 @@ function flaechenanteil(raster: Raster | undefined, anzahl: number, helligkeit: 
   if (raster === undefined) {
     const ergebnis = new Float32Array(anzahl);
     if (ds !== undefined) ergebnis.fill(deepSkyWert(0, h, helligkeit.punktExponent, ds));
-    else if (g > 0) ergebnis.fill(mischWert(0, f, h, g, helligkeit.punktFaktor, helligkeit.punktExponent));
+    else if (g > 0) ergebnis.fill(mischWert(0, 0, f, h, g, helligkeit.punktFaktor, helligkeit.punktExponent));
     else ergebnis.fill(f * 0 + h);
     return ergebnis;
   }
@@ -194,10 +209,12 @@ function flaechenanteil(raster: Raster | undefined, anzahl: number, helligkeit: 
   } else if (g > 0) {
     const a = helligkeit.punktFaktor;
     const n = helligkeit.punktExponent;
-    const leer = mischWert(0, f, h, g, a, n);
+    const leer = mischWert(0, 0, f, h, g, a, n);
+    const dh = halo !== undefined ? halo.daten : d;
     for (let i = 0; i < d.length; i++) {
       const q = d[i] as number;
-      ergebnis[i] = q === 0 ? leer : mischWert(q, f, h, g, a, n);
+      const qh = dh[i] as number;
+      ergebnis[i] = q === 0 && qh === 0 ? leer : mischWert(q, qh, f, h, g, a, n);
     }
   } else {
     for (let i = 0; i < d.length; i++) ergebnis[i] = f * (d[i] as number) + h;
@@ -205,9 +222,9 @@ function flaechenanteil(raster: Raster | undefined, anzahl: number, helligkeit: 
   return ergebnis;
 }
 
-/** Fall unaufgeloest: (1 - g) f q + h + g min(1, (aP q)^n), Basis von pow nicht negativ. */
-function mischWert(q: number, f: number, h: number, g: number, a: number, n: number): number {
-  return (1 - g) * f * q + h + g * Math.min(1, Math.pow(Math.max(0, a * q), n));
+/** Fall unaufgeloest: (1 - g) f q + h + g min(1, (aP qH)^n), Basis von pow nicht negativ. */
+function mischWert(q: number, qh: number, f: number, h: number, g: number, a: number, n: number): number {
+  return (1 - g) * f * q + h + g * Math.min(1, Math.pow(Math.max(0, a * qh), n));
 }
 
 /** Fall Deep-Sky: h + P * (min(1, (a q + s)^n) - h + Sockel) mit P = Phi((q / q* - 1) / Breite). */
@@ -286,7 +303,9 @@ function maskiereAn(raster: Raster, gesichtsfeld: Gesichtsfeld, fenster: Fenster
  * gefalteten Nullraster). Stufe 1b (Punktquellen malen) unter quellbild.schluessel plus
  * quellbild.punkte.schluessel, weil das Malen auch Massstab, Raster und Mitte braucht. Stufe 2
  * getrennt: die Faltung des Objekts mit dem Falter unter kern.schluessel plus Objektschluessel, die
- * der Punktebene (lokal in punktebene.ts) unter kern.schluessel plus Punkteschluessel.
+ * der Punktebene (lokal in punktebene.ts) unter kern.schluessel plus Punkteschluessel. Im Fall
+ * unaufgeloest (mischgewicht > 0, ohne deepSky, mit Objektraster, Kern kein Delta) faltet der Falter das Objekt
+ * zusaetzlich mit halokern, unter dessen Schluessel plus Objektschluessel (Issue #135).
  * Wer den Zwischenspeicher weglaesst, rechnet alles neu. Der Zwischenspeicher gehoert zu genau
  * einer Quelle; bei Wechsel der Quelle einen neuen anlegen.
  */
@@ -329,6 +348,17 @@ export function rendere(parameter: Simulationsparameter, quelle: Quelle, falter:
 
   const zusatz: TonwertZusatz = { rasterPx: quellbild.rasterPx, kanaele: objekt.kanaele };
   if (punktebene.faerbung !== undefined) zusatz.faerbung = punktebene.faerbung;
+  // Ein Delta (Radius 0, Vergleichsbild) hat kein Randfenster: halokern gleicht dem Kern, qH = q.
+  if (helligkeit.deepSky === undefined && helligkeit.mischgewicht > 0 && objekt.raster !== undefined && kern.radius > 0) {
+    const kernHalo = halokern(kern, helligkeit.punktExponent);
+    const schluesselHalo = `${kernHalo.schluessel}|${objekt.schluessel}`;
+    let halo = zwischen.halo;
+    if (!halo || halo.schluessel !== schluesselHalo) {
+      halo = { schluessel: schluesselHalo, raster: falter.falte(objekt.raster, kernHalo) };
+      zwischen.halo = halo;
+    }
+    zusatz.halo = halo.raster;
+  }
   const getont = tonwert(gefaltet.raster, punktebene.raster, helligkeit, zusatz);
   const raster = skaliere(getont, fenster.px);
   maskiereAn(raster, gesichtsfeld, fenster);

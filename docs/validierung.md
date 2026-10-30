@@ -342,4 +342,16 @@ Trabanten (hellstes Pixel ausserhalb der Scheibe): T1 119 (111), T4a 147 (138), 
 
 **T1 bis T6 mit den neuen Konstanten** (Sichtpruefung von T4a, T4c, T12a, T12b; die uebrigen Bilder sind nur heller oder dunkler, die Tabellen-Tests aus Abschnitt 3 haengen nicht an den Konstanten): T4a und T4c zeigen Baender, GRF in seiner Farbe und in T4c die weissen Ovale; in T4a sind die hellen Zonen teils auf Weiss begrenzt (etwa ein Achtel der Scheibe, ADR-0004 erwartete ein Fuenftel). Der Unterschied T4c gegen T4d (mehr Detail bei 300 mm) bleibt deutlich. Urteile wie in Abschnitt 2, alle **erfuellt**.
 
-**Offen, eigene Issues:** das helle Quadrat (etwa 28 x 28 Anzeigepixel, Kante 90 gegen Himmel 51) um unaufgeloeste Planeten mit blossem Auge in T6b und T12b bis T12d (#135); M32 mit blossem Auge als sichtbarer Fleck (#136). Beides haengt nicht an den Konstanten (`helligkeit-v2.md` 1.1, Nebenbefunde).
+**Offen, eigene Issues:** das helle Quadrat (etwa 28 x 28 Anzeigepixel, Kante 90 gegen Himmel 51) um unaufgeloeste Planeten mit blossem Auge in T6b und T12b bis T12d (#135, behoben, siehe unten); M32 mit blossem Auge als sichtbarer Fleck (#136). Beides haengt nicht an den Konstanten (`helligkeit-v2.md` 1.1, Nebenbefunde).
+
+**Quadrat um unaufgeloeste Planeten (Issue #135).** Ursache und Abhilfe in `physik.md` 28: der Mischanteil nimmt das Objekt, gefaltet mit dem Kern mal $w^{1/n}$. Messung an der Uebersicht wie oben (Mittel der Kanaele, Himmel 51), vorher = main 0c6fd21, nachher = dieser Stand, beide SwiftShader:
+
+| Fall | Scheitel | Rand des Quadrats (Ring 13 bis 14 px) | Ecken des Quadrats (11 bis 13 px auf beiden Achsen) | Halo ueber Himmel + 2 |
+|---|---|---|---|---|
+| T6b = T12b Jupiter | 236 / 236 | 84 / 62 | 82 / 52 | 32 x 31 / 28 x 28 px |
+| T12c Mars 14'' | 212 / 212 | 76 / 54 | 78 / 51 | 28 x 28 / 26 x 26 px |
+| T12d Saturn 20'' | 175 / 175 | 71 / 57 | 69 / 51 | 30 x 28 / 28 x 24 px |
+
+Die Kernwerte sind unveraendert (innen ist der Halokern bitgleich mit dem Kern). In den Ecken, wo vorher nur das Quadrat Licht hatte, liegt das Bild hoechstens 1 Kode ueber dem Himmel; der runde Halo laeuft auf der Achse ueber drei bis vier Pixel in Schritten von 9, 7, 3 und 1 Kodes auf den Himmel aus (T6b: 71, 62, 55, 52, 51). Am Rand der Achse liegt er noch im Ring des alten Quadrats, ist dort aber rund und ohne Stufe (Sichtpruefung der Uebersichten und Zooms von T6b, T12b bis T12d: kein Quadrat). **Erfuellt.**
+
+Geaendert sind ausserdem T5b (Mars 6'' bei 120-fach, $g$ = 0,0147) und T6c (Jupiter im 10x50): beide liegen im Fall unaufgeloest, der schwache Mischanteil im aeusseren Drittel des Kerns faellt weg. Alle geaenderten Pixel werden dunkler, um hoechstens 2 (T5b) bzw. 1 Kode (T6c) in der Uebersicht und 2 bzw. 3 Kodes im Zoom, ueberwiegend im schwachen Halo (Median der alten Helligkeit an den geaenderten Pixeln im Zoom 27 bzw. 74); Scheitel 163 und 212 unveraendert. Alle uebrigen Bilder (T1 bis T5a, T6a, P1 bis P3, T12a) sind bytegleich. Sichtpruefung T1 und T4a: unveraendert.

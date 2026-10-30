@@ -10,7 +10,7 @@ import { brauchtFaerbung, falteFaerbung, faltePunkte } from "./punktebene";
 import { QuelleAusRaster, type Objektpunkt, type Quellausschnitt, type Quelle } from "./quelle";
 import { neuesRaster, pixelIndex, type Raster, summe } from "./raster";
 import { phi, rendere, tonwert, type Zwischenspeicher } from "./rendere";
-import { deltaKern, kastenKern } from "./testkerne";
+import { deltaKern, kastenKern, kernAusDaten } from "./testkerne";
 
 const N = 16;
 
@@ -129,6 +129,26 @@ describe("tonwert Fall 2: deepSky fehlt, mischgewicht > 0", () => {
       const erwartet = (gOhne.daten[i] as number) + (pw > 0 ? Math.min(1, Math.cbrt(4.9 * pw)) : 0);
       expect(g.daten[i]).toBeCloseTo(erwartet, 6);
     }
+  });
+
+  it("mit zusatz.halo (Issue #135): linearer Teil aus q, Mischanteil aus qH; qH = q gibt dieselben Bytes wie ohne", () => {
+    const q = zufallsRaster(N, 1, 21);
+    const qh = zufallsRaster(N, 1, 22, 0.5);
+    for (let i = 0; i < 9; i++) q.daten[i] = qh.daten[i] = 0;
+    q.daten[9] = 0;
+    const g = 0.6;
+    const h = helligkeit({ mischgewicht: g });
+    const t = tonwert(q, undefined, h, { halo: qh });
+    for (let i = 0; i < q.daten.length; i++) {
+      const erwartet = (1 - g) * 0.83 * (q.daten[i] as number) + 0.0123 + g * Math.min(1, Math.cbrt(4.9 * (qh.daten[i] as number)));
+      expect(t.daten[i]).toBeCloseTo(erwartet, 6);
+    }
+    expect(bytes(tonwert(q, undefined, h, { halo: q }))).toEqual(bytes(tonwert(q, undefined, h)));
+    // Ohne Mischgewicht und mit deepSky ohne Wirkung.
+    expect(bytes(tonwert(q, undefined, helligkeit(), { halo: qh }))).toEqual(bytes(tonwert(q, undefined, helligkeit())));
+    expect(() => tonwert(q, undefined, h, { halo: neuesRaster(N + 1, N) })).toThrow(BildFehler);
+    expect(() => tonwert(q, undefined, h, { halo: neuesRaster(N, N, 3) })).toThrow(BildFehler);
+    expect(() => tonwert(undefined, undefined, h, { rasterPx: N, halo: qh })).toThrow(BildFehler);
   });
 
   it("ohne Objektraster gleich dem Nullraster", () => {
@@ -399,5 +419,123 @@ describe("rendere Version 2", () => {
     for (const teil of [{ mischgewicht: 1 }, { mischgewicht: -0.1 }, { mischgewicht: Number.NaN }, { deepSky: { ...deepSky, schwelleRelativ: 0 } }, { deepSky: { ...deepSky, breite: 0 } }, { deepSky: { ...deepSky, sockel: -1 } }, { deepSky: { ...deepSky, faktor: Number.POSITIVE_INFINITY } }]) {
       expect(() => rendere(parameter([], teil), leer, new FalterJs())).toThrow(BildFehler);
     }
+  });
+});
+
+describe("rendere Fall unaufgeloest: kein Quadrat um den Planeten (Issue #135)", () => {
+  // Nachbau von T6b (Jupiter 47'' mit blossem Auge, Bortle 5): Kern 17 x 17 mit dem radialen Profil
+  // des echten Kerns (Augen-PSF 60'' bei 25,25''/px, Werte der Mittelzeile relativ zum Scheitel aus
+  // physik baueKern), Helligkeit wie auswerten fuer T6b, Planetenscheibe 1,86 px Durchmesser,
+  // Anzeige 1,5-fach (T6b: 1089 Anzeigepixel auf 713 Arbeitspixel).
+  const R = 8;
+  const G = 2 * R + 1;
+  const PROFIL = [1, 0.673, 0.209, 0.0353, 0.00612, 0.00216, 0.00113, 0.000674, 0.000439];
+  const NA = 41;
+  const PX = 61;
+
+  function profil(rho: number): number {
+    const i = Math.min(R - 1, Math.floor(rho));
+    const t = rho - i;
+    return Math.exp((1 - t) * Math.log(PROFIL[i] as number) + t * Math.log(PROFIL[i + 1] as number));
+  }
+
+  function augenkern(): Kern {
+    const daten = new Float32Array(G * G);
+    let s = 0;
+    for (let b = 0; b < G; b++) for (let a = 0; a < G; a++) s += daten[b * G + a] = profil(Math.min(R, Math.hypot(a - R, b - R)));
+    for (let i = 0; i < daten.length; i++) daten[i] = (daten[i] as number) / s;
+    return kernAusDaten(G, daten, "auge");
+  }
+
+  function planet(): Raster {
+    const r = neuesRaster(NA, NA);
+    const radius = 0.93;
+    for (let j = 0; j < NA; j++) {
+      for (let i = 0; i < NA; i++) {
+        let n = 0;
+        for (let b = 0; b < 10; b++) for (let a = 0; a < 10; a++) if ((i + (a + 0.5) / 10 - NA / 2) ** 2 + (j + (b + 0.5) / 10 - NA / 2) ** 2 <= radius ** 2) n++;
+        r.daten[j * NA + i] = n / 100;
+      }
+    }
+    return r;
+  }
+
+  const T6B: Partial<Helligkeit> = { faktorObjekt: 2.84, hintergrundRelativ: 0.03311, punktFaktor: 3.631, punktExponent: 1 / 3, mischgewicht: 0.8238 };
+
+  function t6b(px: number, teil: Partial<Helligkeit> = T6B): Simulationsparameter {
+    return {
+      quellbild: { schluessel: "jup", massstabArcsecProPx: 1, rasterPx: NA, mitteXArcsec: 0, mitteYArcsec: 0, punkte: { schluessel: "p", punktquellen: [] } },
+      kern: augenkern(),
+      helligkeit: helligkeit(teil),
+      gesichtsfeld: { form: "rechteck", breiteArcsec: 1000, hoeheArcsec: 1000 },
+      fenster: { breiteArcsec: NA, mitteXArcsec: 0, mitteYArcsec: 0, px }
+    };
+  }
+
+  /** 8-Bit-sRGB wie src/ui/zeichne.ts (IEC 61966-2-1), ohne Tabelle. */
+  const kode = (w: number): number => Math.round(255 * (w <= 0.0031308 ? 12.92 * w : 1.055 * Math.min(1, w) ** (1 / 2.4) - 0.055));
+
+  it("kein Quadrat: ausserhalb des runden Halos hoechstens 2 Kodes ueber dem Himmel, Halo rund und zum Rand fallend", () => {
+    const anblick = rendere(t6b(PX), new QuelleAusRaster(planet(), 1), new FalterJs()).raster;
+    const d = anblick.daten;
+    const himmel = kode(0.03311);
+    const mitte = (PX - 1) / 2;
+    const massstab = PX / NA;
+    // Rund reicht das Licht hoechstens bis Kernradius + 0,5 px (Fenster) + Planetenradius, dazu ein
+    // Arbeitspixel fuer die bilineare Vergroesserung. Darueber hinaus lagen die Ecken des Quadrats
+    // (vor #135 bis 36 Kodes ueber dem Himmel).
+    const rund = (R + 0.5 + 0.93 + 1) * massstab;
+    let ausserhalb = 0;
+    for (let j = 0; j < PX; j++) {
+      for (let i = 0; i < PX; i++) if (Math.hypot(i - mitte, j - mitte) > rund) ausserhalb = Math.max(ausserhalb, kode(d[j * PX + i] as number) - himmel);
+    }
+    expect(ausserhalb).toBeLessThanOrEqual(2);
+    // Rund: auf der Achse und auf der Diagonalen endet der Halo bei etwa demselben Radius.
+    const strahl = (dx: number, dy: number): number[] => {
+      const werte: number[] = [];
+      for (let k = 0; mitte + k * dy < PX && mitte + k * dx < PX; k++) werte.push(kode(d[(mitte + k * dy) * PX + mitte + k * dx] as number));
+      return werte;
+    };
+    const ende = (dx: number, dy: number): number => strahl(dx, dy).findIndex((w) => w <= himmel) * Math.hypot(dx, dy);
+    expect(ende(1, 1)).toBeLessThan(1.1 * ende(1, 0));
+    // Vom Scheitel nach aussen nirgends ansteigend (kein Ring, keine Stufe nach oben).
+    for (const [dx, dy] of [[1, 0], [0, 1], [1, 1]] as const) {
+      const w = strahl(dx, dy);
+      for (let k = 1; k < w.length; k++) expect(w[k] as number).toBeLessThanOrEqual(w[k - 1] as number);
+    }
+  });
+
+  it("Halo-Faltung nur im Fall unaufgeloest, ein Helligkeitszug faltet nicht neu", () => {
+    const q = new QuelleAusRaster(planet(), 1);
+    const f = new FalterZaehlend();
+    const zwischen: Zwischenspeicher = {};
+    rendere(t6b(NA, { ...T6B, mischgewicht: 0 }), q, f, zwischen);
+    expect(f.aufrufe).toBe(1);
+    expect(zwischen.halo).toBeUndefined();
+    rendere(t6b(NA), q, f, zwischen);
+    expect(f.aufrufe).toBe(2);
+    expect(zwischen.halo?.schluessel.startsWith("auge|halo|")).toBe(true);
+    rendere(t6b(NA, { ...T6B, schluessel: "h|b7", hintergrundRelativ: 0.06 }), q, f, zwischen);
+    expect(f.aufrufe).toBe(2);
+    rendere(t6b(NA, { ...T6B, deepSky }), q, f, zwischen);
+    expect(f.aufrufe).toBe(2);
+    // Delta (Vergleichsbild): keine zweite Faltung, gleiche Bytes wie vor #135 (qH = q).
+    const delta = { ...t6b(NA), kern: deltaKern(1) };
+    const f2 = new FalterZaehlend();
+    const mitDelta = rendere(delta, q, f2);
+    expect(f2.aufrufe).toBe(1);
+    const qDelta = new FalterJs().falte(planet(), delta.kern);
+    expect(bytes(mitDelta.raster)).toEqual(bytes(tonwert(qDelta, undefined, delta.helligkeit, { halo: qDelta })));
+  });
+
+  it("Kern unveraendert: Scheitel wie (1 - g) f q + h + g min(1, (aP q)^n) mit dem ungefensterten Kern", () => {
+    const p = t6b(NA);
+    const anblick = rendere(p, new QuelleAusRaster(planet(), 1), new FalterJs()).raster;
+    const q = new FalterJs().falte(planet(), p.kern);
+    const i = (NA * NA - 1) / 2;
+    const w = q.daten[i] as number;
+    const erwartet = (1 - 0.8238) * 2.84 * w + 0.03311 + 0.8238 * Math.min(1, Math.cbrt(3.631 * w));
+    expect(anblick.daten[i]).toBeCloseTo(erwartet, 6);
+    expect(kode(erwartet)).toBeGreaterThan(230);
   });
 });
