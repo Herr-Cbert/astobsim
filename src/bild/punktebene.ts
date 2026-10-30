@@ -15,6 +15,8 @@
 // Begruendung und Grenzen: docs/recherche/physik.md Abschnitt 24.
 // Dasselbe Fenster, hoch 1/n, liefert halokern fuer den Mischanteil des Falls unaufgeloest in
 // tonwert (Issue #135, physik.md Abschnitt 28).
+// Feinere Punktebene (Issue #145, physik.md Abschnitt 31): mit einem Kern am feineren Massstab endet
+// das Fenster wie am Arbeitsraster ein halbes Arbeitspixel ausserhalb des Radius (randZusatzPx).
 
 import type { Kern } from "../naht/simulationsparameter";
 import { pruefeKern } from "./falter";
@@ -30,10 +32,12 @@ import { neuesRaster, type Raster } from "./raster";
  * eines ganz innen liegenden Scheibchens bleibt erhalten (Kern Summe 1).
  *
  * undefined, wenn kein Scheibchen nach der Faltung ins Raster reicht (dann gibt es keine
- * Punktebene, und tonwert rechnet bitgleich wie ohne Trabanten).
+ * Punktebene, und tonwert rechnet bitgleich wie ohne Trabanten). randZusatzPx: wo das Randfenster
+ * 0 erreicht, in Pixeln des Kerns ausserhalb seines Radius (Standard ein halbes Pixel; bei der
+ * feineren Punktebene ein halbes Arbeitspixel, Issue #145).
  */
-export function faltePunkte(scheibchen: readonly Scheibchen[], kern: Kern, rasterPx: number): Raster | undefined {
-  return falteInEbene(scheibchen, kern, rasterPx, 1);
+export function faltePunkte(scheibchen: readonly Scheibchen[], kern: Kern, rasterPx: number, randZusatzPx = FENSTER_ENDE_ZUSATZ_PX): Raster | undefined {
+  return falteInEbene(scheibchen, kern, rasterPx, 1, randZusatzPx);
 }
 
 /**
@@ -49,25 +53,25 @@ export function brauchtFaerbung(scheibchen: readonly Scheibchen[]): boolean {
  * (farbe fehlt = grau 1, 1, 1). Fuer ein graues Scheibchen mit Deckkraft 1 ist jeder Kanal bitgleich
  * mit der Punktebene, tonwert rechnet dort c_k / p = 1. undefined wie bei faltePunkte.
  */
-export function falteFaerbung(scheibchen: readonly Scheibchen[], kern: Kern, rasterPx: number): Raster | undefined {
-  return falteInEbene(scheibchen, kern, rasterPx, 3);
+export function falteFaerbung(scheibchen: readonly Scheibchen[], kern: Kern, rasterPx: number, randZusatzPx = FENSTER_ENDE_ZUSATZ_PX): Raster | undefined {
+  return falteInEbene(scheibchen, kern, rasterPx, 3, randZusatzPx);
 }
 
 /** Das Fenster beginnt bei diesem Anteil des Kernradius (aeusseres Drittel, etwa eine Gesamt-FWHM). */
 const FENSTER_ANFANG_PRO_RADIUS = 2 / 3;
 /** Das Fenster erreicht 0 einen halben Pixel ausserhalb des Radius: die Pixel auf der Achse bleiben knapp ueber 0. */
-const FENSTER_ENDE_ZUSATZ_PX = 0.5;
+export const FENSTER_ENDE_ZUSATZ_PX = 0.5;
 
-const ausgeblendet = new WeakMap<Kern, Float32Array>();
+const ausgeblendet = new WeakMap<Kern, { zusatzPx: number; daten: Float32Array }>();
 
 /**
  * Randfenster w(rho) aus physik.md Abschnitt 24: 1 bis rho0 = 2/3 Radius, dann
- * cos^2(pi/2 * (rho - rho0) / (rhoE - rho0)) bis rhoE = Radius + 0,5 px, darueber 0 (rho Abstand
- * zur Kernmitte in Pixeln).
+ * cos^2(pi/2 * (rho - rho0) / (rhoE - rho0)) bis rhoE = Radius + zusatzPx (Standard 0,5 px),
+ * darueber 0 (rho Abstand zur Kernmitte in Pixeln).
  */
-function randfenster(rho: number, r: number): number {
+function randfenster(rho: number, r: number, zusatzPx = FENSTER_ENDE_ZUSATZ_PX): number {
   const rho0 = FENSTER_ANFANG_PRO_RADIUS * r;
-  const rhoE = r + FENSTER_ENDE_ZUSATZ_PX;
+  const rhoE = r + zusatzPx;
   return rho <= rho0 ? 1 : rho >= rhoE ? 0 : Math.cos(((Math.PI / 2) * (rho - rho0)) / (rhoE - rho0)) ** 2;
 }
 
@@ -75,11 +79,12 @@ function randfenster(rho: number, r: number): number {
  * Kerndaten fuer die Punktebene: kern.daten mal w(rho), w = 1 bis rho0 = 2/3 Radius, dann
  * cos^2(pi/2 * (rho - rho0) / (rhoE - rho0)) bis rhoE = Radius + 0,5 px, darueber 0 (rho Abstand
  * zur Kernmitte in Pixeln); danach auf die Summe der urspruenglichen Daten normiert, so dass der
- * Fluss erhalten bleibt. Ein Delta (Radius 0, Vergleichsbild) bleibt unveraendert. Zwischengespeichert je Kern.
+ * Fluss erhalten bleibt. Ein Delta (Radius 0, Vergleichsbild) bleibt unveraendert. Zwischengespeichert
+ * je Kern (fuer das letzte zusatzPx). zusatzPx ersetzt die 0,5 px fuer rhoE (Issue #145).
  */
-export function ausgeblendetKern(kern: Kern): Float32Array {
+export function ausgeblendetKern(kern: Kern, zusatzPx = FENSTER_ENDE_ZUSATZ_PX): Float32Array {
   const fertig = ausgeblendet.get(kern);
-  if (fertig !== undefined) return fertig;
+  if (fertig !== undefined && fertig.zusatzPx === zusatzPx) return fertig.daten;
   const r = kern.radius | 0;
   const g = kern.groesse | 0;
   const daten = new Float32Array(kern.daten.length);
@@ -89,7 +94,7 @@ export function ausgeblendetKern(kern: Kern): Float32Array {
     for (let a = 0; a < g; a++) {
       const i = b * g + a;
       const wert = kern.daten[i] as number;
-      const w = randfenster(Math.hypot(a - r, b - r), r);
+      const w = randfenster(Math.hypot(a - r, b - r), r, zusatzPx);
       vorher += wert;
       nachher += wert * w;
       daten[i] = wert * w;
@@ -101,7 +106,7 @@ export function ausgeblendetKern(kern: Kern): Float32Array {
   } else {
     daten.set(kern.daten);
   }
-  ausgeblendet.set(kern, daten);
+  ausgeblendet.set(kern, { zusatzPx, daten });
   return daten;
 }
 
@@ -134,13 +139,14 @@ export function halokern(kern: Kern, n: number): Kern {
   return ergebnis;
 }
 
-function falteInEbene(scheibchen: readonly Scheibchen[], kern: Kern, rasterPx: number, kanaele: 1 | 3): Raster | undefined {
+function falteInEbene(scheibchen: readonly Scheibchen[], kern: Kern, rasterPx: number, kanaele: 1 | 3, randZusatzPx: number): Raster | undefined {
   pruefePositivGanz("rasterPx", rasterPx);
   if (scheibchen.length === 0) return undefined;
   pruefeKern(kern);
   const r = kern.radius | 0;
   const g = kern.groesse | 0;
-  const k = ausgeblendetKern(kern);
+  if (!(randZusatzPx > 0) || !Number.isFinite(randZusatzPx)) throw new BildFehler(`randZusatzPx muss positiv sein, nicht ${randZusatzPx}`);
+  const k = ausgeblendetKern(kern, randZusatzPx);
   const n = rasterPx | 0;
   let ebene: Raster | undefined;
   for (const s of scheibchen) {

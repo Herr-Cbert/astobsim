@@ -141,10 +141,15 @@ export function pruefsumme(daten: Float32Array): string {
   return h.toString(16).padStart(8, "0");
 }
 
-/** Simulationsparameter als JSON-taugliches Objekt: kern.daten durch die Pruefsumme ersetzt. */
+/**
+ * Simulationsparameter als JSON-taugliches Objekt: kern.daten durch die Pruefsumme ersetzt. Ohne
+ * punktkern: den gibt es erst seit Issue #145 (feinere Punktebene, physik.md 31); er traegt dieselbe
+ * Kernbeschreibung bis auf den Massstab und laesst alle Felder aus Version 1 unveraendert.
+ */
 export function vergleichbar(p: Simulationsparameter): unknown {
   const { daten, ...kern } = p.kern;
-  return JSON.parse(JSON.stringify({ ...p, kern: { ...kern, pruefsumme: pruefsumme(daten) } }));
+  const { punktkern: _punktkern, ...ohnePunktkern } = p;
+  return JSON.parse(JSON.stringify({ ...ohnePunktkern, kern: { ...kern, pruefsumme: pruefsumme(daten) } }));
 }
 
 /**

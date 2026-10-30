@@ -12,13 +12,16 @@ import objekteJson from "../daten/objekte.json";
 import { malePunktquellen } from "./bild/male";
 import { faltePunkte } from "./bild/punktebene";
 import { eckeLinksOben } from "./bild/quelle";
+import { punktquellbild } from "./bild/rendere";
 import { pruefeBildnachweise } from "./daten/bildnachweise";
 import { pruefeGeraete } from "./daten/geraete";
 import { pruefeObjekte, pruefeSternliste, pruefeVerweise } from "./daten/objekte";
 import type { Konfiguration } from "./naht/konfiguration";
 import { type Auswertung, auswerten } from "./physik/auswerten";
+import { baueKern } from "./physik/kern";
 import { SCHWELLE_ERKENNBAR } from "./physik/konstanten";
-import { zoomfenster } from "./ui/zoom";
+import { rundeSignifikant } from "./physik/schluessel";
+import { detailstart, zoomfenster } from "./ui/zoom";
 import { ausUrl } from "./zustand";
 
 const sternlisten = import.meta.glob("../daten/sterne/*.json", { import: "default", eager: true });
@@ -51,17 +54,26 @@ function delle(profil: readonly number[]): number {
   return ergebnis;
 }
 
+/** Anteil der Verbindungslinie fuer das Profil: von 0,3 Abstaenden vor A bis 0,3 hinter B, 401 Punkte. */
+const linie = (t: number): number => -0.3 + (1.6 * t) / 400;
+
 /**
  * Trennung zweier Sterne, wie das Bild sie zeigt: Punktebene im Zoomfenster (malePunktquellen und
- * faltePunkte aus bild, Arbeitsmassstab Gesamt-FWHM / 2,5), linear vor tonwert, bilinear abgetastet
- * entlang der Verbindungslinie von 0,3 Abstaenden vor dem ersten bis 0,3 hinter dem zweiten Stern.
- * Mass wie doppelsterne.md 4: delta = 1 - I_min / I_B.
+ * faltePunkte aus bild, auf dem Raster, das rendere fuer die Punktebene nimmt: punktquellbild, seit
+ * Issue #145 bis fuenffach feiner als der Arbeitsmassstab Gesamt-FWHM / 2,5), linear vor tonwert,
+ * bilinear abgetastet entlang der Verbindungslinie. Mass wie doppelsterne.md 4: delta = 1 - I_min / I_B.
+ * fein: dieselbe Delle im feinen Modell (Issue #112, validierung.md 14), derselbe Kern mit dem
+ * fuenften Teil des Arbeitsmassstabs (etwa 12 Pixel je Gesamt-FWHM), ohne Randfenster, die Sterne als
+ * Punkte mit dem Fluss helligkeitRelativ * Durchmesser^2, der Kern bilinear an jeder Stelle des Profils.
+ * detail: im Detailfenster um den hellsten Stern (wie T8b-detail.png) statt im Zoom; beide 540 px wie
+ * eine Zoom-Canvas der Validierungsbilder.
  */
-function trennung(such: string, sternA: string, sternB: string): { delle: number; auswertung: Auswertung } {
+function trennung(such: string, sternA: string, sternB: string, detail = false): { delle: number; fein: number; auswertung: Auswertung } {
   const k = konfiguration(such);
-  const auswertung = auswerten(k, { fenster: zoomfenster(k, { xArcsec: 0, yArcsec: 0 }, 540) });
-  const { quellbild, kern } = auswertung.parameter;
-  const ebene = faltePunkte(malePunktquellen(quellbild), kern, quellbild.rasterPx)!;
+  const mitte = detail ? detailstart(k)! : { xArcsec: 0, yArcsec: 0 };
+  const auswertung = auswerten(k, { fenster: zoomfenster(k, mitte, 540, detail) });
+  const { quellbild, kern, randZusatzPx } = punktquellbild(auswertung.parameter);
+  const ebene = faltePunkte(malePunktquellen(quellbild), kern, quellbild.rasterPx, randZusatzPx)!;
   const n = quellbild.rasterPx;
   const m = quellbild.massstabArcsecProPx;
   const ecke = eckeLinksOben({ xArcsec: quellbild.mitteXArcsec, yArcsec: quellbild.mitteYArcsec }, n, n, m);
@@ -80,49 +92,92 @@ function trennung(such: string, sternA: string, sternB: string): { delle: number
   };
   const [ua, va] = lage(sternA);
   const [ub, vb] = lage(sternB);
+  const profil = Array.from({ length: 401 }, (_, t) => bilinear(ua + linie(t) * (ub - ua), va + linie(t) * (vb - va)));
+  return { delle: delle(profil), fein: delleFein(auswertung, sternA, sternB), auswertung };
+}
+
+/** Delle im feinen Modell (siehe trennung), in Bogensekunden entlang derselben Linie. */
+function delleFein(auswertung: Auswertung, sternA: string, sternB: string): number {
+  const { kern, quellbild } = auswertung.parameter;
+  const f = baueKern({ ...kern.beschreibung, massstabArcsecProPx: rundeSignifikant(kern.massstabArcsecProPx / 5) });
+  const m = f.massstabArcsecProPx;
+  const g = f.groesse;
+  const wert = (dx: number, dy: number): number => {
+    const u = dx / m + f.radius;
+    const v = -dy / m + f.radius;
+    const i = Math.floor(u);
+    const j = Math.floor(v);
+    const k = (a: number, b: number): number => (a < 0 || b < 0 || a >= g || b >= g ? 0 : f.daten[b * g + a]!);
+    const fu = u - i;
+    const fv = v - j;
+    return (1 - fu) * (1 - fv) * k(i, j) + fu * (1 - fv) * k(i + 1, j) + (1 - fu) * fv * k(i, j + 1) + fu * fv * k(i + 1, j + 1);
+  };
+  const sterne = quellbild.punkte.punktquellen.filter((p) => p.sichtbar);
+  const a = sterne.find((p) => p.name === sternA)!;
+  const b = sterne.find((p) => p.name === sternB)!;
   const profil = Array.from({ length: 401 }, (_, t) => {
-    const s = -0.3 + (1.6 * t) / 400;
-    return bilinear(ua + s * (ub - ua), va + s * (vb - va));
+    const x = a.xArcsec + linie(t) * (b.xArcsec - a.xArcsec);
+    const y = a.yArcsec + linie(t) * (b.yArcsec - a.yArcsec);
+    return sterne.reduce((summe, p) => summe + p.helligkeitRelativ * p.durchmesserArcsec ** 2 * wert(x - p.xArcsec, y - p.yArcsec), 0);
   });
-  return { delle: delle(profil), auswertung };
+  return delle(profil);
 }
 
 interface Paarfall {
   fall: string;
   such: string;
   sterne: [string, string];
-  /** Delle am 2026-10-30 (eingefroren auf 0,03). */
+  /** Delle am 2026-10-30 (eingefroren auf 0,03), seit Issue #145 mit der feineren Punktebene. */
   heute: number;
   /** Was das Bild zeigt: getrennt, wenn die Delle ueber SCHWELLE_ERKENNBAR liegt (doppelsterne.md 4). */
   getrennt: boolean;
+  /** Im Detailfenster statt im Zoom (trennung). */
+  detail?: boolean;
 }
 
 const PAARE: Paarfall[] = [
   // T7: Erwartung 80 mm beide nicht getrennt (laenglich), 150 mm beide getrennt.
   { fall: "T7a", such: `${R(80, 800, 5)}&z=pi_aql_2021&s=0.5&${bed()}`, sterne: ["A", "B"], heute: 0, getrennt: false },
-  { fall: "T7b", such: `${R(150, 1500, 5)}&z=pi_aql_2021&s=0.5&${bed()}`, sterne: ["A", "B"], heute: 0.214, getrennt: true },
+  { fall: "T7b", such: `${R(150, 1500, 5)}&z=pi_aql_2021&s=0.5&${bed()}`, sterne: ["A", "B"], heute: 0.476, getrennt: true },
   { fall: "T7c", such: `${R(80, 800, 5)}&z=eps_ari_2027&s=0.5&${bed()}`, sterne: ["A", "B"], heute: 0, getrennt: false },
-  { fall: "T7d", such: `${R(150, 1500, 5)}&z=eps_ari_2027&s=0.5&${bed()}`, sterne: ["A", "B"], heute: 0.141, getrennt: true },
+  { fall: "T7d", such: `${R(150, 1500, 5)}&z=eps_ari_2027&s=0.5&${bed()}`, sterne: ["A", "B"], heute: 0.331, getrennt: true },
   // T8: 10x50 zwei runde Sterne (enge Paare nicht getrennt, weites Paar getrennt); 80 mm bei 0,5'' beide
   // engen Paare getrennt, bei 2'' keines.
   { fall: "T8a", such: `g=fernglas-10x50&z=eps_lyr_2027&s=2&${bed()}`, sterne: ["eps1 A", "eps1 B"], heute: 0, getrennt: false },
   { fall: "T8a", such: `g=fernglas-10x50&z=eps_lyr_2027&s=2&${bed()}`, sterne: ["eps2 C", "eps2 D"], heute: 0, getrennt: false },
   { fall: "T8a", such: `g=fernglas-10x50&z=eps_lyr_2027&s=2&${bed()}`, sterne: ["eps1 A", "eps2 C"], heute: 1, getrennt: true },
-  // Abweichung #145: Epsilon1 am 80 mm bei 0,5'' nicht getrennt (erwartet getrennt). Im feinen Modell 0,139
-  // (doppelsterne.md 4: 0,152), am Arbeitsmassstab 0,64'' mit Scheibchen von einem Arbeitspixel 0.
-  { fall: "T8b", such: `${R(80, 800, 5)}&z=eps_lyr_2027&s=0.5&${bed()}`, sterne: ["eps1 A", "eps1 B"], heute: 0, getrennt: false },
-  { fall: "T8b", such: `${R(80, 800, 5)}&z=eps_lyr_2027&s=0.5&${bed()}`, sterne: ["eps2 C", "eps2 D"], heute: 0.515, getrennt: true },
+  // Epsilon1 am 80 mm bei 0,5'': bis Issue #145 nicht getrennt (Delle 0, am Arbeitsmassstab 0,64'' mit
+  // Scheibchen von einem Arbeitspixel). Seit #145 im Detail getrennt (feines Modell 0,142, doppelsterne.md 4:
+  // 0,152). Im Zoom (beide Paare, 240'' auf 540 px) liegen die Sterne nur 4,5 Anzeigepixel auseinander, dort
+  // bleibt die Delle unter der Schwelle: die Anzeige selbst tastet zu grob ab.
+  { fall: "T8b", such: `${R(80, 800, 5)}&z=eps_lyr_2027&s=0.5&${bed()}`, sterne: ["eps1 A", "eps1 B"], heute: 0.134, getrennt: true, detail: true },
+  { fall: "T8b", such: `${R(80, 800, 5)}&z=eps_lyr_2027&s=0.5&${bed()}`, sterne: ["eps1 A", "eps1 B"], heute: 0.072, getrennt: false },
+  { fall: "T8b", such: `${R(80, 800, 5)}&z=eps_lyr_2027&s=0.5&${bed()}`, sterne: ["eps2 C", "eps2 D"], heute: 0.523, getrennt: true },
   { fall: "T8c", such: `${R(80, 800, 5)}&z=eps_lyr_2027&s=2&${bed()}`, sterne: ["eps1 A", "eps1 B"], heute: 0, getrennt: false },
   { fall: "T8c", such: `${R(80, 800, 5)}&z=eps_lyr_2027&s=2&${bed()}`, sterne: ["eps2 C", "eps2 D"], heute: 0.002, getrennt: false },
   // T9: Seeing 0,5'' getrennt, 1,5'' oder 15 Grad Hoehe nicht (Farbfleck von B ohne Einsattelung: #146).
-  { fall: "T9a", such: `${R(150, 1200, 6)}&z=antares_2027&s=0.5&${bed()}`, sterne: ["A", "B"], heute: 0.303, getrennt: true },
+  { fall: "T9a", such: `${R(150, 1200, 6)}&z=antares_2027&s=0.5&${bed()}`, sterne: ["A", "B"], heute: 0.5, getrennt: true },
   { fall: "T9b", such: `${R(150, 1200, 6)}&z=antares_2027&s=1.5&${bed()}`, sterne: ["A", "B"], heute: 0, getrennt: false },
   { fall: "T9c", such: `${R(150, 1200, 6)}&z=antares_2027&s=0.5&${bed(5, 15)}`, sterne: ["A", "B"], heute: 0, getrennt: false }
 ];
 
 describe("Validierung T7 bis T9: Doppelsterne getrennt oder nicht (Delle der Punktebene, Schwelle 0,125)", () => {
-  it.each(PAARE)("$fall $sterne: getrennt $getrennt (Delle heute $heute)", (f) => {
-    const { delle: d } = trennung(f.such, ...f.sterne);
+  // Issue #145: die Delle im Bild liegt hoechstens 0,05 neben der des feinen Modells (validierung.md 14,
+  // doppelsterne.md 4). Epsilon1 im Detail: im Zoom liegen beide Paare in einem Fenster von 240'', dort
+  // sind die beiden Sterne nur 4,5 Anzeigepixel getrennt, und die Anzeige selbst tastet zu grob ab.
+  it.each([
+    { fall: "T7b", such: `${R(150, 1500, 5)}&z=pi_aql_2021&s=0.5&${bed()}`, sterne: ["A", "B"] as [string, string], fein: 0.483, detail: false },
+    { fall: "T7d", such: `${R(150, 1500, 5)}&z=eps_ari_2027&s=0.5&${bed()}`, sterne: ["A", "B"] as [string, string], fein: 0.33, detail: false },
+    { fall: "T8b", such: `${R(80, 800, 5)}&z=eps_lyr_2027&s=0.5&${bed()}`, sterne: ["eps1 A", "eps1 B"] as [string, string], fein: 0.139, detail: true },
+    { fall: "T9a", such: `${R(150, 1200, 6)}&z=antares_2027&s=0.5&${bed()}`, sterne: ["A", "B"] as [string, string], fein: 0.527, detail: false }
+  ])("$fall $sterne (Detail $detail): Delle im Bild wie im feinen Modell $fein, auf 0,05", (f) => {
+    const t = trennung(f.such, f.sterne[0], f.sterne[1], f.detail);
+    expect(Math.abs(t.fein - f.fein)).toBeLessThan(0.01);
+    expect(Math.abs(t.delle - t.fein)).toBeLessThanOrEqual(0.05);
+  });
+
+  it.each(PAARE)("$fall $sterne (Detail $detail): getrennt $getrennt (Delle heute $heute)", (f) => {
+    const { delle: d } = trennung(f.such, f.sterne[0], f.sterne[1], f.detail);
     expect(Math.abs(d - f.heute)).toBeLessThan(0.03);
     if (f.getrennt) expect(d).toBeGreaterThan(SCHWELLE_ERKENNBAR);
     else expect(d).toBeLessThan(SCHWELLE_ERKENNBAR);

@@ -12,13 +12,16 @@
 // Issue #136: Begleiter (M32 bei M31) kommen aus eigenen Quellen, werden je fuer sich gemittelt und
 // gefaltet (nur im Teilfenster um ihr Licht) und bekommen in tonwert eine eigene Deckkraft
 // (ADR-0004 Nachtrag, docs/recherche/physik.md Abschnitt 29).
+// Issue #145: mit parameter.punktkern liegt die Punktebene auf einem feineren Raster (bis fuenffach,
+// hoechstens so fein wie die Anzeige); Flaeche und Punktanteil werden dann getrennt auf die Anzeige
+// skaliert und erst dort addiert (docs/recherche/physik.md Abschnitt 31).
 
-import type { Fenster, Gesichtsfeld, Helligkeit, Kern, Simulationsparameter } from "../naht/simulationsparameter";
+import type { Fenster, Gesichtsfeld, Helligkeit, Kern, Quellbild, Simulationsparameter } from "../naht/simulationsparameter";
 import { pruefeKern, type Falter } from "./falter";
 import { BildFehler, pruefePositivGanz } from "./fehler";
 import { malePunktquellen, type Scheibchen } from "./male";
 import { mittele, skaliere } from "./mittele";
-import { brauchtFaerbung, falteFaerbung, faltePunkte, halokern } from "./punktebene";
+import { brauchtFaerbung, falteFaerbung, faltePunkte, FENSTER_ENDE_ZUSATZ_PX, halokern } from "./punktebene";
 import type { Quelle } from "./quelle";
 import { pruefeRaster, type Kanaele, type Raster } from "./raster";
 
@@ -79,6 +82,13 @@ function pruefeParameter(p: Simulationsparameter): void {
   if (!ungefaehrGleich(quellbild.mitteXArcsec, fenster.mitteXArcsec) || !ungefaehrGleich(quellbild.mitteYArcsec, fenster.mitteYArcsec)) {
     throw new BildFehler("quellbild.mitte muss fenster.mitte gleichen");
   }
+  if (p.punktkern !== undefined) {
+    pruefeKern(p.punktkern);
+    const punktPx = Math.round(fenster.breiteArcsec / p.punktkern.massstabArcsecProPx);
+    if (!(punktPx > quellbild.rasterPx) || !ungefaehrGleich(punktPx * p.punktkern.massstabArcsecProPx, fenster.breiteArcsec)) {
+      throw new BildFehler(`Punktkern: Massstab ${p.punktkern.massstabArcsecProPx} muss fenster.breiteArcsec / punktPx mit ganzzahligem punktPx > rasterPx sein`);
+    }
+  }
   if (!(helligkeit.faktorObjekt >= 0) || !(helligkeit.hintergrundRelativ >= 0)) {
     throw new BildFehler(`Helligkeit: faktorObjekt ${helligkeit.faktorObjekt} und hintergrundRelativ ${helligkeit.hintergrundRelativ} muessen >= 0 sein`);
   }
@@ -105,6 +115,34 @@ function pruefeParameter(p: Simulationsparameter): void {
       }
     }
   }
+}
+
+/** Quellbild, Kern und Ende des Randfensters (faltePunkte) fuer die Punktebene. */
+export interface Punktbasis {
+  quellbild: Quellbild;
+  kern: Kern;
+  randZusatzPx: number;
+}
+
+/**
+ * Quellbild und Kern der Punktebene (Issue #145, physik.md Abschnitt 31): mit parameter.punktkern
+ * das Quellbild auf dessen Raster, punktPx = fenster.breiteArcsec / punktkern.massstabArcsecProPx
+ * (gerundet), gleiche Mitte, also gleiche linke obere Ecke und dieselben Punktquellen; sonst
+ * Quellbild und Kern des Arbeitsrasters. Werte der Punktebene bleiben relativ zu Quellweiss (eine
+ * Flaechenhelligkeit), unabhaengig vom Massstab. Der Schluessel des Quellbilds bekommt punktPx
+ * angehaengt, damit Stufe 1b je Raster gilt. randZusatzPx: das Randfenster (physik.md 24) endet
+ * wie am Arbeitsraster ein halbes Arbeitspixel ausserhalb des Kernradius, in Pixeln der Punktebene
+ * 0,5 * punktPx / rasterPx.
+ */
+export function punktquellbild(parameter: Simulationsparameter): Punktbasis {
+  const { quellbild, punktkern, fenster } = parameter;
+  if (punktkern === undefined) return { quellbild, kern: parameter.kern, randZusatzPx: FENSTER_ENDE_ZUSATZ_PX };
+  const rasterPx = Math.round(fenster.breiteArcsec / punktkern.massstabArcsecProPx);
+  return {
+    quellbild: { ...quellbild, schluessel: `${quellbild.schluessel}|punkte ${rasterPx}`, massstabArcsecProPx: fenster.breiteArcsec / rasterPx, rasterPx },
+    kern: punktkern,
+    randZusatzPx: (FENSTER_ENDE_ZUSATZ_PX * rasterPx) / quellbild.rasterPx
+  };
 }
 
 /** true, wenn alle Werte des Rasters 0 sind (Ausschnitt ohne Quellbild, QuelleLeer). */
@@ -206,6 +244,57 @@ export function tonwert(raster: Raster | undefined, punktebene: Raster | undefin
     for (let c = 3 * i; c < 3 * i + 3; c++) ergebnis[c] = (ergebnis[c] as number) + ((fd[c] as number) / wert) * w;
   }
   return ergebnisRaster;
+}
+
+/**
+ * Punktanteil allein (Issue #145): je Pixel der Punktebene W = min(1, (aP * p)^n), mit Faerbung
+ * c_k / p * W je Kanal, wo p > 0, sonst 0; derselbe Ausdruck wie in tonwert. Fuer die feinere
+ * Punktebene, die rendere getrennt von der Flaeche auf die Anzeige skaliert. Ergebnis 1 Kanal ohne,
+ * 3 Kanaele mit Faerbung.
+ */
+export function punktanteil(punktebene: Raster, helligkeit: Helligkeit, faerbung?: Raster): Raster {
+  const { breite, hoehe } = punktebene;
+  if (punktebene.kanaele !== 1) throw new BildFehler(`Punktebene braucht 1 Kanal, nicht ${punktebene.kanaele}`);
+  if (faerbung !== undefined && (faerbung.breite !== breite || faerbung.hoehe !== hoehe || faerbung.kanaele !== 3)) {
+    throw new BildFehler(`Faerbung ${faerbung.breite}x${faerbung.hoehe}x${faerbung.kanaele} muss ${breite}x${hoehe}x3 sein`);
+  }
+  const p = punktebene.daten;
+  const a = helligkeit.punktFaktor;
+  const n = helligkeit.punktExponent;
+  if (faerbung === undefined) {
+    const daten = new Float32Array(p.length);
+    for (let i = 0; i < p.length; i++) {
+      const wert = p[i] as number;
+      if (wert > 0) daten[i] = Math.min(1, Math.pow(a * wert, n));
+    }
+    return { breite, hoehe, kanaele: 1, daten };
+  }
+  const fd = faerbung.daten;
+  const daten = new Float32Array(3 * p.length);
+  for (let i = 0; i < p.length; i++) {
+    const wert = p[i] as number;
+    if (!(wert > 0)) continue;
+    const w = Math.min(1, Math.pow(a * wert, n));
+    for (let c = 3 * i; c < 3 * i + 3; c++) daten[c] = ((fd[c] as number) / wert) * w;
+  }
+  return { breite, hoehe, kanaele: 3, daten };
+}
+
+/** Addiert den skalierten Punktanteil (1 oder 3 Kanaele) zur skalierten Flaeche; gleiche Breite und Hoehe. */
+function addierePunkte(flaeche: Raster, punkte: Raster): Raster {
+  const ziel: Raster = punkte.kanaele === 3 && flaeche.kanaele === 1 ? { ...flaeche, kanaele: 3, daten: verbreitere(flaeche.daten) } : flaeche;
+  const d = ziel.daten;
+  const q = punkte.daten;
+  const k = ziel.kanaele;
+  if (punkte.kanaele === k) {
+    for (let i = 0; i < d.length; i++) d[i] = (d[i] as number) + (q[i] as number);
+  } else {
+    for (let i = 0; i < q.length; i++) {
+      const w = q[i] as number;
+      for (let c = i * k; c < (i + 1) * k; c++) d[c] = (d[c] as number) + w;
+    }
+  }
+  return ziel;
 }
 
 /**
@@ -478,10 +567,11 @@ export function rendere(
     zwischen.objekt = objekt;
   }
 
-  const schluesselPunkte = `${quellbild.schluessel}|${quellbild.punkte.schluessel}`;
+  const punktbasis = punktquellbild(parameter);
+  const schluesselPunkte = `${punktbasis.quellbild.schluessel}|${quellbild.punkte.schluessel}`;
   let punkte = zwischen.punkte;
   if (!punkte || punkte.schluessel !== schluesselPunkte) {
-    punkte = { schluessel: schluesselPunkte, scheibchen: malePunktquellen(quellbild) };
+    punkte = { schluessel: schluesselPunkte, scheibchen: malePunktquellen(punktbasis.quellbild) };
     zwischen.punkte = punkte;
   }
 
@@ -492,17 +582,21 @@ export function rendere(
     zwischen.gefaltet = gefaltet;
   }
 
-  const schluesselPunktebene = `${kern.schluessel}|${punkte.schluessel}`;
+  const schluesselPunktebene = `${punktbasis.kern.schluessel}|${punkte.schluessel}`;
   let punktebene = zwischen.punktebene;
   if (!punktebene || punktebene.schluessel !== schluesselPunktebene) {
-    const raster = faltePunkte(punkte.scheibchen, kern, quellbild.rasterPx);
-    const faerbung = raster !== undefined && brauchtFaerbung(punkte.scheibchen) ? falteFaerbung(punkte.scheibchen, kern, quellbild.rasterPx) : undefined;
+    const punktPx = punktbasis.quellbild.rasterPx;
+    const { kern: punktkern, randZusatzPx } = punktbasis;
+    const raster = faltePunkte(punkte.scheibchen, punktkern, punktPx, randZusatzPx);
+    const faerbung = raster !== undefined && brauchtFaerbung(punkte.scheibchen) ? falteFaerbung(punkte.scheibchen, punktkern, punktPx, randZusatzPx) : undefined;
     punktebene = { schluessel: schluesselPunktebene, raster, faerbung };
     zwischen.punktebene = punktebene;
   }
 
+  // Feinere Punktebene (Issue #145): tonwert nur fuer die Flaeche, der Punktanteil getrennt.
+  const fein = parameter.punktkern !== undefined ? punktebene.raster : undefined;
   const zusatz: TonwertZusatz = { rasterPx: quellbild.rasterPx, kanaele: objekt.kanaele };
-  if (punktebene.faerbung !== undefined) zusatz.faerbung = punktebene.faerbung;
+  if (punktebene.faerbung !== undefined && fein === undefined) zusatz.faerbung = punktebene.faerbung;
   // Ein Delta (Radius 0, Vergleichsbild) hat kein Randfenster: halokern gleicht dem Kern, qH = q.
   if (helligkeit.deepSky === undefined && helligkeit.mischgewicht > 0 && objekt.raster !== undefined && kern.radius > 0) {
     const kernHalo = halokern(kern, helligkeit.punktExponent);
@@ -538,8 +632,13 @@ export function rendere(
     zwischen.begleiterGemittelt = gemittelt;
     zwischen.begleiter = gespeichert;
   }
-  const getont = tonwert(gefaltet.raster, punktebene.raster, helligkeit, zusatz);
-  const raster = skaliere(getont, fenster.px);
+  let raster: Raster;
+  if (fein !== undefined) {
+    const flaeche = skaliere(tonwert(gefaltet.raster, undefined, helligkeit, zusatz), fenster.px);
+    raster = addierePunkte(flaeche, skaliere(punktanteil(fein, helligkeit, punktebene.faerbung), fenster.px));
+  } else {
+    raster = skaliere(tonwert(gefaltet.raster, punktebene.raster, helligkeit, zusatz), fenster.px);
+  }
   maskiereAn(raster, gesichtsfeld, fenster);
   return { fenster, massstabArcsecProPx: fenster.breiteArcsec / fenster.px, raster };
 }

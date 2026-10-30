@@ -141,6 +141,10 @@ describe("vergleichsparameter", () => {
     expect(v.helligkeit.schluessel).not.toBe(anblick.helligkeit.schluessel);
   });
 
+  it("ohne Punktkern (Issue #145): das Vergleichsraster ist schon so fein wie die Anzeige", () => {
+    expect(vergleichsparameter({ ...anblick, punktkern: anblick.kern }, k.objekt.quelle!.massstabArcsecProPx)).not.toHaveProperty("punktkern");
+  });
+
   it("gleiches Fenster, Gesichtsfeld und Punktquellen, eigener Schluessel", () => {
     expect(v.fenster).toBe(anblick.fenster);
     expect(v.gesichtsfeld).toBe(anblick.gesichtsfeld);
