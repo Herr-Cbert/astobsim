@@ -79,8 +79,10 @@ function pruefeParameter(p: Simulationsparameter): void {
   }
   const ds = helligkeit.deepSky;
   if (ds !== undefined) {
-    if (!(ds.faktor >= 0) || !(ds.himmel >= 0) || !(ds.sockel >= 0) || !Number.isFinite(ds.faktor) || !Number.isFinite(ds.himmel) || !Number.isFinite(ds.sockel)) {
-      throw new BildFehler(`Helligkeit.deepSky: faktor ${ds.faktor}, himmel ${ds.himmel} und sockel ${ds.sockel} muessen endlich und >= 0 sein`);
+    // himmel darf negativ sein: das Vergleichsbild (src/ui/zoom.ts, Issue #110) setzt so den Boden der
+    // Kennlinie auf Schwarz; deepSkyWert begrenzt die Basis mit max(0, ...). physik liefert himmel >= 0.
+    if (!(ds.faktor >= 0) || !(ds.sockel >= 0) || !Number.isFinite(ds.faktor) || !Number.isFinite(ds.himmel) || !Number.isFinite(ds.sockel)) {
+      throw new BildFehler(`Helligkeit.deepSky: faktor ${ds.faktor} und sockel ${ds.sockel} muessen endlich und >= 0 sein, himmel ${ds.himmel} endlich`);
     }
     if (!(ds.schwelleRelativ > 0) || !(ds.breite > 0) || !Number.isFinite(ds.schwelleRelativ) || !Number.isFinite(ds.breite)) {
       throw new BildFehler(`Helligkeit.deepSky: schwelleRelativ ${ds.schwelleRelativ} und breite ${ds.breite} muessen positiv sein`);

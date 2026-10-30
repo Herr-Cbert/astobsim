@@ -194,6 +194,18 @@ describe("tonwert Fall 2 und 3: Absicherung und schneller Weg fuer q = 0", () =>
     expect(t.daten[0]).toBeCloseTo(hRel + phi(-1 / 0.484) * (-hRel + 0.004), 6);
   });
 
+  it("negativer himmel (Boden des Vergleichsbilds, Issue #110): unter dem Boden 0, darueber (a q + s)^n", () => {
+    const q = neuesRaster(4, 1);
+    q.daten.set([0, 0.0005, 0.001, 1]);
+    // Das Raster ist Float32: der Boden genau auf dem gespeicherten Wert.
+    const boden = Math.fround(0.001);
+    const faktor = 1 / (1 - boden);
+    const ds = { faktor, himmel: -(boden * faktor), schwelleRelativ: 1e-30, breite: 0.484, sockel: 0 };
+    const t = tonwert(q, undefined, helligkeit({ hintergrundRelativ: 0, deepSky: ds })).daten;
+    expect(Array.from(t.slice(0, 3))).toEqual([0, 0, 0]);
+    expect(t[3]).toBeCloseTo(1, 6);
+  });
+
   it("schneller Weg fuer q = 0 bitgleich zum allgemeinen Ausdruck, gemischt mit q != 0", () => {
     const q = zufallsRaster(N, 3, 61, 0.5);
     for (let i = 0; i < q.daten.length; i += 2) q.daten[i] = 0;
