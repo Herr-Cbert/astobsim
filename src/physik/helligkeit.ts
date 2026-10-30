@@ -111,7 +111,8 @@ export function leuchtdichteRelativ(magProArcsec2: number, weissMagProArcsec2: n
  * Quellweiss und Himmel im Okular relativ zum Anzeigeweiss, schwelleRelativ
  * q* = 10^(-0,4 (mu_Schwelle - Quellweiss)) aus der sichtbaren Isophote (gilt in allen drei Faellen von
  * sichtbareIsophote), breite 0,484, sockel nach mischung.ts. isophote ist die sichtbare Isophote
- * fuer die Anzeigewerte, sonst undefined.
+ * fuer die Anzeigewerte, sonst undefined. Je Begleiter (Issue #136) dasselbe mit dessen
+ * Flaechentabelle: deepSky.begleiter mit eigenem q* und Sockel.
  *
  * Schluessel: die Felder aus Version 1; mischgewicht nur, wenn es nicht 0 ist, und die deepSky-Felder
  * nur, wenn es sie gibt. So bleibt der Schluessel der Faelle mit dem Ausdruck aus Version 1 gleich.
@@ -145,9 +146,26 @@ export function helligkeitUndIsophote(
     const faktor = leuchtdichteRelativ(ok.objektMagProArcsec2);
     const himmel = leuchtdichteRelativ(ok.hintergrundMagProArcsec2);
     const schwelleRelativ = Math.pow(10, -0.4 * (isophote.schwelleMagProArcsec2 - zustand.quelle.weissMagProArcsec2));
-    const ds = { faktor, himmel, schwelleRelativ, breite: BLACKWELL_BREITE, sockel: sockel(faktor, himmel, schwelleRelativ, SOCKEL_DELTA_KODES, punktExponent) };
+    const ds: NonNullable<Helligkeit["deepSky"]> = {
+      faktor,
+      himmel,
+      schwelleRelativ,
+      breite: BLACKWELL_BREITE,
+      sockel: sockel(faktor, himmel, schwelleRelativ, SOCKEL_DELTA_KODES, punktExponent)
+    };
     h.deepSky = ds;
     felder.push("deepSky", ds.faktor, ds.himmel, ds.schwelleRelativ, ds.breite, ds.sockel);
+    // Begleiter (Issue #136, ADR-0004 Nachtrag): eigene sichtbare Isophote aus der eigenen
+    // Flaechentabelle, q* relativ zum Quellweiss des Hauptobjekts, Sockel wie beim Hauptobjekt.
+    if (zustand.begleiter !== undefined && zustand.begleiter.length > 0) {
+      const weiss = zustand.quelle.weissMagProArcsec2;
+      ds.begleiter = zustand.begleiter.map((b) => {
+        const iso = sichtbareIsophote(b.isophoten, optik, atmosphaere, bortleMagProArcsec2(bortle));
+        const q = Math.pow(10, -0.4 * (iso.schwelleMagProArcsec2 - weiss));
+        return { schwelleRelativ: q, sockel: sockel(faktor, himmel, q, SOCKEL_DELTA_KODES, punktExponent) };
+      });
+      for (const b of ds.begleiter) felder.push("begleiter", b.schwelleRelativ, b.sockel);
+    }
   }
   h.schluessel = schluessel("helligkeit", ...felder);
   return isophote === undefined ? { helligkeit: h } : { helligkeit: h, isophote };

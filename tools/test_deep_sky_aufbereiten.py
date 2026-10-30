@@ -5,7 +5,8 @@ src/daten/kennlinie.ts, FITS-Leser an einer selbst geschriebenen Datei, Flaechen
 synthetischen Ring, Sternentfernung an einem Stern auf glattem Nebel, Eichung auf die
 Gesamthelligkeit; dazu (Issue #106) das M31-Modell gegen deep-sky.md 1.2, Tonkurve (Mitteln,
 Isotonie, Saettigung, Schwarzpunkt), Achsen des TIFF gegen die CD-Matrix, Rueckrechnung eines
-synthetisch gestreckten Bilds und die Flaechentabelle an einer Mosaikkante.
+synthetisch gestreckten Bilds und die Flaechentabelle an einer Mosaikkante; (Issue #136) die
+Trennung eines Begleiters (Fluss, Lage, Hauptbild ausserhalb des Kreises unveraendert).
 """
 
 import math
@@ -292,6 +293,53 @@ class TonkurveTest(unittest.TestCase):
         rand = ds._dehnen(ohne) & ~ohne
         self.assertEqual([m for m, _ in ds.flaechentabelle(mu, 1.0, 16.0, 25.0)], [18.0, 21.0])
         self.assertEqual([m for m, _ in ds.flaechentabelle(mu, 1.0, 16.0, 25.0, rand_maske=rand)], [18.0])
+
+
+
+class BegleiterTest(unittest.TestCase):
+    """Issue #136: Begleiter (M32 in M31) vom Hauptobjekt trennen."""
+
+    PARAM = {"id": "b", "name": "B", "datei": "x/b.webp", "mitte_arcsec": [-40.0, 80.0], "mitte_beleg": "Test",
+             "suche_arcsec": 30, "radius_arcsec": 60, "ring_arcsec": 40, "leinwand_px": 40, "magnitude": 10.0,
+             "magnitude_quelle": "Test"}
+
+    def bild(self):
+        # Leinwand 200 x 200 bei 4''/px; Hauptobjekt mit quadratischem log L (vom Ringfit genau
+        # darstellbar), Begleiter Gauss (sigma 8'') bei Ost -40, Nord 80, am Ring praktisch 0.
+        s = 4.0
+        yy, xx = np.mgrid[0:200, 0:200]
+        x, y = (xx + 0.5 - 100) * s, (100 - yy - 0.5) * s
+        haupt = 1e-3 * np.exp(-(x / 400) ** 2 - (y / 300) ** 2 + x / 500)
+        rx, ry = x - 40.0, y - 80.0
+        begleiter = 0.05 * np.exp(-(rx ** 2 + ry ** 2) / (2 * 8.0 ** 2))
+        return haupt, begleiter, s
+
+    def test_trennt_fluss_und_lage(self):
+        haupt, begleiter, s = self.bild()
+        ohne = np.zeros(haupt.shape, bool)
+        h, teil, info = ds.begleiter_trennen(haupt + begleiter, ohne, s, self.PARAM)
+        # Fluss des Begleiters auf 1 %, Hauptbild ausserhalb des Kreises unveraendert, innen nahe am Modell.
+        self.assertAlmostEqual(teil.sum() / begleiter.sum(), 1.0, delta=0.01)
+        yy, xx = np.mgrid[0:200, 0:200]
+        r = np.hypot((xx + 0.5 - 110) * s, (yy + 0.5 - 80) * s)
+        np.testing.assert_array_equal(h[r >= 64], (haupt + begleiter)[r >= 64])
+        self.assertLess(np.abs(h[r < 60] / haupt[r < 60] - 1).max(), 1e-6)
+        # Schwerpunkt Ost -40, Nord 80; Ausschnitt 40 px auf ganzen Pixeln: Mitte (110, 80) -> dx +40, dy +80.
+        self.assertEqual(info["schwerpunkt_ost_nord"], [-40.0, 80.0])
+        self.assertEqual((info["dx_arcsec"], info["dy_arcsec"]), (40.0, 80.0))
+        self.assertEqual(teil.shape, (40, 40))
+        self.assertAlmostEqual(teil[20, 20] + teil[19, 19], begleiter[80, 110] + begleiter[79, 109], places=6)
+        self.assertLess(info["streuung_mag"], 1e-6)
+        self.assertTrue(info["randmaske"].any())
+
+    def test_kreis_ueber_datenkante_und_zu_kleiner_ausschnitt(self):
+        haupt, begleiter, s = self.bild()
+        ohne = np.zeros(haupt.shape, bool)
+        ohne[60:100, 100:120] = True
+        with self.assertRaises(SystemExit):
+            ds.begleiter_trennen(haupt + begleiter, ohne, s, self.PARAM)
+        with self.assertRaises(SystemExit):
+            ds.begleiter_trennen(haupt + begleiter, np.zeros(haupt.shape, bool), s, {**self.PARAM, "leinwand_px": 20})
 
 
 if __name__ == "__main__":

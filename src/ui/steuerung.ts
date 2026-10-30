@@ -31,6 +31,8 @@ import { bodenRelativ, detailstart, VERGLEICH_DEEP_SKY, vergleichsparameter, ver
 /** Quelle eines Objektzustands mit dem asynchronen Vorladen, das rendere voraussetzt. */
 export interface Bildquelle {
   quelle: Quelle;
+  /** Quellen der Begleiter des Zustands (Issue #136), Reihenfolge wie Objektzustand.begleiter; fehlt ohne Begleiter. */
+  begleiter?: Quelle[];
   /** Holt, was quelle.ausschnitt fuer die Anfrage braucht (Kacheln); bei Einzelbildern nichts. */
   lade(anfrage: Ausschnittsanfrage): Promise<void>;
 }
@@ -373,11 +375,12 @@ export class Steuerung {
     if (neueQuelle) this.setze({ phase: "rechnet" });
     try {
       const t0 = this.umgebung.uhr();
-      const anblick = rendere(auswertung.parameter, bildquelle.quelle, this.umgebung.falter, zwischenspeicherFuer(aktuell, zoom, detail));
+      const begleiter = bildquelle.begleiter ?? [];
+      const anblick = rendere(auswertung.parameter, bildquelle.quelle, this.umgebung.falter, zwischenspeicherFuer(aktuell, zoom, detail), begleiter);
       const bilder: Partial<Stand> =
         vergleich === undefined
           ? { anblick }
-          : { zoombilder: { anblick, vergleich: rendere(vergleich, bildquelle.quelle, this.vergleichsfalter, aktuell.zwischen.vergleich) } };
+          : { zoombilder: { anblick, vergleich: rendere(vergleich, bildquelle.quelle, this.vergleichsfalter, aktuell.zwischen.vergleich, begleiter) } };
       const ms = Math.round(this.umgebung.uhr() - t0);
       this.setze({ phase: "fertig", ...bilder, ms, nummer: this.zustand.nummer + 1 });
     } catch (e) {

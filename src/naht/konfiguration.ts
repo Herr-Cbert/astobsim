@@ -100,6 +100,25 @@ export interface Isophote {
   flaecheArcsec2: number;
 }
 
+/**
+ * Begleiter eines Deep-Sky-Objekts mit Quellbild (Issue #136, ADR-0004 Nachtrag): kompakte Quelle im
+ * Feld des Hauptobjekts (M32 bei M31) mit eigenem Bild und eigener Flaechentabelle, damit sie eine
+ * eigene Wahrnehmungsschwelle bekommt. dxArcsec, dyArcsec ist die Mitte des Begleiterbilds relativ
+ * zur Objektmitte (+x rechts, +y Norden). Pixelwerte des Begleiterbilds sind wie die des Hauptbilds
+ * relativ zum Quellweiss des Hauptobjekts (quelle.weissMagProArcsec2 des Zustands).
+ */
+export interface Begleiter {
+  /** id aus daten/objekte.json (z. B. "m32"). */
+  kennung: string;
+  name: string;
+  dxArcsec: number;
+  dyArcsec: number;
+  magnitude: number;
+  quelle: { breitePx: number; hoehePx: number; massstabArcsecProPx: number };
+  /** mag aufsteigend, Flaeche steigend, wie Objektzustand.isophoten. */
+  isophoten: Isophote[];
+}
+
 /** Eingaben des freien Paars (A-Z9); Quelle der Wahrheit fuer URL und begrenze. Trennung in Bogensekunden. */
 export interface Paareingaben {
   trennungArcsec: number;
@@ -138,6 +157,8 @@ export interface Objektzustand {
   sterne: Stern[];
   /** Nur deep_sky mit Quellbild: mag aufsteigend, Flaeche steigend. */
   isophoten?: Isophote[];
+  /** Nur deep_sky mit Quellbild, optional (Issue #136); Reihenfolge wie in daten/objekte.json. */
+  begleiter?: Begleiter[];
   /** Nur das freie Paar (kennung "frei"). */
   paar?: Paareingaben;
 }

@@ -6,7 +6,7 @@
 
 import "./stil.css";
 import { type Falterwahl, waehleFalter } from "../bild";
-import { ladeBildnachweise, ladeGeraete, ladeObjekte, nachweisZu, quelleEinzelbildBrowser, quelleKachelnBrowser } from "../daten";
+import { begleiterNachweise, ladeBildnachweise, ladeGeraete, ladeObjekte, nachweisZu, quelleBegleiterBrowser, quelleEinzelbildBrowser, quelleKachelnBrowser } from "../daten";
 import type { Objektzustand } from "../naht/konfiguration";
 import { TEXTE } from "../texte";
 import { ausUrl, type Kataloge } from "../zustand";
@@ -177,11 +177,18 @@ async function bildquelleBrowser(kataloge: Kataloge, objekt: Objektzustand): Pro
   const nachweis = nachweisZu(kataloge.objekte, kataloge.nachweise, objekt.kennung);
   if (nachweis === undefined) throw new Error(`ui: kein Bildnachweis zum Zustand "${objekt.kennung}"`);
   if (nachweis.kacheln !== undefined) {
+    if ((objekt.begleiter ?? []).length > 0) throw new Error(`ui: Begleiter zu Kachelpyramiden gibt es nicht ("${objekt.kennung}")`);
     const quelle = quelleKachelnBrowser(nachweis, objekt.durchmesserArcsec);
     return { quelle, lade: (a) => quelle.lade(a.mitte, a.breiteArcsec, a.massstabArcsecProPx) };
   }
   const quelle = await quelleEinzelbildBrowser(nachweis, objekt.durchmesserArcsec);
-  return { quelle, lade: async () => {} };
+  // Begleiter (Issue #136): eigene kleine Bilder, Werte relativ zum Quellweiss des Hauptobjekts.
+  const weiss = objekt.quelle?.weissMagProArcsec2;
+  const begleiter = objekt.begleiter ?? [];
+  if (begleiter.length === 0 || weiss === undefined) return { quelle, lade: async () => {} };
+  const nachweiseB = begleiterNachweise(kataloge.objekte, kataloge.nachweise, objekt.kennung);
+  const quellen = await Promise.all(begleiter.map((b, k) => quelleBegleiterBrowser(nachweiseB[k]!, weiss, b.dxArcsec, b.dyArcsec)));
+  return { quelle, begleiter: quellen, lade: async () => {} };
 }
 
 /**

@@ -9,8 +9,11 @@
 // Punktebene; ohne Quellbild (schwarzer Ausschnitt, etwa QuelleLeer) weder mittele noch falte.
 // Issue #135: im Fall unaufgeloest geht der Mischanteil durch eine zweite Faltung mit halokern
 // (Randfenster, docs/recherche/physik.md Abschnitt 28), sonst stuende der Planet in einem Quadrat.
+// Issue #136: Begleiter (M32 bei M31) kommen aus eigenen Quellen, werden je fuer sich gemittelt und
+// gefaltet (nur im Teilfenster um ihr Licht) und bekommen in tonwert eine eigene Deckkraft
+// (ADR-0004 Nachtrag, docs/recherche/physik.md Abschnitt 29).
 
-import type { Fenster, Gesichtsfeld, Helligkeit, Simulationsparameter } from "../naht/simulationsparameter";
+import type { Fenster, Gesichtsfeld, Helligkeit, Kern, Simulationsparameter } from "../naht/simulationsparameter";
 import { pruefeKern, type Falter } from "./falter";
 import { BildFehler, pruefePositivGanz } from "./fehler";
 import { malePunktquellen, type Scheibchen } from "./male";
@@ -42,6 +45,8 @@ export interface Zwischenspeicher {
   gefaltet?: { schluessel: string; raster: Raster | undefined };
   /** Stufe 2, nur im Fall unaufgeloest: Objektraster mit halokern gefaltet (Issue #135). */
   halo?: { schluessel: string; raster: Raster };
+  /** Stufen 1 und 2 je Begleiter (Issue #136): gemittelt und gefaltet, undefined ohne Licht im Fenster. */
+  begleiter?: { schluessel: string; raster: Raster | undefined }[];
   /**
    * Stufe 2: gefaltete Punktebene (undefined ohne Punktquelle im Raster) und Faerbung (undefined,
    * wenn alle Punktquellen grau mit Deckkraft 1 sind).
@@ -114,6 +119,13 @@ export interface TonwertZusatz {
    * unaufgeloest genutzt, dort fuer den Mischanteil. Fehlt es, gilt q (wie vor #135).
    */
   halo?: Raster;
+  /**
+   * Gefaltete Begleiterraster (Issue #136), Masse und Kanaele wie das Objektraster, Werte relativ zu
+   * Quellweiss des Hauptobjekts; undefined fuer einen Begleiter ohne Licht im Fenster. Mit
+   * deepSky.begleiter (gleiche Anzahl) eigene Deckkraft je Begleiter, ohne deepSky werden sie zum
+   * Objektraster addiert (Vergleichsbild linear).
+   */
+  begleiter?: (Raster | undefined)[];
 }
 
 /**
@@ -126,7 +138,11 @@ export interface TonwertZusatz {
  * - d fehlt, g > 0: (1 - g) * f * q_k + h + g * min(1, (aP * qH_k)^n) (unaufgeloest, A-P10), qH das
  *   Objektraster mit halokern gefaltet (zusatz.halo, Issue #135), ohne zusatz.halo qH = q;
  * - d vorhanden (hat Vorrang vor g): P = Phi((q / d.schwelleRelativ - 1) / d.breite),
- *   F = h + P * (min(1, (d.faktor * q + d.himmel)^n) - h + d.sockel) (ADR-0004 Ebene b).
+ *   F = h + P * (min(1, (d.faktor * q + d.himmel)^n) - h + d.sockel) (ADR-0004 Ebene b);
+ *   mit Begleitern (zusatz.begleiter, d.begleiter, Issue #136) kommt je Begleiter k mit q_k > 0 der
+ *   Zuwachs P'_k * (Z(Q_k) - Z(Q_(k-1)) + sockel_k) dazu, Z(x) = min(1, (d.faktor * x + d.himmel)^n),
+ *   Q_0 = q, Q_k = Q_(k-1) + q_k, P'_k = max(0, (P_k - P0) / (1 - P0)), P_k = Phi((q_k / q*_k - 1) / d.breite),
+ *   P0 = Phi(-1 / d.breite). Ohne Begleiter derselbe Ausdruck wie bisher.
  * Punktanteil, nur wo p > 0: W = min(1, (aP * p)^n), Pixel_k = F_k + (c ? c_k / p : 1) * W. Ohne c
  * wird W in allen Kanaelen addiert; mit c hat das Ergebnis 3 Kanaele (ein einkanaliges q wird
  * verbreitert). Nicht begrenzt; das geschieht erst beim Zeichnen.
@@ -149,7 +165,14 @@ export function tonwert(raster: Raster | undefined, punktebene: Raster | undefin
   if (halo !== undefined && (raster === undefined || halo.breite !== breite || halo.hoehe !== hoehe || halo.kanaele !== raster.kanaele)) {
     throw new BildFehler(`Halo ${halo.breite}x${halo.hoehe}x${halo.kanaele} braucht ein Objektraster gleicher Masse`);
   }
-  const flaeche = flaechenanteil(raster, breite * hoehe * kanaeleFlaeche, helligkeit, halo);
+  const begleiter = pruefeBegleiter(zusatz.begleiter, breite, hoehe, kanaeleFlaeche, helligkeit);
+  const ds = helligkeit.deepSky;
+  const flaeche =
+    begleiter.length === 0
+      ? flaechenanteil(raster, breite * hoehe * kanaeleFlaeche, helligkeit, halo)
+      : ds?.begleiter !== undefined
+        ? flaechenanteilMitBegleitern(raster, breite * hoehe * kanaeleFlaeche, helligkeit.hintergrundRelativ, helligkeit.punktExponent, ds, begleiter)
+        : flaechenanteil(summe(raster, begleiter, breite, hoehe, kanaeleFlaeche), breite * hoehe * kanaeleFlaeche, helligkeit, halo);
   const kanaele = faerbung !== undefined ? 3 : kanaeleFlaeche;
   const ergebnis = kanaele === kanaeleFlaeche ? flaeche : verbreitere(flaeche);
   const ergebnisRaster: Raster = { breite, hoehe, kanaele, daten: ergebnis };
@@ -218,6 +241,120 @@ function flaechenanteil(raster: Raster | undefined, anzahl: number, helligkeit: 
     }
   } else {
     for (let i = 0; i < d.length; i++) ergebnis[i] = f * (d[i] as number) + h;
+  }
+  return ergebnis;
+}
+
+/**
+ * Prueft die Begleiterraster gegen das Arbeitsraster und deepSky.begleiter; liefert sie als Liste
+ * (leer ohne Begleiter oder wenn keiner Licht im Fenster hat und deepSky keine Begleiter nennt).
+ */
+function pruefeBegleiter(begleiter: (Raster | undefined)[] | undefined, breite: number, hoehe: number, kanaele: number, helligkeit: Helligkeit): (Raster | undefined)[] {
+  const liste = begleiter ?? [];
+  const ds = helligkeit.deepSky;
+  if (ds?.begleiter !== undefined && ds.begleiter.length !== liste.length) {
+    throw new BildFehler(`deepSky nennt ${ds.begleiter.length} Begleiter, tonwert bekommt ${liste.length} Raster`);
+  }
+  if (ds !== undefined && ds.begleiter === undefined && liste.length > 0) {
+    throw new BildFehler("Begleiterraster ohne Schwelle in deepSky.begleiter");
+  }
+  for (const b of liste) {
+    if (b !== undefined && (b.breite !== breite || b.hoehe !== hoehe || b.kanaele !== kanaele)) {
+      throw new BildFehler(`Begleiter ${b.breite}x${b.hoehe}x${b.kanaele} passt nicht zum Raster ${breite}x${hoehe}x${kanaele}`);
+    }
+  }
+  return ds?.begleiter !== undefined || liste.some((b) => b !== undefined) ? liste : [];
+}
+
+/** Objektraster plus alle Begleiter (Vergleichsbild ohne deepSky); undefined, wenn alles fehlt. */
+function summe(raster: Raster | undefined, begleiter: (Raster | undefined)[], breite: number, hoehe: number, kanaele: Kanaele): Raster | undefined {
+  const vorhanden = begleiter.filter((b): b is Raster => b !== undefined);
+  if (vorhanden.length === 0) return raster;
+  const daten = raster !== undefined ? new Float32Array(raster.daten) : new Float32Array(breite * hoehe * kanaele);
+  for (const b of vorhanden) for (let i = 0; i < daten.length; i++) daten[i] = (daten[i] as number) + (b.daten[i] as number);
+  return { breite, hoehe, kanaele, daten };
+}
+
+/**
+ * Fall Deep-Sky mit Begleitern (Issue #136, Formel in tonwert): je Pixel der Wert des Hauptobjekts
+ * nach deepSkyWert, dazu je Begleiter mit q_k > 0 sein Zuwachs mit eigener Deckkraft P'_k.
+ * Ohne Objektraster ist q = 0.
+ */
+function flaechenanteilMitBegleitern(
+  raster: Raster | undefined,
+  anzahl: number,
+  h: number,
+  n: number,
+  ds: NonNullable<Helligkeit["deepSky"]>,
+  begleiter: (Raster | undefined)[]
+): Float32Array {
+  const schwellen = ds.begleiter ?? [];
+  const p0 = phi(-1 / ds.breite);
+  const d = raster?.daten;
+  const leer = deepSkyWert(0, h, n, ds);
+  const ergebnis = new Float32Array(anzahl);
+  const z = (x: number): number => Math.min(1, Math.pow(Math.max(0, ds.faktor * x + ds.himmel), n));
+  for (let i = 0; i < anzahl; i++) {
+    const q = d !== undefined ? (d[i] as number) : 0;
+    let wert = q === 0 ? leer : deepSkyWert(q, h, n, ds);
+    let basis = q;
+    for (let k = 0; k < begleiter.length; k++) {
+      const qk = begleiter[k]?.daten[i];
+      if (qk === undefined || !(qk > 0)) continue;
+      const s = schwellen[k]!;
+      const deckkraft = Math.max(0, (phi((qk / s.schwelleRelativ - 1) / ds.breite) - p0) / (1 - p0));
+      const vorher = z(basis);
+      basis += qk;
+      wert += deckkraft * (z(basis) - vorher + s.sockel);
+    }
+    ergebnis[i] = wert;
+  }
+  return ergebnis;
+}
+
+/**
+ * Faltet ein Begleiterraster nur im Teilfenster um sein Licht (Issue #136): Rechteck um alle Werte
+ * ungleich 0, um den Kernradius erweitert und auf das Raster begrenzt. Das Ergebnis gleicht der
+ * Faltung des ganzen Rasters: ausserhalb liegt alles weiter als der Kernradius vom Licht (0), und am
+ * Rand des Teilfensters klemmt der Falter auf Werte 0 statt auf die (ebenfalls 0) des ganzen Rasters,
+ * ausser wo das Teilfenster am Rasterrand endet, dort gleich. undefined, wenn alles 0 ist.
+ */
+export function falteTeilfenster(raster: Raster, kern: Kern, falter: Falter): Raster | undefined {
+  const { breite, hoehe, kanaele, daten } = raster;
+  let x0 = breite;
+  let x1 = -1;
+  let y0 = hoehe;
+  let y1 = -1;
+  for (let y = 0; y < hoehe; y++) {
+    for (let x = 0; x < breite; x++) {
+      for (let c = 0; c < kanaele; c++) {
+        if ((daten[(y * breite + x) * kanaele + c] as number) !== 0) {
+          if (x < x0) x0 = x;
+          if (x > x1) x1 = x;
+          if (y < y0) y0 = y;
+          if (y > y1) y1 = y;
+        }
+      }
+    }
+  }
+  if (x1 < 0) return undefined;
+  const r = kern.radius;
+  x0 = Math.max(0, x0 - r);
+  y0 = Math.max(0, y0 - r);
+  x1 = Math.min(breite - 1, x1 + r);
+  y1 = Math.min(hoehe - 1, y1 + r);
+  const tb = x1 - x0 + 1;
+  const th = y1 - y0 + 1;
+  const teil: Raster = { breite: tb, hoehe: th, kanaele, daten: new Float32Array(tb * th * kanaele) };
+  for (let y = 0; y < th; y++) {
+    const von = ((y + y0) * breite + x0) * kanaele;
+    teil.daten.set(daten.subarray(von, von + tb * kanaele), y * tb * kanaele);
+  }
+  const gefaltet = falter.falte(teil, kern);
+  const ergebnis: Raster = { breite, hoehe, kanaele, daten: new Float32Array(daten.length) };
+  for (let y = 0; y < th; y++) {
+    const nach = ((y + y0) * breite + x0) * kanaele;
+    ergebnis.daten.set(gefaltet.daten.subarray(y * tb * kanaele, (y + 1) * tb * kanaele), nach);
   }
   return ergebnis;
 }
@@ -306,10 +443,19 @@ function maskiereAn(raster: Raster, gesichtsfeld: Gesichtsfeld, fenster: Fenster
  * der Punktebene (lokal in punktebene.ts) unter kern.schluessel plus Punkteschluessel. Im Fall
  * unaufgeloest (mischgewicht > 0, ohne deepSky, mit Objektraster, Kern kein Delta) faltet der Falter das Objekt
  * zusaetzlich mit halokern, unter dessen Schluessel plus Objektschluessel (Issue #135).
+ * begleiter (Issue #136): je Begleiter des Zustands seine Quelle, in der Reihenfolge von
+ * helligkeit.deepSky.begleiter; Ausschnitt, mittele und Faltung im Teilfenster (falteTeilfenster)
+ * unter kern.schluessel plus Objektschluessel plus Index.
  * Wer den Zwischenspeicher weglaesst, rechnet alles neu. Der Zwischenspeicher gehoert zu genau
  * einer Quelle; bei Wechsel der Quelle einen neuen anlegen.
  */
-export function rendere(parameter: Simulationsparameter, quelle: Quelle, falter: Falter, zwischen: Zwischenspeicher = {}): Anblick {
+export function rendere(
+  parameter: Simulationsparameter,
+  quelle: Quelle,
+  falter: Falter,
+  zwischen: Zwischenspeicher = {},
+  begleiter: readonly Quelle[] = []
+): Anblick {
   pruefeParameter(parameter);
   const { quellbild, kern, helligkeit, gesichtsfeld, fenster } = parameter;
 
@@ -358,6 +504,23 @@ export function rendere(parameter: Simulationsparameter, quelle: Quelle, falter:
       zwischen.halo = halo;
     }
     zusatz.halo = halo.raster;
+  }
+  if (begleiter.length > 0) {
+    const gespeichert = zwischen.begleiter ?? [];
+    zusatz.begleiter = begleiter.map((b, k) => {
+      const schluessel = `${kern.schluessel}|${objekt.schluessel}|begleiter ${k}`;
+      let eintrag = gespeichert[k];
+      if (!eintrag || eintrag.schluessel !== schluessel) {
+        const mitte = { xArcsec: quellbild.mitteXArcsec, yArcsec: quellbild.mitteYArcsec };
+        const ausschnitt = b.ausschnitt(mitte, quellbild.rasterPx * quellbild.massstabArcsecProPx, quellbild.massstabArcsecProPx);
+        pruefeRaster(ausschnitt.raster, "Begleiterausschnitt");
+        const raster = istSchwarz(ausschnitt.raster) ? undefined : falteTeilfenster(mittele(ausschnitt, quellbild), kern, falter);
+        eintrag = { schluessel, raster };
+        gespeichert[k] = eintrag;
+      }
+      return eintrag.raster;
+    });
+    zwischen.begleiter = gespeichert;
   }
   const getont = tonwert(gefaltet.raster, punktebene.raster, helligkeit, zusatz);
   const raster = skaliere(getont, fenster.px);

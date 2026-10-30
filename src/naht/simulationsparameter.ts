@@ -148,6 +148,12 @@ export interface Helligkeit {
     breite: number;
     /** Anzeigehelligkeit, >= 0 (Mindestsichtbarkeit, ADR-0004). */
     sockel: number;
+    /**
+     * Je Begleiter des Zustands (Objektzustand.begleiter, gleiche Reihenfolge) eigene Schwelle q* und
+     * eigener Sockel (Issue #136, ADR-0004 Nachtrag); faktor, himmel und breite gelten gemeinsam.
+     * Fehlt ohne Begleiter.
+     */
+    begleiter?: { schwelleRelativ: number; sockel: number }[];
   };
 }
 

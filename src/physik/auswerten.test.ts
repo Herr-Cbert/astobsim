@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import type { Fernglas, Konfiguration, Objektzustand, Paareingaben } from "../naht/konfiguration";
+import type { Begleiter, Fernglas, Konfiguration, Objektzustand, Paareingaben } from "../naht/konfiguration";
 import { atmosphaere } from "./atmosphaere";
 import { aufloesung } from "./aufloesung";
 import { auswerten } from "./auswerten";
@@ -434,6 +434,44 @@ describe("auswerten Version 2: Deep-Sky mit Quellbild (ADR-0004 Ebene b)", () =>
     expect(r.parameter.helligkeit.deepSky).toBeUndefined();
     expect(r.anzeige.isophote).toBeUndefined();
     expect(r.parameter.quellbild.punkte.punktquellen).toHaveLength(2);
+  });
+});
+
+describe("auswerten: Begleiter mit eigener Schwelle (Issue #136, ADR-0004 Nachtrag)", () => {
+  // Kompakter Begleiter: kleine Flaechen, also strenge Schwelle (Ricco-Bereich).
+  const begleiter: Begleiter = {
+    kennung: "b",
+    name: "Begleiter",
+    dxArcsec: 30,
+    dyArcsec: -20,
+    magnitude: 12,
+    quelle: { breitePx: 16, hoehePx: 16, massstabArcsecProPx: 1 },
+    isophoten: [
+      { magProArcsec2: 17, flaecheArcsec2: 4 },
+      { magProArcsec2: 18, flaecheArcsec2: 20 },
+      { magProArcsec2: 19, flaecheArcsec2: 60 }
+    ]
+  };
+  const mit: Objektzustand = { ...DEEP_SKY_RING, begleiter: [begleiter] };
+  const k = ad9Mit(mit);
+  const o = optik(k.geraet);
+  const a = atmosphaere(k.bedingungen);
+  const ds = auswerten(k).parameter.helligkeit.deepSky!;
+  const ohne = auswerten(ad9Mit(DEEP_SKY_RING)).parameter.helligkeit;
+
+  it("q* und Sockel je Begleiter aus dessen Flaechentabelle, relativ zum Quellweiss des Hauptobjekts", () => {
+    const iso = sichtbareIsophote(begleiter.isophoten, o, a, bortleMagProArcsec2(5));
+    const q = 10 ** (-0.4 * (iso.schwelleMagProArcsec2 - 16.5));
+    expect(ds.begleiter).toHaveLength(1);
+    expect(ds.begleiter![0]!.schwelleRelativ).toBeCloseTo(q, 12);
+    expect(ds.begleiter![0]!.sockel).toBe(sockel(ds.faktor, ds.himmel, ds.begleiter![0]!.schwelleRelativ, SOCKEL_DELTA_KODES, KOMPRESSIONSEXPONENT));
+  });
+  it("das Hauptobjekt bleibt unveraendert; der Schluessel traegt die Begleiter", () => {
+    const { begleiter: _b, ...haupt } = ds;
+    expect(haupt).toEqual(ohne.deepSky);
+    expect(ohne.deepSky!.begleiter).toBeUndefined();
+    const schluesselMit = auswerten(k).parameter.helligkeit.schluessel;
+    expect(schluesselMit.startsWith(`${ohne.schluessel}|begleiter|`)).toBe(true);
   });
 });
 
