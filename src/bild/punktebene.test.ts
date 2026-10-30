@@ -36,6 +36,17 @@ function helligkeit(teil: Partial<Helligkeit> = {}): Helligkeit {
 }
 
 describe("faltePunkte", () => {
+  it("randZusatzPx (Issue #145): Standard 0,5 bitgleich; laengeres Fenster laesst mehr Fluegel, Fluss bleibt; ungueltig wirft", () => {
+    const q = quellbild([punkt()]);
+    const s = malePunktquellen(q);
+    const standard = faltePunkte(s, gaussKern(), N)!;
+    expect(Array.from(faltePunkte(s, gaussKern(), N, 0.5)!.daten)).toEqual(Array.from(standard.daten));
+    const lang = faltePunkte(s, gaussKern(), N, 2)!;
+    expect(summe(lang)).toBeCloseTo(summe(standard), 5);
+    expect(lang.daten).not.toEqual(standard.daten);
+    expect(() => faltePunkte(s, gaussKern(), N, 0)).toThrow(BildFehler);
+  });
+
   it("ohne Scheibchen keine Punktebene", () => {
     expect(faltePunkte([], gaussKern(), N)).toBeUndefined();
   });

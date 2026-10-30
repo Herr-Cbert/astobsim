@@ -251,8 +251,10 @@ export function vergleichsparameter(
     massstabArcsecProPx,
     daten: new Float32Array([1])
   };
+  // Ohne punktkern (Issue #145): das Raster des Vergleichsbilds ist ohnehin so fein wie die Anzeige.
+  const { punktkern: _punktkern, ...ohnePunktkern } = anblick;
   return {
-    ...anblick,
+    ...ohnePunktkern,
     quellbild: {
       ...quellbild,
       // Der Schluessel des Anblicks deckt alles ab, was physik fuer Stufe 1 zaehlt; die Punktquellen

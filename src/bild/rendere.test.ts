@@ -5,7 +5,7 @@ import { BildFehler } from "./fehler";
 import { QuelleAusRaster } from "./quelle";
 import { neuesRaster, pixelIndex, summe, type Raster } from "./raster";
 import { mittele, skaliere } from "./mittele";
-import { maskiere, rendere, type Zwischenspeicher } from "./rendere";
+import { maskiere, punktanteil, punktquellbild, rendere, tonwert, type Zwischenspeicher } from "./rendere";
 import { deltaKern, kastenKern } from "./testkerne";
 
 const N = 16;
@@ -234,5 +234,62 @@ describe("rendere", () => {
     expect(() => rendere(parameter({ fenster: { ...p.fenster, px: 0 } }), quelle(), falter)).toThrow(BildFehler);
     expect(() => rendere(parameter({ helligkeit: { ...p.helligkeit, punktExponent: 0 } }), quelle(), falter)).toThrow(BildFehler);
     expect(() => rendere(parameter({ helligkeit: { ...p.helligkeit, punktFaktor: -1 } }), quelle(), falter)).toThrow(BildFehler);
+  });
+});
+
+describe("feinere Punktebene (Issue #145, physik.md Abschnitt 31)", () => {
+  /** Stern 0,1'' an (x, y), Fluss pi (0,05)^2 relativ zu Quellweiss (helligkeitRelativ 1). */
+  const stern = (x: number, y: number): Punktquelle => ({ name: "S", xArcsec: x, yArcsec: y, durchmesserArcsec: 0.1, helligkeitRelativ: 1, sichtbar: true });
+  /** Fenster 16'' auf 64 px, Arbeitsraster 16 px, Punktkern Delta bei 0,25''/px (Punktebene 64 px). */
+  function fein(punkte: Punktquelle[]): Simulationsparameter {
+    const p = parameter({ fenster: { breiteArcsec: N, mitteXArcsec: 0, mitteYArcsec: 0, px: 64 }, punktkern: deltaKern(5, 0.25) });
+    return { ...p, quellbild: { ...p.quellbild, punkte: { schluessel: "s", punktquellen: punkte } }, helligkeit: { ...p.helligkeit, faktorObjekt: 0 } };
+  }
+
+  it("punktquellbild: Raster 64 px bei 0,25''/px, gleiche Mitte, Randfenster ein halbes Arbeitspixel (2 px)", () => {
+    const b = punktquellbild(fein([]));
+    expect(b.quellbild).toMatchObject({ rasterPx: 64, massstabArcsecProPx: 0.25, mitteXArcsec: 0, mitteYArcsec: 0 });
+    expect(b.quellbild.schluessel).toBe("q|0|0|punkte 64");
+    expect(b.kern.massstabArcsecProPx).toBe(0.25);
+    expect(b.randZusatzPx).toBe(2);
+    const p0 = parameter();
+    const ohne = punktquellbild(p0);
+    expect(ohne.quellbild).toBe(p0.quellbild);
+    expect(ohne.kern).toBe(p0.kern);
+    expect(ohne.randZusatzPx).toBe(0.5);
+  });
+
+  it("der Stern liegt im Anzeigepixel seiner Lage, der Fluss bleibt erhalten (Delta, linear)", () => {
+    // x = 2,3'', y = 0,1'': Spalte (8 + 2,3) / 0,25 = 41,2, Zeile (8 - 0,1) / 0,25 = 31,6.
+    const r = rendere(fein([stern(2.3, 0.1)]), quelle(), falter).raster;
+    expect(r.breite).toBe(64);
+    const groesster = r.daten.indexOf(Math.max(...r.daten));
+    expect([groesster % 64, Math.floor(groesster / 64)]).toEqual([41, 31]);
+    expect(summe(r)).toBeCloseTo(Math.PI * (0.05 / 0.25) ** 2, 5);
+  });
+
+  it("Flaeche und Punktanteil getrennt skaliert: ohne Punkte wie ohne Punktkern", () => {
+    const p = fein([stern(2.3, 0.1)]);
+    const mitObjekt = { ...p, helligkeit: { ...p.helligkeit, faktorObjekt: 1 } };
+    const ohnePunkte = { ...mitObjekt, quellbild: { ...mitObjekt.quellbild, punkte: { schluessel: "leer", punktquellen: [] } } };
+    const flaeche = rendere(ohnePunkte, quelle(), falter).raster;
+    const beides = rendere(mitObjekt, quelle(), falter).raster;
+    const punkte = rendere(p, quelle(), falter).raster;
+    for (let i = 0; i < beides.daten.length; i++) expect(beides.daten[i]).toBeCloseTo((flaeche.daten[i] as number) + (punkte.daten[i] as number), 6);
+  });
+
+  it("punktanteil rechnet denselben Ausdruck wie tonwert (ohne Flaeche), mit und ohne Faerbung", () => {
+    const p = neuesRaster(4, 4, 1, 0);
+    p.daten.set([0, 0.01, 0.1, 0.5, 1, 2, 30, 0, 0.2, 0.3, 0.4, 0.6, 0.7, 0.8, 0.9, 5]);
+    const c = neuesRaster(4, 4, 3, 0);
+    for (let i = 0; i < 16; i++) c.daten.set([1.2, 1, 0.7].map((f) => f * (p.daten[i] as number)), 3 * i);
+    const h = { ...parameter().helligkeit, hintergrundRelativ: 0, punktFaktor: 2, punktExponent: 1 / 3 };
+    expect(Array.from(punktanteil(p, h).daten)).toEqual(Array.from(tonwert(undefined, p, h, { rasterPx: 4 }).daten));
+    expect(Array.from(punktanteil(p, h, c).daten)).toEqual(Array.from(tonwert(undefined, p, h, { rasterPx: 4, faerbung: c }).daten));
+  });
+
+  it("wirft BildFehler, wenn der Punktkern kein ganzzahliges, feineres Raster ergibt", () => {
+    expect(() => rendere({ ...fein([stern(0, 0)]), punktkern: deltaKern(5, 0.3) }, quelle(), falter)).toThrow(BildFehler);
+    expect(() => rendere({ ...fein([stern(0, 0)]), punktkern: deltaKern(5, 1) }, quelle(), falter)).toThrow(BildFehler);
   });
 });
