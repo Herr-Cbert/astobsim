@@ -254,7 +254,7 @@ export function vergleichsparameter(
   // Ohne punktkern (Issue #145): das Raster des Vergleichsbilds ist ohnehin so fein wie die Anzeige.
   // Ohne farbkern und Anzeigefarbe (Issue #146): das Vergleichsbild ist unverschlechtert, jeder Stern
   // zeigt seine eigene Farbe; der Schluessel der Punktquellen bekommt dafuer einen Zusatz.
-  const { punktkern: _punktkern, farbkern: _farbkern, ...ohnePunktkern } = anblick;
+  const { punktkern: _punktkern, farbkern: _farbkern, ...ohneFeinkerne } = anblick;
   const gekoppelt = quellbild.punkte.punktquellen.some((p) => p.farbeAnzeige !== undefined);
   const punkte = gekoppelt
     ? {
@@ -263,7 +263,7 @@ export function vergleichsparameter(
       }
     : quellbild.punkte;
   return {
-    ...ohnePunktkern,
+    ...ohneFeinkerne,
     quellbild: {
       ...quellbild,
       punkte,

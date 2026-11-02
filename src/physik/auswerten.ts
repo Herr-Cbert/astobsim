@@ -3,7 +3,9 @@
 // Abschnitt 1.3, A-D4, A-D5, A-D7). Reihenfolge: optik -> atmosphaere -> aufloesung -> fenster ->
 // arbeitsmassstab (ohne Quellbild ohne Quellgrenze) -> Arbeitsraster -> kernbeschreibung; dann nur
 // bei geaendertem Kernschluessel baueKern; dann grenzgroesse -> punktquellen (Trabanten und Sterne
-// mit Deckkraft und Farbe), Quellbild mit Schluesseln fuer Objektraster und Punkte -> helligkeit
+// mit Deckkraft und Farbe) -> farbkern und Farbkopplung (nur bei farbigen Paaren in Reichweite,
+// Issue #146) -> punktkern (nur bei Punktquellen im Fenster und feinerer Anzeige, Issue #145),
+// Quellbild mit Schluesseln fuer Objektraster und Punkte -> helligkeit
 // (intern mischgewicht, bei deep_sky sichtbareIsophote und sockel) -> Anzeigewerte -> Warnungen mit
 // ueberstrahlung. Formeln stehen in den Stufe-1-Funktionen, hier kommt keine neue hinzu.
 //

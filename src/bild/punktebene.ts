@@ -27,8 +27,8 @@ import type { Scheibchen } from "./male";
 import { neuesRaster, type Raster } from "./raster";
 
 /**
- * Faltet jedes Scheibchen mit dem ausgeblendeten Kern (ausgeblendetKern; echte Faltung; die Kerne der Naht sind punktsymmetrisch)
- * und addiert das Ergebnis in eine mit 0 belegte Ebene rasterPx x rasterPx (ein Kanal, Werte
+ * Faltet jedes Scheibchen mit dem ausgeblendeten Kern (ausgeblendetKern; echte Faltung; die Kerne
+ * der Naht sind punktsymmetrisch) und addiert das Ergebnis in eine mit 0 belegte Ebene rasterPx x rasterPx (ein Kanal, Werte
  * relativ zu Quellweiss). Rand wie bei male: der Kern wird nicht neu normiert, was ausserhalb des
  * Rasters faellt, fehlt; innen behaelt ein angeschnittener Punkt seine Helligkeit. Der Gesamtfluss
  * eines ganz innen liegenden Scheibchens bleibt erhalten (Kern Summe 1).
@@ -106,9 +106,8 @@ function randfenster(rho: number, r: number, fenster: Randfenster = RANDFENSTER_
 
 /**
  * Kerndaten fuer die Punktebene: kern.daten mal w(rho) (Randfenster, Standard
- * RANDFENSTER_ARBEITSRASTER: 1 bis rho0 = 2/3 Radius, dann cos^2(pi/2 * (rho - rho0) / (rhoE - rho0))
- * bis rhoE = Radius + 0,5 px, darueber 0); danach auf die Summe der urspruenglichen Daten normiert,
- * so dass der Fluss erhalten bleibt. Ein Delta (Radius 0, Vergleichsbild) bleibt unveraendert.
+ * RANDFENSTER_ARBEITSRASTER, Verlauf siehe dort); danach auf die Summe der urspruenglichen Daten
+ * normiert, so dass der Fluss erhalten bleibt. Ein Delta (Radius 0, Vergleichsbild) bleibt unveraendert.
  * Zwischengespeichert je Kern (fuer das letzte Fenster).
  */
 export function ausgeblendetKern(kern: Kern, fenster: Randfenster = RANDFENSTER_ARBEITSRASTER): Float32Array {

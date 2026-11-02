@@ -1,7 +1,8 @@
 // Einstieg des Moduls physik (docs/architektur.md Abschnitt 3). Stufe 0: Einzelformeln,
 // jede einzeln getestet gegen docs/recherche/physik.md Abschnitt 8 (A-Q1). Stufe 1:
 // Konfiguration zu Zwischengroessen (optik, atmosphaere, aufloesung, helligkeit, punktquellen,
-// arbeitsmassstab, kernbeschreibung) und begrenze. Stufe 2: baueKern mit den Testhelfern
+// arbeitsmassstab, kernbeschreibung) und begrenze; seit Version 2 dazu schwelle (Wahrnehmung),
+// sternfarbe, mischung und doppelstern (farbkopplung nutzt nur auswerten). Stufe 2: baueKern mit den Testhelfern
 // kontrastUebertragung und kernFwhmArcsec (Issue #4) sowie profilDelle (Issue #21). Stufe 3:
 // auswerten mit Anzeigewerten, Warnungen und Wiederverwendung des Kerns (Issue #5). ui und zustand
 // importieren nur von hier; bild importiert physik nicht (docs/architektur.md Abschnitt 4).

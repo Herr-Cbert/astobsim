@@ -200,8 +200,9 @@ export function zahlenfeld(d: Document, o: ZahlOptionen): Zahlenfeld {
 
 /**
  * Regler mit Zahlenfeld daneben (z. B. Seeing, A-B1). grob gilt nur fuer das Zahlenfeld: der
- * Browser zaehlt die Schritte eines Reglers ab min, ein Wechsel des Schritts passt nicht dazu. Der Regler rechnet beim Ziehen live
- * (input, A-D7), das Zahlenfeld beim Verlassen; beide zeigen immer denselben Wert.
+ * Browser zaehlt die Schritte eines Reglers ab min, ein Wechsel des Schritts passt nicht dazu. Der
+ * Regler rechnet beim Ziehen live (input, A-D7), das Zahlenfeld beim Verlassen; beide zeigen immer
+ * denselben Wert.
  */
 export function regler(d: Document, o: ZahlOptionen): Regler {
   const { element, zeile } = feldrahmen(d, o);

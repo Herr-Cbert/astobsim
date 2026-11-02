@@ -57,7 +57,8 @@ export const KASTEN_YOUNG = { a: 0.50572, b: 6.07995, c: -1.6364 } as const;
 /**
  * Transmission tau der Geraetearten einschliesslich Okular und Zenitspiegel (Abschnitt 5.2,
  * Groessenordnung nach [32, 38]). Ohne Abschattung: der Faktor (1 - eps^2) steht in
- * transmissionMitAbschattung() (optik.ts), die okularhelligkeit() und schwelle.ts teilen (Issue #100).
+ * transmissionMitAbschattung() (optik.ts), die okularhelligkeit() und schwelle.ts teilen (Issue #100);
+ * beleuchtungAmAugeLx (sternfarbe.ts) rechnet ihn selbst.
  */
 export const TRANSMISSION: Readonly<Record<Bauart | "fernglas" | "auge", number>> = {
   refraktor: 0.9,
@@ -220,7 +221,8 @@ export const MISCHGEWICHT_SCHNITT = 0.005;
  * als erkennbar, wenn ihre Delle nach der Faltung (profilDelle, physik.md 8.1) darueber liegt.
  * Kalibrierkonstante, keine Physik: am Bild der Testfaelle T1 bis T6 festgelegt, als geometrisches
  * Mittel des Intervalls zwischen der tiefsten nicht erkennbaren (T4d) und der flachsten
- * erkennbaren Delle (T4c). Nur die Tests verwenden sie; das Bild haengt nicht davon ab.
+ * erkennbaren Delle (T4c). Seit Issue #146 haengt auch das Bild davon ab: die Farbkopplung der
+ * Doppelsterne (farbkopplung.ts) rechnet sigma = min(1, Delle / SCHWELLE_ERKENNBAR).
  */
 export const SCHWELLE_ERKENNBAR = 0.125;
 

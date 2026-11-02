@@ -534,10 +534,12 @@ function maskiereAn(raster: Raster, gesichtsfeld: Gesichtsfeld, fenster: Fenster
  * behalten; ist der Ausschnitt ganz schwarz (Zustand ohne Quellbild, QuelleLeer, oder Fenster ganz
  * neben dem Bild), gibt es kein Objektraster, weder mittele noch falte laufen, tonwert rechnet mit
  * q = 0 und den Kanaelen des Ausschnitts (docs/architektur.md 5.3; das Ergebnis gleicht dem
- * gefalteten Nullraster). Stufe 1b (Punktquellen malen) unter quellbild.schluessel plus
+ * gefalteten Nullraster). Stufe 1b (Punktquellen malen) unter dem Schluessel des Punktquellbilds
+ * (punktquellbild: quellbild.schluessel, mit punktkern zusaetzlich "|punkte N") plus
  * quellbild.punkte.schluessel, weil das Malen auch Massstab, Raster und Mitte braucht. Stufe 2
  * getrennt: die Faltung des Objekts mit dem Falter unter kern.schluessel plus Objektschluessel, die
- * der Punktebene (lokal in punktebene.ts) unter kern.schluessel plus Punkteschluessel. Im Fall
+ * der Punktebene (lokal in punktebene.ts) unter dem Schluessel des Punktkerns (punktkern, sonst
+ * kern) plus Punkteschluessel. Im Fall
  * unaufgeloest (mischgewicht > 0, ohne deepSky, mit Objektraster, Kern kein Delta) faltet der Falter das Objekt
  * zusaetzlich mit halokern, unter dessen Schluessel plus Objektschluessel (Issue #135).
  * begleiter (Issue #136): je Begleiter des Zustands seine Quelle, in der Reihenfolge von

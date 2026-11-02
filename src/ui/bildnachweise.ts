@@ -30,8 +30,8 @@ export interface NachweisImFuss {
 /**
  * Alle Bilder in der Reihenfolge von bilder.json. Die Ueberschrift nennt das Objekt und die
  * Zustaende, deren Feld bild auf den Nachweis zeigt (Mars 14" und 6" teilen ein Bild), bei
- * Begleiterbildern Zustand und Begleiter (Issue #136); ein Bild
- * ohne Zustand faellt auf objekt und zustand des Nachweises zurueck.
+ * Begleiterbildern Zustand und Begleiter (Issue #136); ein Bild ohne Zustand faellt auf objekt und
+ * zustand des Nachweises zurueck.
  */
 export function nachweiseImFuss(kataloge: Pick<Kataloge, "objekte" | "nachweise">): NachweisImFuss[] {
   const T = TEXTE.fuss;

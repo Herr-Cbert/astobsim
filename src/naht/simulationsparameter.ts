@@ -179,7 +179,8 @@ export interface Simulationsparameter {
   kern: Kern;
   /**
    * Kern der Punktebene (Issue #145, docs/recherche/physik.md Abschnitt 31): dieselbe Gesamt-PSF am
-   * feineren Massstab fenster.breiteArcsec / punktPx mit punktPx = min(fenster.px, 3 * rasterPx).
+   * feineren Massstab fenster.breiteArcsec / punktPx mit punktPx = min(fenster.px, 5 * rasterPx)
+   * (PUNKT_UEBERABTASTUNG_MAX in physik/auswerten.ts).
    * Nur gesetzt, wenn punktPx > quellbild.rasterPx ist (die Anzeige ist feiner als das Arbeitsraster)
    * und Punktquellen im Fenster liegen. Fehlt er, malt und faltet bild die Punktquellen am
    * Arbeitsraster mit kern (wie vor Issue #145). massstabArcsecProPx ist dann genau
