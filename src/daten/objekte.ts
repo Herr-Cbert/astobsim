@@ -28,7 +28,7 @@ const OBJEKTTYPEN = ["mond", "planet", "doppelstern", "deep_sky"] as const;
 type Objekttyp = (typeof OBJEKTTYPEN)[number];
 
 /** Objektklasse zum typ in objekte.json (A-D18). */
-const KLASSE_ZU_TYP: Record<Objekttyp, Objektklasse> = {
+const TYP_ZU_KLASSE: Record<Objekttyp, Objektklasse> = {
   mond: "sonnensystem",
   planet: "sonnensystem",
   doppelstern: "doppelstern",
@@ -217,7 +217,7 @@ export function pruefeObjekte(roh: unknown): Objekt[] {
     objektIds.add(id);
     nurBekannteFelder(obj, ort, FELDER_OBJEKT);
     const typ = wahl(obj, "typ", ort, OBJEKTTYPEN);
-    const klasse = KLASSE_ZU_TYP[typ];
+    const klasse = TYP_ZU_KLASSE[typ];
     const rohZustaende = alsListe(obj["zustaende"], ort, "zustaende");
     if (rohZustaende.length === 0) throw new DatenFehler(OBJEKTE_DATEI, id, "zustaende", "mindestens ein Zustand erwartet");
     const zustaende = rohZustaende.map((z, n) => {

@@ -51,7 +51,7 @@ Schritte:
 
 Aufruf aus dem Repo-Root (numpy, Pillow nicht noetig; gzip im Pfad):
     python3 tools/m42_wfi_stapeln.py --abrufen   fehlende Rohdaten holen (Netz, etwa 2,9 GB), Bytes und SHA-256 ausgeben
-    python3 tools/m42_wfi_stapeln.py             pruefen und data/roh/m42/m42_wfi_v.fits schreiben (etwa 11 min)
+    python3 tools/m42_wfi_stapeln.py             pruefen und data/roh/m42/m42_wfi_v.fits schreiben (etwa 12 min)
 """
 
 import argparse
