@@ -488,3 +488,61 @@ Gemessen: $\delta$ wie in 14 (Punktebene linear, 540 px), Anzeige am PNG entlang
 Gemessen am Zoom-PNG (Mittel 5 x 5 Pixel, Python), Farbton-Differenz: groesster Unterschied der Kanaele, nachdem jede Farbe auf Mittel 128 skaliert ist. T8b: $\varepsilon^1$ $\delta$ = 0,135, $\varepsilon^2$ 0,619 im feinen Modell, beide farbig; Zoom und Detail bytegleich.
 
 **Bilder (geprueft, Read auf die PNG, vorher/nachher nebeneinander):** geaendert sind Zoom und Uebersicht von T7a, T7c, T8a, T8c, T9b, T9c und das Detail T8c, sonst ist alles bytegleich (auch T7b, T7d, T8b, T9a, T1 bis T6, T10 bis T12, P1 bis P3, M13). T9b und T9c: die blaeulich-graue Stelle und die blaue Sichel jenseits des Halos von A sind weg; der Halo ist zur Seite von B laenger und dort orange (Schulter von B). T7a: ein laenglicher, neutral grauer Fleck statt gelblich und blaeulich nebeneinander. T7c, T8a, T8c: hoechstens 3 Kodes im Anblick (die Paare haben aehnliche Farben). Das Quellbild des Zooms ist ueberall bytegleich: es zeigt die eigenen Farben der Sterne (`farbe`), nur der Anblick die Anzeigefarbe (`farbeAnzeige`). Ein einzelner Lauf lieferte T12b-Zoom mit 3 Kodes Abweichung, ein zweiter bytegleich (Rauschen des Laufs, nicht uebernommen). Bei T9c bleibt die atmosphaerische Dispersion unberuecksichtigt ([#151](https://github.com/herr-cbert/astobsim/issues/151), Spaeter).
+
+## 15. Sicherheit Version 2 (Issue #113)
+
+Stand 2026-11-02, Aenderungen seit dem Abschluss von Version 1 (Merge-Commit 0a5b71d bis bb2e8a3: 414 Dateien, rund 27 000 Zeilen). Wie in Abschnitt 7 von Hand nach dem Vorgehen des Skills `security-review` geprueft (`git diff --no-ext-diff`), Schwerpunkt `src/`, `scripts/`, `tools/`, CSP und Workflows; Bilddaten nur auf Ladewege und Groesse. Kennzeichnung: [G] geprueft, [R] gerechnet, [V] vermutet.
+
+### 15.1 Pruefliste
+
+| Pruefpunkt | Ergebnis | Beleg |
+|---|---|---|
+| Keine Laufzeitabhaengigkeiten (ADR-0001) | erfuellt [G] | `package.json` und `package-lock.json` seit Version 1 unveraendert, ohne `dependencies` |
+| `npm audit` | 0 Befunde [G] | am 2026-11-02 |
+| Keine Cookies, kein Browserspeicher, kein Tracking (A-T4) | erfuellt [G] | Suche wie in Abschnitt 7 ueber `src/`: keine Treffer |
+| Keine Code-Ausfuehrung aus Daten | erfuellt [G] | kein `innerHTML`, `outerHTML`, `insertAdjacentHTML`, `document.write`, `eval`, `new Function` in `src/`; Hilfetexte (`hinweis_hilfe`), Infopanel und Fuss setzen nur `textContent` |
+| Neue Ladewege | erfuellt [G] | alle ueber `holeDaten` mit `import.meta.env.BASE_URL + "daten/"` (`src/daten/pruefe.ts`). Sternlisten: `sterne_datei` muss `^[a-z0-9_-]+\.json$` erfuellen (`src/daten/objekte.ts`); Begleiterbilder und log-Kennlinie kommen aus `daten/bilder.json` (Pfad ohne fuehrendes `/` und ohne `..`, Masse, `mag_dunkel > mag_hell`, Begleiter nur mit Kennlinie); nichts davon aus der URL |
+| Links im Fuss | erfuellt [G] | `href` nur aus `bilder.json` (`quelle_url`, `lizenz_url` mit `^https?://` geprueft, alle https) oder Konstanten in `src/texte.ts`; `rel="noopener noreferrer"` |
+| Neue URL-Parameter (freies Paar `z=frei` mit `tr`, `ma`, `mb`, `bva`, `bvb`) | erfuellt [G] | Zahlen per `Number`, NaN faellt auf die Vorgabe, danach schneidet `begrenze` (auch Unendlich, Tests in `begrenze.test.ts` und `url.test.ts`); die Werte gelangen nur ueber `textContent` ins DOM |
+| `data:`-URL | nur Tests [G] | `src/daten/webpkopf.ts` dient `bilddateien.test.ts` (`?inline`), nicht im Bundle |
+| Bau | erfuellt [G] | `dist/daten/` enthaelt nur `.webp` und `.json`, keine Source-Maps |
+| GitHub-Workflows | unveraendert seit Version 1 [G] | siehe S1 |
+
+### 15.2 Befunde
+
+| Nr. | Schwere | Ort | Befund | Bewertung |
+|---|---|---|---|---|
+| S1 | niedrig | `.github/workflows/ci.yml`, `pages.yml` | Actions per Major-Tag (`actions/checkout@v7`, `deploy-pages@v5` usw.), nicht per Commit-SHA gepinnt [G] | Bleibt so (Entscheidung Herbert 2026-11-02): nur offizielle Actions von `actions/`, Rechte minimal (`contents: read`; `pages: write` und `id-token: write` nur im Deploy-Job), keine Geheimnisse ausser dem Pages-Token. Ein verschobenes Tag einer offiziellen Action waere ein Lieferkettenangriff auf GitHub selbst; Updates kommen so ohne Pflege |
+| S2 | niedrig | `tools/deep_sky_aufbereiten.py` (`lies_tiff_tonkurve`), `tools/mond_kacheln.py` (`lade_rohbild`, Version 1) | `Image.MAX_IMAGE_PIXELS = None` schaltet den Schutz von Pillow gegen Dekompressionsbomben ab [G] | Kein Handlungsbedarf: das Rohbild ist vorher per SHA-256 und Bytezahl geprueft (`pruefe_rohbild` in `verarbeite`), beim Mond per erwarteter Groesse; die Werkzeuge laufen nur lokal mit Rohdaten aus `data/roh/` |
+| S3 | niedrig | `tools/m42_wfi_stapeln.py` (`abrufen`, `--ohne-pruefung`) | `--abrufen` gibt die SHA-256 der geholten Dateien nur aus und vergleicht sie nicht; die Gaia-CSV wird ohne Zwischendatei geschrieben [G] | Kein Handlungsbedarf: feste https-URLs (ESO, ESA), das Stapeln prueft danach Bytezahl und SHA-256 aller Rohdateien (Standard); `--ohne-pruefung` nur von Hand |
+| S4 | Info | `src/zustand/url.ts` (`leseObjekt`) | `leseZahl` laesst Unendlich durch [G] | Kein Befund: `begrenze` schneidet es auf die Bereichsgrenze und meldet einen Hinweis (getestet) |
+
+Aussortiert (kein Befund) [G]: `subprocess` in `m42_wfi_stapeln.py` ruft `gzip -dc` als Liste ohne Shell mit Pfaden aus einer festen Tabelle; `urlopen` nur auf feste https-URLs; kein `pickle`, `eval`, `exec` oder `shell=True` in `tools/`; der Testserver in `scripts/validierung-bilder.mjs` prueft weiter `startsWith(bau + sep)` und lauscht nur auf 127.0.0.1, `--ziel` ist ein lokaler Ausgabeordner.
+
+### 15.3 Content-Security-Policy
+
+Die CSP des Baus ist seit Version 1 unveraendert: `default-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'` (`vite.config.ts`). Sie deckt die neuen Daten ab, weil Sternlisten, Begleiterbilder und Deep-Sky-Bilder wie bisher per `fetch` vom eigenen Ursprung kommen; sie ist nicht weiter als noetig (kein `unsafe-*`, keine fremden Hosts). Lauf am 2026-11-02 auf `main` bb2e8a3: `node scripts/validierung-bilder.mjs` mit allen 42 Faellen (T1 bis T12, P1 bis P3, M13a bis M13c), 98 Bilder, Exit 0, ohne CSP-Verstoss und ohne Konsolenfehler, alle Bilder byte-gleich zu `docs/validierung/` [G]. Nach den Vereinfachungen aus #113 (Pakete A bis C) derselbe Lauf noch einmal: ebenfalls ohne Verstoss, 97 von 98 Bildern byte-gleich; `T7b-zoom.png` wich in 298 Pixeln um hoechstens 3 Stufen ab (Zeilen 9 bis 44 am oberen Rand), bei vier Wiederholungen der Faelle T7a bis T7d auf demselben Stand war es byte-gleich [G]. Die Abweichung kam also vom Lauf, nicht vom Code; vermutlich SwiftShader oder der Zeitpunkt der Aufnahme [V].
+
+### 15.4 Groessen (A-X6)
+
+Erstladen und Groesse je Objekt aus `dist/` und den Ladewegen in `src/ui/starte.ts` und `src/daten/` [G fuer die Dateigroessen, R fuer die Summen]:
+
+| Ladeweg | Dateien | Bytes |
+|---|---|---|
+| Programm | `index.html`, JS, CSS | 163 599 |
+| Kataloge beim Start | `geraete.json`, `bilder.json`, `objekte.json` | 135 254 |
+| Sternlisten beim Start (`ladeObjekte` laedt alle) | `sterne/m13.json`, `m45.json`, `m42.json` | 139 778 |
+| **Erstladen, wie `npm run build` es seit #113 misst** | | **438 631 = 0,44 MB** |
+| dazu Startobjekt `mond_ev` (Kacheln nach Bedarf, hoechstens alle 49) | | bis 1 245 988 |
+| Erstladen mit Startobjekt, Obergrenze | | 1,68 MB (Grenze 5 MB) |
+| Mond voll / letztes Viertel / Sichel | je 49 Kacheln | 1,90 / 1,16 / 0,50 MB |
+| M31 mit Begleiter M32 | 2 WebP | 0,77 MB |
+| M57 / M42 / M13 | je 1 WebP | 0,69 / 0,42 / 0,27 MB |
+| Jupiter / Mars (2 Bilder) / Saturn | | 0,18 / 0,13 / 0,07 MB |
+| Doppelsterne, M45 | ohne Bild | 0 |
+
+Urteil: A-X6 erfuellt, Erstladen hoechstens 1,7 MB, groesstes Objekt (Vollmond) 1,9 MB gegen 20 MB. `pruefeBildnachweise` prueft die 20 MB je Objekt zusaetzlich beim Laden.
+
+### 15.5 Massnahmen
+
+Keine offenen Sicherheitsbefunde. Die Messung des Erstladens in `scripts/build-abschluss.mjs` zaehlt seit #113 die Kataloge und die beim Start geladenen Sternlisten mit. Vereinfachungen aus #113 als PRs A (Kommentare, Doku), B (ungenutzte Exporte) und C (Doppelungen); Effizienz zurueckgestellt als #153.
