@@ -154,6 +154,8 @@ Als Issues angelegt am 2026-10-27, Milestone M3 (Herbert, 2026-10-27):
 | Claude | 2026-10-30 | #111: Anzeigeweiss 8,9 und Punktweiss 6,9 (Entscheidung Herbert), alle T- und P-Bilder neu, T12 erfuellt, T1 bis T6 weiter erfuellt (Abschnitt 13) |
 | Claude | 2026-10-30 | #112: T7 bis T11 und Sternzahl M13 (Abschnitt 14), Vorschlag: T7, T8a, T8c, T9a, T10b, T11a bis T11c bestanden, Abweichungen T8b, T9b/c (Farbe), T10a (Loch), T11d, M13; T1 bis T6, T12, P1 bis P3 bytegleich |
 | Herbert | 2026-10-30 | #112: T7a bis T7d, T8a, T8c, T9a, T10b, T11a bis T11c, T11-Grenzgroesse, T12 bestanden; T10a bestanden mit Anmerkung (Loch eher angedeutet); Abweichungen T8b #145, T9b/c #146, T11d #147, M13 #148; Pruefpunkt M57-Deckkraft erledigt |
+| Claude | 2026-11-02 | #114: Nachweis A-Q4 (Abschnitt 16): Muss-V2 erfuellt, Seite erreichbar; offen Firefox (Abschnitt 17), Entscheidung zu T11d, Tag `v2.0` |
+| Herbert | | #114: Firefox-Pruefung Version 2 (Abschnitt 17) |
 
 ## 7. Sicherheit (Issue #22)
 
@@ -546,3 +548,97 @@ Urteil: A-X6 erfuellt, Erstladen hoechstens 1,7 MB, groesstes Objekt (Vollmond) 
 ### 15.5 Massnahmen
 
 Keine offenen Sicherheitsbefunde. Die Messung des Erstladens in `scripts/build-abschluss.mjs` zaehlt seit #113 die Kataloge und die beim Start geladenen Sternlisten mit. Vereinfachungen aus #113 als PRs A (Kommentare, Doku), B (ungenutzte Exporte) und C (Doppelungen); Effizienz zurueckgestellt als #153.
+
+## 16. Nachweis Version 2 (Issue #114, A-Q4)
+
+Stand 2026-11-02, `main` 816491f. A-Q4 woertlich: "Version 2 ist fertig, wenn alle Muss-V2-Anforderungen erfuellt sind, T1 bis T6 und die neuen Testfaelle T7 bis T12 bestehen, die Seite auf GitHub Pages erreichbar ist und der Tag `v2.0` gesetzt ist." Die vier Bedingungen einzeln, darunter die Luecken. Erhoben von Claude aus `docs/anforderungen.md`, `docs/plan.md` 7, dem Milestone "Version 2" (31 Issues, 30 geschlossen) und den gemergten PRs #115 bis #157 (per `gh api`); Belegdateien auf Existenz geprueft. Kennzeichnung: [G] geprueft, [R] gerechnet, [V] vermutet.
+
+### 16.1 Muss-V2-Anforderungen
+
+| ID | Kurzform | Issue / PR | Beleg | Status |
+|---|---|---|---|---|
+| A-Z9 | Doppelsterne als Objektklasse, feste Liste aus dem WDS, freies Paar, Ueberstrahlungshinweis ab etwa 4 mag | #99 / PR #117, #103 / PR #125, #100 / PR #126, #109 / PR #127, #145 / PR #150, #146 / PR #152 | `daten/objekte.json` (14 Paare von Albireo bis Antares, kein Sirius), `src/physik/doppelstern.test.ts`, `src/daten/doppelsterne.test.ts`, `src/ui/formular_objekt.test.ts`, T7 bis T9 | erfuellt [G] |
+| A-Z10 | M31, M42, M13, M45, M57 mit Flaechenhelligkeit und Schwelle; Sterne aus Gaia DR3 oder Hipparcos; M13 als Sterne plus Restlicht | #104 / PR #123, #105 / PR #124, #106 / PR #130, #107 / PR #132, #108 / PR #131, #136 / PR #140, #139 / PR #144 | `daten/sterne/m45.json`, `m42.json`, `m13.json`, `src/daten/m45.test.ts`, `src/daten/m13.test.ts`, `src/daten/m32.test.ts`, Abschnitte 10 bis 12, T10, T11 | erfuellt [G] |
+| A-B2 (V2) | Bortle wirkt ueber die Wahrnehmungsschwelle, Satz zur vollen Wirkung entfaellt | #96 / PR #121, #110 / PR #129 | `src/physik/schwelle.test.ts`, `src/texte.test.ts` (Hilfetext Bortle ohne "volle Wirkung"), T11a gegen T11b | erfuellt [G] |
+| A-P4 (V2) | Abbildungsmodell bleibt, Konstanten auf A-P13 nachgestellt | #100 / PR #126, #111 / PR #137 | `src/physik/helligkeit.test.ts`, `src/physik/regression_v1.test.ts`, Abschnitt 13 (Monotonie in der AP) | erfuellt [G] |
+| A-P10 | Unaufgeloest als Punktquelle, gleitender Uebergang | #97 / PR #118, #100 / PR #126, #110 / PR #129, #135 / PR #138 | `src/physik/mischung.test.ts`, `src/bild/rendere.test.ts`, T6b, T12b bis T12d | erfuellt [G] |
+| A-P11 | Wahrnehmungsschwelle nach Blackwell, Grenzgroesse, fuer alle Objekte | #96 / PR #121, #100 / PR #126, #110 / PR #129 | `src/physik/schwelle.test.ts`, `src/physik/auswerten.test.ts`, T11 Grenzgroesse 6,20 und 5,17 | erfuellt [G] |
+| A-P12 | Deep-Sky grau, Sternfarbe aus B-V ueber einer Leuchtdichteschwelle | #98 / PR #119, #101 / PR #120, #146 / PR #152 | `src/physik/sternfarbe.test.ts`, `src/physik/farbkopplung.test.ts`, `src/bild/tonwert.test.ts` | erfuellt [G] |
+| A-P13 | Zielkriterien der Anzeigehelligkeit (Mond AP 1 mm, Jupiter mit blossem Auge, Abstufung) | #100 / PR #126, #111 / PR #137 | Abschnitt 13 (T12), `src/physik/helligkeit.test.ts`, ADR-0004 Nachtrag | erfuellt [G] |
+| A-D18 | Objektauswahl nach Klassen, Eingaben des freien Paars in der URL | #109 / PR #127 | `src/ui/formular_objekt.test.ts`, `src/zustand/url.test.ts`, `src/daten/objektklassen.test.ts` | erfuellt [G] |
+| A-X7 | Mondphasen Sichel, Vollmond, letztes Viertel aus SVS 5587 | #36 / PR #128 | `daten/bilder.json` (Frames 6173, 6449, 6615), `src/daten/objektzustand.test.ts`, Abschnitt 9 (P1 bis P3) | erfuellt, Maria des Vollmonds mit blossem Auge als Modellgrenze (Herbert 2026-10-29) [G] |
+| A-X11 | Grosse Deep-Sky-Objekte mit groberem Quellbild, Hilfetext nennt die Grenze | #102 / PR #122, #106 / PR #130, #107 / PR #132, #110 / PR #129 | `bogensekunden_pro_pixel` in `daten/bilder.json` (M31 4,0'', M42 1,0''), `src/ui/infopanel.test.ts` (Hinweis nur bei Deep-Sky) | erfuellt [G] |
+| A-Q5 | T7 bis T12 mit Quellen vorgeschlagen, von Herbert bestaetigt | Phase 2 und 4 (Commits a236eef, 0a9d065), #112 / PR #149 | `docs/recherche/README.md` (Testfaelle), Abschnitt 14 | erfuellt [G] |
+| A-Q4 | Version 2 fertig | #114 (dieser Abschnitt) | 16.2 bis 16.4 | **offen**: Firefox (A-T3) und Tag `v2.0` |
+
+Vorbereitende Issues ohne eigene Anforderung: #95 / PR #115 (Naht), #102 / PR #122 (Datenformat), #133 / PR #134 (Umlaute in Datentexten), #141 / PR #142 (Nacharbeit), #113 / PRs #154 bis #157 (Sicherheit, Vereinfachung, Abschnitt 15). Die Sammel-Issues #25, #26 und #93 sind mit ihren Sub-Issues geschlossen. Die V2-Nachtraege zu Nicht-Zielen (A-Z7, A-P9, A-X9) grenzen nur ab; sie sind durch die Daten eingehalten (keine Feldsterne, kein Reflexionsnebel um M45, Adaption als Konstante) [G fuer die Daten, keine eigenen Tests].
+
+Die Muss-Anforderungen aus Version 1 (Abschnitt 8) gelten weiter: alle Tests aus Version 1 laufen mit (1006 Vitest-Faelle, `npm test` gruen), A-X6 ist in 15.4 neu gemessen, A-T4 und A-T1 in 15.1. A-T3 (Firefox) ist fuer den Stand Version 2 noch nicht geprueft, siehe 16.4 und Abschnitt 17.
+
+### 16.2 Testfaelle T1 bis T12
+
+| Fall | Urteil | Quelle |
+|---|---|---|
+| T1 bis T6 | erfuellt | Abschnitt 2 und 6 (Herbert 2026-10-27/28); mit den Konstanten von #111 von Claude neu geprueft (Abschnitt 13, "alle erfuellt"); nach #135, #145 und #146 nur T5b, T6c und Trabanten in T1/T4 um wenige Kodes geaendert (13, 14.5, 14.6) |
+| T7a bis T7d | bestanden | 14.1, Herbert 2026-10-30, T7a nach #146 einfarbig gewollt (2026-11-02) |
+| T8a, T8c | bestanden | 14.1, Herbert 2026-10-30 |
+| T8b | bestanden nach #145 | 14.5, Herbert 2026-11-02 (Kriterium im Detailfenster) |
+| T9a | bestanden | 14.1, Herbert 2026-10-30 |
+| T9b, T9c | bestanden nach #146 | 14.6, Herbert 2026-11-02 |
+| T10a | bestanden mit Anmerkung (Loch eher angedeutet) | 14.1, Herbert 2026-10-30 |
+| T10b | bestanden | 14.1, Herbert 2026-10-30 |
+| T11a bis T11c, T11 Grenzgroesse | bestanden | 14.1, Herbert 2026-10-30 |
+| **T11d** | **Abweichung**: sieben statt sechs Plejaden bei Bortle 7, Pleione von Atlas getrennt | 14.4 Punkt 2, Herbert 2026-10-30: [#147](https://github.com/herr-cbert/astobsim/issues/147) im Milestone "Spaeter", "bis dahin Grenze des Modells" |
+| T12 | bestanden | Abschnitt 13, Herbert 2026-10-30 |
+| Pruefpunkt Sternzahl M13 (kein T-Fall) | Abweichung | 14.3, [#148](https://github.com/herr-cbert/astobsim/issues/148) "Spaeter" |
+
+### 16.3 Seite auf GitHub Pages
+
+Am 2026-11-02 [G]: `curl https://herr-cbert.github.io/astobsim/` liefert HTTP 200; das ausgelieferte `index.html` ist bytegleich mit dem lokalen `npm run build` von `main` 816491f (gleiche Hash-Namen `index-DXUOLkjO.js`, `index-8AkE0728.css`); der Workflow "Pages" lief fuer 816491f erfolgreich. Alle Links in `README.md` und alle `quelle_url`/`lizenz_url` in `daten/bilder.json` antworten mit HTTP 200.
+
+### 16.4 Luecken
+
+1. **A-T3 Firefox fuer Version 2 nicht geprueft.** Pruefung von Hand nach Abschnitt 17 (Herbert).
+2. **T11d ist eine Abweichung, kein "bestanden".** A-Q4 verlangt woertlich, dass T7 bis T12 bestehen. Herbert hat T11d am 2026-10-30 als Grenze des Modells nach "Spaeter" (#147) verschoben. Fuer die Freigabe von `v2.0` noetig: ausdrueckliche Entscheidung, T11d als dokumentierte Modellgrenze gelten zu lassen (oder die Erwartung von T11 anzupassen, wie bei T2 nach #76).
+3. **T1 bis T6 im Stand Version 2 ohne eigenen Eintrag von Herbert.** Das letzte Urteil von Herbert zu T1 bis T6 stammt aus Version 1; seither hat Claude sie nach #111 als weiter erfuellt eingetragen (Abschnitt 6), Herbert hat die Konstanten am Bild festgelegt. Vorschlag: bei der Firefox-Pruefung T1, T3 und T5a mit ansehen und in Abschnitt 6 eintragen.
+4. **Tag `v2.0`** wird erst nach Freigabe durch Herbert gesetzt (Issue #114).
+
+Kann-Punkte und Folge-Issues bleiben im Milestone "Spaeter" (18 offen): #24, #27 bis #35, #37, #38, #94 (Erdlicht), #143 (eingebettete Begleiter, M43), #147 (T11d), #148 (Sternzahl M13), #151 (atmosphaerische Dispersion), #153 (Effizienz). #28 und #151 behandeln beide die atmosphaerische Dispersion [G]; #151 entstand aus T9c (Antares bei 15 Grad Hoehe).
+
+## 17. Firefox-Pruefung Version 2 (A-T3), Vorlage
+
+Vorbereitet von Claude am 2026-11-02 fuer die Pruefung von Hand durch Herbert; das Ergebnis traegt Herbert in die Felder unten und in Abschnitt 6 ein. Firefox headless macht nur einen Screenshot beim Laden und wartet nicht auf die Rechnung (Abschnitt 8, Firefox); die Faelle unten decken deshalb vor allem ab, was in Version 2 neu ist und in Version 1 nicht in Firefox lief: Objektklassen, Doppelsterne mit Punktebene und Farbe, Deep-Sky mit log-Kennlinie und Schwelle, Begleiterbild M32, Sternlisten, neue Mondphasen, der erweiterte Seitenfuss. Geschaetzte Dauer etwa 20 bis 30 Minuten [V].
+
+**Vorbereitung:** aktuelles Firefox (Desktop), neues privates Fenster, Fenster etwa 1400 x 1000, Konsole offen (F12, Reiter Konsole, "Logs beibehalten" an). URL-Basis `https://herr-cbert.github.io/astobsim/`, dahinter der Suchteil. In jedem Fall: Statuszeile unter dem Bild nennt "WebGL2-Faltung" und eine Zeit, keine Fehlermeldung im Bild, Konsole ohne Fehler und ohne CSP-Meldung. Zum Vergleich liegen die Chrome-Bilder unter `docs/validierung/` (Spalte "Chrome-Bild").
+
+| Nr | Suchteil | Was pruefen | Chrome-Bild | Ergebnis Firefox |
+|---|---|---|---|---|
+| F1 | (ohne, Startseite) | Startkonfiguration A-D9 (Mond, 80/600, 10 mm); Objektauswahl zeigt die Gruppen Sonnensystem, Doppelsterne, Deep-Sky (A-D18); Fuss: Lizenzzeile, "Bildnachweise (13 Bilder ...)" und "Sterndaten (7 Quellen ...)" aufklappen, Umlaute korrekt | - | |
+| F2 | `?v=1&R(80,800,8)&z=mond_ev&s=2&B` (T3) | Zoom per Klick, Detail einschalten, im Detail ziehen und Pfeiltasten, Pos1, Escape zurueck | T3 | |
+| F3 | `?v=1&R(80,800,10)&z=mond_sichel&s=2&B` | Sichel mit schwarzer Nachtseite; im Formular auf Vollmond und letztes Viertel wechseln (A-X7) | - (P1a bis P3b zeigen dieselben Zustaende mit blossem Auge und im Fernrohr) | |
+| F4 | `?v=1&R(70,700,7)&z=jup_47&s=2&B` (T1) | Baender, Monde; Seeing-Regler ziehen: Bild folgt fluessig | T1 | |
+| F5 | `?v=1&g=auge&z=jup_47&s=2&B` (T12b) | Punkt fast weiss, runder Halo ohne Quadrat (#135) | T12b | |
+| F6 | `?v=1&R(150,1200,6)&z=antares_2027&s=0.5&b=5&t=klar&h=90` (T9a) | Warnung "Ueberstrahlung nicht simuliert" im Infopanel; Zoom: orange A, blaeulicher B getrennt | T9a | |
+| F7 | `?v=1&R(80,800,5)&z=eps_lyr_2027&s=0.5&b=5&t=klar&h=90` (T8b) | Zoom, dann Detail: Epsilon1 als zwei Kerne mit Beugungsring | T8b (Detail) | |
+| F8 | `?v=1&R(80,800,10)&z=frei&tr=1.5&ma=5&mb=6.5&bva=1.2&bvb=0&s=1&b=5&t=klar&h=90` | Freies Paar: die fuenf Eingaben erscheinen im Formular mit diesen Werten; eine Eingabe aendern, URL folgt (A-D8); Link in neuem Tab ergibt dasselbe Bild | - | |
+| F9 | `?v=1&g=auge&z=m31&s=2&b=3` (T11a) | M31 laenglich mit hellem Kern; Bortle-Regler auf 7: nur noch Kern als Hauch (T11b); Infopanel Grenzgroesse etwa 6,2 bzw. 5,2 | T11a, T11b | |
+| F10 | `?v=1&g=auge&z=m45&s=2&b=3` (T11c) | Plejaden als Sternhaufen mit Farben (Sternliste aus `daten/sterne/m45.json` geladen) | T11c | |
+| F11 | `?v=1&R(80,800,10)&z=m57&s=2&b=5` (T10a) | Kleines Oval mit dunklerer Mitte; Zoom mit Vergleichsbild | T10a | |
+| F12 | `?v=1&g=newton-200-1200&ok=8&z=m13&s=1.5&b=4` (M13b) | Koerniger Haufen mit vielen Sternen, Detail | M13b | |
+| F13 | M42 aus der Objektauswahl, 80/600 mit 10 mm | Nebel mit Trapez in der Mitte; Hilfetext zu M42 (Infosymbol) mit Hinweis auf M43 und den Bildrand | - | |
+| F14 | Startseite, dann Fernglas 10x50 und Blosses Auge waehlen | Geraetewechsel ohne Fehler, beim Auge rechteckiger Ausschnitt (A-D1) | T6a | |
+
+Kurzform im Suchteil wie Abschnitt 1: `R(D, f, ok)` = `a=fernrohr&ba=refraktor&d=D&f=f&o=0&ok=ok&sg=50`, `B` = `b=5&t=klar&h=90`; F2 also ausgeschrieben `?v=1&a=fernrohr&ba=refraktor&d=80&f=800&o=0&ok=8&sg=50&z=mond_ev&s=2&b=5&t=klar&h=90`.
+
+**Ergebnis** (Herbert):
+
+| Feld | Eintrag |
+|---|---|
+| Datum | |
+| Firefox-Version, Betriebssystem | |
+| Falter laut Statuszeile (WebGL2 oder JavaScript) | |
+| Faelle ohne Befund | |
+| Befunde (Fall, Beschreibung, Issue) | |
+| Konsole: Fehler oder CSP-Meldungen | |
+| T1, T3, T5a im Stand Version 2 angesehen (16.4 Punkt 3) | |
+| Urteil A-T3 Version 2 | |
