@@ -72,8 +72,8 @@ function trennung(such: string, sternA: string, sternB: string, detail = false):
   const k = konfiguration(such);
   const mitte = detail ? detailstart(k)! : { xArcsec: 0, yArcsec: 0 };
   const auswertung = auswerten(k, { fenster: zoomfenster(k, mitte, 540, detail) });
-  const { quellbild, kern, randZusatzPx } = punktquellbild(auswertung.parameter);
-  const ebene = faltePunkte(malePunktquellen(quellbild), kern, quellbild.rasterPx, randZusatzPx)!;
+  const { quellbild, kern, randfenster } = punktquellbild(auswertung.parameter);
+  const ebene = faltePunkte(malePunktquellen(quellbild), kern, quellbild.rasterPx, randfenster)!;
   const n = quellbild.rasterPx;
   const m = quellbild.massstabArcsecProPx;
   const ecke = eckeLinksOben({ xArcsec: quellbild.mitteXArcsec, yArcsec: quellbild.mitteYArcsec }, n, n, m);
@@ -156,7 +156,7 @@ const PAARE: Paarfall[] = [
   { fall: "T8c", such: `${R(80, 800, 5)}&z=eps_lyr_2027&s=2&${bed()}`, sterne: ["eps1 A", "eps1 B"], heute: 0, getrennt: false },
   { fall: "T8c", such: `${R(80, 800, 5)}&z=eps_lyr_2027&s=2&${bed()}`, sterne: ["eps2 C", "eps2 D"], heute: 0.002, getrennt: false },
   // T9: Seeing 0,5'' getrennt, 1,5'' oder 15 Grad Hoehe nicht (Farbfleck von B ohne Einsattelung: #146).
-  { fall: "T9a", such: `${R(150, 1200, 6)}&z=antares_2027&s=0.5&${bed()}`, sterne: ["A", "B"], heute: 0.5, getrennt: true },
+  { fall: "T9a", such: `${R(150, 1200, 6)}&z=antares_2027&s=0.5&${bed()}`, sterne: ["A", "B"], heute: 0.497, getrennt: true },
   { fall: "T9b", such: `${R(150, 1200, 6)}&z=antares_2027&s=1.5&${bed()}`, sterne: ["A", "B"], heute: 0, getrennt: false },
   { fall: "T9c", such: `${R(150, 1200, 6)}&z=antares_2027&s=0.5&${bed(5, 15)}`, sterne: ["A", "B"], heute: 0, getrennt: false }
 ];

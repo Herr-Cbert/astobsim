@@ -3,7 +3,7 @@ import type { Helligkeit, Punktquelle, Quellbild } from "../naht/simulationspara
 import { FalterJs } from "./falter";
 import { BildFehler } from "./fehler";
 import { malePunktquellen } from "./male";
-import { ausgeblendetKern, faltePunkte, halokern } from "./punktebene";
+import { ausgeblendetKern, faltePunkte, halokern, RANDFENSTER_ARBEITSRASTER, randfensterFein } from "./punktebene";
 import { neuesRaster, pixelIndex, summe, type Raster } from "./raster";
 import { tonwert } from "./rendere";
 import { deltaKern, kastenKern, kernAusDaten, verschobenerDeltaKern } from "./testkerne";
@@ -36,15 +36,36 @@ function helligkeit(teil: Partial<Helligkeit> = {}): Helligkeit {
 }
 
 describe("faltePunkte", () => {
-  it("randZusatzPx (Issue #145): Standard 0,5 bitgleich; laengeres Fenster laesst mehr Fluegel, Fluss bleibt; ungueltig wirft", () => {
+  it("Randfenster (Issue #145): Standard bitgleich; laengeres Fenster laesst mehr Fluegel, Fluss bleibt; ungueltig wirft", () => {
     const q = quellbild([punkt()]);
     const s = malePunktquellen(q);
     const standard = faltePunkte(s, gaussKern(), N)!;
-    expect(Array.from(faltePunkte(s, gaussKern(), N, 0.5)!.daten)).toEqual(Array.from(standard.daten));
-    const lang = faltePunkte(s, gaussKern(), N, 2)!;
+    expect(Array.from(faltePunkte(s, gaussKern(), N, { anfangProRadius: 2 / 3, endeZusatzPx: 0.5, potenz: 1 })!.daten)).toEqual(Array.from(standard.daten));
+    const lang = faltePunkte(s, gaussKern(), N, { ...RANDFENSTER_ARBEITSRASTER, endeZusatzPx: 2 })!;
     expect(summe(lang)).toBeCloseTo(summe(standard), 5);
     expect(lang.daten).not.toEqual(standard.daten);
-    expect(() => faltePunkte(s, gaussKern(), N, 0)).toThrow(BildFehler);
+    expect(summe(faltePunkte(s, gaussKern(), N, randfensterFein(5))!)).toBeCloseTo(summe(standard), 5);
+    expect(() => faltePunkte(s, gaussKern(), N, { ...RANDFENSTER_ARBEITSRASTER, endeZusatzPx: 0 })).toThrow(BildFehler);
+    expect(() => faltePunkte(s, gaussKern(), N, { ...RANDFENSTER_ARBEITSRASTER, potenz: 0 })).toThrow(BildFehler);
+    expect(() => faltePunkte(s, gaussKern(), N, { ...RANDFENSTER_ARBEITSRASTER, anfangProRadius: 1 })).toThrow(BildFehler);
+  });
+
+  it("randfensterFein (Issue #145, physik.md 31): der angezeigte Halo (k w)^(1/3) laeuft wie cos^2 aus, ohne Kante", () => {
+    const kern = gaussKern();
+    const r = kern.radius;
+    const g = kern.groesse;
+    const f = randfensterFein(5);
+    expect(f).toEqual({ anfangProRadius: 0.75, endeZusatzPx: 2.5, potenz: 3 });
+    const roh = Array.from({ length: r + 1 }, (_, a) => kern.daten[r * g + r + a] as number);
+    const aus = ausgeblendetKern(kern, f);
+    const faktor = (aus[r * g + r] as number) / (roh[0] as number);
+    const rho0 = 0.75 * r;
+    const rhoE = r + 2.5;
+    for (let a = 0; a <= r; a++) {
+      const erwartet = a <= rho0 ? 1 : Math.cos(((Math.PI / 2) * (a - rho0)) / (rhoE - rho0)) ** 2;
+      // Halo relativ zum ungefensterten Kern, unter der Kubikwurzel: cos^2.
+      expect(Math.cbrt((aus[r * g + r + a] as number) / faktor / (roh[a] as number))).toBeCloseTo(erwartet, 5);
+    }
   });
 
   it("ohne Scheibchen keine Punktebene", () => {

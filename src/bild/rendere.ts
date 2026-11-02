@@ -21,7 +21,7 @@ import { pruefeKern, type Falter } from "./falter";
 import { BildFehler, pruefePositivGanz } from "./fehler";
 import { malePunktquellen, type Scheibchen } from "./male";
 import { mittele, skaliere } from "./mittele";
-import { brauchtFaerbung, falteFaerbung, faltePunkte, FENSTER_ENDE_ZUSATZ_PX, halokern } from "./punktebene";
+import { brauchtFaerbung, falteFaerbung, faltePunkte, halokern, RANDFENSTER_ARBEITSRASTER, randfensterFein, type Randfenster } from "./punktebene";
 import type { Quelle } from "./quelle";
 import { pruefeRaster, type Kanaele, type Raster } from "./raster";
 
@@ -117,11 +117,11 @@ function pruefeParameter(p: Simulationsparameter): void {
   }
 }
 
-/** Quellbild, Kern und Ende des Randfensters (faltePunkte) fuer die Punktebene. */
+/** Quellbild, Kern und Randfenster (faltePunkte) fuer die Punktebene. */
 export interface Punktbasis {
   quellbild: Quellbild;
   kern: Kern;
-  randZusatzPx: number;
+  randfenster: Randfenster;
 }
 
 /**
@@ -130,18 +130,18 @@ export interface Punktbasis {
  * (gerundet), gleiche Mitte, also gleiche linke obere Ecke und dieselben Punktquellen; sonst
  * Quellbild und Kern des Arbeitsrasters. Werte der Punktebene bleiben relativ zu Quellweiss (eine
  * Flaechenhelligkeit), unabhaengig vom Massstab. Der Schluessel des Quellbilds bekommt punktPx
- * angehaengt, damit Stufe 1b je Raster gilt. randZusatzPx: das Randfenster (physik.md 24) endet
- * wie am Arbeitsraster ein halbes Arbeitspixel ausserhalb des Kernradius, in Pixeln der Punktebene
- * 0,5 * punktPx / rasterPx.
+ * angehaengt, damit Stufe 1b je Raster gilt. randfenster: am Arbeitsraster RANDFENSTER_ARBEITSRASTER
+ * (physik.md 24), auf dem feineren Raster randfensterFein(punktPx / rasterPx): Ende wie am
+ * Arbeitsraster ein halbes Arbeitspixel ausserhalb des Kernradius, cos^6 (physik.md 31).
  */
 export function punktquellbild(parameter: Simulationsparameter): Punktbasis {
   const { quellbild, punktkern, fenster } = parameter;
-  if (punktkern === undefined) return { quellbild, kern: parameter.kern, randZusatzPx: FENSTER_ENDE_ZUSATZ_PX };
+  if (punktkern === undefined) return { quellbild, kern: parameter.kern, randfenster: RANDFENSTER_ARBEITSRASTER };
   const rasterPx = Math.round(fenster.breiteArcsec / punktkern.massstabArcsecProPx);
   return {
     quellbild: { ...quellbild, schluessel: `${quellbild.schluessel}|punkte ${rasterPx}`, massstabArcsecProPx: fenster.breiteArcsec / rasterPx, rasterPx },
     kern: punktkern,
-    randZusatzPx: (FENSTER_ENDE_ZUSATZ_PX * rasterPx) / quellbild.rasterPx
+    randfenster: randfensterFein(rasterPx / quellbild.rasterPx)
   };
 }
 
@@ -586,9 +586,9 @@ export function rendere(
   let punktebene = zwischen.punktebene;
   if (!punktebene || punktebene.schluessel !== schluesselPunktebene) {
     const punktPx = punktbasis.quellbild.rasterPx;
-    const { kern: punktkern, randZusatzPx } = punktbasis;
-    const raster = faltePunkte(punkte.scheibchen, punktkern, punktPx, randZusatzPx);
-    const faerbung = raster !== undefined && brauchtFaerbung(punkte.scheibchen) ? falteFaerbung(punkte.scheibchen, punktkern, punktPx, randZusatzPx) : undefined;
+    const { kern: punktkern, randfenster } = punktbasis;
+    const raster = faltePunkte(punkte.scheibchen, punktkern, punktPx, randfenster);
+    const faerbung = raster !== undefined && brauchtFaerbung(punkte.scheibchen) ? falteFaerbung(punkte.scheibchen, punktkern, punktPx, randfenster) : undefined;
     punktebene = { schluessel: schluesselPunktebene, raster, faerbung };
     zwischen.punktebene = punktebene;
   }

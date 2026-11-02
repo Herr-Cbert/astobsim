@@ -246,17 +246,17 @@ describe("feinere Punktebene (Issue #145, physik.md Abschnitt 31)", () => {
     return { ...p, quellbild: { ...p.quellbild, punkte: { schluessel: "s", punktquellen: punkte } }, helligkeit: { ...p.helligkeit, faktorObjekt: 0 } };
   }
 
-  it("punktquellbild: Raster 64 px bei 0,25''/px, gleiche Mitte, Randfenster ein halbes Arbeitspixel (2 px)", () => {
+  it("punktquellbild: Raster 64 px bei 0,25''/px, gleiche Mitte, Randfenster fein bis ein halbes Arbeitspixel (2 px)", () => {
     const b = punktquellbild(fein([]));
     expect(b.quellbild).toMatchObject({ rasterPx: 64, massstabArcsecProPx: 0.25, mitteXArcsec: 0, mitteYArcsec: 0 });
     expect(b.quellbild.schluessel).toBe("q|0|0|punkte 64");
     expect(b.kern.massstabArcsecProPx).toBe(0.25);
-    expect(b.randZusatzPx).toBe(2);
+    expect(b.randfenster).toEqual({ anfangProRadius: 0.75, endeZusatzPx: 2, potenz: 3 });
     const p0 = parameter();
     const ohne = punktquellbild(p0);
     expect(ohne.quellbild).toBe(p0.quellbild);
     expect(ohne.kern).toBe(p0.kern);
-    expect(ohne.randZusatzPx).toBe(0.5);
+    expect(ohne.randfenster).toEqual({ anfangProRadius: 2 / 3, endeZusatzPx: 0.5, potenz: 1 });
   });
 
   it("der Stern liegt im Anzeigepixel seiner Lage, der Fluss bleibt erhalten (Delta, linear)", () => {
