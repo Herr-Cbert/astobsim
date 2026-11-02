@@ -1283,3 +1283,34 @@ Mit dreifacher statt fuenffacher Punktebene: T8b $\varepsilon^1$ im Detail 0,104
 **Rechenzeit (gemessen, Node, eine Messung je Fall, 1080 px).** Punktkernbau bis 22 ms (Kern 77 px, FFT 256), nur bei geaendertem Schluessel. Punktebene mit Faerbung: M13 am 300 mm im Zoom (531 Sterne) 26 statt 4 ms, M45 mit blossem Auge im Zoom 10 statt 1 ms, $\varepsilon$ Lyr im Zoom 3 statt 0,4 ms. Das Raster der Punktebene ist nie groesser als die Anzeige, der Speicher also nicht groesser als bei einer Punktebene im Anzeigemassstab.
 
 **Grenzen.** Die Delle bleibt bei Phasenlagen der Sterne zum Raster um einige Hundertstel unsicher (dreifach gegen vierfach gegen fuenffach oben). Die Flaeche bleibt im Arbeitsraster; Sterne vor einer Flaeche (M13, Trabanten vor dem Planeten) werden feiner gezeichnet als die Flaeche darunter, was dem Fernrohr entspricht (die Flaeche ist ohnehin durch das Quellbild oder den Arbeitsmassstab begrenzt).
+
+## 32. Farbkopplung: ungetrennter Begleiter ohne eigene Farbe (Issue #146)
+
+**Problem (gemessen, `docs/validierung.md` 14, T9b und T9c).** Die Faerbung der Punktebene (Abschnitte 14 und 31) mischt flussgewichtet: Farbe am Pixel $c_k/p$, linear und nicht gestaucht, Helligkeit $W = \min(1, (a\,p)^n)$ mit $n = 1/3$. Antares B (59,7-mal schwaecher als A) ist bei 1,5'' Seeing nicht getrennt ($\delta$ = 0), traegt am eigenen Pixel aber 48 % des Flusses (T9c 68 %; vor #145 am Arbeitsraster 24 %) und bildet eine Schulter (bei T9b $W$ an B 0,282 gegen 0,233 am Spiegelpunkt). Hinter dem Ende des Halos von A (beide Kerne enden mit dem Randfenster bei 3 Gesamt-FWHM, Abschnitte 24 und 31) liegt nur noch Licht von B (B-Anteil 0,99 bei zwei Abstaenden von A), und die Kubikwurzel hebt diesen Rand sichtbar an. Im Bild erscheint B so als blaeulich-graue Stelle mit einer blauen Sichel (Farbton am Ort von B gegen den Spiegelpunkt 2 A - B: T9b 36, T9c 50 Kodes; gemessen am Zoom-PNG, Mittel 5 x 5, jede Farbe auf Mittel 128 skaliert). Mit einer Moffat-PSF mit $\beta$ = 4,765 (Abschnitt 3.2) waere der Rand auch ohne Fenster blau, A dominiert dort nicht (gerechnet).
+
+**Beobachtung (`doppelsterne.md` 10).** Beobachter ordnen einem Begleiter die Farbe erst zu, wenn er als eigener Fleck erscheint; einen Farbsaum oder eine farbige Asymmetrie im Halo durch einen ungetrennten Begleiter beschreibt keine gefundene Quelle. Die Farbaufloesung des Auges (11 bis 12 Perioden je Grad, Mullen 1985) liegt bei 200x bei 0,75'' am Himmel, also unter dem Seeing; eine Unschaerfe der Farbe allein begruendet das Verhalten also nicht.
+
+**Modellannahme.** Die Farbe einer Punktquelle wird an die Trennung von ihren Nachbarn gekoppelt. Je Paar $i, j$ sichtbarer Punktquellen, deren Kerne sich ueberlappen (Abstand unter 6 Gesamt-FWHM), die Delle $\delta_{ij}$ wie `doppelsterne.md` 4 im feinen Modell: Kern derselben Gesamt-PSF (Abschnitte 2 und 9, `baueKern`) am Massstab Gesamt-FWHM / 12,5 (wie das feine Modell der Validierung), beide Quellen als Punkte mit dem Fluss $f = h_\mathrm{rel}\,d^2$, Profil $f_i K(x) + f_j K(x - \rho)$ entlang der Verbindungslinie von 0,3 Abstaenden vor $i$ bis 0,3 hinter $j$, $K$ das Radialprofil des Kerns. Dann
+
+$$\sigma_{ij} = \min\left(1, \frac{\delta_{ij}}{\delta_\mathrm{s}}\right), \qquad \mathbf{c}'_i = \frac{f_i\,\mathbf{c}_i + \sum_j (1 - \sigma_{ij})\,f_j\,\mathbf{c}_j}{f_i + \sum_j (1 - \sigma_{ij})\,f_j},$$
+
+$\delta_\mathrm{s}$ = 0,125 (`SCHWELLE_ERKENNBAR`, dieselbe Schwelle wie fuer "getrennt"), $\mathbf{c}$ die Farbe in linearem sRGB mit $Y$ = 1 (fehlt sie, grau 1, 1, 1); das Mittel hat wieder $Y$ = 1, die Helligkeit bleibt also unveraendert. Getrennte Paare ($\sigma$ = 1) behalten ihre Farben; ungetrennte ($\sigma$ = 0) bekommen beide das flussgewichtete Mittel, also die Farbe ihres gemeinsamen Lichts; dazwischen linear. Paare gleicher Farbe zaehlen nicht. physik rechnet das in `auswerten` (`farbkopplung.ts`) und setzt `Punktquelle.farbeAnzeige` auf $\mathbf{c}'$ (`farbe` bleibt die eigene Farbe); bild malt mit `farbeAnzeige`, wo sie gesetzt ist, die Faltung und die Falter bleiben unveraendert. Das Vergleichsbild (unverschlechtert, A-D3) zeigt die eigenen Farben (`ui/zoom.ts` laesst `farbeAnzeige` weg). Die Delle haengt nicht vom Fenster ab, ein Paar hat in Uebersicht, Zoom und Detail dieselbe Farbe.
+
+**Ergebnis (gerechnet, Node; Delle im feinen Modell, `src/validierung_v2.test.ts`).**
+
+| Fall | Paar | $\delta$ | $\sigma$ | Farbton an B gegen Spiegelpunkt (Zoom-PNG) vorher / nachher |
+|---|---|---|---|---|
+| T9a Antares 0,5'' | A-B | 0,523 | 1 | 63 / 63 (bytegleich) |
+| T9b Antares 1,5'' | A-B | 0 | 0 | 36 / 0 |
+| T9c Antares 15 Grad | A-B | 0 | 0 | 50 / 0 |
+| T7a $\pi$ Aql 80 mm | A-B | 0 | 0 | 25 / 1 (einfarbig) |
+| T7b $\pi$ Aql 150 mm | A-B | 0,479 | 1 | bytegleich |
+| T7c, T7d $\varepsilon$ Ari | A-B | 0 / 0,325 | 0 / 1 | 80 mm hoechstens 1 Kode, 150 mm bytegleich |
+| T8b $\varepsilon$ Lyr 80 mm 0,5'' | $\varepsilon^1$, $\varepsilon^2$ | 0,135 / 0,619 | 1 / 1 | bytegleich (Zoom und Detail) |
+| T8a, T8c $\varepsilon$ Lyr | $\varepsilon^1$, $\varepsilon^2$ | 0 bis 0,019 | 0 bis 0,15 | hoechstens 3 Kodes |
+
+Die Delle des feinen Modells trifft die Tabelle in `doppelsterne.md` 4 auf 0,02 (Unit-Test `farbkopplung.test.ts`). $\varepsilon^1$ Lyr liegt mit 0,135 nur 8 % ueber der Schwelle und bleibt farbig.
+
+**Rechenzeit (gemessen, Node).** Die Pruefung, ob ein Paar verschiedener Farbe sich ueberlappt, laeuft bei jedem `auswerten` nur von den farbigen Quellen aus (M13: alle grau, keine Aenderung messbar). Der Kern des feinen Modells (`Simulationsparameter.farbkern`, 77 px) kostet beim ersten Aufruf etwa 22 ms und wird ueber `vorher` wiederverwendet; Antares mit `vorher` 0,023 statt 0,010 ms je Aufruf.
+
+**Grenzen.** Die Kopplung ist paarweise; in einem dichten Feld mischt ein Stern mit jedem ungetrennten Nachbarn, nicht transitiv. Die Helligkeitsschulter eines ungetrennten Begleiters bleibt (sie ist Physik des Langzeitbilds). Die Schwelle 0,125 ist eine Annahme (`doppelsterne.md` 7 Punkt 2). Die atmosphaerische Dispersion bei tiefem Stand (T9c), die den Hauptstern selbst farbig saeumt, ist nicht modelliert: Issue [#151](https://github.com/herr-cbert/astobsim/issues/151) (Spaeter).

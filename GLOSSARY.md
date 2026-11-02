@@ -103,7 +103,7 @@ _Vermeiden_: Hintergrundstern
 Eigenschaft eines Zustands, dessen Winkelgroesse mal Vergroesserung unter der Aufloesung des Auges liegt (z. B. Jupiter mit blossem Auge). Er wird mit gleitendem Uebergang als Punktquelle statt als Flaeche dargestellt.
 
 **Punktebene**:
-Eigene Ebene im Arbeitsraster, in die bild die Punktquellen malt und lokal mit dem Kern faltet, getrennt vom Objektraster (Issue #72). Ihre Pixel werden je Pixel mit `Helligkeit.punktFaktor` und `punktExponent` auf die Anzeigehelligkeit abgebildet (physik.md Abschnitt 14), bezogen auf das Punktweiss. Farbe und Deckkraft der Sterne traegt eine dreikanalige Faerbung neben der einkanaligen Punktebene (`docs/architektur.md` 5.3).
+Eigene Ebene im Arbeitsraster, in die bild die Punktquellen malt und lokal mit dem Kern faltet, getrennt vom Objektraster (Issue #72). Ihre Pixel werden je Pixel mit `Helligkeit.punktFaktor` und `punktExponent` auf die Anzeigehelligkeit abgebildet (physik.md Abschnitt 14), bezogen auf das Punktweiss. Farbe und Deckkraft der Sterne traegt eine dreikanalige Faerbung neben der einkanaligen Punktebene (`docs/architektur.md` 5.3). Die Faerbung nimmt die **Anzeigefarbe** (`Punktquelle.farbeAnzeige`) nach der **Farbkopplung** (Issue #146, physik.md Abschnitt 32): ein Stern, der von einem Nachbarn anderer Farbe nicht getrennt ist (Delle im feinen Modell unter 0,125), bekommt anteilig die flussgewichtete Mischfarbe beider; das Vergleichsbild zeigt die eigene Farbe (`farbe`).
 
 **Winkelgroesse**:
 Scheinbarer Durchmesser eines Objekts oder Zustands in Bogensekunden, bei Planeten aequatorial.
