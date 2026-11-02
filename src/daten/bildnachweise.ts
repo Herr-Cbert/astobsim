@@ -86,11 +86,14 @@ const FELDER_EINTRAG = [
   "kacheln", "kennlinie"
 ] as const;
 const FELDER_KENNLINIE = ["art", "mag_hell", "mag_dunkel"] as const;
-/** Grenzen der Flaechenhelligkeit in der Kennlinie, mag/arcsec^2. */
-const MAG_KENNLINIE_MIN = -5;
-const MAG_KENNLINIE_MAX = 35;
-/** Groesste Winkelgroesse eines Bilds: M31 rund 11400'' (deep-sky.md 1.1), 5 Grad Gesichtsfeld des Auges. */
-const WINKELGROESSE_MAX_ARCSEC = 18000;
+/** Grenzen der Flaechenhelligkeit in der Kennlinie und der Flaechentabelle (objekte.ts), mag/arcsec^2. */
+export const MAG_KENNLINIE_MIN = -5;
+export const MAG_KENNLINIE_MAX = 35;
+/**
+ * Groesste Winkelgroesse eines Bilds und eines Deep-Sky-Objekts (objekte.ts): M31 rund 11400''
+ * (deep-sky.md 1.1), 5 Grad Gesichtsfeld des Auges.
+ */
+export const WINKELGROESSE_BILD_MAX_ARCSEC = 18000;
 const FELDER_KACHELN = ["kachel_px", "format", "qualitaet", "muster", "gesamt_bytes", "stufen"] as const;
 const FELDER_STUFE = ["stufe", "breite_px", "hoehe_px", "bogensekunden_pro_pixel", "kacheln_x", "kacheln_y"] as const;
 
@@ -147,7 +150,7 @@ function pruefeEintrag(obj: Record<string, unknown>, id: string, ort: Ort): Bild
     pixelBreite: ganzzahl(obj, "pixel_breite", ort, 1, 100000),
     pixelHoehe: ganzzahl(obj, "pixel_hoehe", ort, 1, 100000),
     originalPixel: text(obj, "original_pixel", ort),
-    winkelgroesseArcsec: zahl(obj, "winkelgroesse_arcsec", ort, 0.1, WINKELGROESSE_MAX_ARCSEC),
+    winkelgroesseArcsec: zahl(obj, "winkelgroesse_arcsec", ort, 0.1, WINKELGROESSE_BILD_MAX_ARCSEC),
     objektDurchmesserPx: ganzzahl(obj, "objekt_durchmesser_px", ort, 1, 100000),
     bogensekundenProPixel: zahl(obj, "bogensekunden_pro_pixel", ort, 0.001, 100),
     nordenOben: wahrheitswert(obj, "norden_oben", ort),

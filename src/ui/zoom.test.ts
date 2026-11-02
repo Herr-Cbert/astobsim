@@ -12,13 +12,12 @@ import { TEXTE } from "../texte";
 import { type Kataloge, voreinstellung } from "../zustand";
 import { linearZuSrgb8 } from "./zeichne";
 import { quellbildHilfe } from "./zoomansicht";
-import { arbeitsmassstabOhneFenster } from "../physik";
+import { arbeitsmassstabOhneFenster, KERN_RADIUS_PRO_FWHM } from "../physik";
 import {
   DETAIL_ARBEITSPIXEL,
   detailbreiteArcsec,
   detailstart,
   objektausdehnungArcsec,
-  STERN_RAND_PRO_FWHM,
   bodenRelativ,
   VERGLEICH_DEEP_SKY,
   vergleichsparameter,
@@ -208,8 +207,8 @@ describe("Zoom ohne Quellbild (Doppelsterne, M45, Issue #109)", () => {
     const albireo = mit("albireo_2025");
     expect(albireo.objekt.quelle).toBeUndefined();
     const fwhm = aufloesung(optik(albireo.geraet), atmosphaere(albireo.bedingungen)).gesamtFwhmArcsec;
-    const ausdehnung = albireo.objekt.durchmesserArcsec + 2 * STERN_RAND_PRO_FWHM * fwhm;
-    expect(STERN_RAND_PRO_FWHM).toBe(3);
+    const ausdehnung = albireo.objekt.durchmesserArcsec + 2 * KERN_RADIUS_PRO_FWHM * fwhm;
+    expect(KERN_RADIUS_PRO_FWHM).toBe(3);
     expect(objektausdehnungArcsec(albireo)).toBeCloseTo(ausdehnung, 9);
     expect(zoombreiteArcsec(albireo)).toBeCloseTo(ausdehnung * (1 + 2 * ZOOM_RAND), 9);
     // Albireo am 80/600 bei 60x: Gesamt-FWHM rund 2,7'', also knapp 12'' Rand je Seite statt 1,7''.

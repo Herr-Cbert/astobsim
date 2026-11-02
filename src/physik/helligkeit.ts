@@ -145,7 +145,8 @@ export function helligkeitUndIsophote(
     isophote = sichtbareIsophote(zustand.isophoten, optik, atmosphaere, bortleMagProArcsec2(bortle));
     const faktor = leuchtdichteRelativ(ok.objektMagProArcsec2);
     const himmel = leuchtdichteRelativ(ok.hintergrundMagProArcsec2);
-    const schwelleRelativ = Math.pow(10, -0.4 * (isophote.schwelleMagProArcsec2 - zustand.quelle.weissMagProArcsec2));
+    const weiss = zustand.quelle.weissMagProArcsec2;
+    const schwelleRelativ = leuchtdichteRelativ(isophote.schwelleMagProArcsec2, weiss);
     const ds: NonNullable<Helligkeit["deepSky"]> = {
       faktor,
       himmel,
@@ -158,10 +159,9 @@ export function helligkeitUndIsophote(
     // Begleiter (Issue #136, ADR-0004 Nachtrag): eigene sichtbare Isophote aus der eigenen
     // Flaechentabelle, q* relativ zum Quellweiss des Hauptobjekts, Sockel wie beim Hauptobjekt.
     if (zustand.begleiter !== undefined && zustand.begleiter.length > 0) {
-      const weiss = zustand.quelle.weissMagProArcsec2;
       ds.begleiter = zustand.begleiter.map((b) => {
         const iso = sichtbareIsophote(b.isophoten, optik, atmosphaere, bortleMagProArcsec2(bortle));
-        const q = Math.pow(10, -0.4 * (iso.schwelleMagProArcsec2 - weiss));
+        const q = leuchtdichteRelativ(iso.schwelleMagProArcsec2, weiss);
         return { schwelleRelativ: q, sockel: sockel(faktor, himmel, q, SOCKEL_DELTA_KODES, punktExponent) };
       });
       for (const b of ds.begleiter) felder.push("begleiter", b.schwelleRelativ, b.sockel);

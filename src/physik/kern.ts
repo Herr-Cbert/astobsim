@@ -258,7 +258,19 @@ export function profilDelle(kern: Kern, stufen: readonly Profilstufe[], grund: n
     }
     werte[k] = summe;
   }
+  return delleImProfil(werte, (k) => {
+    const x = von + k * schritt;
+    return x >= sucheVonArcsec && x <= sucheBisArcsec;
+  });
+}
 
+/**
+ * Tiefste relative Delle eines abgetasteten Profils (physik.md 8.1): an jedem lokalen Minimum k
+ * (zulassen(k), Standard alle) 1 - werte[k] / min(hoechstes Maximum links, hoechstes Maximum rechts),
+ * 0 ohne Delle. Gemeinsam fuer profilDelle und paarDelle (farbkopplung.ts).
+ */
+export function delleImProfil(werte: Float64Array, zulassen: (k: number) => boolean = () => true): number {
+  const anzahl = werte.length;
   // Hoechstes Maximum links und rechts jeder Stelle, damit die Delle in einem Durchlauf entsteht.
   const linksMax = new Float64Array(anzahl);
   const rechtsMax = new Float64Array(anzahl);
@@ -266,8 +278,7 @@ export function profilDelle(kern: Kern, stufen: readonly Profilstufe[], grund: n
   for (let k = anzahl - 2; k >= 0; k--) rechtsMax[k] = Math.max(rechtsMax[k + 1]!, werte[k + 1]!);
   let delle = 0;
   for (let k = 1; k < anzahl - 1; k++) {
-    const x = von + k * schritt;
-    if (x < sucheVonArcsec || x > sucheBisArcsec) continue;
+    if (!zulassen(k)) continue;
     if (werte[k]! > werte[k - 1]! || werte[k]! > werte[k + 1]!) continue;
     const nachbar = Math.min(linksMax[k]!, rechtsMax[k]!);
     if (nachbar > 0) delle = Math.max(delle, 1 - werte[k]! / nachbar);
