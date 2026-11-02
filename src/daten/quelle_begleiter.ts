@@ -15,7 +15,7 @@ import { begleiterMassstab } from "./objektzustand";
 import { QuelleEinzelbild } from "./quelle_einzelbild";
 
 /** Quelle, deren Bild um (dx, dy) Bogensekunden gegen die Objektmitte versetzt liegt. */
-export class QuelleVersetzt implements Quelle {
+class QuelleVersetzt implements Quelle {
   constructor(
     private readonly innen: Quelle,
     readonly dxArcsec: number,

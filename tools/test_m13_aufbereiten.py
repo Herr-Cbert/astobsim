@@ -9,14 +9,12 @@ echten Rohdaten (Zaehlung, Gleichheit mit daten/sterne/m13.json) laufen nur, wen
 enthaelt (gitignored).
 """
 
-import io
 import json
 import math
 import os
 import unittest
 
 import numpy as np
-from PIL import Image
 
 import deep_sky_aufbereiten as ds
 import m13_aufbereiten as m

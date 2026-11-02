@@ -185,7 +185,6 @@ export function baueFormularObjekt(platz: HTMLElement, steuerung: Steuerung): vo
   // Eingaben des freien Paars (A-Z9), sichtbar nur, wenn es gewaehlt ist.
   const paar = d.createElement("fieldset");
   paar.className = "objekt-paar";
-  paar.id = "objekt-paar";
   const legende = d.createElement("legend");
   legende.textContent = T.paar.ueberschrift;
   paar.append(legende);

@@ -8,7 +8,7 @@
 // importieren nur von hier; bild importiert physik nicht (docs/architektur.md Abschnitt 4).
 
 export * from "../naht/konfiguration";
-export { PhysikFehler, quelleVon } from "./fehler";
+export { PhysikFehler } from "./fehler";
 export { besselJ1 } from "./bessel";
 export {
   airyAmplitude,

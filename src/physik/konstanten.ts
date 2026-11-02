@@ -230,7 +230,7 @@ export const SCHWELLE_ERKENNBAR = 0.125;
 export const BELEUCHTUNG_NULL_MAG_LX = 2.54e-6;
 
 /** Grenze des Farbsehens mit blossem Auge: Sterne ab etwa 2,3 mag sind farbig (wahrnehmung.md 5.1, [13]). */
-export const FARBGRENZE_AUGE_MAG = 2.3;
+const FARBGRENZE_AUGE_MAG = 2.3;
 
 /**
  * Schwelle des Farbsehens als Beleuchtungsstaerke am Auge: Z 10^(-0,4 2,3) = 3,05e-7 lx, in der
