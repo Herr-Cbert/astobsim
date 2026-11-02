@@ -12,6 +12,7 @@
 // gewichtet. farbe bleibt die eigene Farbe, das Vergleichsbild (ui/zoom.ts) zeigt sie.
 
 import type { Kern, Punktquelle } from "../naht/simulationsparameter";
+import { delleImProfil } from "./kern";
 import { KERN_RADIUS_PRO_FWHM, SCHWELLE_ERKENNBAR } from "./konstanten";
 
 /** Ein Paar sichtbarer Punktquellen mit sich ueberlappenden Kernen: Indizes in punkte, Delle, Kopplung. */
@@ -91,17 +92,7 @@ export function paarDelle(kern: Kern, abstandArcsec: number, fa: number, fb: num
     const x = (-0.3 + (1.6 * t) / anzahl) * abstandArcsec;
     werte[t] = fa * k(x) + fb * k(x - abstandArcsec);
   }
-  const linksMax = new Float64Array(anzahl + 1);
-  const rechtsMax = new Float64Array(anzahl + 1);
-  for (let t = 1; t <= anzahl; t++) linksMax[t] = Math.max(linksMax[t - 1]!, werte[t - 1]!);
-  for (let t = anzahl - 1; t >= 0; t--) rechtsMax[t] = Math.max(rechtsMax[t + 1]!, werte[t + 1]!);
-  let delle = 0;
-  for (let t = 1; t < anzahl; t++) {
-    if (werte[t]! > werte[t - 1]! || werte[t]! > werte[t + 1]!) continue;
-    const nachbar = Math.min(linksMax[t]!, rechtsMax[t]!);
-    if (nachbar > 0) delle = Math.max(delle, 1 - werte[t]! / nachbar);
-  }
-  return delle;
+  return delleImProfil(werte);
 }
 
 /**

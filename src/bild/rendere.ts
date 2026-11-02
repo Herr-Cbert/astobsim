@@ -66,6 +66,11 @@ function ungefaehrGleich(a: number, b: number): boolean {
   return Math.abs(a - b) <= TOLERANZ * Math.max(1, Math.abs(a), Math.abs(b));
 }
 
+/** Pixel der Punktebene je Achse zum Punktkern: fenster.breiteArcsec / punktkern.massstabArcsecProPx, gerundet. */
+function punktPxZu(fenster: Fenster, punktkern: Kern): number {
+  return Math.round(fenster.breiteArcsec / punktkern.massstabArcsecProPx);
+}
+
 /** Wirft BildFehler bei Parametern, die den Invarianten der Naht widersprechen. */
 function pruefeParameter(p: Simulationsparameter): void {
   const { quellbild, kern, helligkeit, fenster } = p;
@@ -84,7 +89,7 @@ function pruefeParameter(p: Simulationsparameter): void {
   }
   if (p.punktkern !== undefined) {
     pruefeKern(p.punktkern);
-    const punktPx = Math.round(fenster.breiteArcsec / p.punktkern.massstabArcsecProPx);
+    const punktPx = punktPxZu(fenster, p.punktkern);
     if (!(punktPx > quellbild.rasterPx) || !ungefaehrGleich(punktPx * p.punktkern.massstabArcsecProPx, fenster.breiteArcsec)) {
       throw new BildFehler(`Punktkern: Massstab ${p.punktkern.massstabArcsecProPx} muss fenster.breiteArcsec / punktPx mit ganzzahligem punktPx > rasterPx sein`);
     }
@@ -137,7 +142,7 @@ export interface Punktbasis {
 export function punktquellbild(parameter: Simulationsparameter): Punktbasis {
   const { quellbild, punktkern, fenster } = parameter;
   if (punktkern === undefined) return { quellbild, kern: parameter.kern, randfenster: RANDFENSTER_ARBEITSRASTER };
-  const rasterPx = Math.round(fenster.breiteArcsec / punktkern.massstabArcsecProPx);
+  const rasterPx = punktPxZu(fenster, punktkern);
   return {
     quellbild: { ...quellbild, schluessel: `${quellbild.schluessel}|punkte ${rasterPx}`, massstabArcsecProPx: fenster.breiteArcsec / rasterPx, rasterPx },
     kern: punktkern,
@@ -231,7 +236,7 @@ export function tonwert(raster: Raster | undefined, punktebene: Raster | undefin
     for (let i = 0; i < p.length; i++) {
       const wert = p[i] as number;
       if (!(wert > 0)) continue;
-      const w = Math.min(1, Math.pow(a * wert, n));
+      const w = punktwert(a, wert, n);
       for (let c = i * k; c < (i + 1) * k; c++) ergebnis[c] = (ergebnis[c] as number) + w;
     }
     return ergebnisRaster;
@@ -240,10 +245,15 @@ export function tonwert(raster: Raster | undefined, punktebene: Raster | undefin
   for (let i = 0; i < p.length; i++) {
     const wert = p[i] as number;
     if (!(wert > 0)) continue;
-    const w = Math.min(1, Math.pow(a * wert, n));
+    const w = punktwert(a, wert, n);
     for (let c = 3 * i; c < 3 * i + 3; c++) ergebnis[c] = (ergebnis[c] as number) + ((fd[c] as number) / wert) * w;
   }
   return ergebnisRaster;
+}
+
+/** Punktwert W = min(1, (aP * p)^n) eines Pixels der Punktebene mit p > 0 (tonwert, punktanteil). */
+function punktwert(a: number, wert: number, n: number): number {
+  return Math.min(1, Math.pow(a * wert, n));
 }
 
 /**
@@ -265,7 +275,7 @@ export function punktanteil(punktebene: Raster, helligkeit: Helligkeit, faerbung
     const daten = new Float32Array(p.length);
     for (let i = 0; i < p.length; i++) {
       const wert = p[i] as number;
-      if (wert > 0) daten[i] = Math.min(1, Math.pow(a * wert, n));
+      if (wert > 0) daten[i] = punktwert(a, wert, n);
     }
     return { breite, hoehe, kanaele: 1, daten };
   }
@@ -274,7 +284,7 @@ export function punktanteil(punktebene: Raster, helligkeit: Helligkeit, faerbung
   for (let i = 0; i < p.length; i++) {
     const wert = p[i] as number;
     if (!(wert > 0)) continue;
-    const w = Math.min(1, Math.pow(a * wert, n));
+    const w = punktwert(a, wert, n);
     for (let c = 3 * i; c < 3 * i + 3; c++) daten[c] = ((fd[c] as number) / wert) * w;
   }
   return { breite, hoehe, kanaele: 3, daten };
@@ -390,7 +400,7 @@ function flaechenanteilMitBegleitern(
   const d = raster?.daten;
   const leer = deepSkyWert(0, h, n, ds);
   const ergebnis = new Float32Array(anzahl);
-  const z = (x: number): number => Math.min(1, Math.pow(Math.max(0, ds.faktor * x + ds.himmel), n));
+  const z = (x: number): number => deepSkyZ(x, n, ds);
   for (let i = 0; i < anzahl; i++) {
     const q = d !== undefined ? (d[i] as number) : 0;
     let wert = q === 0 ? leer : deepSkyWert(q, h, n, ds);
@@ -464,7 +474,12 @@ function mischWert(q: number, qh: number, f: number, h: number, g: number, a: nu
 /** Fall Deep-Sky: h + P * (min(1, (a q + s)^n) - h + Sockel) mit P = Phi((q / q* - 1) / Breite). */
 function deepSkyWert(q: number, h: number, n: number, ds: NonNullable<Helligkeit["deepSky"]>): number {
   const deckkraft = phi((q / ds.schwelleRelativ - 1) / ds.breite);
-  return h + deckkraft * (Math.min(1, Math.pow(Math.max(0, ds.faktor * q + ds.himmel), n)) - h + ds.sockel);
+  return h + deckkraft * (deepSkyZ(q, n, ds) - h + ds.sockel);
+}
+
+/** Z(x) = min(1, max(0, faktor x + himmel)^n) der Deep-Sky-Abbildung (deepSkyWert, Begleiter). */
+function deepSkyZ(x: number, n: number, ds: NonNullable<Helligkeit["deepSky"]>): number {
+  return Math.min(1, Math.pow(Math.max(0, ds.faktor * x + ds.himmel), n));
 }
 
 /** Einkanalige Werte auf drei gleiche Kanaele. */
@@ -530,6 +545,17 @@ function maskiereAn(raster: Raster, gesichtsfeld: Gesichtsfeld, fenster: Fenster
 }
 
 /**
+ * Stufe 1: Ausschnitt der Quelle um die Mitte des Quellbilds holen und auf das Arbeitsraster
+ * mitteln; raster undefined, wenn der Ausschnitt ganz schwarz ist. kanaele: die des Ausschnitts.
+ */
+function gemittelterAusschnitt(quelle: Quelle, quellbild: Quellbild, name: string): { raster: Raster | undefined; kanaele: Kanaele } {
+  const mitte = { xArcsec: quellbild.mitteXArcsec, yArcsec: quellbild.mitteYArcsec };
+  const ausschnitt = quelle.ausschnitt(mitte, quellbild.rasterPx * quellbild.massstabArcsecProPx, quellbild.massstabArcsecProPx);
+  pruefeRaster(ausschnitt.raster, name);
+  return { raster: istSchwarz(ausschnitt.raster) ? undefined : mittele(ausschnitt, quellbild), kanaele: ausschnitt.raster.kanaele };
+}
+
+/**
  * Fuehrt die Pipeline aus. Stufe 1 (Ausschnitt holen, mitteln) wird unter quellbild.schluessel
  * behalten; ist der Ausschnitt ganz schwarz (Zustand ohne Quellbild, QuelleLeer, oder Fenster ganz
  * neben dem Bild), gibt es kein Objektraster, weder mittele noch falte laufen, tonwert rechnet mit
@@ -561,11 +587,8 @@ export function rendere(
 
   let objekt = zwischen.objekt;
   if (!objekt || objekt.schluessel !== quellbild.schluessel) {
-    const mitte = { xArcsec: quellbild.mitteXArcsec, yArcsec: quellbild.mitteYArcsec };
-    const ausschnitt = quelle.ausschnitt(mitte, quellbild.rasterPx * quellbild.massstabArcsecProPx, quellbild.massstabArcsecProPx);
-    pruefeRaster(ausschnitt.raster, "Quellausschnitt");
-    const raster = istSchwarz(ausschnitt.raster) ? undefined : mittele(ausschnitt, quellbild);
-    objekt = { schluessel: quellbild.schluessel, raster, kanaele: ausschnitt.raster.kanaele };
+    const { raster, kanaele } = gemittelterAusschnitt(quelle, quellbild, "Quellausschnitt");
+    objekt = { schluessel: quellbild.schluessel, raster, kanaele };
     zwischen.objekt = objekt;
   }
 
@@ -617,10 +640,7 @@ export function rendere(
       const schluesselGemittelt = `${objekt.schluessel}|begleiter ${k}`;
       let stufe1 = gemittelt[k];
       if (!stufe1 || stufe1.schluessel !== schluesselGemittelt) {
-        const mitte = { xArcsec: quellbild.mitteXArcsec, yArcsec: quellbild.mitteYArcsec };
-        const ausschnitt = b.ausschnitt(mitte, quellbild.rasterPx * quellbild.massstabArcsecProPx, quellbild.massstabArcsecProPx);
-        pruefeRaster(ausschnitt.raster, "Begleiterausschnitt");
-        stufe1 = { schluessel: schluesselGemittelt, raster: istSchwarz(ausschnitt.raster) ? undefined : mittele(ausschnitt, quellbild) };
+        stufe1 = { schluessel: schluesselGemittelt, raster: gemittelterAusschnitt(b, quellbild, "Begleiterausschnitt").raster };
         gemittelt[k] = stufe1;
       }
       const schluessel = `${kern.schluessel}|${schluesselGemittelt}`;

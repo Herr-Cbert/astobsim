@@ -14,7 +14,7 @@
 // Obstruktion, Vergroesserung, Zoom und Quelle schon, wenn sie den gerundeten Schluessel aendern.
 
 import type { Konfiguration, Objektklasse, Objektzustand } from "../naht/konfiguration";
-import type { Fenster, Kern, Punktquelle, Quellbild, Simulationsparameter } from "../naht/simulationsparameter";
+import type { Fenster, Kern, Kernbeschreibung, Punktquelle, Quellbild, Simulationsparameter } from "../naht/simulationsparameter";
 import { arbeitsmassstab, kernbeschreibung, kernSchluessel } from "./arbeitsmassstab";
 import { type Atmosphaere, atmosphaere, seeingstufe } from "./atmosphaere";
 import { type Aufloesung, aufloesung } from "./aufloesung";
@@ -162,6 +162,15 @@ function punkteFelder(p: Punktquelle): (number | string)[] {
 }
 
 /**
+ * Kern zur Beschreibung: vorher bei gleichem Schluessel, sonst baueKern. Mit massstabArcsecProPx
+ * traegt er diesen genauen Massstab statt des gerundeten der Beschreibung (siehe auswerten).
+ */
+function kernZu(beschreibung: Kernbeschreibung, vorher: Kern | undefined, massstabArcsecProPx?: number): Kern {
+  const gebaut = vorher !== undefined && vorher.schluessel === kernSchluessel(beschreibung) ? vorher : baueKern(beschreibung);
+  return massstabArcsecProPx === undefined || gebaut.massstabArcsecProPx === massstabArcsecProPx ? gebaut : { ...gebaut, massstabArcsecProPx };
+}
+
+/**
  * Hoechstens so viele Pixel der Punktebene je Arbeitspixel und Achse (Issue #145, physik.md
  * Abschnitt 31). Implementierungsparameter, keine Modellkonstante: mit 5 hat die Punktebene bei
  * einer Gesamt-FWHM von 2,5 Arbeitspixeln 12,5 Pixel je FWHM, so fein wie das feine Modell der
@@ -179,9 +188,7 @@ function punktkernFuer(o: Optik, a: Atmosphaere, aufl: Aufloesung, fenster: Fens
   const punktPx = Math.min(fenster.px, PUNKT_UEBERABTASTUNG_MAX * rasterPx);
   if (punktPx <= rasterPx) return undefined;
   const massstabArcsecProPx = fenster.breiteArcsec / punktPx;
-  const beschreibung = kernbeschreibung(o, a, aufl, massstabArcsecProPx);
-  const gebaut = vorher !== undefined && vorher.schluessel === kernSchluessel(beschreibung) ? vorher : baueKern(beschreibung);
-  return gebaut.massstabArcsecProPx === massstabArcsecProPx ? gebaut : { ...gebaut, massstabArcsecProPx };
+  return kernZu(kernbeschreibung(o, a, aufl, massstabArcsecProPx), vorher, massstabArcsecProPx);
 }
 
 /**
@@ -193,8 +200,7 @@ function punktkernFuer(o: Optik, a: Atmosphaere, aufl: Aufloesung, fenster: Fens
  */
 function farbkernFuer(o: Optik, a: Atmosphaere, aufl: Aufloesung, punkte: readonly Punktquelle[], vorher: Kern | undefined): Kern | undefined {
   if (!farbkopplungNoetig(punkte, farbreichweiteArcsec(aufl.gesamtFwhmArcsec))) return undefined;
-  const beschreibung = kernbeschreibung(o, a, aufl, aufl.gesamtFwhmArcsec / (ARBEITSPIXEL_PRO_FWHM * PUNKT_UEBERABTASTUNG_MAX));
-  return vorher !== undefined && vorher.schluessel === kernSchluessel(beschreibung) ? vorher : baueKern(beschreibung);
+  return kernZu(kernbeschreibung(o, a, aufl, aufl.gesamtFwhmArcsec / (ARBEITSPIXEL_PRO_FWHM * PUNKT_UEBERABTASTUNG_MAX)), vorher);
 }
 
 /**
@@ -224,10 +230,7 @@ export function auswerten(k: Konfiguration, optionen: Auswertoptionen = {}): Aus
   if (quelle !== undefined) pruefePositiv("objekt.quelle.massstabArcsecProPx", quelle.massstabArcsecProPx);
 
   const { rasterPx, massstabArcsecProPx } = arbeitsraster(fenster, arbeitsmassstab(aufl, quelle, fenster));
-  const beschreibung = kernbeschreibung(o, a, aufl, massstabArcsecProPx);
-  const vorherKern = optionen.vorher?.kern;
-  const gebaut: Kern = vorherKern !== undefined && vorherKern.schluessel === kernSchluessel(beschreibung) ? vorherKern : baueKern(beschreibung);
-  const kern = gebaut.massstabArcsecProPx === massstabArcsecProPx ? gebaut : { ...gebaut, massstabArcsecProPx };
+  const kern = kernZu(kernbeschreibung(o, a, aufl, massstabArcsecProPx), optionen.vorher?.kern, massstabArcsecProPx);
 
   // Grenzgroesse am Okular (A-P11) mit dem Seeing am Objekt, wie im Kern: dieselbe FWHM, die das
   // Sternbild verbreitert, setzt die Seeing-Scheibe der Schwelle (ADR-0004, Nachtrag Issue #100).

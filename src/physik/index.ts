@@ -59,6 +59,8 @@ export { baueKern, kernFwhmArcsec, kontrastUebertragung, type Profilstufe, profi
 export { type Anzeigewerte, type Auswertoptionen, type Auswertung, type Warnung, auswerten } from "./auswerten";
 export { freiesPaar, gesamthelligkeit, ueberstrahlung } from "./doppelstern";
 export { mischgewicht, sockel } from "./mischung";
+// Rand um Sterne im Zoom (ui/zoom.ts, Issue #113): Kernradius in Gesamt-FWHM.
+export { KERN_RADIUS_PRO_FWHM } from "./konstanten";
 export { beleuchtungAmAugeLx, bvZuTemperatur, sternfarbe, temperaturZuRgb } from "./sternfarbe";
 export {
   type Beobachter,

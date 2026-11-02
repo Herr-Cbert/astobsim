@@ -60,7 +60,7 @@ export function sterndatenImFuss(): NachweisImFuss[] {
   const T = TEXTE.fuss;
   return T.sterndaten.quellen.map((q, i) => {
     const zeilen: Nachweiszeile[] = [{ beschriftung: T.verwendet, text: q.verwendet }];
-    zeilen.push(q.lizenzUrl === undefined ? { beschriftung: T.lizenz, text: q.lizenz } : { beschriftung: T.lizenz, text: q.lizenz, href: q.lizenzUrl });
+    zeilen.push({ beschriftung: T.lizenz, text: q.lizenz, href: q.lizenzUrl });
     if (q.danksagung !== undefined) zeilen.push({ beschriftung: T.danksagung, text: q.danksagung });
     zeilen.push({ beschriftung: T.quelle, text: q.url, href: q.url });
     return { id: `sterndaten-${i}`, titel: q.titel, zeilen };
@@ -77,7 +77,7 @@ function link(d: Document, text: string, href: string): HTMLAnchorElement {
 }
 
 /** Aufklappbarer Block mit einer Ueberschrift je Eintrag und den Zeilen als Definitionsliste. */
-function aufklappbar(d: Document, kopfText: string, klasse: string, klasseEintrag: string, eintraege: readonly NachweisImFuss[]): HTMLDetailsElement {
+function aufklappbar(d: Document, kopfText: string, klasse: string, eintraege: readonly NachweisImFuss[]): HTMLDetailsElement {
   const details = d.createElement("details");
   details.className = klasse;
   const kopf = d.createElement("summary");
@@ -85,7 +85,7 @@ function aufklappbar(d: Document, kopfText: string, klasse: string, klasseEintra
   details.append(kopf);
   for (const e of eintraege) {
     const abschnitt = d.createElement("section");
-    abschnitt.className = klasseEintrag;
+    abschnitt.className = "fuss-eintrag";
     const titel = d.createElement("h2");
     titel.textContent = e.titel;
     const liste = d.createElement("dl");
@@ -114,7 +114,7 @@ export function baueFuss(fuss: HTMLElement, kataloge: Pick<Kataloge, "objekte" |
   const sterne = sterndatenImFuss();
   fuss.replaceChildren(
     lizenz,
-    aufklappbar(d, T.bildnachweise(bilder.length), "fuss-nachweise", "fuss-bild", bilder),
-    aufklappbar(d, T.sterndaten.titel(sterne.length), "fuss-nachweise fuss-sterndaten", "fuss-eintrag", sterne)
+    aufklappbar(d, T.bildnachweise(bilder.length), "fuss-nachweise", bilder),
+    aufklappbar(d, T.sterndaten.titel(sterne.length), "fuss-nachweise fuss-sterndaten", sterne)
   );
 }

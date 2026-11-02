@@ -15,8 +15,9 @@
 //   kennlinie.mag_hell des Bildnachweises (Entscheidung Herbert 2026-10-29); sterne inline
 //   oder als sterne_datei.
 
-import { BILDER_DATEI, type Bildnachweis } from "./bildnachweise";
+import { BILDER_DATEI, type Bildnachweis, MAG_KENNLINIE_MAX, MAG_KENNLINIE_MIN, WINKELGROESSE_BILD_MAX_ARCSEC } from "./bildnachweise";
 import { DatenFehler } from "./fehler";
+import type { Kennlinie } from "./kennlinie";
 import { KENNUNG_FREIES_PAAR, type Isophote, type Objektklasse, type Trabant } from "../naht/konfiguration";
 import { alsListe, alsObjekt, ladeJson, nurBekannteFelder, optional, text, wahl, zahl, type Ort } from "./pruefe";
 
@@ -39,7 +40,6 @@ const TYP_ZU_KLASSE: Record<Objekttyp, Objektklasse> = {
 const LAGE_MAX_ARCSEC = 7200;
 /** Winkelgroesse: Sonnensystem bis 4000'' (Mond), Deep-Sky bis 5 Grad (M31 rund 11400''). */
 const WINKELGROESSE_MAX_ARCSEC = 4000;
-const WINKELGROESSE_DEEP_SKY_MAX_ARCSEC = 18000;
 /** Grenzen der Magnitude je Klasse: Sonnensystem wie Version 1, Sterne und Deep-Sky bis 25. */
 const MAGNITUDE_GRENZEN: Record<Objektklasse, readonly [number, number]> = {
   sonnensystem: [-15, 10],
@@ -372,8 +372,8 @@ function pruefeTrennung(nachweis: Paarnachweis, nachName: ReadonlyMap<string, St
 
 function pruefeDeepSky(obj: Record<string, unknown>, zustand: ZustandEintrag, ort: Ort): void {
   const id = zustand.id;
-  zustand.winkelgroesseArcsec = zahl(obj, "winkelgroesse_arcsec", ort, 0.1, WINKELGROESSE_DEEP_SKY_MAX_ARCSEC);
-  zustand.polarArcsec = zahl(obj, "polar_arcsec", ort, 0.1, WINKELGROESSE_DEEP_SKY_MAX_ARCSEC);
+  zustand.winkelgroesseArcsec = zahl(obj, "winkelgroesse_arcsec", ort, 0.1, WINKELGROESSE_BILD_MAX_ARCSEC);
+  zustand.polarArcsec = zahl(obj, "polar_arcsec", ort, 0.1, WINKELGROESSE_BILD_MAX_ARCSEC);
   if (zustand.polarArcsec > zustand.winkelgroesseArcsec) {
     throw new DatenFehler(OBJEKTE_DATEI, id, "polar_arcsec", "groesser als winkelgroesse_arcsec (grosse Achse)");
   }
@@ -505,7 +505,7 @@ function pruefeIsophoten(liste: unknown[], ort: Ort): Isophote[] {
     const obj = alsObjekt(roh, ortI, "Isophote");
     nurBekannteFelder(obj, ortI, FELDER_ISOPHOTE);
     return {
-      magProArcsec2: zahl(obj, "mag_arcsec2", ortI, -5, 35),
+      magProArcsec2: zahl(obj, "mag_arcsec2", ortI, MAG_KENNLINIE_MIN, MAG_KENNLINIE_MAX),
       flaecheArcsec2: zahl(obj, "flaeche_arcsec2", ortI, 0)
     };
   });
@@ -605,11 +605,7 @@ function pruefeBegleiterbild(objekt: Objekt, zustand: ZustandEintrag, begleiter:
   if (nachweis.kacheln !== undefined) throw new DatenFehler(BILDER_DATEI, nachweis.id, "kacheln", "Begleiterbilder sind Einzelbilder");
   const kennlinie = nachweis.kennlinie;
   if (kennlinie === undefined) throw new DatenFehler(BILDER_DATEI, nachweis.id, "kennlinie", "Begleiterbilder brauchen die log-Kennlinie");
-  for (const [n, iso] of begleiter.isophoten.entries()) {
-    if (iso.magProArcsec2 < kennlinie.magHell || iso.magProArcsec2 > kennlinie.magDunkel) {
-      throw new DatenFehler(OBJEKTE_DATEI, `${ort}, isophoten[${n}]`, "mag_arcsec2", `${iso.magProArcsec2} ausserhalb der Kennlinie von "${nachweis.id}"`);
-    }
-  }
+  pruefeIsophotenInKennlinie(begleiter.isophoten, kennlinie, ort, nachweis.id);
 }
 
 function pruefeKennlinieZuKlasse(objekt: Objekt, zustand: ZustandEintrag, nachweis: Bildnachweis): void {
@@ -619,13 +615,18 @@ function pruefeKennlinieZuKlasse(objekt: Objekt, zustand: ZustandEintrag, nachwe
     return;
   }
   if (kennlinie === undefined) throw new DatenFehler(BILDER_DATEI, nachweis.id, "kennlinie", "Deep-Sky-Bilder brauchen die log-Kennlinie");
-  for (const [n, iso] of (zustand.isophoten ?? []).entries()) {
+  pruefeIsophotenInKennlinie(zustand.isophoten ?? [], kennlinie, zustand.id, nachweis.id);
+}
+
+/** Jede Isophote im Umfang der Kennlinie (mag_hell bis mag_dunkel); ort nennt Zustand und Begleiter. */
+function pruefeIsophotenInKennlinie(isophoten: readonly Isophote[], kennlinie: Kennlinie, ort: string, nachweisId: string): void {
+  for (const [n, iso] of isophoten.entries()) {
     if (iso.magProArcsec2 < kennlinie.magHell || iso.magProArcsec2 > kennlinie.magDunkel) {
       throw new DatenFehler(
         OBJEKTE_DATEI,
-        `${zustand.id}, isophoten[${n}]`,
+        `${ort}, isophoten[${n}]`,
         "mag_arcsec2",
-        `${iso.magProArcsec2} ausserhalb der Kennlinie ${kennlinie.magHell} bis ${kennlinie.magDunkel} von "${nachweis.id}"`
+        `${iso.magProArcsec2} ausserhalb der Kennlinie ${kennlinie.magHell} bis ${kennlinie.magDunkel} von "${nachweisId}"`
       );
     }
   }
