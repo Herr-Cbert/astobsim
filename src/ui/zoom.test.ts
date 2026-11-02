@@ -6,6 +6,7 @@ import { FalterJs, neuesRaster, QuelleAusRaster } from "../bild";
 import { rendere } from "../bild/rendere";
 import { objektzustand, pruefeBildnachweise, pruefeGeraete, pruefeObjekte, pruefeVerweise } from "../daten";
 import type { Konfiguration } from "../naht/konfiguration";
+import type { Simulationsparameter } from "../naht/simulationsparameter";
 import { atmosphaere, aufloesung, auswerten, freiesPaar, optik } from "../physik";
 import { TEXTE } from "../texte";
 import { type Kataloge, voreinstellung } from "../zustand";
@@ -143,6 +144,23 @@ describe("vergleichsparameter", () => {
 
   it("ohne Punktkern (Issue #145): das Vergleichsraster ist schon so fein wie die Anzeige", () => {
     expect(vergleichsparameter({ ...anblick, punktkern: anblick.kern }, k.objekt.quelle!.massstabArcsecProPx)).not.toHaveProperty("punktkern");
+  });
+
+  it("ohne Farbkopplung (Issue #146): eigene Farben der Sterne, kein farbkern, eigener Punkteschluessel", () => {
+    const punkte = anblick.quellbild.punkte;
+    const gekoppelt: Simulationsparameter = {
+      ...anblick,
+      farbkern: anblick.kern,
+      quellbild: { ...anblick.quellbild, punkte: { ...punkte, punktquellen: punkte.punktquellen.map((p) => ({ ...p, farbe: [1.6, 0.9, 0.4], farbeAnzeige: [1, 1, 1] })) } }
+    };
+    const vg = vergleichsparameter(gekoppelt, k.objekt.quelle!.massstabArcsecProPx);
+    expect(vg).not.toHaveProperty("farbkern");
+    for (const p of vg.quellbild.punkte.punktquellen) {
+      expect(p).not.toHaveProperty("farbeAnzeige");
+      expect(p.farbe).toEqual([1.6, 0.9, 0.4]);
+    }
+    expect(vg.quellbild.punkte.schluessel).not.toBe(punkte.schluessel);
+    expect(v.quellbild.punkte).toBe(punkte);
   });
 
   it("gleiches Fenster, Gesichtsfeld und Punktquellen, eigener Schluessel", () => {

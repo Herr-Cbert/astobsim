@@ -17,10 +17,11 @@ import { arbeitsmassstab, kernbeschreibung, kernSchluessel } from "./arbeitsmass
 import { type Atmosphaere, atmosphaere, seeingstufe } from "./atmosphaere";
 import { type Aufloesung, aufloesung } from "./aufloesung";
 import { ueberstrahlung } from "./doppelstern";
+import { farbkopplungNoetig, farbreichweiteArcsec, koppleFarben } from "./farbkopplung";
 import { PhysikFehler, pruefePositiv } from "./fehler";
 import { bortleMagProArcsec2, helligkeitUndIsophote } from "./helligkeit";
 import { baueKern } from "./kern";
-import { ANZEIGE_PX_STANDARD, ARCSEC_PRO_GRAD, AUSTRITTSPUPILLE_MIN_MM, PUPILLE_MM, type Seeingwortstufe } from "./konstanten";
+import { ANZEIGE_PX_STANDARD, ARBEITSPIXEL_PRO_FWHM, ARCSEC_PRO_GRAD, AUSTRITTSPUPILLE_MIN_MM, PUPILLE_MM, type Seeingwortstufe } from "./konstanten";
 import { type Optik, optik, vergroesserungsgrenzen } from "./optik";
 import { punktquellen } from "./punktquellen";
 import { schluessel } from "./schluessel";
@@ -154,6 +155,7 @@ function punkteFelder(p: Punktquelle): (number | string)[] {
   const felder: (number | string)[] = [p.name, p.xArcsec, p.yArcsec, p.durchmesserArcsec, p.helligkeitRelativ];
   if (p.deckkraft !== undefined) felder.push("deckkraft", p.deckkraft);
   if (p.farbe !== undefined) felder.push("farbe", ...p.farbe);
+  if (p.farbeAnzeige !== undefined) felder.push("farbeAnzeige", ...p.farbeAnzeige);
   return felder;
 }
 
@@ -178,6 +180,19 @@ function punktkernFuer(o: Optik, a: Atmosphaere, aufl: Aufloesung, fenster: Fens
   const beschreibung = kernbeschreibung(o, a, aufl, massstabArcsecProPx);
   const gebaut = vorher !== undefined && vorher.schluessel === kernSchluessel(beschreibung) ? vorher : baueKern(beschreibung);
   return gebaut.massstabArcsecProPx === massstabArcsecProPx ? gebaut : { ...gebaut, massstabArcsecProPx };
+}
+
+/**
+ * Kern des feinen Modells fuer die Farbkopplung (Issue #146, physik.md Abschnitt 32): dieselbe
+ * Gesamt-PSF am Massstab Gesamt-FWHM / (ARBEITSPIXEL_PRO_FWHM * PUNKT_UEBERABTASTUNG_MAX), also etwa
+ * 12,5 Pixel je FWHM wie das feine Modell der Validierung, unabhaengig vom Fenster; undefined, wenn
+ * keine zwei sichtbaren Punktquellen verschiedener Farbe sich ueberlappen (farbkopplungNoetig).
+ * Wiederverwendet wie kern: vorher bei gleichem Schluessel.
+ */
+function farbkernFuer(o: Optik, a: Atmosphaere, aufl: Aufloesung, punkte: readonly Punktquelle[], vorher: Kern | undefined): Kern | undefined {
+  if (!farbkopplungNoetig(punkte, farbreichweiteArcsec(aufl.gesamtFwhmArcsec))) return undefined;
+  const beschreibung = kernbeschreibung(o, a, aufl, aufl.gesamtFwhmArcsec / (ARBEITSPIXEL_PRO_FWHM * PUNKT_UEBERABTASTUNG_MAX));
+  return vorher !== undefined && vorher.schluessel === kernSchluessel(beschreibung) ? vorher : baueKern(beschreibung);
 }
 
 /**
@@ -226,7 +241,11 @@ export function auswerten(k: Konfiguration, optionen: Auswertoptionen = {}): Aus
   // Vergroesserung ab, Deckkraft und Farbe auch von Bortle, Transparenz, Hoehe und Seeing; Stufe 1b
   // kann sich also aendern, ohne dass Ausschnitt oder Massstab sich aendern.
   // Punktquellen ganz ausserhalb des Fensters malt bild nicht, sie bleiben draussen.
-  const punkte = punktquellen(k.objekt, o, a, grenzgroesseMag);
+  // Farbkopplung (Issue #146, physik.md 32): nicht getrennte Nachbarn verschiedener Farbe bekommen
+  // eine gemeinsame Anzeigefarbe (farbeAnzeige), vor dem Schluessel, damit bild bei einer Aenderung neu malt.
+  const roh = punktquellen(k.objekt, o, a, grenzgroesseMag);
+  const farbkern = farbkernFuer(o, a, aufl, roh, optionen.vorher?.farbkern);
+  const punkte = farbkern !== undefined ? koppleFarben(roh, farbkern) : roh;
   const gemalt = punkte.filter((p) => p.sichtbar && imFenster(p, fenster, massstabArcsecProPx)).flatMap(punkteFelder);
   const punktkern = gemalt.length > 0 ? punktkernFuer(o, a, aufl, fenster, rasterPx, optionen.vorher?.punktkern) : undefined;
   const quellbild: Quellbild = {
@@ -264,7 +283,15 @@ export function auswerten(k: Konfiguration, optionen: Auswertoptionen = {}): Aus
   }
   if (k.objekt.klasse === "sonnensystem") anzeige.mischgewicht = helligkeit.mischgewicht;
   return {
-    parameter: { quellbild, kern, ...(punktkern !== undefined ? { punktkern } : {}), helligkeit, gesichtsfeld: o.gesichtsfeld, fenster },
+    parameter: {
+      quellbild,
+      kern,
+      ...(punktkern !== undefined ? { punktkern } : {}),
+      ...(farbkern !== undefined ? { farbkern } : {}),
+      helligkeit,
+      gesichtsfeld: o.gesichtsfeld,
+      fenster
+    },
     anzeige,
     warnungen: warnungen(o, k.objekt)
   };

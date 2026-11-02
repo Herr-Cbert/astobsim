@@ -89,6 +89,16 @@ describe("malePunktquellen", () => {
     expect(summe(r)).toBeLessThan(0.6 * fluss(punkt()));
   });
 
+  it("Farbe: farbeAnzeige (Farbkopplung, Issue #146) vor farbe; ohne beide grau (undefined)", () => {
+    const [eigen, gekoppelt, grau] = malePunktquellen(
+      quellbild([punkt({ farbe: [1.6, 0.9, 0.4] }), punkt({ farbe: [1.6, 0.9, 0.4], farbeAnzeige: [1.2, 1, 0.8] }), punkt()])
+    );
+    expect(eigen!.farbe).toEqual([1.6, 0.9, 0.4]);
+    expect(gekoppelt!.farbe).toEqual([1.2, 1, 0.8]);
+    expect(grau!.farbe).toBeUndefined();
+    expect(() => malePunktquellen(quellbild([punkt({ farbeAnzeige: [1, Number.NaN, 1] })]))).toThrow(BildFehler);
+  });
+
   it("wirft BildFehler bei Durchmesser 0, negativer Helligkeit oder Position NaN", () => {
     expect(() => malePunktquellen(quellbild([punkt({ durchmesserArcsec: 0 })]))).toThrow(BildFehler);
     expect(() => malePunktquellen(quellbild([punkt({ helligkeitRelativ: -1 })]))).toThrow(BildFehler);
