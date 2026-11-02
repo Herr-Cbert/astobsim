@@ -65,8 +65,13 @@ export interface Punktquelle {
   grund?: "blendung" | "unter_schwelle";
   /** (0, 1], Blackwell (A-P11); fehlt = 1. */
   deckkraft?: number;
-  /** Linear sRGB (D65), Y = 1 (A-P12); fehlt = grau. */
+  /** Linear sRGB (D65), Y = 1 (A-P12); fehlt = grau. Die eigene Farbe des Sterns (Vergleichsbild). */
   farbe?: [number, number, number];
+  /**
+   * Farbe im Anblick nach der Farbkopplung (Issue #146, physik.md 32), linear sRGB mit Y = 1: bei
+   * einem nicht getrennten Nachbarn anderer Farbe das flussgewichtete Mittel; fehlt = farbe.
+   */
+  farbeAnzeige?: [number, number, number];
 }
 
 /**
@@ -181,6 +186,13 @@ export interface Simulationsparameter {
    * fenster.breiteArcsec / punktPx, punktPx ganzzahlig.
    */
   punktkern?: Kern;
+  /**
+   * Kern des feinen Modells fuer die Farbkopplung (Issue #146, docs/recherche/physik.md Abschnitt 32):
+   * dieselbe Gesamt-PSF mit etwa 12,5 Pixeln je Gesamt-FWHM, unabhaengig vom Fenster. Nur gesetzt, wenn
+   * zwei sichtbare Punktquellen verschiedener Farbe sich ueberlappen. physik koppelt damit die Farben
+   * (Punktquelle.farbeAnzeige) und nimmt ihn ueber vorher wieder; bild nutzt ihn nicht.
+   */
+  farbkern?: Kern;
   helligkeit: Helligkeit;
   gesichtsfeld: Gesichtsfeld;
   fenster: Fenster;

@@ -64,7 +64,8 @@ export function malePunktquellen(quellbild: Quellbild): Scheibchen[] {
     const durchmesserPx = p.durchmesserArcsec / m;
     const fluss = p.helligkeitRelativ * Math.PI * (durchmesserPx / 2) ** 2;
     const s = maleScheibchen(spalte, zeile, Math.max(durchmesserPx, DURCHMESSER_MIN_PX) / 2, fluss);
-    if (s !== undefined) ergebnis.push({ ...s, deckkraft: p.deckkraft ?? 1, farbe: p.farbe });
+    // Im Anblick die Anzeigefarbe nach der Farbkopplung (Issue #146), sonst die eigene Farbe.
+    if (s !== undefined) ergebnis.push({ ...s, deckkraft: p.deckkraft ?? 1, farbe: p.farbeAnzeige ?? p.farbe });
   }
   return ergebnis;
 }
@@ -82,8 +83,10 @@ function pruefePunktquelle(p: Punktquelle): void {
   if (p.deckkraft !== undefined && !(p.deckkraft > 0 && p.deckkraft <= 1)) {
     throw new BildFehler(`Punktquelle ${p.name}: deckkraft muss in (0, 1] liegen, nicht ${p.deckkraft}`);
   }
-  if (p.farbe !== undefined && (p.farbe.length !== 3 || !p.farbe.every((k) => k >= 0 && Number.isFinite(k)))) {
-    throw new BildFehler(`Punktquelle ${p.name}: farbe muss drei endliche Werte >= 0 haben, nicht ${String(p.farbe)}`);
+  for (const [feld, farbe] of [["farbe", p.farbe], ["farbeAnzeige", p.farbeAnzeige]] as const) {
+    if (farbe !== undefined && (farbe.length !== 3 || !farbe.every((k) => k >= 0 && Number.isFinite(k)))) {
+      throw new BildFehler(`Punktquelle ${p.name}: ${feld} muss drei endliche Werte >= 0 haben, nicht ${String(farbe)}`);
+    }
   }
 }
 

@@ -344,3 +344,34 @@ Nummern vorlaeufig als TD1 bis TD4; die Nummern T7 bis T12 teilen sich Doppelste
 21. Armstrong, M.: "The Double Double: Detach Lyra's multiple-star gem", Astronomy Now, 13.06.2022, https://astronomynow.com/2022/06/13/the-double-double-detach-lyras-multiple-star-gem/
 22. Lawrence, P.: "A guide to star Epsilon Lyrae, the Double Double", BBC Sky at Night Magazine, 30.08.2022 (zuerst Juli 2017), https://www.skyatnightmagazine.com/advice/epsilon-lyrae
 23. Jodrell Bank Centre for Astrophysics, Explore Astronomy, "Lyra" (Hrsg. I. Morison, Stand 2008), https://www.jb.man.ac.uk/astronomy/nightsky/AList/Lyra.html
+
+---
+
+## 10. Unaufgeloester farbiger Begleiter (Issue #146)
+
+Frage aus der Validierung (`docs/validierung.md` 14, T9b und T9c): Wie erscheint ein Begleiter anderer Farbe, der neben dem hellen Hauptstern nicht getrennt ist? Beispiel Antares (A M1.5 Iab, V 1,0; B B2.5 V, V 5,4; 2,6''), 150 mm bei 200x, Seeing 1,5'' oder 15 Grad Hoehe. Kennzeichnung: [G] Stelle gelesen, [S] nur als Suchmaschinen-Ausschnitt gesehen, [V] nicht geprueft.
+
+**Beobachtung.**
+- Antares B wird fast nur bei ruhiger Luft gesehen. Bei maessigem Seeing: "I was pretty certain it was apparent as a pinprick at 4 o'clock that came and went with the seeing" (150x) [24] [G]. Wo er gesehen wird, ist er ein Fleck oder Punkt am ersten Beugungsring: "the companion just touching the diffraction ring", "I saw green" (102-mm-Refraktor, 176x, nachdem das Seeing besser wurde) [25] [G]; "a blue / green smudge nestled in the 1st diffraction ring" [20] [S].
+- "Antares B is normally difficult to see in small telescopes due to glare from Antares, but can sometimes be seen in apertures over 150 millimetres"; die gruene Farbe "is probably either a contrast effect" [26] [G].
+- Farbe bei unruhiger Luft: "Under turbulent seeing conditions, a star's color can change rapidly, making color perception difficult at best" [27] [G].
+- Ein Farbsaum oder eine farbige Asymmetrie im Halo des Hauptsterns durch einen ungetrennten Begleiter wird in keiner gefundenen Quelle beschrieben, auch nicht fuer andere enge farbige Paare ($\alpha$ Her, $\gamma$ And, $\delta$ Cyg). Die Farbe wird dem Begleiter als eigenem Fleck zugeordnet, also erst, wenn er getrennt erscheint.
+
+**Physiologie (Winkel am Auge = Himmelswinkel mal Vergroesserung).**
+- Die Farbaufloesung des Auges endet bei 11 bis 12 Perioden je Grad, fuer rot-gruen wie fuer blau-gelb: "limiting acuities based on red-green and blue-yellow colour discriminations are similar at 11 or 12 cycles/deg" [28] [G]; fuer Helligkeit liegt die Grenze bei etwa 50 bis 60 [V].
+- Blau-gelb wird bei kleinen Feldern unter etwa 15' bis 25' kaum noch unterschieden (small-field tritanopia nach Willmer und Wright 1945 und Thomson und Wright 1947); in der Mitte der Fovea fehlen die Blauzapfen auf etwa 25' Durchmesser ("an area roughly 25' in diameter in the central fovea lacks functioning blue-sensitive cones") [29] [G]. Kleine Proben von 1' bis 2' werden nur noch auf einer Achse gruenlich-blau bis orange abgeglichen (Middleton und Holmes 1949, nach [30]) [G].
+- Antares bei 200x: Abstand 2,6'' sind 8,7' am Auge, eine Seeingscheibe von 1,5'' sind 5' (gerechnet). Das liegt ueber der Farbaufloesung, aber unter der Grenze fuer Blau-gelb kleiner Felder: ein blaeulicher Fleck dieser Groesse wird schlecht als blau erkannt.
+
+**Folgerung fuer das Modell.** Unterhalb der Trennschwelle hat der Begleiter keine eigene Farbe; er erscheint hoechstens als Helligkeitsbuckel im Halo des Hauptsterns, in dessen Farbe. Ab der Trennung traegt er seine Farbe. Das spricht fuer eine Kopplung der Farbe an die Delle aus Abschnitt 4 und gegen eine reine Unschaerfe der Farbe: die Grenze der Farbaufloesung liegt bei 200x bei 0,75'' am Himmel, also unter dem Seeing. Umsetzung: `physik.md` 32.
+
+**Offen.** Haas [15], Burnham, Argyle und das Webb Society Handbook nicht eingesehen. Bei 15 Grad Hoehe saeumt die atmosphaerische Dispersion den Hauptstern selbst farbig, grob 2'' bis 5'' (nicht geprueft), also groesser als jeder Farbeffekt von B; nicht modelliert, Issue [#151](https://github.com/herr-cbert/astobsim/issues/151) (Spaeter).
+
+**Quellen zu Abschnitt 10** (Nummern weiter wie in Abschnitt 9):
+
+24. The Observers' Page (observers.org), Bericht 2001-08-08, Montebello, https://old.observers.org/reports/2001/2001.08.08.html (abgerufen 2026-11-02)
+25. The Observers' Page (observers.org), Bericht 2001-07-06, TV-102, https://old.observers.org/reports/2001/2001.07.06.html (abgerufen 2026-11-02)
+26. Wikipedia, "Antares", Abschnitt Antares B, https://en.wikipedia.org/wiki/Antares (abgerufen 2026-11-02)
+27. O'Meara, S. J.: "Double trouble", Astronomy, Sept. 2015, https://www.astronomy.com/science/double-trouble/
+28. Mullen, K. T.: "The contrast sensitivity of human colour vision to red-green and blue-yellow chromatic gratings", J. Physiol. 359, 381-400 (1985), Abstract
+29. Williams, D. R., MacLeod, D. I. A., Hayhoe, M. M.: "Foveal tritanopia", Vision Res. 21, 1341-1356 (1981), Abstract und S. 1345 f.
+30. Mollon, J. D.: "A taxonomy of tritanopias", Documenta Ophthalmologica Proceedings Series 33, Junk, Den Haag (1982), Abschnitte 3, 5a und 7

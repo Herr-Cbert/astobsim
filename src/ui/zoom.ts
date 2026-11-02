@@ -252,11 +252,21 @@ export function vergleichsparameter(
     daten: new Float32Array([1])
   };
   // Ohne punktkern (Issue #145): das Raster des Vergleichsbilds ist ohnehin so fein wie die Anzeige.
-  const { punktkern: _punktkern, ...ohnePunktkern } = anblick;
+  // Ohne farbkern und Anzeigefarbe (Issue #146): das Vergleichsbild ist unverschlechtert, jeder Stern
+  // zeigt seine eigene Farbe; der Schluessel der Punktquellen bekommt dafuer einen Zusatz.
+  const { punktkern: _punktkern, farbkern: _farbkern, ...ohnePunktkern } = anblick;
+  const gekoppelt = quellbild.punkte.punktquellen.some((p) => p.farbeAnzeige !== undefined);
+  const punkte = gekoppelt
+    ? {
+        schluessel: `${quellbild.punkte.schluessel}|${VERGLEICH}`,
+        punktquellen: quellbild.punkte.punktquellen.map(({ farbeAnzeige: _farbeAnzeige, ...p }) => p)
+      }
+    : quellbild.punkte;
   return {
     ...ohnePunktkern,
     quellbild: {
       ...quellbild,
+      punkte,
       // Der Schluessel des Anblicks deckt alles ab, was physik fuer Stufe 1 zaehlt; die Punktquellen
       // (Stufe 1b) gehen mit quellbild.punkte unveraendert mit, bild verbindet beide Schluessel.
       schluessel: [VERGLEICH, quellbild.schluessel, massstabArcsecProPx, rasterPx].join("|"),

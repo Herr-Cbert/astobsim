@@ -10,14 +10,15 @@ import bilderJson from "../daten/bilder.json";
 import geraeteJson from "../daten/geraete.json";
 import objekteJson from "../daten/objekte.json";
 import { malePunktquellen } from "./bild/male";
-import { faltePunkte } from "./bild/punktebene";
+import { falteFaerbung, faltePunkte } from "./bild/punktebene";
 import { eckeLinksOben } from "./bild/quelle";
-import { punktquellbild } from "./bild/rendere";
+import { punktanteil, punktquellbild } from "./bild/rendere";
 import { pruefeBildnachweise } from "./daten/bildnachweise";
 import { pruefeGeraete } from "./daten/geraete";
 import { pruefeObjekte, pruefeSternliste, pruefeVerweise } from "./daten/objekte";
 import type { Konfiguration } from "./naht/konfiguration";
 import { type Auswertung, auswerten } from "./physik/auswerten";
+import { farbpaare } from "./physik/farbkopplung";
 import { baueKern } from "./physik/kern";
 import { SCHWELLE_ERKENNBAR } from "./physik/konstanten";
 import { rundeSignifikant } from "./physik/schluessel";
@@ -188,6 +189,87 @@ describe("Validierung T7 bis T9: Doppelsterne getrennt oder nicht (Delle der Pun
       const ueber = trennung(f.such, ...f.sterne).auswertung.warnungen.filter((w) => w.art === "ueberstrahlung");
       expect(ueber, f.fall).toHaveLength(1);
       expect(ueber[0]!.wert).toBeCloseTo(4.44, 2);
+    }
+  });
+});
+
+/** sRGB-Kode (0 bis 255) eines linearen Werts, begrenzt auf 0 bis 1. */
+const kode = (x: number): number => {
+  const v = Math.min(1, Math.max(0, x));
+  return 255 * (v <= 0.0031308 ? 12.92 * v : 1.055 * v ** (1 / 2.4) - 0.055);
+};
+
+/**
+ * Farbe des Punktanteils im Zoom am Ort von B und am Spiegelpunkt 2 A - B (Issue #146), wie das Bild
+ * sie rechnet: malePunktquellen, faltePunkte, falteFaerbung und punktanteil aus bild auf der Punktebene
+ * aus punktquellbild, ohne Flaeche und Himmel, naechstes Pixel. differenz: groesster Unterschied der
+ * sRGB-Kanaele bei gleicher Helligkeit (jede Farbe auf Mittel 128 skaliert), also nur der Farbton.
+ */
+function farbeBeiB(such: string, sternA: string, sternB: string): { b: number[]; spiegel: number[]; differenz: number } {
+  const k = konfiguration(such);
+  const auswertung = auswerten(k, { fenster: zoomfenster(k, { xArcsec: 0, yArcsec: 0 }, 540, false) });
+  const { quellbild, kern, randfenster } = punktquellbild(auswertung.parameter);
+  const scheibchen = malePunktquellen(quellbild);
+  const n = quellbild.rasterPx;
+  const ebene = faltePunkte(scheibchen, kern, n, randfenster)!;
+  const anteil = punktanteil(ebene, auswertung.parameter.helligkeit, falteFaerbung(scheibchen, kern, n, randfenster));
+  const m = quellbild.massstabArcsecProPx;
+  const ecke = eckeLinksOben({ xArcsec: quellbild.mitteXArcsec, yArcsec: quellbild.mitteYArcsec }, n, n, m);
+  const lage = (name: string): [number, number] => {
+    const p = quellbild.punkte.punktquellen.find((q) => q.name === name)!;
+    return [(p.xArcsec - ecke.xArcsec) / m - 0.5, (ecke.yArcsec - p.yArcsec) / m - 0.5];
+  };
+  const farbe = (x: number, y: number): number[] => {
+    const i = Math.round(y) * n + Math.round(x);
+    return [0, 1, 2].map((c) => kode(anteil.daten[3 * i + c]!));
+  };
+  const [xa, ya] = lage(sternA);
+  const [xb, yb] = lage(sternB);
+  const b = farbe(xb, yb);
+  const spiegel = farbe(2 * xa - xb, 2 * ya - yb);
+  const ton = (f: number[]): number[] => f.map((w) => (w * 128 * 3) / (f[0]! + f[1]! + f[2]!));
+  const tb = ton(b);
+  const ts = ton(spiegel);
+  return { b, spiegel, differenz: Math.max(...tb.map((w, c) => Math.abs(w - ts[c]!))) };
+}
+
+describe("Issue #146: Farbe eines nicht getrennten Begleiters (Farbkopplung an die Delle, physik.md 32)", () => {
+  // Kein eigener Farbfleck unterhalb der Trennschwelle: am Ort von B derselbe Farbton wie am
+  // Spiegelpunkt im Halo von A (vor #146: T9b 36, T9c 50 Kodes am PNG, validierung.md 14).
+  it.each([
+    { fall: "T9b", such: `${R(150, 1200, 6)}&z=antares_2027&s=1.5&${bed()}` },
+    { fall: "T9c", such: `${R(150, 1200, 6)}&z=antares_2027&s=0.5&${bed(5, 15)}` },
+    { fall: "T7a", such: `${R(80, 800, 5)}&z=pi_aql_2021&s=0.5&${bed()}` }
+  ])("$fall: Farbton an B gleich dem am Spiegelpunkt, hoechstens 3 Kodes", (f) => {
+    expect(farbeBeiB(f.such, "A", "B").differenz).toBeLessThanOrEqual(3);
+  });
+
+  it("T9a (getrennt): B bleibt blaeulich im orangen Halo, Farbton mindestens 40 Kodes neben dem Spiegelpunkt", () => {
+    const f = farbeBeiB(`${R(150, 1200, 6)}&z=antares_2027&s=0.5&${bed()}`, "A", "B");
+    expect(f.differenz).toBeGreaterThan(40);
+    expect(f.b[2]!).toBeGreaterThan(f.b[0]!);
+  });
+
+  // Die Kopplung haengt nur am feinen Modell, nicht am Fenster: Epsilon1 bleibt auch im Zoom farbig.
+  it.each([
+    { fall: "T7b", such: `${R(150, 1500, 5)}&z=pi_aql_2021&s=0.5&${bed()}`, paar: ["A", "B"], sigma: 1 },
+    { fall: "T7d", such: `${R(150, 1500, 5)}&z=eps_ari_2027&s=0.5&${bed()}`, paar: ["A", "B"], sigma: 1 },
+    { fall: "T8b", such: `${R(80, 800, 5)}&z=eps_lyr_2027&s=0.5&${bed()}`, paar: ["eps1 A", "eps1 B"], sigma: 1 },
+    { fall: "T8b", such: `${R(80, 800, 5)}&z=eps_lyr_2027&s=0.5&${bed()}`, paar: ["eps2 C", "eps2 D"], sigma: 1 },
+    { fall: "T9a", such: `${R(150, 1200, 6)}&z=antares_2027&s=0.5&${bed()}`, paar: ["A", "B"], sigma: 1 },
+    { fall: "T7a", such: `${R(80, 800, 5)}&z=pi_aql_2021&s=0.5&${bed()}`, paar: ["A", "B"], sigma: 0 },
+    { fall: "T7c", such: `${R(80, 800, 5)}&z=eps_ari_2027&s=0.5&${bed()}`, paar: ["A", "B"], sigma: 0 },
+    { fall: "T9b", such: `${R(150, 1200, 6)}&z=antares_2027&s=1.5&${bed()}`, paar: ["A", "B"], sigma: 0 },
+    { fall: "T9c", such: `${R(150, 1200, 6)}&z=antares_2027&s=0.5&${bed(5, 15)}`, paar: ["A", "B"], sigma: 0 }
+  ])("$fall $paar: Kopplung sigma = $sigma im Zoom und in der Uebersicht", (f) => {
+    const k = konfiguration(f.such);
+    for (const a of [auswerten(k, { fenster: zoomfenster(k, { xArcsec: 0, yArcsec: 0 }, 540, false) }), auswerten(k)]) {
+      const punkte = a.parameter.quellbild.punkte.punktquellen;
+      const ia = punkte.findIndex((p) => p.name === f.paar[0]);
+      const ib = punkte.findIndex((p) => p.name === f.paar[1]);
+      const paar = farbpaare(punkte, a.parameter.farbkern!).find((p) => (p.a === ia && p.b === ib) || (p.a === ib && p.b === ia));
+      expect(paar, f.fall).toBeDefined();
+      expect(paar!.sigma).toBeCloseTo(f.sigma, 6);
     }
   });
 });
