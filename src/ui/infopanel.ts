@@ -114,7 +114,7 @@ export interface Infohinweis {
 export const MISCHGEWICHT_UNAUFGELOEST = 0.5;
 
 /** Hoechstens so viele Sternnamen nennt der Hinweis zu Sternen unter der Grenzgroesse, sonst die Anzahl. */
-export const NAMEN_MAX = 3;
+const NAMEN_MAX = 3;
 
 /**
  * Die Hinweise zur Auswertung aus der Konfiguration k in fester Reihenfolge: unaufgeloest,

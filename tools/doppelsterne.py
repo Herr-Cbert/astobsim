@@ -43,43 +43,45 @@ def erzeuge(roh):
 
 
     wds = {}
-    for z in open(f"{roh}/wdsweb_summ2.txt", encoding="latin-1"):
-        if len(z) < 70 or not z[0].isdigit():
-            continue
-        schluessel = (z[0:10], z[10:17].strip(), z[17:22].strip())
-        if schluessel[0] not in GESUCHT:
-            continue
-        wds[schluessel] = dict(
-            letzte=int(z[28:32]), anzahl=int(z[33:37]), pa=int(z[42:45]), sep=float(z[52:57]),
-            m1=zw(z[58:63]), m2=zw(z[64:69]))
+    with open(f"{roh}/wdsweb_summ2.txt", encoding="latin-1") as f:
+        for z in f:
+            if len(z) < 70 or not z[0].isdigit():
+                continue
+            schluessel = (z[0:10], z[10:17].strip(), z[17:22].strip())
+            if schluessel[0] not in GESUCHT:
+                continue
+            wds[schluessel] = dict(
+                letzte=int(z[28:32]), anzahl=int(z[33:37]), pa=int(z[42:45]), sep=float(z[52:57]),
+                m1=zw(z[58:63]), m2=zw(z[64:69]))
 
     orb6 = {}
-    for z in open(f"{roh}/orb6ephem.txt", encoding="latin-1"):
-        if len(z) < 100 or not z[0].isdigit() or z[0:10] not in GESUCHT:
-            continue
-        # Spalten: WDS, Name (mit Leerzeichen), Note, Referenz, dann 5 x (Theta, Rho)
-        werte = z[46:].split()
-        name = z[11:27].strip()
-        note = z[27:33].strip()
-        ref = z[33:46].strip()
-        if zw(werte[4]) is None:
-            continue
-        orb6.setdefault((z[0:10], " ".join(name.split()), ref), (note, float(werte[4]), float(werte[5])))
+    with open(f"{roh}/orb6ephem.txt", encoding="latin-1") as f:
+        for z in f:
+            if len(z) < 100 or not z[0].isdigit() or z[0:10] not in GESUCHT:
+                continue
+            # Spalten: WDS, Name (mit Leerzeichen), Note, Referenz, dann 5 x (Theta, Rho)
+            werte = z[46:].split()
+            name = z[11:27].strip()
+            note = z[27:33].strip()
+            ref = z[33:46].strip()
+            if zw(werte[4]) is None:
+                continue
+            orb6.setdefault((z[0:10], " ".join(name.split()), ref), (note, float(werte[4]), float(werte[5])))
 
     tdsc = {}
-    with open(f"{roh}/tdsc_paare.csv") as f:
+    with open(f"{roh}/tdsc_paare.csv", encoding="utf-8", newline="") as f:
         for r in csv.DictReader(f):
             tdsc[(r["WDS"], r["m_TDSC"].strip())] = (float(r["BTmag"]), float(r["VTmag"]), r["TDSC"])
     hip = {}
-    with open(f"{roh}/hip_paare.csv") as f:
+    with open(f"{roh}/hip_paare.csv", encoding="utf-8", newline="") as f:
         for r in csv.DictReader(f):
             hip[int(r["HIP"])] = float(r["B-V"])
     bsc = {}
-    with open(f"{roh}/bsc_paare.csv") as f:
+    with open(f"{roh}/bsc_paare.csv", encoding="utf-8", newline="") as f:
         for r in csv.DictReader(f):
             bsc[int(r["hr"])] = float(r["bv_color"])
     simbad = {}
-    with open(f"{roh}/simbad_begleiter.csv") as f:
+    with open(f"{roh}/simbad_begleiter.csv", encoding="utf-8", newline="") as f:
         for r in csv.DictReader(f):
             simbad[(r["id"], r["filter"])] = float(r["flux"])
 
@@ -296,7 +298,8 @@ def main():
     ap.add_argument("--pruefen", action="store_true", help="nur vergleichen, nichts schreiben")
     a = ap.parse_args()
     objekte_neu = erzeuge(a.roh)
-    alt = open(a.objekte, encoding="utf-8").read()
+    with open(a.objekte, encoding="utf-8") as f:
+        alt = f.read()
     text = neuer_text(alt, objekte_neu)
     for o in objekte_neu:
         z = o["zustaende"][0]
@@ -307,7 +310,8 @@ def main():
         print("objekte.json stimmt mit den Rohdaten ueberein")
         return
     if text != alt:
-        open(a.objekte, "w", encoding="utf-8").write(text)
+        with open(a.objekte, "w", encoding="utf-8") as f:
+            f.write(text)
         print("objekte.json geschrieben")
     else:
         print("objekte.json unveraendert")

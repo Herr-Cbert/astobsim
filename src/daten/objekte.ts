@@ -22,7 +22,7 @@ import { alsListe, alsObjekt, ladeJson, nurBekannteFelder, optional, text, wahl,
 
 export const OBJEKTE_DATEI = "objekte.json";
 /** Verzeichnis der grossen Sternlisten unter daten/ (ADR-0003 Nachtrag Version 2). */
-export const STERNE_VERZEICHNIS = "sterne/";
+const STERNE_VERZEICHNIS = "sterne/";
 
 const OBJEKTTYPEN = ["mond", "planet", "doppelstern", "deep_sky"] as const;
 type Objekttyp = (typeof OBJEKTTYPEN)[number];

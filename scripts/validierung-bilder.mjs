@@ -43,7 +43,7 @@ const refraktor = (d, f, ok) => `a=fernrohr&ba=refraktor&d=${d}&f=${f}&o=0&ok=${
  * Detail an die gepruefte Stelle schieben (T3: knapp rechts vom Terminator, Issue #77), optional
  * Bedingungen statt B.
  */
-export const FAELLE = [
+const FAELLE = [
   ["T1", `${refraktor(70, 700, 7)}&z=jup_47&s=2`],
   ["T2a", `${refraktor(100, 1200, 8)}&z=sat_20&s=1.5`],
   ["T2b", `${refraktor(60, 600, 6)}&z=sat_20&s=1.5`],
