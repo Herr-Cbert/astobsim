@@ -154,7 +154,8 @@ Als Issues angelegt am 2026-10-27, Milestone M3 (Herbert, 2026-10-27):
 | Claude | 2026-10-30 | #111: Anzeigeweiss 8,9 und Punktweiss 6,9 (Entscheidung Herbert), alle T- und P-Bilder neu, T12 erfuellt, T1 bis T6 weiter erfuellt (Abschnitt 13) |
 | Claude | 2026-10-30 | #112: T7 bis T11 und Sternzahl M13 (Abschnitt 14), Vorschlag: T7, T8a, T8c, T9a, T10b, T11a bis T11c bestanden, Abweichungen T8b, T9b/c (Farbe), T10a (Loch), T11d, M13; T1 bis T6, T12, P1 bis P3 bytegleich |
 | Herbert | 2026-10-30 | #112: T7a bis T7d, T8a, T8c, T9a, T10b, T11a bis T11c, T11-Grenzgroesse, T12 bestanden; T10a bestanden mit Anmerkung (Loch eher angedeutet); Abweichungen T8b #145, T9b/c #146, T11d #147, M13 #148; Pruefpunkt M57-Deckkraft erledigt |
-| Claude | 2026-11-02 | #114: Nachweis A-Q4 (Abschnitt 16): Muss-V2 erfuellt, Seite erreichbar; offen Firefox (Abschnitt 17), Entscheidung zu T11d, Tag `v2.0` |
+| Claude | 2026-11-02 | #114: Nachweis A-Q4 (Abschnitt 16): Muss-V2 erfuellt, Seite erreichbar; offen Firefox (Abschnitt 17), Tag `v2.0` |
+| Herbert | 2026-11-02 | #114: T11d gilt fuer A-Q4 als dokumentierte Modellgrenze (#147 Spaeter) |
 | Herbert | | #114: Firefox-Pruefung Version 2 (Abschnitt 17) |
 
 ## 7. Sicherheit (Issue #22)
@@ -588,7 +589,7 @@ Die Muss-Anforderungen aus Version 1 (Abschnitt 8) gelten weiter: alle Tests aus
 | T10a | bestanden mit Anmerkung (Loch eher angedeutet) | 14.1, Herbert 2026-10-30 |
 | T10b | bestanden | 14.1, Herbert 2026-10-30 |
 | T11a bis T11c, T11 Grenzgroesse | bestanden | 14.1, Herbert 2026-10-30 |
-| **T11d** | **Abweichung**: sieben statt sechs Plejaden bei Bortle 7, Pleione von Atlas getrennt | 14.4 Punkt 2, Herbert 2026-10-30: [#147](https://github.com/herr-cbert/astobsim/issues/147) im Milestone "Spaeter", "bis dahin Grenze des Modells" |
+| T11d | dokumentierte Modellgrenze (sieben statt sechs Plejaden bei Bortle 7, Pleione von Atlas getrennt) | 14.4 Punkt 2, Herbert 2026-10-30: [#147](https://github.com/herr-cbert/astobsim/issues/147) "Spaeter"; Herbert 2026-11-02: gilt fuer A-Q4 als Modellgrenze |
 | T12 | bestanden | Abschnitt 13, Herbert 2026-10-30 |
 | Pruefpunkt Sternzahl M13 (kein T-Fall) | Abweichung | 14.3, [#148](https://github.com/herr-cbert/astobsim/issues/148) "Spaeter" |
 
@@ -599,11 +600,11 @@ Am 2026-11-02 [G]: `curl https://herr-cbert.github.io/astobsim/` liefert HTTP 20
 ### 16.4 Luecken
 
 1. **A-T3 Firefox fuer Version 2 nicht geprueft.** Pruefung von Hand nach Abschnitt 17 (Herbert).
-2. **T11d ist eine Abweichung, kein "bestanden".** A-Q4 verlangt woertlich, dass T7 bis T12 bestehen. Herbert hat T11d am 2026-10-30 als Grenze des Modells nach "Spaeter" (#147) verschoben. Fuer die Freigabe von `v2.0` noetig: ausdrueckliche Entscheidung, T11d als dokumentierte Modellgrenze gelten zu lassen (oder die Erwartung von T11 anzupassen, wie bei T2 nach #76).
+2. **T11d** ist eine Abweichung, kein "bestanden". Entschieden von Herbert am 2026-11-02: T11d gilt fuer A-Q4 als dokumentierte Grenze des Modells (wie T2 nach #76), Verbesserung in [#147](https://github.com/herr-cbert/astobsim/issues/147) "Spaeter".
 3. **T1 bis T6 im Stand Version 2 ohne eigenen Eintrag von Herbert.** Das letzte Urteil von Herbert zu T1 bis T6 stammt aus Version 1; seither hat Claude sie nach #111 als weiter erfuellt eingetragen (Abschnitt 6), Herbert hat die Konstanten am Bild festgelegt. Vorschlag: bei der Firefox-Pruefung T1, T3 und T5a mit ansehen und in Abschnitt 6 eintragen.
 4. **Tag `v2.0`** wird erst nach Freigabe durch Herbert gesetzt (Issue #114).
 
-Kann-Punkte und Folge-Issues bleiben im Milestone "Spaeter" (18 offen): #24, #27 bis #35, #37, #38, #94 (Erdlicht), #143 (eingebettete Begleiter, M43), #147 (T11d), #148 (Sternzahl M13), #151 (atmosphaerische Dispersion), #153 (Effizienz). #28 und #151 behandeln beide die atmosphaerische Dispersion [G]; #151 entstand aus T9c (Antares bei 15 Grad Hoehe).
+Kann-Punkte und Folge-Issues bleiben im Milestone "Spaeter" (17 offen): #24, #27 bis #35, #37, #38, #94 (Erdlicht), #143 (eingebettete Begleiter, M43), #147 (T11d), #148 (Sternzahl M13), #153 (Effizienz). Die atmosphaerische Dispersion steht in #28; das doppelte #151 (aus T9c, Antares bei 15 Grad Hoehe) ist am 2026-11-02 als Duplikat geschlossen, der Befund steht als Kommentar in #28.
 
 ## 17. Firefox-Pruefung Version 2 (A-T3), Vorlage
 

@@ -86,10 +86,10 @@ Ergebnis von Issue #114. Entwurf von Claude am 2026-11-02 aus dem Git-Log seit d
 
 - Laufzeit: 2026-10-29 bis 2026-11-02, drei Arbeitstage (29. und 30. Oktober, 2. November) [G].
 - 158 Commits seit 0a5b71d, davon 41 auf der ersten Elternlinie von `main`; 31 gemergte Pull Requests #115 bis #157 [G].
-- 20 Issues aus Phase 4 (#95 bis #114) plus #36, dazu 7 Folge-Issues im Milestone "Version 2" (#133, #135, #136, #139, #141, #145, #146) und 6 neue Issues im Milestone "Spaeter" (#94, #143, #147, #148, #151, #153) [G].
+- 20 Issues aus Phase 4 (#95 bis #114) plus #36, dazu 7 Folge-Issues im Milestone "Version 2" (#133, #135, #136, #139, #141, #145, #146) und 5 neue Issues im Milestone "Spaeter" (#94, #143, #147, #148, #153; #151 als Duplikat von #28 geschlossen) [G].
 - Code [G, Zeilen per `wc -l`]: `src/` ohne Tests 11 600 Zeilen (Version 1: 7 800), Tests 10 700 Zeilen in 66 Dateien (5 800), 1006 Vitest-Faelle (550); Python- und Node-Werkzeuge 7 500 Zeilen (2 000); Dokumentation in `docs/` 7 100 Zeilen (3 700).
 - Daten: 7 neue Bilder (insgesamt 13), drei Sternlisten (M45 44, M42 9, M13 531 Sterne), 14 Doppelsterne. Erstladen 0,44 MB, mit dem Startobjekt hoechstens 1,7 MB, groesstes Objekt Vollmond 1,9 MB (`docs/validierung.md` 15.4) [G].
-- Alle Muss-V2-Anforderungen nachgewiesen, T1 bis T12 bestanden bis auf T11d (#147, Spaeter); offen sind Firefox (A-T3), die Entscheidung zu T11d und der Tag `v2.0` (`docs/validierung.md` 16) [G].
+- Alle Muss-V2-Anforderungen nachgewiesen, T1 bis T12 bestanden, T11d als dokumentierte Modellgrenze (#147, Spaeter, Herbert 2026-11-02); offen sind Firefox (A-T3) und der Tag `v2.0` (`docs/validierung.md` 16) [G].
 
 ## 9. Version 2: Ablauf der Phasen
 
