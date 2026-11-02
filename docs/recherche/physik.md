@@ -978,7 +978,7 @@ Dabei ist $\rho$ der Abstand zur Kernmitte in Arbeitspixeln und $r$ der Kernradi
 
 **Warum ein cos²-Fenster.** Ein groesserer Radius allein verschiebt die Kante nur, weil die Kubikwurzel jeden Randwert sichtbar macht. Die Alternative $k' = \max(0, k - k_\text{Rand})$ geht nur linear gegen 0, unter der Kubikwurzel also wie $d^{1/3}$ (bei 10 % der Strecke noch 46 % des Werts). Das cos²-Fenster geht quadratisch gegen 0, also wie $d^{2/3}$ (bei 10 % noch 21 %). Der Halo laeuft damit sichtbar weich aus.
 
-**Grenzen.** Die Punktquellen verlieren Licht jenseits von etwa 2 Gesamt-FWHM an den Kern innen. Das ist dieselbe Groessenordnung, die der harte Schnitt bei 3 FWHM ohnehin abschneidet. Das Fenster ist ein Darstellungsfenster, keine Physik. Die Flaeche (Falter JS und WebGL2) faltet weiter mit dem unveraenderten Kern. Trabanten gehen ebenfalls durch die Punktebene; ihre Werte aendern sich deshalb in T1, T2, T4 und T6 geringfuegig (siehe PR #127).
+**Grenzen.** Die Punktquellen verlieren Licht jenseits von etwa 2 Gesamt-FWHM an den Kern innen. Das ist dieselbe Groessenordnung, die der harte Schnitt bei 3 FWHM ohnehin abschneidet. Das Fenster ist ein Darstellungsfenster, keine Physik. Die Flaeche (Falter JS und WebGL2) faltet weiter mit dem unveraenderten Kern. Trabanten gehen ebenfalls durch die Punktebene; ihre Werte aendern sich deshalb in T1, T2, T4 und T6 geringfuegig (siehe PR #127). Die Begruendung "laeuft sichtbar weich aus" gilt nur, solange das bilineare Hochskalieren vom Arbeitsraster das Ende des Fensters verschmiert; die feinere Punktebene (Abschnitt 31) nimmt deshalb $\cos^6$ ab $\tfrac34 r$.
 
 ## 25. Tonkurve eines Pressebilds gegen ein Flaechenhelligkeitsprofil (Issue #106)
 
@@ -1239,3 +1239,47 @@ Der Rest waechst bis zum Kreisrand weiter (bei 180'' traegt der aeusserste 30''-
 **Empfehlung:** D, als eigenes Issue mit ADR-0004-Nachtrag: B allein laesst bei Bortle 3 einen Rest stehen, C allein loest die Fernrohrkante nicht. Bis dahin A. Der Werkzeugteil (Befund 1, `untergrund_kappen`) ist fuer jede Variante mit M43 noetig.
 
 **Entscheidung Herbert (2026-10-30):** In #139 Variante A: nichts umgebaut, `hinweis_hilfe` von M42 nennt die Abweichung, `docs/validierung.md` 11 fuehrt sie als bekannte Abweichung. Variante D ist Issue #143 (Milestone "Spaeter"); die verworfene Umsetzung (Werkzeugoption `untergrund_kappen`, Kreis 180'', Ring 90'') ist dort im Kommentar beschrieben.
+
+## 31. Feinere Punktebene fuer knapp getrennte Doppelsterne (Issue #145)
+
+**Problem (gerechnet, Validierung #112, `docs/validierung.md` 14).** Die Punktebene (Abschnitt 14) lag im Arbeitsraster mit hoechstens 2,5 Pixeln je Gesamt-FWHM (ADR-0002). Jeder Stern wurde als Scheibchen von mindestens einem Arbeitspixel gemalt (Flaechenanteile, fuer einen Punkt praktisch die bilineare Verteilung auf die vier Nachbarn), mit dem gebinnten Kern gefaltet (Abschnitt 9: Binning auf Arbeitspixel) und fuer die Anzeige bilinear hochskaliert. Jeder dieser drei Schritte verbreitert den Stern um eine Varianz der Groessenordnung $s^2/12$ bis $s^2/6$ ($s$ Arbeitspixel; Rechteck $s^2/12$ wie in Abschnitt 9, Dreieck der linearen Interpolation $s^2/6$), zusammen etwa $s^2/3$ gegen $\sigma^2 = (2{,}5\,s/2{,}355)^2 = 1{,}13\,s^2$ des Kerns, also rund 30 % mehr Varianz (eig. Rechnung). Fuer weit getrennte Paare ist das unsichtbar, die flache Einsattelung knapp getrennter Paare verschwindet aber: Delle $\delta$ (doppelsterne.md 4) im Bild gegen das feine Modell (derselbe Kern mit etwa 12 Pixeln je FWHM, Sterne als Punkte): T7b 0,214 gegen 0,483, T7d 0,141 gegen 0,330, T8b $\varepsilon^1$ Lyr 0 gegen 0,139, T9a 0,303 gegen 0,527.
+
+**Verworfen: Sub-Pixel-Lage im Arbeitsraster.** Gerechnet (Python, eig. Rechnung) mit dem idealen Fall, die Gesamt-PSF exakt an der Sternlage in den Mitten der Arbeitspixel abgetastet (kein Scheibchen, kein Binning), und nur der bilinearen Abtastung entlang der Verbindungslinie: T7b 0,403, T8b $\varepsilon^1$ 0,009. Mit dem gebinnten Kern, der in `bild` allein vorliegt, um die Sub-Pixel-Lage verschoben (Lanczos-3, Keys-Kubik): T7b 0,32 bis 0,37, $\varepsilon^1$ 0. Bei 2,5 Pixeln je FWHM fehlt die Einsattelung also schon in der Abtastung; eine bessere Lage im Arbeitsraster hilft nicht.
+
+**Modellannahme.** Die Punktebene bekommt ein eigenes, feineres Raster mit dem Kern derselben Gesamt-PSF (Abschnitte 2 und 9, `baueKern`) an dessen Massstab:
+
+$$N_P = \min(N_\mathrm{Anzeige},\ 5\,N), \qquad s_P = \frac{B}{N_P},$$
+
+$N$ Arbeitsraster, $N_\mathrm{Anzeige}$ Pixel der Anzeige (`fenster.px`), $B$ Fensterbreite. Nur wenn $N_P > N$ (die Anzeige ist feiner als das Arbeitsraster) und ein Stern im Fenster liegt, liefert physik diesen Punktkern (`Simulationsparameter.punktkern`); sonst bleibt alles wie bisher. Bei FWHM = 2,5 $s$ hat die Punktebene mit $N_P = 5\,N$ 12,5 Pixel je FWHM, so fein wie das feine Modell; feiner als die Anzeige rechnet sie nicht. Der Kern hat dann hoechstens Radius $\lceil 3 \cdot 12{,}5 \rceil$ = 38, also 77 px (Grenze 81).
+
+- *Werte:* Die Punktebene bleibt relativ zu Quellweiss (eine Flaechenhelligkeit); der Fluss eines Sterns verteilt sich auf $(N_P/N)^2$ mal so viele, entsprechend kleinere Pixel (male.ts unveraendert mit $s_P$). Der Punktanteil $W = \min(1, (a\,p)^n)$ und die Faerbung $c_k/p$ (Abschnitt 14, ADR-0004) werden je Pixel der Punktebene gerechnet; Flaeche (je Arbeitspixel) und Punktanteil werden getrennt auf die Anzeige skaliert und dort addiert. Abweichung von 14.2 ("Ort der Kompression: je Arbeitspixel"): mit Punktkern je Pixel der Punktebene.
+- *Randfenster (Abschnitt 24):* endet wie am Arbeitsraster ein halbes Arbeitspixel ausserhalb des Kernradius, im feineren Raster also $0{,}5\,N_P/N$ Pixel. Mit 0,5 Pixeln des feineren Rasters schnitte das Fenster physikalisch frueher ab; bei T9a (Antares B im Fluegel von A, 2,6 FWHM entfernt) kostete das 0,005 in der Delle (gemessen mit dreifacher Punktebene).
+- *Form des Randfensters (Nacharbeit, Entscheidung Herbert 2026-11-02):* Am Arbeitsraster geht der angezeigte Halo unter der Kubikwurzel wie $(\cos^2)^{1/3} \sim d^{2/3}$ gegen 0 (Abschnitt 24, $d$ Abstand zum Fensterende), also mit unendlicher Steigung; das bilineare Hochskalieren um ein Arbeitspixel (bei T7b 27 Anzeigepixel) verschmierte das. Auf dem feineren Raster (T7b: 5,4 Anzeigepixel je Pixel) bleibt es als harte Kante sichtbar: bei T7b faellt der Halo auf den letzten 16 Anzeigepixeln von 36 auf 18 Kodes (Himmel), um das Paar entsteht eine Stadion-Form aus zwei abgeschnittenen Kreisen. Die feinere Punktebene nimmt deshalb $w = \cos^6$ statt $\cos^2$, so dass der angezeigte Halo eines Sterns $(a\,k\,w)^{1/3} = (a\,k)^{1/3}\cos^2$ selbst wie $\cos^2$, also mit Steigung 0, auslaeuft (dieselbe Idee wie $w^{1/n}$ in `halokern`, Abschnitt 28). Das Fenster beginnt bei $\rho_0 = \tfrac34\,r$ statt $\tfrac23\,r$ (Uebergang etwa 0,95 Gesamt-FWHM): $\cos^6$ nimmt im Uebergang mehr weg, und mit $\tfrac23$ sank die Delle von T9a (B bei 2,6 FWHM, im Uebergang) von 0,500 auf 0,480. Normiert wird wie bisher auf die alte Summe, der Fluss bleibt erhalten. Gerechnet (Node, Zoom 540 px, eig. Rechnung; Steigung der Anzeige in Kodes je Pixel, 95-%-Wert im aeusseren Halo bis 15 Kodes ueber dem Himmel gegen den inneren Halo 15 bis 30 Kodes):
+
+  | Fensterform | T7b Rand / innen | T7d Rand / innen | T9a Rand / innen | Delle T9a |
+  |---|---|---|---|---|
+  | $\cos^2$ ab $\tfrac23 r$ (bisher) | 2,0 / 0,7 | 3,2 / 1,1 | 6,7 / 5,4 | 0,500 |
+  | $\cos^4$ ab $\tfrac23 r$ | 0,8 / 0,7 | 1,2 / 0,9 | 2,9 / 2,5 | 0,487 |
+  | $\cos^6$ ab $\tfrac23 r$ | 0,7 / 0,8 | 0,9 / 1,0 | 2,0 / 2,1 | 0,480 |
+  | $\cos^6$ ab $\tfrac34 r$ (gewaehlt) | 0,8 / 0,8 | 1,1 / 1,1 | 2,5 / 2,7 | 0,497 |
+  | $\cos^6$ ab $0{,}8\,r$ | 1,0 / 0,9 | 1,3 / 1,2 | 2,9 / 3,2 | 0,514 |
+
+  Mit der gewaehlten Form ist der Rand nicht steiler als der Halo innen, die Dellen von T7b, T7d und T8b (Detail) sind unveraendert (der Uebergang liegt ausserhalb ihres Sattels), T9a 0,497 statt 0,500. Am Arbeitsraster (ohne Punktkern) bleibt das Fenster aus Abschnitt 24, die Bilder dort sind bytegleich. Der Halo ist etwas kleiner als vor #145 (Fensterende $r + 0{,}5$ Arbeitspixel ohne die Verschmierung um ein weiteres Arbeitspixel); die leichte Einschnuerung oben und unten zwischen zwei Sternen bleibt, weil beide Halos bei $r$ enden (ein Darstellungsfenster, keine Physik, Abschnitt 24 Grenzen).
+- *Vergleichsbild (Zoom):* ohne Punktkern, es rechnet ohnehin im Anzeigemassstab.
+
+**Ergebnis (gerechnet, `src/validierung_v2.test.ts`, Zoom 540 px, Delle der Punktebene linear vor tonwert; mit dem Randfenster $\cos^6$ ab $\tfrac34 r$, siehe oben):**
+
+| Fall | vorher | nachher | feines Modell |
+|---|---|---|---|
+| T7b $\pi$ Aql, 150 mm 300x | 0,214 | 0,476 | 0,483 |
+| T7d $\varepsilon$ Ari, 150 mm 300x | 0,141 | 0,331 | 0,327 |
+| T8b $\varepsilon^1$ Lyr, 80 mm 160x, Detail | 0 | 0,134 | 0,142 |
+| T8b $\varepsilon^1$ Lyr, Zoom (beide Paare) | 0 | 0,072 | 0,139 |
+| T8b $\varepsilon^2$ Lyr, Zoom | 0,515 | 0,523 | 0,623 |
+| T9a Antares, 150 mm 200x | 0,303 | 0,497 | 0,527 |
+
+Mit dreifacher statt fuenffacher Punktebene: T8b $\varepsilon^1$ im Detail 0,104 (unter der Schwelle 0,125), T9a 0,477 (0,050 neben dem feinen Modell); vierfach $\varepsilon^1$ 0,120. Im Zoom von T8b (beide Paare, 240'' auf 540 px) liegen die Sterne von $\varepsilon^1$ nur 4,5 Anzeigepixel auseinander; dort begrenzt die Anzeige selbst ($N_P = N_\mathrm{Anzeige}$, 3,5 Pixel je FWHM), die Einsattelung zeigt das Detail.
+
+**Rechenzeit (gemessen, Node, eine Messung je Fall, 1080 px).** Punktkernbau bis 22 ms (Kern 77 px, FFT 256), nur bei geaendertem Schluessel. Punktebene mit Faerbung: M13 am 300 mm im Zoom (531 Sterne) 26 statt 4 ms, M45 mit blossem Auge im Zoom 10 statt 1 ms, $\varepsilon$ Lyr im Zoom 3 statt 0,4 ms. Das Raster der Punktebene ist nie groesser als die Anzeige, der Speicher also nicht groesser als bei einer Punktebene im Anzeigemassstab.
+
+**Grenzen.** Die Delle bleibt bei Phasenlagen der Sterne zum Raster um einige Hundertstel unsicher (dreifach gegen vierfach gegen fuenffach oben). Die Flaeche bleibt im Arbeitsraster; Sterne vor einer Flaeche (M13, Trabanten vor dem Planeten) werden feiner gezeichnet als die Flaeche darunter, was dem Fernrohr entspricht (die Flaeche ist ohnehin durch das Quellbild oder den Arbeitsmassstab begrenzt).
